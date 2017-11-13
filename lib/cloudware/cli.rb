@@ -32,8 +32,25 @@ module Cloudware
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
 
-    command :domain do |domain|
-      domain.syntax = 'cloudware domain [command]'
+    command :'domain create' do |c|
+      c.syntax = 'cloudware domain create [options]'
+      c.description = 'Create a new domain'
+      c.option '--name', '-n', String, 'Domain identifier/name'
+      c.option '--network-cidr', String, 'Network CIDR'
+      c.option '--provider', '-p', String, 'Provider name'
+      c.action { |options|
+        puts options
+      }
+    end
+
+    command :'domain list' do |c|
+      c.syntax = 'cloudware domain list [options]'
+      c.description = 'List domains'
+      c.option '--name', '-n', String, 'Domain identifier/name'
+      c.option '--provider', '-p', String, 'Provider name'
+      c.action { |options|
+        puts options
+      }
     end
   end
 
