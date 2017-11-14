@@ -17,7 +17,7 @@
 # along with this package.  If not, see <http://www.gnu.org/licenses/>.
 #
 # For more information on the Alces Cloudware, please visit:
-# https://github.com/alces-software/bumblebee
+# https://github.com/alces-software/cloudware
 #==============================================================================
 require 'azure_mgmt_resources'
 
