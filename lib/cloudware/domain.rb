@@ -35,7 +35,24 @@ module Cloudware
       end
     end
 
-    def self.list
+    def self.list(provider)
+      case provider
+      when "azure"
+        azure = Cloudware::Provider::Azure.new
+        azure.list_domains
+      when "gcp"
+        puts "todo"
+      end
+    end
+
+    def self.destroy(name, provider)
+      case provider
+      when "azure"
+        azure = Cloudware::Provider::Azure.new
+        azure.destroy_domain(name)
+      when "gcp"
+        puts "todo"
+      end
     end
 
   end

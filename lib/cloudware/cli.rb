@@ -61,10 +61,22 @@ module Cloudware
     command :'domain list' do |c|
       c.syntax = 'cloudware domain list [options]'
       c.description = 'List domains'
-      c.option '--name', '-n', String, 'Domain identifier/name'
-      c.option '--provider', '-p', String, 'Provider name'
-      c.action { |options|
-        puts options
+      c.option '--provider NAME', String, 'Provider name'
+      c.action { |args, options|
+        options.default \
+            :provider => 'azure'
+        Cloudware::Domain.list("#{options.provider}")
+      }
+    end
+
+    command :'domain destroy' do |c|
+      c.syntax = 'cloudware domain destroy [options]'
+      c.description = 'Destroy a domain and all the resources contained in a domain'
+      c.option '--name NAME', String, 'Domain name'
+      c.option '--provider NAME', String, 'Provider name'
+      c.action { |args, options|
+        agree("==> Are you sure you wish to destroy this domain? [yes/no]")
+        Cloudware::Domain.destroy("#{options.name}", "#{options.provider}")
       }
     end
   end

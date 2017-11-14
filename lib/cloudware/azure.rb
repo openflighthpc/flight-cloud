@@ -20,6 +20,7 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 require 'azure_mgmt_resources'
+require 'terminal-table'
 
 Resources = Azure::Resources::Profiles::Latest::Mgmt
 
@@ -55,7 +56,9 @@ module Cloudware
         params = @client.model_classes.resource_group.new.tap do |r|
           r.location = region
           r.tags = {
-            cloudware_domain: name
+            cloudware_domain: name,
+            network_cidr: networkcidr,
+            region: region
           }
         end
         puts "==> Creating resource group #{name}"
@@ -66,11 +69,16 @@ module Cloudware
       end
 
       def list_domains
+        rows = []
         @client.resource_groups.list.each { |group|
           next if group.tags.nil?
           cloudwaredomain = group.tags
-          puts cloudwaredomain
+          rows << [cloudwaredomain["cloudware_domain"],
+                   cloudwaredomain["network_cidr"],
+                   cloudwaredomain["region"]]
         }
+        table = Terminal::Table.new :headings => ['Domain name', 'Network CIDR', 'Region'], :rows => rows
+        puts table
       end
 
       def check_if_domain_exists(name)
@@ -80,6 +88,12 @@ module Cloudware
             abort("==> Domain #{name} already exists")
           end
         }
+      end
+
+      def destroy_domain(name)
+        puts "==> Destroying domain #{name}. This may take a while.."
+        @client.resource_groups.delete(name)
+        puts "==> Resource group #{name} destroyed"
       end
 
     end
