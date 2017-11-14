@@ -223,6 +223,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  azure_mgmt_resources
   azure_sdk
   commander
   terminal-table
