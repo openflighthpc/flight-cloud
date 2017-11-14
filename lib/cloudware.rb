@@ -20,6 +20,9 @@
 # https://github.com/alces-software/bumblebee
 #==============================================================================
 require 'cloudware/cli'
+require 'cloudware/domain'
+require 'cloudware/azure'
+require 'cloudware/gcp'
 
 module Cloudware
 
