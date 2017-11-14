@@ -49,6 +49,8 @@ module Cloudware
       def create_domain(name, networkcidr, subnets, region)
         @template = File.read(File.expand_path(File.join(__dir__, '../../templates/azure-network-base.json')))
 
+        check_if_domain_exists(name)
+
         # Ensure the resource group is created before deploying the first template
         params = @client.model_classes.resource_group.new.tap do |r|
           r.location = region
@@ -62,6 +64,24 @@ module Cloudware
 
       def deploy(template, params)
       end
+
+      def list_domains
+        @client.resource_groups.list.each { |group|
+          next if group.tags.nil?
+          cloudwaredomain = group.tags
+          puts cloudwaredomain
+        }
+      end
+
+      def check_if_domain_exists(name)
+        @client.resource_groups.list.each { |group|
+          next if group.name != name
+          if group.name == name
+            abort("==> Domain #{name} already exists")
+          end
+        }
+      end
+
     end
   end
 end
