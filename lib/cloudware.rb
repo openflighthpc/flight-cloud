@@ -20,9 +20,7 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 require 'cloudware/cli'
-require 'cloudware/domain'
-require 'cloudware/azure'
-require 'cloudware/gcp'
+require 'cloudware/infrastructure'
 
 module Cloudware
 

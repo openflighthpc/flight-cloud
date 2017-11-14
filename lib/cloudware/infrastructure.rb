@@ -22,17 +22,17 @@
 
 module Cloudware
   class Infrastructure
-    attr_accessor :name, :provider
+    require 'cloudware/azure'
+
+    attr_accessor :name, :provider, :region
 
     def create
-      case provider
+      case @provider
       when "azure"
-        i = Cloudware::Infrastructure::Azure.new
-        i.name = name
-        i.provider = provider
-        i.create
-      when "gcp"
-        puts "todo"
+        i = Cloudware::Azure.new
+        i.name="#{@name}"
+        i.region="#{@region}"
+        i.create_infrastructure
       end
     end
 

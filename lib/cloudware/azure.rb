@@ -19,106 +19,42 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-require 'azure_mgmt_resources'
-require 'terminal-table'
-
-Resources = Azure::Resources::Profiles::Latest::Mgmt
 
 module Cloudware
-  class Infrastructure
-    class Azure
-      attr_accessor :name
+  class Azure
+    require 'azure_mgmt_resources'
 
-      def initialize
-      end
+    attr_accessor :name, :networkcidr, :subnets, :region, :infrastructure
 
-      def create
-      end
-
-      def list
-      end
-
-      def destroy
-      end
+    def initialize
     end
-  end
-end
 
+    def create_infrastructure
+      puts "#{@name}"
+    end
 
+    def list_infrastructure
+    end
 
+    def destroy_infrastructure
+    end
 
-module Cloudware
-  module Provider
-    class Azure
-      attr_accessor :name
+    def create_domain
+    end
 
-      def initialize
-        client
-      end
+    def list_domain
+    end
 
-      def client
-        subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
-        provider = MsRestAzure::ApplicationTokenProvider.new(
-                   ENV['AZURE_TENANT_ID'],
-                   ENV['AZURE_CLIENT_ID'],
-                   ENV['AZURE_CLIENT_SECRET'])
-        credentials = MsRest::TokenCredentials.new(provider)
-        options = {
-          credentials: credentials,
-          subscription_id: subscription_id
-        }
-        @client = Resources::Client.new(options)
-      end
-      
-      def create_domain(name, networkcidr, subnets, region)
-        @template = File.read(File.expand_path(File.join(__dir__, '../../templates/azure-network-base.json')))
+    def destroy_domain
+    end
 
-        check_if_domain_exists(name)
+    def create_machine
+    end
 
-        # Ensure the resource group is created before deploying the first template
-        params = @client.model_classes.resource_group.new.tap do |r|
-          r.location = region
-          r.tags = {
-            cloudware_domain: name,
-            network_cidr: networkcidr,
-            region: region
-          }
-        end
-        puts "==> Creating resource group #{name}"
-        @client.resource_groups.create_or_update(name, params)
-      end
+    def list_machine
+    end
 
-      def deploy(template, params)
-      end
-
-      def list_domains
-        rows = []
-        @client.resource_groups.list.each { |group|
-          next if group.tags.nil?
-          cloudwaredomain = group.tags
-          rows << [cloudwaredomain["cloudware_domain"],
-                   cloudwaredomain["network_cidr"],
-                   cloudwaredomain["region"]]
-        }
-        table = Terminal::Table.new :headings => ['Domain name', 'Network CIDR', 'Region'], :rows => rows
-        puts table
-      end
-
-      def check_if_domain_exists(name)
-        @client.resource_groups.list.each { |group|
-          next if group.name != name
-          if group.name == name
-            abort("==> Domain #{name} already exists")
-          end
-        }
-      end
-
-      def destroy_domain(name)
-        puts "==> Destroying domain #{name}. This may take a while.."
-        @client.resource_groups.delete(name)
-        puts "==> Resource group #{name} destroyed"
-      end
-
+    def destroy_machine
     end
   end
 end

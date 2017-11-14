@@ -33,37 +33,18 @@ module Cloudware
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
 
-    command :'domain create' do |c|
-      c.syntax = 'cloudware domain create [options]'
-      c.description = 'Create a new domain'
-      c.option '--name NAME', String, 'Domain identifier/name'
-      c.option '--networkcidr CIDR', String, 'Network CIDR'
+    command :'infrastructure create' do |c|
+      c.syntax = 'cloudware infrastructure create [options]'
+      c.description = 'Interact with infrastructure groups'
+      c.option '--name NAME', String, 'Infrastructure identifier'
       c.option '--provider NAME', String, 'Provider name'
-      c.option '--subnets LIST', String, 'Comma delimited subnet list e.g. prv:192.168.1.0/24,mgt:192.168.2.0/24'
       c.option '--region NAME', String, 'Region name to deploy into'
       c.action { |args, options|
-      }
-    end
-
-    command :'domain list' do |c|
-      c.syntax = 'cloudware domain list [options]'
-      c.description = 'List domains'
-      c.option '--provider NAME', String, 'Provider name'
-      c.action { |args, options|
-        options.default \
-            :provider => 'azure'
-        Cloudware::Domain.list("#{options.provider}")
-      }
-    end
-
-    command :'domain destroy' do |c|
-      c.syntax = 'cloudware domain destroy [options]'
-      c.description = 'Destroy a domain and all the resources contained in a domain'
-      c.option '--name NAME', String, 'Domain name'
-      c.option '--provider NAME', String, 'Provider name'
-      c.action { |args, options|
-        agree("==> Are you sure you wish to destroy this domain? [yes/no]")
-        Cloudware::Domain.destroy("#{options.name}", "#{options.provider}")
+        i = Cloudware::Infrastructure.new
+        i.name="#{options.name}"
+        i.provider="#{options.provider}"
+        i.region="#{options.region}"
+        i.create
       }
     end
   end

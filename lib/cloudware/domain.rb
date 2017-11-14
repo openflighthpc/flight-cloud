@@ -21,40 +21,4 @@
 #==============================================================================
 
 module Cloudware
-  class Domain < Infrastructure
-
-    attr_accessor :name, :provider
-
-    def self.create(name, provider, networkcidr, subnets, region)
-      case provider
-      when "azure"
-        azure = Cloudware::Provider::Azure.new
-        azure.create_domain(name, networkcidr, subnets, region)
-      when "gcp"
-        puts "todo"
-      end
-    end
-
-    def self.list(provider)
-      case provider
-      when "azure"
-        azure = Cloudware::Provider::Azure.new
-        azure.list_domains
-      when "gcp"
-        gcp = Cloudware::Provider::Gcp.new
-        gcp.list_domains
-      end
-    end
-
-    def self.destroy(name, provider)
-      case provider
-      when "azure"
-        azure = Cloudware::Provider::Azure.new
-        azure.destroy_domain(name)
-      when "gcp"
-        puts "todo"
-      end
-    end
-
-  end
 end
