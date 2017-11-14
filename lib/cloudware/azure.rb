@@ -19,7 +19,9 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-require 'azure_sdk'
+require 'azure_mgmt_resources'
+
+Resources = Azure::Resources::Profiles::Latest::Mgmt
 
 module Cloudware
   module Provider
@@ -27,6 +29,11 @@ module Cloudware
       attr_accessor :name
 
       def initialize
+        client
+      end
+
+      def client
+        subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
         provider = MsRestAzure::ApplicationTokenProvider.new(
                    ENV['AZURE_TENANT_ID'],
                    ENV['AZURE_CLIENT_ID'],
@@ -34,13 +41,23 @@ module Cloudware
         credentials = MsRest::TokenCredentials.new(provider)
         options = {
           credentials: credentials,
-          subscription_id: ENV['AZURE_SUBSCRIPTION_ID']
+          subscription_id: subscription_id
         }
-        @client = Azure::Resources::Profiles::Latest::Mgmt::Client.new(options)
+        @client = Resources::Client.new(options)
       end
       
-      def create_domain(name, networkcidr, subnets)
+      def create_domain(name, networkcidr, subnets, region)
         @template = File.read(File.expand_path(File.join(__dir__, '../../templates/azure-network-base.json')))
+
+        # Ensure the resource group is created before deploying the first template
+        params = @client.model_classes.resource_group.new.tap do |r|
+          r.location = region
+        end
+        puts "==> Creating resource group #{name}"
+#        @client.resource_groups.create_or_update(name, params)
+      end
+
+      def deploy(template, params)
       end
     end
   end
