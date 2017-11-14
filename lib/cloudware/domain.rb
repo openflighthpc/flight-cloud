@@ -25,11 +25,11 @@ module Cloudware
 
     attr_accessor :name, :networkcidr, :provider
 
-    def self.create(name, provider, networkcidr, subnets)
+    def self.create(name, provider, networkcidr, subnets, region)
       case provider
       when "azure"
         azure = Cloudware::Provider::Azure.new
-        azure.create_domain(name, networkcidr, subnets)
+        azure.create_domain(name, networkcidr, subnets, region)
       when "gcp"
         puts "todo"
       end
