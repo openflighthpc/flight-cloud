@@ -20,6 +20,7 @@
 # https://github.com/alces-software/bumblebee
 #==============================================================================
 require 'commander'
+require 'terminal-table'
 
 module Cloudware
 
@@ -35,11 +36,22 @@ module Cloudware
     command :'domain create' do |c|
       c.syntax = 'cloudware domain create [options]'
       c.description = 'Create a new domain'
-      c.option '--name', '-n', String, 'Domain identifier/name'
-      c.option '--network-cidr', String, 'Network CIDR'
-      c.option '--provider', '-p', String, 'Provider name'
-      c.action { |options|
-        puts options
+      c.option '--name NAME', String, 'Domain identifier/name'
+      c.option '--networkcidr CIDR', String, 'Network CIDR'
+      c.option '--provider NAME', String, 'Provider name'
+      c.option '--subnets LIST', String, 'Comma delimited subnet list e.g. prv:192.168.1.0/24,mgt:192.168.2.0/24'
+      c.action { |args, options|
+        rows = []
+        rows << ["#{options.name}", "#{options.networkcidr}", "#{options.provider}"]
+        table = Terminal::Table.new :headings => ['Domain identifier',
+                                                  'Network CIDR',
+                                                  'Provider name'],
+                                    :rows => rows
+        puts table
+        Cloudware::Domain.create("#{options.name}",
+                                 "#{options.provider}",
+                                 "#{options.networkcidr}",
+                                 "#{options.subnets}")
       }
     end
 
