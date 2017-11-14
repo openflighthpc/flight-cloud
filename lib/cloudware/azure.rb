@@ -25,6 +25,29 @@ require 'terminal-table'
 Resources = Azure::Resources::Profiles::Latest::Mgmt
 
 module Cloudware
+  class Infrastructure
+    class Azure
+      attr_accessor :name
+
+      def initialize
+      end
+
+      def create
+      end
+
+      def list
+      end
+
+      def destroy
+      end
+    end
+  end
+end
+
+
+
+
+module Cloudware
   module Provider
     class Azure
       attr_accessor :name

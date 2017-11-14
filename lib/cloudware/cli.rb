@@ -42,19 +42,6 @@ module Cloudware
       c.option '--subnets LIST', String, 'Comma delimited subnet list e.g. prv:192.168.1.0/24,mgt:192.168.2.0/24'
       c.option '--region NAME', String, 'Region name to deploy into'
       c.action { |args, options|
-        rows = []
-        rows << ["#{options.name}", "#{options.networkcidr}", "#{options.provider}", "#{options.region}"]
-        table = Terminal::Table.new :headings => ['Domain identifier',
-                                                  'Network CIDR',
-                                                  'Provider name',
-                                                  'Region'],
-                                    :rows => rows
-        puts table
-        Cloudware::Domain.create("#{options.name}",
-                                 "#{options.provider}",
-                                 "#{options.networkcidr}",
-                                 "#{options.subnets}",
-                                 "#{options.region}")
       }
     end
 
