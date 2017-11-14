@@ -52,9 +52,12 @@ module Cloudware
         # Ensure the resource group is created before deploying the first template
         params = @client.model_classes.resource_group.new.tap do |r|
           r.location = region
+          r.tags = {
+            cloudware_domain: name
+          }
         end
         puts "==> Creating resource group #{name}"
-#        @client.resource_groups.create_or_update(name, params)
+        @client.resource_groups.create_or_update(name, params)
       end
 
       def deploy(template, params)
