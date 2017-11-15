@@ -29,14 +29,19 @@ module Cloudware
     def create
       case @provider
       when "azure"
-        i = Cloudware::Azure.new
-        i.name="#{@name}"
-        i.region="#{@region}"
-        i.create_infrastructure
+        az = Cloudware::Azure.new
+        az.name="#{@name}"
+        az.region="#{@region}"
+        az.create_infrastructure
       end
     end
 
     def list
+      case @provider
+      when "azure"
+        az = Cloudware::Azure.new
+        puts az.infrastructure_list
+      end
     end
 
     def destroy
