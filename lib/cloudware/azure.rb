@@ -65,6 +65,9 @@ module Cloudware
     end
 
     def destroy_infrastructure
+      puts "==> Destroying infrastructure #{@name}. This may take a while.."
+      @client.resource_groups.delete(@name)
+      puts "==> Infrastructure group #{@name} destroyed."
     end
 
     def create_domain

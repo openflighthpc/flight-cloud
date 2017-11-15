@@ -58,6 +58,19 @@ module Cloudware
         i.list
       }
     end
+
+    command :'infrastructure destroy' do |c|
+      c.syntax = 'cloudware infrastructure destroy [options]'
+      c.description = 'Destroy infrastructure groups'
+      c.option '--name NAME', String, 'Infrastructure identifier'
+      c.option '--provider NAME', String, 'Provider name'
+      c.action { |args, options|
+        i = Cloudware::Infrastructure.new
+        i.name = "#{options.name}"
+        i.provider = "#{options.provider}"
+        i.destroy
+      }
+    end
   end
 
 end
