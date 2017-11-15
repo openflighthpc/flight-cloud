@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You hould have received a copy of the GNU General Public License
 # along with this package.  If not, see <http://www.gnu.org/licenses/>.
 #
 # For more information on the Alces Cloudware, please visit:
@@ -61,7 +61,7 @@ module Cloudware
         next if g["cloudware_id"].nil?
         i.push(g["cloudware_id"].to_s)
       }
-      "#{i}"
+      i
     end
 
     def destroy_infrastructure
@@ -71,6 +71,12 @@ module Cloudware
     end
 
     def create_domain
+      t = "azure-network-base.json"
+      @params = {
+        infrastructure: @infrastructure,
+        networkCIDR: @networkcidr
+      }
+      deploy(t, 'domain')
     end
 
     def list_domain
@@ -86,6 +92,28 @@ module Cloudware
     end
 
     def destroy_machine
+    end
+
+    def deploy(template, type)
+      t = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
+      d = @client.model_classes.deployment.new
+      d.properties = @client.model_classes.deployment_properties.new
+      d.properties.template = JSON.parse(t)
+      d.properties.mode = Resources::Models::DeploymentMode::Incremental
+      d.properties.parameters = Hash[*@params.map{ |k, v| [k,  {value: v}] }.flatten]
+      debug_settings = @client.model_classes.debug_setting.new
+      debug_settings.detail_level = 'requestContent, responseContent'
+      d.properties.debug_setting = debug_settings
+      @client.deployments.create_or_update(infrastructure, "#{type}", d)
+      operation_results = @client.deployment_operations.list(@infrastructure, "#{type}")
+      unless operation_results.nil?
+        operation_results.each do |operation_result|
+          until operation_result.properties.provisioning_state == "Succeeded"
+            sleep(1)
+          end
+        end
+      end
+      puts "==> Deployment succeeded"
     end
   end
 end

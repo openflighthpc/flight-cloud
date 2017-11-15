@@ -33,6 +33,30 @@ module Cloudware
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
 
+    command :'domain create' do |c|
+      c.syntax = 'cloudware domain create [options]'
+      c.description = 'Create a new domain'
+      c.option '--infrastructure NAME', String, 'Infrastructure identifier'
+      c.option '--networkcidr CIDR', String, 'Primary network CIDR, e.g. 10.0.0.0/16'
+      c.option '--subnets LIST', String, 'Comma delimited subnet list, e.g. prv:10.0.1.0/24,mgt:10.0.2.0/24'
+      c.option '--provider NAME', String, 'Provider name'
+      c.action { |args, options|
+        i = Cloudware::Infrastructure.new
+        i.name="#{options.infrastructure}"
+        i.provider="#{options.provider}"
+        if i.list.include?("#{options.infrastructure}")
+          d = Cloudware::Domain.new
+          d.name="#{options.infrastructure}"
+          d.infrastructure="#{options.infrastructure}"
+          d.networkcidr="#{options.networkcidr}"
+          d.provider="#{options.provider}"
+          d.create
+        else
+          abort("==> Infrastructure group #{options.infrastructure} does not exist")
+        end
+      }
+    end
+
     command :'infrastructure create' do |c|
       c.syntax = 'cloudware infrastructure create [options]'
       c.description = 'Interact with infrastructure groups'
@@ -55,7 +79,7 @@ module Cloudware
       c.action { |args, options|
         i = Cloudware::Infrastructure.new
         i.provider = "#{options.provider}"
-        i.list
+        puts i.list
       }
     end
 

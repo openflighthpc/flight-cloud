@@ -8,15 +8,21 @@
       "metadata": {
         "description": "Choose the desired network range"
       }
+    },
+    "infrastructure": {
+      "type": "string",
+      "metadata": {
+        "description": "Infrastructure group the domain belongs to"
+      }
     }
   },
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "name": "cloudware-test",
+      "name": "network",
       "apiVersion": "2017-03-01",
       "tags": {
-        "cloudware:domain": "cloudware-test"
+        "cloudware_id": "[parameters('infrastructure')]"
       },
       "location": "[resourceGroup().location]",
       "properties": {

@@ -21,4 +21,18 @@
 #==============================================================================
 
 module Cloudware
+  class Domain
+    attr_accessor :name, :infrastructure, :networkcidr, :provider
+
+    def create
+      case @provider
+      when "azure"
+        d = Cloudware::Azure.new
+      end
+      d.name=@name
+      d.infrastructure=@infrastructure
+      d.networkcidr=@networkcidr
+      d.create_domain
+    end
+  end
 end

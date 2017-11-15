@@ -41,7 +41,7 @@ module Cloudware
       when "azure"
         p = Cloudware::Azure.new
       end
-      puts p.list_infrastructure
+      p.list_infrastructure
     end
 
     def destroy
