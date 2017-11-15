@@ -13,49 +13,50 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You hould have received a copy of the GNU General Public License
 # along with this package.  If not, see <http://www.gnu.org/licenses/>.
 #
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
+require 'google/cloud/resource_manager'
 
 module Cloudware
-  class Infrastructure
-    require 'cloudware/azure'
-    require 'cloudware/gcp'
+  class Gcp
+    attr_accessor :name, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :region, :infrastructure
 
-    attr_accessor :name, :provider, :region
-
-    def create
-      case @provider
-      when "azure"
-        p = Cloudware::Azure.new
-        p.region=@region
-      when "gcp"
-        p = Cloudware::Gcp.new
-      end
-      p.name=@name
-      p.create_infrastructure
+    def initialize
+      @resource_manager = Google::Cloud::ResourceManager.new
     end
 
-    def list
-      case @provider
-      when "azure"
-        p = Cloudware::Azure.new
-      when "gcp"
-        p = Cloudware::Gcp.new
-      end
-      p.list_infrastructure
+    def create_infrastructure
     end
 
-    def destroy
-      case @provider
-      when "azure"
-        p = Cloudware::Azure.new
-      end
-      p.name=@name
-      p.destroy_infrastructure
+    def list_infrastructure
+    end
+
+    def destroy_infrastructure
+    end
+
+    def create_domain
+    end
+
+    def list_domains
+    end
+
+    def destroy_domain
+    end
+
+    def create_machine
+    end
+
+    def list_machine
+    end
+
+    def destroy_machine
+    end
+
+    def deploy(template, type)
     end
   end
 end
