@@ -25,7 +25,7 @@ Resources = Azure::Resources::Profiles::Latest::Mgmt
 
 module Cloudware
   class Azure
-    attr_accessor :name, :networkcidr, :subnets, :region, :infrastructure
+    attr_accessor :name, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :region, :infrastructure
 
     def initialize
       subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
@@ -74,7 +74,9 @@ module Cloudware
       t = "azure-network-base.json"
       @params = {
         infrastructure: @infrastructure,
-        networkCIDR: @networkcidr
+        networkCIDR: @networkcidr,
+        prvSubnetCIDR: @prvsubnetcidr,
+        mgtSubnetCIDR: @mgtsubnetcidr
       }
       deploy(t, 'domain')
     end
@@ -85,7 +87,11 @@ module Cloudware
         resources = @client.resources.list_by_resource_group(i)
         resources.each { |r|
           next unless r.name == "network"
-          d.push(i)
+          d.push([i,
+                  r.tags["cloudware_network_cidr"],
+                  r.tags["cloudware_prv_subnet_cidr"],
+                  r.tags["cloudware_mgt_subnet_cidr"],
+                  'azure'])
         }
       }
       d
@@ -113,6 +119,7 @@ module Cloudware
       debug_settings = @client.model_classes.debug_setting.new
       debug_settings.detail_level = 'requestContent, responseContent'
       d.properties.debug_setting = debug_settings
+      puts "==> Creating new deployment. This may take a while.."
       @client.deployments.create_or_update(infrastructure, "#{type}", d)
       operation_results = @client.deployment_operations.list(@infrastructure, "#{type}")
       unless operation_results.nil?

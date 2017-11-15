@@ -38,8 +38,9 @@ module Cloudware
       c.description = 'Create a new domain'
       c.option '--infrastructure NAME', String, 'Infrastructure identifier'
       c.option '--networkcidr CIDR', String, 'Primary network CIDR, e.g. 10.0.0.0/16'
-      c.option '--subnets LIST', String, 'Comma delimited subnet list, e.g. prv:10.0.1.0/24,mgt:10.0.2.0/24'
       c.option '--provider NAME', String, 'Provider name'
+      c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
+      c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
       c.action { |args, options|
         i = Cloudware::Infrastructure.new
         i.name="#{options.infrastructure}"
@@ -49,6 +50,8 @@ module Cloudware
           d.name="#{options.infrastructure}"
           d.infrastructure="#{options.infrastructure}"
           d.networkcidr="#{options.networkcidr}"
+          d.prvsubnetcidr="#{options.prvsubnetcidr}"
+          d.mgtsubnetcidr="#{options.mgtsubnetcidr}"
           d.provider="#{options.provider}"
           d.create
         else
@@ -62,9 +65,14 @@ module Cloudware
       c.description = 'List created domains'
       c.option '--provider NAME', String, 'Provider name'
       c.action { |args, options|
+        rows = []
         d = Cloudware::Domain.new
-        d.provider="#{options.provider}"
-        puts d.list
+        d.list.each do |l|
+          rows.concat(l)
+        end
+        table = Terminal::Table.new :headings => ['Infrastructure', 'Network CIDR', 'Prv Subnet CIDR', 'Mgt Subnet CIDR', 'Provider'],
+                                    :rows => rows
+        puts table
       }
     end
 

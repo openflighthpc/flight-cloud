@@ -22,7 +22,7 @@
 
 module Cloudware
   class Domain
-    attr_accessor :name, :infrastructure, :networkcidr, :provider
+    attr_accessor :name, :infrastructure, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :provider
 
     def create
       case @provider
@@ -32,15 +32,22 @@ module Cloudware
       d.name=@name
       d.infrastructure=@infrastructure
       d.networkcidr=@networkcidr
+      d.prvsubnetcidr=@prvsubnetcidr
+      d.mgtsubnetcidr=@mgtsubnetcidr
       d.create_domain
     end
 
     def list
+      l = Array.new
       case @provider
       when "azure"
         d = Cloudware::Azure.new
+        l.push(d.list_domains)
+      else
+        azure = Cloudware::Azure.new
+        l.push(azure.list_domains)
       end
-      d.list_domains
+      l
     end
   end
 end
