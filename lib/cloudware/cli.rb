@@ -114,6 +114,25 @@ module Cloudware
         i.destroy
       }
     end
+
+    command :'machine create' do |c|
+      c.syntax = 'cloudware machine create [options]'
+      c.description = 'Create a new machine'
+      c.option '--name NAME', String, 'Machine name'
+      c.option '--infrastructure NAME', String, 'Infrastructure identifier'
+      c.option '--type TYPE', String, 'Machine type to create'
+      c.option '--provider NAME', String, 'Provider name'
+      c.option '--ipaddresstail INT', Integer, 'IP address tail'
+      c.action { |args, options|
+        m = Cloudware::Machine.new
+        m.name="#{options.name}"
+        m.infrastructure="#{options.infrastructure}"
+        m.type="#{options.type}"
+        m.provider="#{options.provider}"
+        m.ipaddresstail="#{options.ipaddresstail}"
+        m.create
+      }
+    end
   end
 
 end

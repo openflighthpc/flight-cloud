@@ -13,25 +13,33 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You hould have received a copy of the GNU General Public License
 # along with this package.  If not, see <http://www.gnu.org/licenses/>.
 #
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-require 'cloudware/cli'
-require 'cloudware/infrastructure'
-require 'cloudware/domain'
-require 'cloudware/machine'
 
 module Cloudware
+  class Machine
+    attr_accessor :name, :infrastructure, :ipaddresstail, :provider, :type
 
-  class << self
-
-    def config
-      @config ||= Config.new(ENV['CLOUDWARE_CONFIG'] || '/opt/cloudware/config.yml')
+    def create
+      case @provider
+        when "azure"
+          p = Cloudware::Azure.new
+      end
+      p.name=@name
+      p.infrastructure=@infrastructure
+      p.iptail=@infrastructure
+      p.type=@type
+      p.create_machine
     end
 
-  end
+    def list
+    end
 
+    def destroy
+    end
+  end
 end

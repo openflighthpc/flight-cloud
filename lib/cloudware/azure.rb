@@ -25,7 +25,7 @@ Resources = Azure::Resources::Profiles::Latest::Mgmt
 
 module Cloudware
   class Azure
-    attr_accessor :name, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :region, :infrastructure
+    attr_accessor :name, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :region, :infrastructure, :iptail, :type
 
     def initialize
       subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
@@ -101,6 +101,8 @@ module Cloudware
     end
 
     def create_machine
+      puts "Creating new machine:"
+      puts "Name: #{@name}"
     end
 
     def list_machine
