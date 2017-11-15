@@ -27,10 +27,20 @@ module Cloudware
     attr_accessor :name, :networkcidr, :subnets, :region, :infrastructure
 
     def initialize
+      subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
+      provider = MsRestAzure::ApplicationTokenProvider.new(
+                     ENV['AZURE_TENANT_ID'],
+                     ENV['AZURE_CLIENT_ID'],
+                     ENV['AZURE_CLIENT_SECRET'])
+      credentials = MsRest::TokenCredentials.new(provider)
+      options = {
+        credentials: credentials,
+        subscription_id: subscription_id
+      }
+      @client = Resources::Client.new(options)
     end
 
     def create_infrastructure
-      puts "#{@name}"
     end
 
     def list_infrastructure
