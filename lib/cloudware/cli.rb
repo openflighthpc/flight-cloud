@@ -47,6 +47,17 @@ module Cloudware
         i.create
       }
     end
+
+    command :'infrastructure list' do |c|
+      c.syntax = 'cloudware infrastructure list [options]'
+      c.description = 'List infrastructure groups'
+      c.option '--provider NAME', String, 'Provider name'
+      c.action { |args, options|
+        i = Cloudware::Infrastructure.new
+        i.provider = "#{options.provider}"
+        i.list
+      }
+    end
   end
 
 end

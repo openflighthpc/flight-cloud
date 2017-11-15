@@ -19,11 +19,12 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
+require 'azure_mgmt_resources'
+
+Resources = Azure::Resources::Profiles::Latest::Mgmt
 
 module Cloudware
   class Azure
-    require 'azure_mgmt_resources'
-
     attr_accessor :name, :networkcidr, :subnets, :region, :infrastructure
 
     def initialize
@@ -41,9 +42,26 @@ module Cloudware
     end
 
     def create_infrastructure
+      params = @client.model_classes.resource_group.new.tap do |r|
+        r.location = region
+        r.tags = {
+          cloudware_id: name,
+          region: region
+        }
+      end
+      puts "==> Creating infrastructure: #{@name}"
+      @client.resource_groups.create_or_update(@name, params)
     end
 
     def list_infrastructure
+      i = Array.new
+      @client.resource_groups.list.each { |group|
+        next if group.tags.nil?
+        g = group.tags
+        next if g["cloudware_id"].nil?
+        i.push(g["cloudware_id"].to_s)
+      }
+      puts i
     end
 
     def destroy_infrastructure

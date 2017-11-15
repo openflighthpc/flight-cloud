@@ -40,7 +40,7 @@ module Cloudware
       case @provider
       when "azure"
         az = Cloudware::Azure.new
-        puts az.infrastructure_list
+        puts az.list_infrastructure
       end
     end
 
