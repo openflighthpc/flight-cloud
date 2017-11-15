@@ -61,7 +61,7 @@ module Cloudware
         next if g["cloudware_id"].nil?
         i.push(g["cloudware_id"].to_s)
       }
-      puts i
+      "#{i}"
     end
 
     def destroy_infrastructure
