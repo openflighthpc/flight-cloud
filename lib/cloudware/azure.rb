@@ -79,7 +79,16 @@ module Cloudware
       deploy(t, 'domain')
     end
 
-    def list_domain
+    def list_domains
+      d = Array.new
+      list_infrastructure.each { |i|
+        resources = @client.resources.list_by_resource_group(i)
+        resources.each { |r|
+          next unless r.name == "network"
+          d.push(i)
+        }
+      }
+      d
     end
 
     def destroy_domain

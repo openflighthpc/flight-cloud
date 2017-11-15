@@ -34,5 +34,13 @@ module Cloudware
       d.networkcidr=@networkcidr
       d.create_domain
     end
+
+    def list
+      case @provider
+      when "azure"
+        d = Cloudware::Azure.new
+      end
+      d.list_domains
+    end
   end
 end

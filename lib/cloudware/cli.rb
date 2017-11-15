@@ -57,6 +57,17 @@ module Cloudware
       }
     end
 
+    command :'domain list' do |c|
+      c.syntax = 'cloudware domain list [options]'
+      c.description = 'List created domains'
+      c.option '--provider NAME', String, 'Provider name'
+      c.action { |args, options|
+        d = Cloudware::Domain.new
+        d.provider="#{options.provider}"
+        puts d.list
+      }
+    end
+
     command :'infrastructure create' do |c|
       c.syntax = 'cloudware infrastructure create [options]'
       c.description = 'Interact with infrastructure groups'
