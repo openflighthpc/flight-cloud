@@ -21,6 +21,7 @@
 #==============================================================================
 require 'cloudware/cli'
 require 'cloudware/infrastructure'
+require 'cloudware/domain'
 
 module Cloudware
 
