@@ -30,9 +30,10 @@ module Cloudware
     def initialize
       subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
       provider = MsRestAzure::ApplicationTokenProvider.new(
-                     ENV['AZURE_TENANT_ID'],
-                     ENV['AZURE_CLIENT_ID'],
-                     ENV['AZURE_CLIENT_SECRET'])
+        ENV['AZURE_TENANT_ID'],
+        ENV['AZURE_CLIENT_ID'],
+        ENV['AZURE_CLIENT_SECRET']
+      )
       credentials = MsRest::TokenCredentials.new(provider)
       options = {
         credentials: credentials,
@@ -54,13 +55,13 @@ module Cloudware
     end
 
     def list_infrastructure
-      i = Array.new
-      @client.resource_groups.list.each { |group|
+      i = []
+      @client.resource_groups.list.each do |group|
         next if group.tags.nil?
         g = group.tags
-        next if g["cloudware_id"].nil?
-        i.push(g["cloudware_id"].to_s)
-      }
+        next if g['cloudware_id'].nil?
+        i.push(g['cloudware_id'].to_s)
+      end
       i
     end
 
@@ -71,7 +72,7 @@ module Cloudware
     end
 
     def create_domain
-      t = "azure-network-base.json"
+      t = 'azure-network-base.json'
       @params = {
         infrastructure: @infrastructure,
         networkCIDR: @networkcidr,
@@ -82,34 +83,31 @@ module Cloudware
     end
 
     def list_domains
-      d = Array.new
-      list_infrastructure.each { |i|
+      d = []
+      list_infrastructure.each do |i|
         resources = @client.resources.list_by_resource_group(i)
-        resources.each { |r|
-          next unless r.name == "network"
+        resources.each do |r|
+          next unless r.name == 'network'
           d.push([i,
-                  r.tags["cloudware_network_cidr"],
-                  r.tags["cloudware_prv_subnet_cidr"],
-                  r.tags["cloudware_mgt_subnet_cidr"],
+                  r.tags['cloudware_network_cidr'],
+                  r.tags['cloudware_prv_subnet_cidr'],
+                  r.tags['cloudware_mgt_subnet_cidr'],
                   'azure'])
-        }
-      }
+        end
+      end
       d
     end
 
-    def destroy_domain
-    end
+    def destroy_domain; end
 
     def create_machine
-      puts "Creating new machine:"
+      puts 'Creating new machine:'
       puts "Name: #{@name}"
     end
 
-    def list_machine
-    end
+    def list_machine; end
 
-    def destroy_machine
-    end
+    def destroy_machine; end
 
     def deploy(template, type)
       t = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
@@ -117,21 +115,21 @@ module Cloudware
       d.properties = @client.model_classes.deployment_properties.new
       d.properties.template = JSON.parse(t)
       d.properties.mode = Resources::Models::DeploymentMode::Incremental
-      d.properties.parameters = Hash[*@params.map{ |k, v| [k,  {value: v}] }.flatten]
+      d.properties.parameters = Hash[*@params.map { |k, v| [k, { value: v }] }.flatten]
       debug_settings = @client.model_classes.debug_setting.new
       debug_settings.detail_level = 'requestContent, responseContent'
       d.properties.debug_setting = debug_settings
-      puts "==> Creating new deployment. This may take a while.."
-      @client.deployments.create_or_update(infrastructure, "#{type}", d)
-      operation_results = @client.deployment_operations.list(@infrastructure, "#{type}")
+      puts '==> Creating new deployment. This may take a while..'
+      @client.deployments.create_or_update(infrastructure, type.to_s, d)
+      operation_results = @client.deployment_operations.list(@infrastructure, type.to_s)
       unless operation_results.nil?
         operation_results.each do |operation_result|
-          until operation_result.properties.provisioning_state == "Succeeded"
+          until operation_result.properties.provisioning_state == 'Succeeded'
             sleep(1)
           end
         end
       end
-      puts "==> Deployment succeeded"
+      puts '==> Deployment succeeded'
     end
   end
 end

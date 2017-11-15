@@ -29,34 +29,24 @@ module Cloudware
       @resource_manager = Google::Cloud::ResourceManager.new
     end
 
-    def create_infrastructure
-    end
+    def create_infrastructure; end
 
-    def list_infrastructure
-    end
+    def list_infrastructure; end
 
-    def destroy_infrastructure
-    end
+    def destroy_infrastructure; end
 
-    def create_domain
-    end
+    def create_domain; end
 
-    def list_domains
-    end
+    def list_domains; end
 
-    def destroy_domain
-    end
+    def destroy_domain; end
 
-    def create_machine
-    end
+    def create_machine; end
 
-    def list_machine
-    end
+    def list_machine; end
 
-    def destroy_machine
-    end
+    def destroy_machine; end
 
-    def deploy(template, type)
-    end
+    def deploy(template, type); end
   end
 end

@@ -23,7 +23,6 @@ require 'commander'
 require 'terminal-table'
 
 module Cloudware
-
   class CLI
     extend Commander::UI
     extend Commander::UI::AskForClass
@@ -41,39 +40,39 @@ module Cloudware
       c.option '--provider NAME', String, 'Provider name'
       c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
       c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
-      c.action { |args, options|
+      c.action do |_args, options|
         i = Cloudware::Infrastructure.new
-        i.name="#{options.infrastructure}"
-        i.provider="#{options.provider}"
-        if i.list.include?("#{options.infrastructure}")
+        i.name = options.infrastructure.to_s
+        i.provider = options.provider.to_s
+        if i.list.include?(options.infrastructure.to_s)
           d = Cloudware::Domain.new
-          d.name="#{options.infrastructure}"
-          d.infrastructure="#{options.infrastructure}"
-          d.networkcidr="#{options.networkcidr}"
-          d.prvsubnetcidr="#{options.prvsubnetcidr}"
-          d.mgtsubnetcidr="#{options.mgtsubnetcidr}"
-          d.provider="#{options.provider}"
+          d.name = options.infrastructure.to_s
+          d.infrastructure = options.infrastructure.to_s
+          d.networkcidr = options.networkcidr.to_s
+          d.prvsubnetcidr = options.prvsubnetcidr.to_s
+          d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
+          d.provider = options.provider.to_s
           d.create
         else
           abort("==> Infrastructure group #{options.infrastructure} does not exist")
         end
-      }
+      end
     end
 
     command :'domain list' do |c|
       c.syntax = 'cloudware domain list [options]'
       c.description = 'List created domains'
       c.option '--provider NAME', String, 'Provider name'
-      c.action { |args, options|
+      c.action do |_args, _options|
         rows = []
         d = Cloudware::Domain.new
         d.list.each do |l|
           rows.concat(l)
         end
-        table = Terminal::Table.new :headings => ['Infrastructure', 'Network CIDR', 'Prv Subnet CIDR', 'Mgt Subnet CIDR', 'Provider'],
-                                    :rows => rows
+        table = Terminal::Table.new headings: ['Infrastructure', 'Network CIDR', 'Prv Subnet CIDR', 'Mgt Subnet CIDR', 'Provider'],
+                                    rows: rows
         puts table
-      }
+      end
     end
 
     command :'infrastructure create' do |c|
@@ -82,24 +81,24 @@ module Cloudware
       c.option '--name NAME', String, 'Infrastructure identifier'
       c.option '--provider NAME', String, 'Provider name'
       c.option '--region NAME', String, 'Region name to deploy into'
-      c.action { |args, options|
+      c.action do |_args, options|
         i = Cloudware::Infrastructure.new
-        i.name="#{options.name}"
-        i.provider="#{options.provider}"
-        i.region="#{options.region}"
+        i.name = options.name.to_s
+        i.provider = options.provider.to_s
+        i.region = options.region.to_s
         i.create
-      }
+      end
     end
 
     command :'infrastructure list' do |c|
       c.syntax = 'cloudware infrastructure list [options]'
       c.description = 'List infrastructure groups'
       c.option '--provider NAME', String, 'Provider name'
-      c.action { |args, options|
+      c.action do |_args, options|
         i = Cloudware::Infrastructure.new
-        i.provider = "#{options.provider}"
+        i.provider = options.provider.to_s
         puts i.list
-      }
+      end
     end
 
     command :'infrastructure destroy' do |c|
@@ -107,12 +106,12 @@ module Cloudware
       c.description = 'Destroy infrastructure groups'
       c.option '--name NAME', String, 'Infrastructure identifier'
       c.option '--provider NAME', String, 'Provider name'
-      c.action { |args, options|
+      c.action do |_args, options|
         i = Cloudware::Infrastructure.new
-        i.name = "#{options.name}"
-        i.provider = "#{options.provider}"
+        i.name = options.name.to_s
+        i.provider = options.provider.to_s
         i.destroy
-      }
+      end
     end
 
     command :'machine create' do |c|
@@ -123,16 +122,15 @@ module Cloudware
       c.option '--type TYPE', String, 'Machine type to create'
       c.option '--provider NAME', String, 'Provider name'
       c.option '--ipaddresstail INT', Integer, 'IP address tail'
-      c.action { |args, options|
+      c.action do |_args, options|
         m = Cloudware::Machine.new
-        m.name="#{options.name}"
-        m.infrastructure="#{options.infrastructure}"
-        m.type="#{options.type}"
-        m.provider="#{options.provider}"
-        m.ipaddresstail="#{options.ipaddresstail}"
+        m.name = options.name.to_s
+        m.infrastructure = options.infrastructure.to_s
+        m.type = options.type.to_s
+        m.provider = options.provider.to_s
+        m.ipaddresstail = options.ipaddresstail.to_s
         m.create
-      }
+      end
     end
   end
-
 end

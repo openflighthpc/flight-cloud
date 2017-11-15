@@ -29,21 +29,21 @@ module Cloudware
 
     def create
       case @provider
-      when "azure"
+      when 'azure'
         p = Cloudware::Azure.new
-        p.region=@region
-      when "gcp"
+        p.region = @region
+      when 'gcp'
         p = Cloudware::Gcp.new
       end
-      p.name=@name
+      p.name = @name
       p.create_infrastructure
     end
 
     def list
       case @provider
-      when "azure"
+      when 'azure'
         p = Cloudware::Azure.new
-      when "gcp"
+      when 'gcp'
         p = Cloudware::Gcp.new
       end
       p.list_infrastructure
@@ -51,10 +51,10 @@ module Cloudware
 
     def destroy
       case @provider
-      when "azure"
+      when 'azure'
         p = Cloudware::Azure.new
       end
-      p.name=@name
+      p.name = @name
       p.destroy_infrastructure
     end
   end

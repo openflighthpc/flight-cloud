@@ -25,13 +25,9 @@ require 'cloudware/domain'
 require 'cloudware/machine'
 
 module Cloudware
-
   class << self
-
     def config
       @config ||= Config.new(ENV['CLOUDWARE_CONFIG'] || '/opt/cloudware/config.yml')
     end
-
   end
-
 end

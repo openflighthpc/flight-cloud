@@ -26,20 +26,18 @@ module Cloudware
 
     def create
       case @provider
-        when "azure"
-          p = Cloudware::Azure.new
+      when 'azure'
+        p = Cloudware::Azure.new
       end
-      p.name=@name
-      p.infrastructure=@infrastructure
-      p.iptail=@infrastructure
-      p.type=@type
+      p.name = @name
+      p.infrastructure = @infrastructure
+      p.iptail = @infrastructure
+      p.type = @type
       p.create_machine
     end
 
-    def list
-    end
+    def list; end
 
-    def destroy
-    end
+    def destroy; end
   end
 end
