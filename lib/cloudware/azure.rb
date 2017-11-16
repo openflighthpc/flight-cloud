@@ -25,7 +25,14 @@ Resources = Azure::Resources::Profiles::Latest::Mgmt
 
 module Cloudware
   class Azure
-    attr_accessor :name, :id, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :region, :iptail, :type
+    attr_accessor :name
+    attr_accessor :id
+    attr_accessor :networkcidr
+    attr_accessor :prvsubnetcidr
+    attr_accessor :mgtsubnetcidr
+    attr_accessor :region
+    attr_accessor :iptail
+    attr_accessor :type
 
     def initialize
       subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
@@ -43,13 +50,12 @@ module Cloudware
     end
 
     def create_domain
-      unless resource_group_exists == true
-        create_resource_group
-      end
+      create_resource_group unless resource_group_exists == true
 
       t = 'azure-network-base.json'
       @params = {
-        infrastructure: @name,
+        cloudwareDomain: @name,
+        cloudwareId: @id,
         networkCIDR: @networkcidr,
         prvSubnetCIDR: @prvsubnetcidr,
         mgtSubnetCIDR: @mgtsubnetcidr
@@ -71,6 +77,18 @@ module Cloudware
         end
       end
       d
+    end
+
+    def describe
+      @client.resource_groups.list_resources(@name).value.each do |r|
+        next unless r.name == 'network'
+        next unless r.name == 'network'
+        @name = r.tags['cloudware_domain']
+        @name = r.tags['cloudware_id']
+        @networkcidr = r.tags['cloudware_network_cidr']
+        @prvsubnetcidr = r.tags['cloudware_prv_subnet_cidr']
+        @mgtsubnetcidr = r.tags['cloudware_mgt_subnet_cidr']
+      end
     end
 
     def destroy_domain; end
@@ -112,9 +130,9 @@ module Cloudware
       @client.resource_groups.list.each do |group|
         next if group.tags.nil?
         next if group.tags['cloudware_id'].nil?
-        unless group.tags['cloudware_id'] == @name
+        if group.tags['cloudware_id'] == @name return true; else
           return false
-        else return true; end
+        end
       end
     end
 

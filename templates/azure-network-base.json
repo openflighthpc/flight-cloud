@@ -23,10 +23,16 @@
         "description": "Choose the desired mgt subnet range"
       }
     },
-    "infrastructure": {
+    "cloudwareId": {
       "type": "string",
       "metadata": {
-        "description": "Infrastructure group the domain belongs to"
+        "description": "Cloudware UUID"
+      }
+    },
+    "cloudwareDomain": {
+      "type": "string",
+      "metadata": {
+        "description": "Cloudware domain"
       }
     }
   },
@@ -36,7 +42,8 @@
       "name": "network",
       "apiVersion": "2017-03-01",
       "tags": {
-        "cloudware_id": "[parameters('infrastructure')]",
+        "cloudware_id": "[parameters('cloudwareId')]",
+        "cloudware_domain": "[parameters('cloudwareDomain')]",
         "cloudware_network_cidr": "[parameters('networkCIDR')]",
         "cloudware_prv_subnet_cidr": "[parameters('prvSubnetCIDR')]",
         "cloudware_mgt_subnet_cidr": "[parameters('mgtSubnetCIDR')]"

@@ -44,9 +44,7 @@ module Cloudware
       c.option '--region NAME', String, 'Provider region to create domain in'
       c.action do |_args, options|
         d = Cloudware::Domain.new
-        if options.name.nil?
-          options.name = ask('Domain identifier: ')
-        end
+        options.name = ask('Domain identifier: ') if options.name.nil?
         d.name = options.name.to_s
 
         if d.check_domain_exists == true
@@ -63,7 +61,7 @@ module Cloudware
         d.networkcidr = options.networkcidr.to_s
 
         options.prvsubnetcidr = ask('Prv subnet CIDR: ') if options.prvsubnetcidr.nil?
-        d.prvsubnetcidr = options.prvsubnetcidr.to_s 
+        d.prvsubnetcidr = options.prvsubnetcidr.to_s
 
         options.mgtsubnetcidr = ask('Mgt subnet CIDR: ') if options.mgtsubnetcidr.nil?
         d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
