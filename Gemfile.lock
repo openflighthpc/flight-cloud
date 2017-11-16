@@ -11,6 +11,7 @@ GEM
     concurrent-ruby (1.0.5)
     declarative (0.0.10)
     declarative-option (0.1.0)
+    diff-lcs (1.3)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
     faraday (0.13.1)
@@ -72,6 +73,19 @@ GEM
       declarative-option (< 0.2.0)
       uber (< 0.2.0)
     retriable (3.1.1)
+    rspec (3.7.0)
+      rspec-core (~> 3.7.0)
+      rspec-expectations (~> 3.7.0)
+      rspec-mocks (~> 3.7.0)
+    rspec-core (3.7.0)
+      rspec-support (~> 3.7.0)
+    rspec-expectations (3.7.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.7.0)
+    rspec-mocks (3.7.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.7.0)
+    rspec-support (3.7.0)
     signet (0.8.1)
       addressable (~> 2.3)
       faraday (~> 0.9)
@@ -94,6 +108,7 @@ DEPENDENCIES
   colorize
   commander
   google-cloud-resource_manager
+  rspec
   terminal-table
 
 BUNDLED WITH
