@@ -25,7 +25,7 @@ Resources = Azure::Resources::Profiles::Latest::Mgmt
 
 module Cloudware
   class Azure
-    attr_accessor :name, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :region, :iptail, :type
+    attr_accessor :name, :id, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :region, :iptail, :type
 
     def initialize
       subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
@@ -122,7 +122,8 @@ module Cloudware
       params = @client.model_classes.resource_group.new.tap do |r|
         r.location = @region
         r.tags = {
-          cloudware_id: @name,
+          cloudware_id: @id,
+          cloudware_domain: @name,
           region: @region
         }
       end
@@ -134,7 +135,7 @@ module Cloudware
       @client.resource_groups.list.each do |group|
         next if group.tags.nil?
         next if group.tags['cloudware_id'].nil?
-        i.push([group.tags['cloudware_id'],
+        i.push([group.tags['cloudware_domain'],
                 group.tags['region'],
                 'azure'])
       end

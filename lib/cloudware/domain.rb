@@ -19,6 +19,7 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
+require 'securerandom'
 
 module Cloudware
   class Domain
@@ -34,6 +35,7 @@ module Cloudware
       d.prvsubnetcidr = @prvsubnetcidr
       d.mgtsubnetcidr = @mgtsubnetcidr
       d.region = @region
+      d.id = SecureRandom.uuid
       d.create_domain
     end
 
