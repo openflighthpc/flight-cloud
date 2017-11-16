@@ -58,9 +58,10 @@ module Cloudware
       i = []
       @client.resource_groups.list.each do |group|
         next if group.tags.nil?
-        g = group.tags
-        next if g['cloudware_id'].nil?
-        i.push(g['cloudware_id'].to_s)
+        next if group.tags['cloudware_id'].nil?
+        i.push([group.tags['cloudware_id'],
+                group.tags['region'],
+                'azure'])
       end
       i
     end
@@ -85,10 +86,10 @@ module Cloudware
     def list_domains
       d = []
       list_infrastructure.each do |i|
-        resources = @client.resources.list_by_resource_group(i)
+        resources = @client.resources.list_by_resource_group(i[0])
         resources.each do |r|
           next unless r.name == 'network'
-          d.push([i,
+          d.push([i[0],
                   r.tags['cloudware_network_cidr'],
                   r.tags['cloudware_prv_subnet_cidr'],
                   r.tags['cloudware_mgt_subnet_cidr'],

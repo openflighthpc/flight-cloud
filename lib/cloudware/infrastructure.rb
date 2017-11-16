@@ -40,13 +40,18 @@ module Cloudware
     end
 
     def list
+      l = []
       case @provider
       when 'azure'
         p = Cloudware::Azure.new
+        l.push(p.list_infrastructure)
       when 'gcp'
         p = Cloudware::Gcp.new
+      else
+        azure = Cloudware::Azure.new
+        l.push(azure.list_infrastructure)
       end
-      p.list_infrastructure
+      l
     end
 
     def destroy
@@ -56,6 +61,15 @@ module Cloudware
       end
       p.name = @name
       p.destroy_infrastructure
+    end
+
+    def check_infrastructure_exists
+      list.each do |i|
+      	i.each do |l|
+          next unless l[0] == @name
+          return true if l[0] == @name
+      	end
+      end
     end
   end
 end

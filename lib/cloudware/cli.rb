@@ -21,6 +21,7 @@
 #==============================================================================
 require 'commander'
 require 'terminal-table'
+require 'colorize'
 
 module Cloudware
   class CLI
@@ -41,21 +42,48 @@ module Cloudware
       c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
       c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
       c.action do |_args, options|
+        if options.infrastructure.nil?
+          options.infrastructure = ask("Infrastructure identifier?: ")
+        end
+
         i = Cloudware::Infrastructure.new
         i.name = options.infrastructure.to_s
-        i.provider = options.provider.to_s
-        if i.list.include?(options.infrastructure.to_s)
-          d = Cloudware::Domain.new
-          d.name = options.infrastructure.to_s
-          d.infrastructure = options.infrastructure.to_s
-          d.networkcidr = options.networkcidr.to_s
-          d.prvsubnetcidr = options.prvsubnetcidr.to_s
-          d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
-          d.provider = options.provider.to_s
-          d.create
-        else
-          abort("==> Infrastructure group #{options.infrastructure} does not exist")
+        unless i.check_infrastructure_exists == true
+					abort("==> Infrastructure #{options.infrastructure.to_s} does not exist")
         end
+
+				if options.provider.nil?
+					options.provider = ask("Provider name?: ")
+				end
+
+				if options.networkcidr.nil?
+					options.networkcidr = ask("Network CIDR?: ")
+				end
+
+				if options.prvsubnetcidr.nil?
+					options.prvsubnetcidr = ask("Prv subnet CIDR?: ")
+				end
+
+				if options.mgtsubnetcidr.nil?
+					options.mgtsubnetcidr = ask("Mgt subnet CIDR?: ")
+				end
+
+        i.provider = options.provider.to_s
+				i.list.each do |ary|
+					ary.each do |k|
+							next if not k[0] == options.infrastructure.to_s
+							if k[0] == options.infrastructure.to_s
+                d = Cloudware::Domain.new
+                d.name = options.infrastructure.to_s
+                d.infrastructure = options.infrastructure.to_s
+                d.networkcidr = options.networkcidr.to_s
+                d.prvsubnetcidr = options.prvsubnetcidr.to_s
+                d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
+                d.provider = options.provider.to_s
+                d.create
+							end
+					end
+				end
       end
     end
 
@@ -69,7 +97,11 @@ module Cloudware
         d.list.each do |l|
           rows.concat(l)
         end
-        table = Terminal::Table.new headings: ['Infrastructure', 'Network CIDR', 'Prv Subnet CIDR', 'Mgt Subnet CIDR', 'Provider'],
+        table = Terminal::Table.new headings: ['Infrastructure'.bold,
+                                               'Network CIDR'.bold,
+                                               'Prv Subnet CIDR'.bold,
+                                               'Mgt Subnet CIDR'.bold,
+                                               'Provider'.bold],
                                     rows: rows
         puts table
       end
@@ -82,6 +114,15 @@ module Cloudware
       c.option '--provider NAME', String, 'Provider name'
       c.option '--region NAME', String, 'Region name to deploy into'
       c.action do |_args, options|
+        if options.name.nil?
+          options.name = ask("Infrastructure identity/name?: ", String)
+        end
+        if options.provider.nil?
+          options.provider = ask("Provider name? [aws, azure, gcp]: ", String)
+        end
+        if options.region.nil?
+          options.region = ask("Region ID?: ", String)
+        end
         i = Cloudware::Infrastructure.new
         i.name = options.name.to_s
         i.provider = options.provider.to_s
@@ -95,9 +136,17 @@ module Cloudware
       c.description = 'List infrastructure groups'
       c.option '--provider NAME', String, 'Provider name'
       c.action do |_args, options|
+        rows = []
         i = Cloudware::Infrastructure.new
         i.provider = options.provider.to_s
-        puts i.list
+        i.list.each do |l|
+          rows.concat(l)
+        end
+        table = Terminal::Table.new headings: ['Identity'.bold,
+                                               'Region'.bold,
+                                               'Provider'.bold],
+                                    rows: rows
+        puts table
       end
     end
 
