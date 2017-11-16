@@ -34,76 +34,70 @@
     }
   },
   "variables": {
+    "adminUsername": "alces",
+    "adminPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/0R5EvmSrySy2I+8Cx6eOX7cVuYFXx5D0O1x0+OmAZ0Qaj9d7E0Nj4ZcWxdCT03uFl1Ka4tInDlQmMyy0V1/AftpHxBEnB17Pk/lJnDW1YstmAqD0GlFa1CrxUdtHd+jB3LJmdoHsV6fRGpMOgFd+u/4Wces7KAqYFmL5uPG1UTCMgokQ2qboQgEVspXotMvni1iil3kEjyH/eW64Laxmn2Vxls9feZ1o95mPQhJPJcN7MMo1h+jkxyat3bawtpqyV7fXYU0+BO2JHpu/VIEDHtxhlk7RhI0U06XbJu6ZCCUrEX8idIhw4hueQpKwVYplTXssa9JqNlcjouqLj5kd cloudware@alces-software.com",
+    "prvInterfaceName": "[concat(parameters('cloudwareDomain'), parameters('vmName'), 'prv')]",
+    "mgtInterfaceName": "[concat(parameters('cloudwareDomain'), parameters('vmName'), 'mgt')]",
     "azureConfig": {
       "imageSubscription": "[concat('/subscriptions/', 'd1e964ef-15c7-4b27-8113-e725167cee83', '/resourceGroups/alcesflight/providers/Microsoft.Compute/images/alces-flight-compute-1.0.0-beta')]"
     }
   },
-  "resources": [
-    {
+  "resources": [{
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(parameters('cloudwareDomain'), '-', parameters('vmName'), '-prv')]",
+      "name": "[variables('prvInterfaceName')]",
       "apiVersion": "2017-03-01",
       "tags": {
         "cloudware_domain": "[parameters('cloudwareDomain')]"
       },
       "location": "[resourceGroup().location]",
       "properties": {
-        "ipConfigurations": [
-          {
-            "name": "[concat(parameters('cloudwareDomain'), '-', parameters('vmName'), '-prv')]",
-            "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[parameters('prvSubnetIp')]",
-              "subnet": {
-                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'network'), '/subnets/prv')]"
-              }
+        "ipConfigurations": [{
+          "name": "[concat(parameters('cloudwareDomain'), parameters('vmName'), '-prv')]",
+          "properties": {
+            "privateIPAllocationMethod": "Static",
+            "privateIPAddress": "[parameters('prvSubnetIp')]",
+            "subnet": {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'network', 'prv')]"
             }
           }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('vmName'))]"
-        }
+        }]
       }
     },
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(parameters('cloudwareDomain'), '-', parameters('vmName'), '-mgt')]",
+      "name": "[variables('mgtInterfaceName')]",
       "apiVersion": "2017-03-01",
       "tags": {
         "cloudware_domain": "[parameters('cloudwareDomain')]"
       },
       "location": "[resourceGroup().location]",
       "properties": {
-        "ipConfigurations": [
-          {
-            "name": "[concat(parameters('cloudwareDomain'), '-', parameters('vmName'), '-mgt')]",
-            "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[parameters('mgtSubnetIp')]",
-              "subnet": {
-                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'network'), '/subnets/mgt')]"
-              }
+        "ipConfigurations": [{
+          "name": "[concat(parameters('cloudwareDomain'), parameters('vmName'), '-mgt')]",
+          "properties": {
+            "privateIPAllocationMethod": "Static",
+            "privateIPAddress": "[parameters('mgtSubnetIp')]",
+            "subnet": {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'network', 'mgt')]"
             }
           }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('vmName'))]"
-        }
+        }]
       }
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmName')",
+      "name": "[parameters('vmName')]",
       "apiVersion": "2016-04-30-preview",
       "tags": {
-        "cloudware_domain": "[parameters('cloudwareDomain')]"
+        "cloudware_domain": "[parameters('cloudwareDomain')]",
+        "cloudware_machine_name": "[parameters('vmName')]",
+        "cloudware_prv_ip": "[parameters('prvSubnetIp')]",
+        "cloudware_mgt_ip": "[parameters('mgtSubnetIp')]"
       },
       "location": "[resourceGroup().location]",
       "properties": {
         "hardwareProfile": {
-          "vmSize": {
-            "vmSize": "[parameters('vmType')]"
-          }
+          "vmSize": "[parameters('vmType')]"
         },
         "storageProfile": {
           "imageReference": {
@@ -117,28 +111,32 @@
           }
         },
         "osProfile": {
-          "computerName": "[concat(parameters('vmName'), '.', parameters('cloudwareDomain'))]",
-          "adminUsername": "alces",
-          "liuxConfiguration": {
-            "publicKeys": [
-              "path": "/home/alces/.ssh/authorized_keys",
-              "keyData": "[parameters('adminPublicKey')]"
-            ]
+          "computerName": "login1",
+          "adminUsername": "[variables('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+              "publicKeys": [{
+                "path": "[concat ('/home/', variables('adminUsername'), '/.ssh/authorized_keys')]",
+                "keyData": "[parameters('adminPublicKey')]"
+              }]
+            }
           }
         },
         "networkProfile": {
-          "networkInterfaces": [
-            { "id": "[concat(resourceId('Microsoft.Network/networkInterfaces'), parameters('cloudwareDomain'), '-', parameters('vmName'), '-prv')]" },
-            { "id": "[concat(resourceId('Microsoft.Network/networkInterfaces'), parameters('cloudwareDomain'), '-', parameters('vmName'), '-mgt')]" }
+          "networkInterfaces": [{
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('prvInterfaceName'))]"
+            },
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('mgtInterfaceName'))]"
+            }
           ]
-        },
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-            "enabled": true,
-            "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('cloudwareDomain').storageAccountName)).primaryEndpoints.blob)]"
-          }
         }
-      }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('prvInterfaceName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('mgtInterfaceName'))]"
+      ]
     }
   ]
 }
