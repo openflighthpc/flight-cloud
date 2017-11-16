@@ -36,54 +36,35 @@ module Cloudware
     command :'domain create' do |c|
       c.syntax = 'cloudware domain create [options]'
       c.description = 'Create a new domain'
-      c.option '--infrastructure NAME', String, 'Infrastructure identifier'
+      c.option '--name NAME', String, 'Domain name'
       c.option '--networkcidr CIDR', String, 'Primary network CIDR, e.g. 10.0.0.0/16'
       c.option '--provider NAME', String, 'Provider name'
       c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
       c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
       c.action do |_args, options|
-        if options.infrastructure.nil?
-          options.infrastructure = ask('Infrastructure identifier?: ')
-        end
-
-        i = Cloudware::Infrastructure.new
         d = Cloudware::Domain.new
-        d.name = options.infrastructure.to_s
-        i.name = options.infrastructure.to_s
-
-        unless i.check_infrastructure_exists == true
-          abort("==> Infrastructure #{options.infrastructure} does not exist")
+        if options.name.nil?
+          options.name = ask('Domain identifier: ')
         end
+        d.name = options.infrastructure.to_s
 
         if d.check_domain_exists == true
-          abort("==> Domain #{options.infrastructure} already exists")
+          abort("==> Domain #{options.name} already exists")
         end
 
-        options.provider = ask('Provider name?: ') if options.provider.nil?
+        options.provider = ask('Provider name: ') if options.provider.nil?
+        d.provider = options.provider.to_s
 
-        options.networkcidr = ask('Network CIDR?: ') if options.networkcidr.nil?
+        options.networkcidr = ask('Network CIDR: ') if options.networkcidr.nil?
+        d.networkcidr = options.networkcidr.to_s
 
-        if options.prvsubnetcidr.nil?
-          options.prvsubnetcidr = ask('Prv subnet CIDR?: ')
-        end
+        options.prvsubnetcidr = ask('Prv subnet CIDR: ') if options.prvsubnetcidr.nil?
+        d.prvsubnetcidr = options.prvsubnetcidr.to_s 
 
-        if options.mgtsubnetcidr.nil?
-          options.mgtsubnetcidr = ask('Mgt subnet CIDR?: ')
-        end
+        options.mgtsubnetcidr = ask('Mgt subnet CIDR: ') if options.mgtsubnetcidr.nil?
+        d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
 
-        i.provider = options.provider.to_s
-        i.list.each do |ary|
-          ary.each do |k|
-            next if k[0] != options.infrastructure.to_s
-            next unless k[0] == options.infrastructure.to_s
-            d.infrastructure = options.infrastructure.to_s
-            d.networkcidr = options.networkcidr.to_s
-            d.prvsubnetcidr = options.prvsubnetcidr.to_s
-            d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
-            d.provider = options.provider.to_s
-            d.create
-          end
-        end
+        d.create
       end
     end
 
@@ -97,7 +78,7 @@ module Cloudware
         d.list.each do |l|
           rows.concat(l)
         end
-        table = Terminal::Table.new headings: ['Infrastructure'.bold,
+        table = Terminal::Table.new headings: ['Domain name'.bold,
                                                'Network CIDR'.bold,
                                                'Prv Subnet CIDR'.bold,
                                                'Mgt Subnet CIDR'.bold,
@@ -107,80 +88,23 @@ module Cloudware
       end
     end
 
-    command :'infrastructure create' do |c|
-      c.syntax = 'cloudware infrastructure create [options]'
-      c.description = 'Interact with infrastructure groups'
-      c.option '--name NAME', String, 'Infrastructure identifier'
-      c.option '--provider NAME', String, 'Provider name'
-      c.option '--region NAME', String, 'Region name to deploy into'
-      c.action do |_args, options|
-        if options.name.nil?
-          options.name = ask('Infrastructure identity/name?: ', String)
-        end
-
-        i = Cloudware::Infrastructure.new
-        i.name = options.name.to_s
-        if i.check_infrastructure_exists == true
-          abort("==> Infrastructure group #{options.name} already exists")
-        end
-
-        if options.provider.nil?
-          options.provider = ask('Provider name? [aws, azure, gcp]: ', String)
-        end
-        options.region = ask('Region ID?: ', String) if options.region.nil?
-        i.provider = options.provider.to_s
-        i.region = options.region.to_s
-        i.create
-      end
-    end
-
-    command :'infrastructure list' do |c|
-      c.syntax = 'cloudware infrastructure list [options]'
-      c.description = 'List infrastructure groups'
-      c.option '--provider NAME', String, 'Provider name'
-      c.action do |_args, options|
-        rows = []
-        i = Cloudware::Infrastructure.new
-        i.provider = options.provider.to_s
-        i.list.each do |l|
-          rows.concat(l)
-        end
-        table = Terminal::Table.new headings: ['Identity'.bold,
-                                               'Region'.bold,
-                                               'Provider'.bold],
-                                    rows: rows
-        puts table
-      end
-    end
-
-    command :'infrastructure destroy' do |c|
-      c.syntax = 'cloudware infrastructure destroy [options]'
-      c.description = 'Destroy infrastructure groups'
-      c.option '--name NAME', String, 'Infrastructure identifier'
-      c.option '--provider NAME', String, 'Provider name'
-      c.action do |_args, options|
-        i = Cloudware::Infrastructure.new
-        i.name = options.name.to_s
-        i.provider = options.provider.to_s
-        i.destroy
-      end
-    end
-
     command :'machine create' do |c|
       c.syntax = 'cloudware machine create [options]'
       c.description = 'Create a new machine'
       c.option '--name NAME', String, 'Machine name'
-      c.option '--infrastructure NAME', String, 'Infrastructure identifier'
+      c.option '--domain NAME', String, 'Domain name'
       c.option '--type TYPE', String, 'Machine type to create'
       c.option '--provider NAME', String, 'Provider name'
-      c.option '--ipaddresstail INT', Integer, 'IP address tail'
+      c.option '--prvsubnetip ADDR', String, 'Prv subnet IP address'
+      c.option '--mgtsubnetip ADDR', String, 'Mgt subnet IP address'
       c.action do |_args, options|
         m = Cloudware::Machine.new
         m.name = options.name.to_s
-        m.infrastructure = options.infrastructure.to_s
+        m.domain = options.domain.to_s
         m.type = options.type.to_s
         m.provider = options.provider.to_s
-        m.ipaddresstail = options.ipaddresstail.to_s
+        m.prvsubnetip = options.prvsubnetip.to_s
+        m.mgtsubnetip = options.mgtsubnetip.to_s
         m.create
       end
     end

@@ -22,7 +22,7 @@
 
 module Cloudware
   class Domain
-    attr_accessor :name, :infrastructure, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :provider
+    attr_accessor :name, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :provider
 
     def create
       case @provider
@@ -30,7 +30,6 @@ module Cloudware
         d = Cloudware::Azure.new
       end
       d.name = @name
-      d.infrastructure = @infrastructure
       d.networkcidr = @networkcidr
       d.prvsubnetcidr = @prvsubnetcidr
       d.mgtsubnetcidr = @mgtsubnetcidr

@@ -25,7 +25,7 @@ Resources = Azure::Resources::Profiles::Latest::Mgmt
 
 module Cloudware
   class Azure
-    attr_accessor :name, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :region, :infrastructure, :iptail, :type
+    attr_accessor :name, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :region, :iptail, :type
 
     def initialize
       subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
@@ -73,9 +73,10 @@ module Cloudware
     end
 
     def create_domain
+      create_infrastructure
       t = 'azure-network-base.json'
       @params = {
-        infrastructure: @infrastructure,
+        infrastructure: @name,
         networkCIDR: @networkcidr,
         prvSubnetCIDR: @prvsubnetcidr,
         mgtSubnetCIDR: @mgtsubnetcidr

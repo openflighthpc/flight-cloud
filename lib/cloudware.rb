@@ -20,9 +20,10 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 require 'cloudware/cli'
-require 'cloudware/infrastructure'
 require 'cloudware/domain'
 require 'cloudware/machine'
+require 'cloudware/azure'
+require 'cloudware/gcp'
 
 module Cloudware
   class << self
