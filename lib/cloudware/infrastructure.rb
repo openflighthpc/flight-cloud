@@ -65,10 +65,10 @@ module Cloudware
 
     def check_infrastructure_exists
       list.each do |i|
-      	i.each do |l|
+        i.each do |l|
           next unless l[0] == @name
           return true if l[0] == @name
-      	end
+        end
       end
     end
   end

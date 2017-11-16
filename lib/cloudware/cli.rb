@@ -43,47 +43,42 @@ module Cloudware
       c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
       c.action do |_args, options|
         if options.infrastructure.nil?
-          options.infrastructure = ask("Infrastructure identifier?: ")
+          options.infrastructure = ask('Infrastructure identifier?: ')
         end
 
         i = Cloudware::Infrastructure.new
         i.name = options.infrastructure.to_s
         unless i.check_infrastructure_exists == true
-					abort("==> Infrastructure #{options.infrastructure.to_s} does not exist")
+          abort("==> Infrastructure #{options.infrastructure} does not exist")
         end
 
-				if options.provider.nil?
-					options.provider = ask("Provider name?: ")
-				end
+        options.provider = ask('Provider name?: ') if options.provider.nil?
 
-				if options.networkcidr.nil?
-					options.networkcidr = ask("Network CIDR?: ")
-				end
+        options.networkcidr = ask('Network CIDR?: ') if options.networkcidr.nil?
 
-				if options.prvsubnetcidr.nil?
-					options.prvsubnetcidr = ask("Prv subnet CIDR?: ")
-				end
+        if options.prvsubnetcidr.nil?
+          options.prvsubnetcidr = ask('Prv subnet CIDR?: ')
+        end
 
-				if options.mgtsubnetcidr.nil?
-					options.mgtsubnetcidr = ask("Mgt subnet CIDR?: ")
-				end
+        if options.mgtsubnetcidr.nil?
+          options.mgtsubnetcidr = ask('Mgt subnet CIDR?: ')
+        end
 
         i.provider = options.provider.to_s
-				i.list.each do |ary|
-					ary.each do |k|
-							next if not k[0] == options.infrastructure.to_s
-							if k[0] == options.infrastructure.to_s
-                d = Cloudware::Domain.new
-                d.name = options.infrastructure.to_s
-                d.infrastructure = options.infrastructure.to_s
-                d.networkcidr = options.networkcidr.to_s
-                d.prvsubnetcidr = options.prvsubnetcidr.to_s
-                d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
-                d.provider = options.provider.to_s
-                d.create
-							end
-					end
-				end
+        i.list.each do |ary|
+          ary.each do |k|
+            next if k[0] != options.infrastructure.to_s
+            next unless k[0] == options.infrastructure.to_s
+            d = Cloudware::Domain.new
+            d.name = options.infrastructure.to_s
+            d.infrastructure = options.infrastructure.to_s
+            d.networkcidr = options.networkcidr.to_s
+            d.prvsubnetcidr = options.prvsubnetcidr.to_s
+            d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
+            d.provider = options.provider.to_s
+            d.create
+          end
+        end
       end
     end
 
@@ -115,16 +110,19 @@ module Cloudware
       c.option '--region NAME', String, 'Region name to deploy into'
       c.action do |_args, options|
         if options.name.nil?
-          options.name = ask("Infrastructure identity/name?: ", String)
+          options.name = ask('Infrastructure identity/name?: ', String)
         end
-        if options.provider.nil?
-          options.provider = ask("Provider name? [aws, azure, gcp]: ", String)
-        end
-        if options.region.nil?
-          options.region = ask("Region ID?: ", String)
-        end
+
         i = Cloudware::Infrastructure.new
         i.name = options.name.to_s
+        if i.check_infrastructure_exists == true
+          abort("==> Infrastructure group #{options.name} already exists")
+        end
+
+        if options.provider.nil?
+          options.provider = ask('Provider name? [aws, azure, gcp]: ', String)
+        end
+        options.region = ask('Region ID?: ', String) if options.region.nil?
         i.provider = options.provider.to_s
         i.region = options.region.to_s
         i.create
