@@ -49,5 +49,14 @@ module Cloudware
       end
       l
     end
+
+    def check_domain_exists
+      list.each do |d|
+        d.each do |l|
+          next unless l[0] == @name
+          return true if l[0] == @name
+        end
+      end
+    end
   end
 end

@@ -47,9 +47,16 @@ module Cloudware
         end
 
         i = Cloudware::Infrastructure.new
+        d = Cloudware::Domain.new
+        d.name = options.infrastructure.to_s
         i.name = options.infrastructure.to_s
+
         unless i.check_infrastructure_exists == true
           abort("==> Infrastructure #{options.infrastructure} does not exist")
+        end
+
+        if d.check_domain_exists == true
+          abort("==> Domain #{options.infrastructure} already exists")
         end
 
         options.provider = ask('Provider name?: ') if options.provider.nil?
@@ -69,8 +76,6 @@ module Cloudware
           ary.each do |k|
             next if k[0] != options.infrastructure.to_s
             next unless k[0] == options.infrastructure.to_s
-            d = Cloudware::Domain.new
-            d.name = options.infrastructure.to_s
             d.infrastructure = options.infrastructure.to_s
             d.networkcidr = options.networkcidr.to_s
             d.prvsubnetcidr = options.prvsubnetcidr.to_s
