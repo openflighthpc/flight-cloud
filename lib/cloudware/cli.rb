@@ -41,12 +41,13 @@ module Cloudware
       c.option '--provider NAME', String, 'Provider name'
       c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
       c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
+      c.option '--region NAME', String, 'Provider region to create domain in'
       c.action do |_args, options|
         d = Cloudware::Domain.new
         if options.name.nil?
           options.name = ask('Domain identifier: ')
         end
-        d.name = options.infrastructure.to_s
+        d.name = options.name.to_s
 
         if d.check_domain_exists == true
           abort("==> Domain #{options.name} already exists")
@@ -54,6 +55,9 @@ module Cloudware
 
         options.provider = ask('Provider name: ') if options.provider.nil?
         d.provider = options.provider.to_s
+
+        options.region = ask('Provider region: ') if options.region.nil?
+        d.region = options.region.to_s
 
         options.networkcidr = ask('Network CIDR: ') if options.networkcidr.nil?
         d.networkcidr = options.networkcidr.to_s

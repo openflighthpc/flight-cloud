@@ -42,38 +42,11 @@ module Cloudware
       @client = Resources::Client.new(options)
     end
 
-    def create_infrastructure
-      params = @client.model_classes.resource_group.new.tap do |r|
-        r.location = region
-        r.tags = {
-          cloudware_id: name,
-          region: region
-        }
-      end
-      puts "==> Creating infrastructure: #{@name}"
-      @client.resource_groups.create_or_update(@name, params)
-    end
-
-    def list_infrastructure
-      i = []
-      @client.resource_groups.list.each do |group|
-        next if group.tags.nil?
-        next if group.tags['cloudware_id'].nil?
-        i.push([group.tags['cloudware_id'],
-                group.tags['region'],
-                'azure'])
-      end
-      i
-    end
-
-    def destroy_infrastructure
-      puts "==> Destroying infrastructure #{@name}. This may take a while.."
-      @client.resource_groups.delete(@name)
-      puts "==> Infrastructure group #{@name} destroyed."
-    end
-
     def create_domain
-      create_infrastructure
+      unless resource_group_exists == true
+        create_resource_group
+      end
+
       t = 'azure-network-base.json'
       @params = {
         infrastructure: @name,
@@ -86,7 +59,7 @@ module Cloudware
 
     def list_domains
       d = []
-      list_infrastructure.each do |i|
+      list_resource_groups.each do |i|
         resources = @client.resources.list_by_resource_group(i[0])
         resources.each do |r|
           next unless r.name == 'network'
@@ -122,8 +95,8 @@ module Cloudware
       debug_settings.detail_level = 'requestContent, responseContent'
       d.properties.debug_setting = debug_settings
       puts '==> Creating new deployment. This may take a while..'
-      @client.deployments.create_or_update(infrastructure, type.to_s, d)
-      operation_results = @client.deployment_operations.list(@infrastructure, type.to_s)
+      @client.deployments.create_or_update(name, type.to_s, d)
+      operation_results = @client.deployment_operations.list(@name, type.to_s)
       unless operation_results.nil?
         operation_results.each do |operation_result|
           until operation_result.properties.provisioning_state == 'Succeeded'
@@ -132,6 +105,40 @@ module Cloudware
         end
       end
       puts '==> Deployment succeeded'
+    end
+
+    def resource_group_exists
+      i = []
+      @client.resource_groups.list.each do |group|
+        next if group.tags.nil?
+        next if group.tags['cloudware_id'].nil?
+        unless group.tags['cloudware_id'] == @name
+          return false
+        else return true; end
+      end
+    end
+
+    def create_resource_group
+      params = @client.model_classes.resource_group.new.tap do |r|
+        r.location = @region
+        r.tags = {
+          cloudware_id: @name,
+          region: @region
+        }
+      end
+      @client.resource_groups.create_or_update(@name, params)
+    end
+
+    def list_resource_groups
+      i = []
+      @client.resource_groups.list.each do |group|
+        next if group.tags.nil?
+        next if group.tags['cloudware_id'].nil?
+        i.push([group.tags['cloudware_id'],
+                group.tags['region'],
+                'azure'])
+      end
+      i
     end
   end
 end
