@@ -77,6 +77,8 @@ module Cloudware
       c.action do |_args, _options|
         rows = []
         d = Cloudware::Domain.new
+        d.list
+        abort('die')
         d.list.each do |l|
           rows.concat(l)
         end

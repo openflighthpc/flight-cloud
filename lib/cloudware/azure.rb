@@ -55,20 +55,17 @@ module Cloudware
     end
 
     def list_domains
-      d = []
-      list_resource_groups.each do |i|
-        resources = @client.resources.list_by_resource_group(i[0])
+      domains = []
+      list_resource_groups.each do |g|
+        resources = @client.resources.list_by_resource_group(g)
         resources.each do |r|
-          next unless r.name == 'network'
-          d.push([i[0],
-                  r.tags['cloudware_network_cidr'],
-                  r.tags['cloudware_prv_subnet_cidr'],
-                  r.tags['cloudware_mgt_subnet_cidr'],
-                  'azure',
-                  r.tags['cloudware_id']])
+          next unless r.type == 'Microsoft.Network/virtualNetworks'
+          next unless r.tags['cloudware_resource_type'] == 'domain'
+          domains.push([r.tags['cloudware_domain'],
+                        r.tags['cloudware_machine_name'],
+                        r.tags['cloudware_machine_type']])
         end
       end
-      d
     end
 
     def describe(name)
@@ -97,7 +94,7 @@ module Cloudware
     def list_machines
       l = []
       list_resource_groups.each do |g|
-        r = @client.resources.list_by_resource_group(g[0])
+        r = @client.resources.list_by_resource_group(g)
         r.each do |r|
           next unless r.type == 'Microsoft.Compute/virtualMachines'
           next unless r.tags['cloudware_resource_type'] == 'machine'
@@ -152,10 +149,8 @@ module Cloudware
     def list_resource_groups
       groups = []
       @client.resource_groups.list.each do |g|
-        next if g.tags['cloudware_id'].nil?
-        groups.push([g.tags['cloudware_domain'],
-                     g.tags['region'],
-                     'azure'])
+        next if g.tags.nil?
+        groups.push(g.tags['cloudware_domain']) unless g.tags['cloudware_domain'].nil?
       end
       return groups
     end
