@@ -91,10 +91,25 @@ module Cloudware
         prvSubnetIp: prvip,
         mgtSubnetIp: mgtip
       }
-      deploy(t, "#{name}", params, domain)
+      deploy(t, name, params, domain)
     end
 
-    def list_machine; end
+    def list_machines
+      l = []
+      list_resource_groups.each do |g|
+        r = @client.resources.list_by_resource_group(g[0])
+        r.each do |r|
+          next unless r.tags['cloudware_resource_type'] == 'machine'
+          l.push([r.tags['cloudware_domain'],
+                  r.tags['cloudware_machine_name'],
+                  r.tags['cloudware_machine_type'],
+                  r.tags['cloudware_prv_ip'],
+                  r.tags['cloudware_mgt_ip'],
+                  r.tags['cloudware_machine_size']])
+        end
+      end
+      l
+    end
 
     def destroy_machine; end
 
@@ -166,6 +181,5 @@ module Cloudware
         return group.tags['cloudware_id']
       end
     end
-
   end
 end

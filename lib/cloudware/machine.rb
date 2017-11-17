@@ -48,7 +48,12 @@ module Cloudware
                        @size)
     end
 
-    def list; end
+    def list
+      l = []
+      azure = Cloudware::Azure.new
+      l.push(azure.list_machines)
+      l
+    end
 
     def destroy; end
   end

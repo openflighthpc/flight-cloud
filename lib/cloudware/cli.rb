@@ -84,7 +84,8 @@ module Cloudware
                                                'Network CIDR'.bold,
                                                'Prv Subnet CIDR'.bold,
                                                'Mgt Subnet CIDR'.bold,
-                                               'Provider'.bold],
+                                               'Provider'.bold,
+                                               'Identifier'.bold],
                                     rows: rows
         puts table
       end
@@ -108,6 +109,26 @@ module Cloudware
         m.mgtsubnetip = options.mgtsubnetip.to_s
         m.size = options.size.to_s
         m.create
+      end
+    end
+
+    command :'machine list' do |c|
+      c.syntax = 'cloudware machine list'
+      c.description = 'List available machines'
+      c.action do |_args, _options|
+        rows = []
+        m = Cloudware::Machine.new
+        m.list.each do |l|
+          rows.concat(l)
+        end
+        table = Terminal::Table.new headings: ['Domain name'.bold,
+                                               'Machine name'.bold,
+                                               'Machine type'.bold,
+                                               'Prv IP address'.bold,
+                                               'Mgt IP address'.bold,
+                                               'Size'.bold],
+                                    rows: rows
+        puts table
       end
     end
   end
