@@ -72,11 +72,11 @@ module Cloudware
     end
 
     def describe(name)
-      a = []
+      resource = []
       @client.resource_groups.list_resources(name).value.each do |_r|
-        a.push('r.tags')
+        a.push('resource.tags')
       end
-      a
+      return resource
     end
 
     def destroy_domain; end
@@ -152,7 +152,6 @@ module Cloudware
     def list_resource_groups
       groups = []
       @client.resource_groups.list.each do |g|
-        next if g.tags.nil?
         next if g.tags['cloudware_id'].nil?
         groups.push([g.tags['cloudware_domain'],
                      g.tags['region'],

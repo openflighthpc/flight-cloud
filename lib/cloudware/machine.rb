@@ -52,7 +52,7 @@ module Cloudware
       l = []
       azure = Cloudware::Azure.new
       l.push(azure.list_machines)
-      l
+      return l
     end
 
     def destroy; end
