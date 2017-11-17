@@ -64,7 +64,8 @@ module Cloudware
                   r.tags['cloudware_network_cidr'],
                   r.tags['cloudware_prv_subnet_cidr'],
                   r.tags['cloudware_mgt_subnet_cidr'],
-                  'azure'])
+                  'azure',
+                  r.tags['cloudware_id']])
         end
       end
       d
@@ -80,9 +81,17 @@ module Cloudware
 
     def destroy_domain; end
 
-    def create_machine
-      puts 'Creating new machine:'
-      puts "Name: #{@name}"
+    def create_machine(name, domain, id, prvip, mgtip, type, size)
+      t = "azure-machine-#{type}.json"
+      params = {
+        cloudwareDomain: domain,
+        cloudwareId: id,
+        vmName: name,
+        vmType: size,
+        prvSubnetIp: prvip,
+        mgtSubnetIp: mgtip
+      }
+      deploy(t, "#{name}", params, domain)
     end
 
     def list_machine; end
@@ -148,5 +157,15 @@ module Cloudware
       end
       i
     end
+
+    def get_domain_id(name)
+      @client.resource_groups.list.each do |group|
+        next if group.tags.nil?
+        next if group.tags['cloudware_id'].nil?
+        next unless group.name == name
+        return group.tags['cloudware_id']
+      end
+    end
+
   end
 end

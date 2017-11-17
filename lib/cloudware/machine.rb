@@ -19,30 +19,33 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
+require 'cloudware/domain'
+require 'cloudware/azure'
 
 module Cloudware
   class Machine
     attr_accessor :name
     attr_accessor :domain
-    attr_accessor :prvsubnetaddress
-    attr_accessor :mgtsubnetaddress
+    attr_accessor :prvsubnetip
+    attr_accessor :mgtsubnetip
     # type: Cloudware instance type, e.g. master,slave
     attr_accessor :type
     # size: Provider specific VM size
     attr_accessor :size
 
     def create
-      case @provider
-      when 'azure'
-        p = Cloudware::Azure.new
-      end
-      p.name = @name
-      p.domain = @domain
-      p.prvsubnetaddress = @prvsubnetaddress
-      p.mgtsubnetaddress = @mgtsubnetaddress
-      p.type = @type
-      p.size = @size
-      p.create_machine
+      p = Cloudware::Azure.new
+      d = Cloudware::Domain.new
+      domain_id = p.get_domain_id(@domain)
+      d.name = @domain
+      provider = d.get_domain_provider
+      p.create_machine(@name,
+                       @domain,
+                       domain_id,
+                       @prvsubnetip,
+                       @mgtsubnetip,
+                       @type,
+                       @size)
     end
 
     def list; end

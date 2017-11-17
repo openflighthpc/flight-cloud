@@ -67,5 +67,14 @@ module Cloudware
         end
       end
     end
+
+    def get_domain_provider
+      list.each do |d|
+        d.each do |l|
+          next unless l[0] == @name
+          l[4]
+        end
+      end
+    end
   end
 end

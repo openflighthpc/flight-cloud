@@ -96,17 +96,17 @@ module Cloudware
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
       c.option '--type TYPE', String, 'Machine type to create'
-      c.option '--provider NAME', String, 'Provider name'
       c.option '--prvsubnetip ADDR', String, 'Prv subnet IP address'
       c.option '--mgtsubnetip ADDR', String, 'Mgt subnet IP address'
+      c.option '--size NAME', String, 'Provider specific instance size'
       c.action do |_args, options|
         m = Cloudware::Machine.new
         m.name = options.name.to_s
         m.domain = options.domain.to_s
         m.type = options.type.to_s
-        m.provider = options.provider.to_s
         m.prvsubnetip = options.prvsubnetip.to_s
         m.mgtsubnetip = options.mgtsubnetip.to_s
+        m.size = options.size.to_s
         m.create
       end
     end
