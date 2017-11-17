@@ -137,19 +137,6 @@ module Cloudware
       puts '==> Deployment succeeded'
     end
 
-    def resource_group_exists(name)
-      i = []
-      @client.resource_groups.list.each do |group|
-        next if group.tags.nil?
-        next if group.tags['cloudware_id'].nil?
-        if group.tags['cloudware_id'] == name
-          return true
-        else
-          return false
-        end
-      end
-    end
-
     def create_resource_group(region, id, name)
       params = @client.model_classes.resource_group.new.tap do |r|
         r.location = region
@@ -163,24 +150,31 @@ module Cloudware
     end
 
     def list_resource_groups
-      i = []
-      @client.resource_groups.list.each do |group|
-        next if group.tags.nil?
-        next if group.tags['cloudware_id'].nil?
-        i.push([group.tags['cloudware_domain'],
-                group.tags['region'],
-                'azure'])
+      groups = []
+      @client.resource_groups.list.each do |g|
+        next if g.tags.nil?
+        next if g.tags['cloudware_id'].nil?
+        groups.push([g.tags['cloudware_domain'],
+                     g.tags['region'],
+                     'azure'])
       end
-      i
+      return groups
     end
 
     def get_domain_id(name)
-      @client.resource_groups.list.each do |group|
-        next if group.tags.nil?
-        next if group.tags['cloudware_id'].nil?
-        next unless group.name == name
-        return group.tags['cloudware_id']
+      list_resource_groups.each do |g|
+        next unless g.name == name
+        return g.tags['cloudware_id']
       end
     end
+
+    def resource_group_exists(name)
+      list_resource_groups.each do |g|
+        next unless g.tags['cloudware_domain'] == name
+        return true if g.tags['cloudware_domain'] == name
+        break
+      end
+    end
+
   end
 end
