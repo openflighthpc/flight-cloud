@@ -5,7 +5,13 @@
     "cloudwareDomain": {
       "type": "string",
       "metadata": {
-        "description": "Enter the Cloudware domain ID"
+        "description": "Enter the Cloudware domain name"
+      }
+    },
+    "cloudwareId": {
+      "type": "string",
+      "metadata": {
+        "description": "Enter the Cloudware ID"
       }
     },
     "vmName": {
@@ -90,6 +96,7 @@
       "apiVersion": "2016-04-30-preview",
       "tags": {
         "cloudware_domain": "[parameters('cloudwareDomain')]",
+        "cloudware_id": "[parameters('cloudwareId')]",
         "cloudware_machine_name": "[parameters('vmName')]",
         "cloudware_prv_ip": "[parameters('prvSubnetIp')]",
         "cloudware_mgt_ip": "[parameters('mgtSubnetIp')]"
@@ -111,24 +118,30 @@
           }
         },
         "osProfile": {
-          "computerName": "login1",
+          "computerName": "[concat(parameters('vmName'), '.prv.', parameters('cloudwareDomain'), '.alces.network')]",
           "adminUsername": "[variables('adminUsername')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
               "publicKeys": [{
                 "path": "[concat ('/home/', variables('adminUsername'), '/.ssh/authorized_keys')]",
-                "keyData": "[parameters('adminPublicKey')]"
+                "keyData": "[variables('adminPublicKey')]"
               }]
             }
           }
         },
         "networkProfile": {
           "networkInterfaces": [{
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('prvInterfaceName'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('prvInterfaceName'))]",
+              "properties": {
+                "primary": true
+              }
             },
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('mgtInterfaceName'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('mgtInterfaceName'))]",
+              "properties": {
+                "primary": false
+              }
             }
           ]
         }

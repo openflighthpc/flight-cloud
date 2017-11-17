@@ -22,7 +22,14 @@
 
 module Cloudware
   class Machine
-    attr_accessor :name, :infrastructure, :ipaddresstail, :provider, :type
+    attr_accessor :name
+    attr_accessor :domain
+    attr_accessor :prvsubnetaddress
+    attr_accessor :mgtsubnetaddress
+    # type: Cloudware instance type, e.g. master,slave
+    attr_accessor :type
+    # size: Provider specific VM size
+    attr_accessor :size
 
     def create
       case @provider
@@ -30,9 +37,11 @@ module Cloudware
         p = Cloudware::Azure.new
       end
       p.name = @name
-      p.infrastructure = @infrastructure
-      p.iptail = @infrastructure
+      p.domain = @domain
+      p.prvsubnetaddress = @prvsubnetaddress
+      p.mgtsubnetaddress = @mgtsubnetaddress
       p.type = @type
+      p.size = @size
       p.create_machine
     end
 
