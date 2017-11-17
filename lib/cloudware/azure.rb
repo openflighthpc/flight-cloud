@@ -99,6 +99,7 @@ module Cloudware
       list_resource_groups.each do |g|
         r = @client.resources.list_by_resource_group(g[0])
         r.each do |r|
+          next unless r.type == 'Microsoft.Compute/virtualMachines'
           next unless r.tags['cloudware_resource_type'] == 'machine'
           l.push([r.tags['cloudware_domain'],
                   r.tags['cloudware_machine_name'],
