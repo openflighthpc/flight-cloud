@@ -25,15 +25,6 @@ Resources = Azure::Resources::Profiles::Latest::Mgmt
 
 module Cloudware
   class Azure
-    attr_accessor :name
-    attr_accessor :id
-    attr_accessor :networkcidr
-    attr_accessor :prvsubnetcidr
-    attr_accessor :mgtsubnetcidr
-    attr_accessor :region
-    attr_accessor :iptail
-    attr_accessor :type
-
     def initialize
       subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
       provider = MsRestAzure::ApplicationTokenProvider.new(
@@ -49,18 +40,18 @@ module Cloudware
       @client = Resources::Client.new(options)
     end
 
-    def create_domain
-      create_resource_group unless resource_group_exists == true
+    def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
+      create_resource_group(region, id, name) unless resource_group_exists(name) == true
 
       t = 'azure-network-base.json'
-      @params = {
-        cloudwareDomain: @name,
-        cloudwareId: @id,
-        networkCIDR: @networkcidr,
-        prvSubnetCIDR: @prvsubnetcidr,
-        mgtSubnetCIDR: @mgtsubnetcidr
+      params = {
+        cloudwareDomain: name,
+        cloudwareId: id,
+        networkCIDR: networkcidr,
+        prvSubnetCIDR: prvsubnetcidr,
+        mgtSubnetCIDR: mgtsubnetcidr
       }
-      deploy(t, 'domain')
+      deploy(t, 'domain', params, name)
     end
 
     def list_domains
@@ -79,16 +70,12 @@ module Cloudware
       d
     end
 
-    def describe
-      @client.resource_groups.list_resources(@name).value.each do |r|
-        next unless r.name == 'network'
-        next unless r.name == 'network'
-        @name = r.tags['cloudware_domain']
-        @name = r.tags['cloudware_id']
-        @networkcidr = r.tags['cloudware_network_cidr']
-        @prvsubnetcidr = r.tags['cloudware_prv_subnet_cidr']
-        @mgtsubnetcidr = r.tags['cloudware_mgt_subnet_cidr']
+    def describe(name)
+      a = []
+      @client.resource_groups.list_resources(name).value.each do |_r|
+        a.push('r.tags')
       end
+      a
     end
 
     def destroy_domain; end
@@ -102,19 +89,19 @@ module Cloudware
 
     def destroy_machine; end
 
-    def deploy(template, type)
+    def deploy(template, type, params, name)
       t = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
       d = @client.model_classes.deployment.new
       d.properties = @client.model_classes.deployment_properties.new
       d.properties.template = JSON.parse(t)
       d.properties.mode = Resources::Models::DeploymentMode::Incremental
-      d.properties.parameters = Hash[*@params.map { |k, v| [k, { value: v }] }.flatten]
+      d.properties.parameters = Hash[*params.map { |k, v| [k, { value: v }] }.flatten]
       debug_settings = @client.model_classes.debug_setting.new
       debug_settings.detail_level = 'requestContent, responseContent'
       d.properties.debug_setting = debug_settings
       puts '==> Creating new deployment. This may take a while..'
       @client.deployments.create_or_update(name, type.to_s, d)
-      operation_results = @client.deployment_operations.list(@name, type.to_s)
+      operation_results = @client.deployment_operations.list(name, type.to_s)
       unless operation_results.nil?
         operation_results.each do |operation_result|
           until operation_result.properties.provisioning_state == 'Succeeded'
@@ -125,12 +112,12 @@ module Cloudware
       puts '==> Deployment succeeded'
     end
 
-    def resource_group_exists
+    def resource_group_exists(name)
       i = []
       @client.resource_groups.list.each do |group|
         next if group.tags.nil?
         next if group.tags['cloudware_id'].nil?
-        if group.tags['cloudware_id'] == @name
+        if group.tags['cloudware_id'] == name
           return true
         else
           return false
@@ -138,16 +125,16 @@ module Cloudware
       end
     end
 
-    def create_resource_group
+    def create_resource_group(region, id, name)
       params = @client.model_classes.resource_group.new.tap do |r|
-        r.location = @region
+        r.location = region
         r.tags = {
-          cloudware_id: @id,
-          cloudware_domain: @name,
-          region: @region
+          cloudware_id: id,
+          cloudware_domain: name,
+          region: region
         }
       end
-      @client.resource_groups.create_or_update(@name, params)
+      @client.resource_groups.create_or_update(name, params)
     end
 
     def list_resource_groups

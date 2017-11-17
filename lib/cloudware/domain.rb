@@ -24,19 +24,26 @@ require 'securerandom'
 module Cloudware
   class Domain
     attr_accessor :name, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :provider, :region
+    attr_accessor :name
+    attr_accessor :id
+    attr_accessor :networkcidr
+    attr_accessor :prvsubnetcidr
+    attr_accessor :mgtsubnetcidr
+    attr_accessor :region
+    attr_accessor :provider
 
     def create
       case @provider
       when 'azure'
         d = Cloudware::Azure.new
       end
-      d.name = @name
-      d.networkcidr = @networkcidr
-      d.prvsubnetcidr = @prvsubnetcidr
-      d.mgtsubnetcidr = @mgtsubnetcidr
-      d.region = @region
-      d.id = SecureRandom.uuid
-      d.create_domain
+      @id = SecureRandom.uuid
+      d.create_domain(@name,
+                      @id,
+                      @networkcidr,
+                      @prvsubnetcidr,
+                      @mgtsubnetcidr,
+                      @region)
     end
 
     def list
