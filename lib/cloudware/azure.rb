@@ -130,7 +130,9 @@ module Cloudware
       @client.resource_groups.list.each do |group|
         next if group.tags.nil?
         next if group.tags['cloudware_id'].nil?
-        if group.tags['cloudware_id'] == @name return true; else
+        if group.tags['cloudware_id'] == @name
+          return true
+        else
           return false
         end
       end
