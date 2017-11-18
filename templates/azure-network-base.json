@@ -46,7 +46,8 @@
         "cloudware_domain": "[parameters('cloudwareDomain')]",
         "cloudware_network_cidr": "[parameters('networkCIDR')]",
         "cloudware_prv_subnet_cidr": "[parameters('prvSubnetCIDR')]",
-        "cloudware_mgt_subnet_cidr": "[parameters('mgtSubnetCIDR')]"
+        "cloudware_mgt_subnet_cidr": "[parameters('mgtSubnetCIDR')]",
+        "cloudware_resource_type": "domain"
       },
       "location": "[resourceGroup().location]",
       "properties": {
