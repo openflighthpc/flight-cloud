@@ -173,13 +173,7 @@ module Cloudware
     end
 
     def resource_group_exists(name)
-      list_resource_groups.each do |g|
-        if g == name
-          return true
-        else
-          return false
-        end
-      end
+      list_resource_groups.include? name
     end
   end
 end
