@@ -34,6 +34,7 @@ module Cloudware
     attr_accessor :size
 
     def create
+      abort('Invalid machine name') unless validate_name
       p = Cloudware::Azure.new
       d = Cloudware::Domain.new
       domain_id = p.get_domain_id(@domain)
@@ -56,5 +57,9 @@ module Cloudware
     end
 
     def destroy; end
+
+    def validate_name
+      !@name.match(/\A[a-zA-Z0-9]*\z/).nil?
+    end
   end
 end

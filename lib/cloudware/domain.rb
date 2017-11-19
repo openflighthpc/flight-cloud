@@ -33,6 +33,7 @@ module Cloudware
     attr_accessor :provider
 
     def create
+      abort('Invalid domain name') unless validate_name
       case @provider
       when 'azure'
         d = Cloudware::Azure.new
@@ -58,6 +59,10 @@ module Cloudware
           l[4]
         end
       end
+    end
+
+    def validate_name
+      !@name.match(/\A[a-zA-Z0-9]*\z/).nil?
     end
   end
 end
