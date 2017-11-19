@@ -23,7 +23,7 @@ require 'cloudware/domain'
 require 'cloudware/azure'
 
 module Cloudware
-  class Machine
+  class Machine < Domain
     attr_accessor :name
     attr_accessor :domain
     attr_accessor :prvsubnetip
@@ -53,7 +53,7 @@ module Cloudware
       l = []
       azure = Cloudware::Azure.new
       l.push(azure.list_machines)
-      return l
+      l
     end
 
     def destroy; end

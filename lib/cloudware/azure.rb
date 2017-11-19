@@ -70,7 +70,7 @@ module Cloudware
                         r.tags['cloudware_id']])
         end
       end
-      return domains
+      domains
     end
 
     def describe(name)
@@ -78,7 +78,7 @@ module Cloudware
       @client.resource_groups.list_resources(name).value.each do |_r|
         a.push('resource.tags')
       end
-      return resource
+      resource
     end
 
     def destroy_domain; end
@@ -111,7 +111,7 @@ module Cloudware
                   r.tags['cloudware_machine_size']])
         end
       end
-      return l
+      l
     end
 
     def destroy_machine; end
@@ -157,10 +157,10 @@ module Cloudware
         next if g.tags.nil?
         groups.push(g.tags['cloudware_domain']) unless g.tags['cloudware_domain'].nil?
       end
-      return groups
+      groups
     end
 
-    def get_domain_id(name)
+    def get_domain_id(_name)
       list_resource_groups.each do |g|
         r = @client.resources.list_by_resource_group(g)
         r.each do |r|
@@ -181,6 +181,5 @@ module Cloudware
         end
       end
     end
-
   end
 end

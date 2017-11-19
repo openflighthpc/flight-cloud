@@ -23,7 +23,6 @@ require 'securerandom'
 
 module Cloudware
   class Domain
-    attr_accessor :name, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr, :provider, :region
     attr_accessor :name
     attr_accessor :id
     attr_accessor :networkcidr
@@ -49,7 +48,7 @@ module Cloudware
 
     def list
       azure = Cloudware::Azure.new
-      return azure.list_domains
+      azure.list_domains
     end
 
     def get_domain_provider
