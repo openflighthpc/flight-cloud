@@ -47,25 +47,8 @@ module Cloudware
     end
 
     def list
-      l = []
-      case @provider
-      when 'azure'
-        d = Cloudware::Azure.new
-        l.push(d.list_domains)
-      else
-        azure = Cloudware::Azure.new
-        l.push(azure.list_domains)
-      end
-      l
-    end
-
-    def check_domain_exists
-      list.each do |d|
-        d.each do |l|
-          next unless l[0] == @name
-          return true if l[0] == @name
-        end
-      end
+      azure = Cloudware::Azure.new
+      return azure.list_domains
     end
 
     def get_domain_provider

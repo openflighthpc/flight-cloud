@@ -47,10 +47,6 @@ module Cloudware
         options.name = ask('Domain identifier: ') if options.name.nil?
         d.name = options.name.to_s
 
-        if d.check_domain_exists == true
-          abort("==> Domain #{options.name} already exists")
-        end
-
         options.provider = ask('Provider name: ') if options.provider.nil?
         d.provider = options.provider.to_s
 
@@ -78,16 +74,15 @@ module Cloudware
         rows = []
         d = Cloudware::Domain.new
         d.list
-        abort('die')
         d.list.each do |l|
-          rows.concat(l)
+          l.delete_at(5)
+          rows << l
         end
         table = Terminal::Table.new headings: ['Domain name'.bold,
                                                'Network CIDR'.bold,
                                                'Prv Subnet CIDR'.bold,
                                                'Mgt Subnet CIDR'.bold,
-                                               'Provider'.bold,
-                                               'Identifier'.bold],
+                                               'Provider'.bold],
                                     rows: rows
         puts table
       end

@@ -41,7 +41,8 @@ module Cloudware
     end
 
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
-      create_resource_group(region, id, name) unless resource_group_exists(name) == true
+      abort('Domain already exists') if resource_group_exists(name) == true
+      create_resource_group(region, id, name)
 
       t = 'azure-network-base.json'
       params = {
@@ -62,10 +63,14 @@ module Cloudware
           next unless r.type == 'Microsoft.Network/virtualNetworks'
           next unless r.tags['cloudware_resource_type'] == 'domain'
           domains.push([r.tags['cloudware_domain'],
-                        r.tags['cloudware_machine_name'],
-                        r.tags['cloudware_machine_type']])
+                        r.tags['cloudware_network_cidr'],
+                        r.tags['cloudware_prv_subnet_cidr'],
+                        r.tags['cloudware_mgt_subnet_cidr'],
+                        'azure',
+                        r.tags['cloudware_id']])
         end
       end
+      return domains
     end
 
     def describe(name)
@@ -106,7 +111,7 @@ module Cloudware
                   r.tags['cloudware_machine_size']])
         end
       end
-      l
+      return l
     end
 
     def destroy_machine; end
@@ -157,16 +162,23 @@ module Cloudware
 
     def get_domain_id(name)
       list_resource_groups.each do |g|
-        next unless g.name == name
-        return g.tags['cloudware_id']
+        r = @client.resources.list_by_resource_group(g)
+        r.each do |r|
+          next unless r.type == 'Microsoft.Network/virtualNetworks'
+          next unless r.tags['cloudware_resource_type'] == 'domain'
+          return r.tags['cloudware_id']
+          break
+        end
       end
     end
 
     def resource_group_exists(name)
       list_resource_groups.each do |g|
-        next unless g.tags['cloudware_domain'] == name
-        return true if g.tags['cloudware_domain'] == name
-        break
+        if g == name
+          return true
+        else
+          return false
+        end
       end
     end
 
