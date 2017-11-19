@@ -84,7 +84,7 @@
 				"publicIPAllocationMethod": "Static",
 				"idleTimeoutInMinutes": 30,
 				"dnsSettings": {
-					"domainNameLabel": "[concat(parameters('cloudwareDomain'), '-', parameters('cloudwareDomain'))]"
+					"domainNameLabel": "[concat(parameters('cloudwareDomain'), '-', parameters('vmName'))]"
 				}
 			}
 		},
