@@ -54,16 +54,6 @@ module Cloudware
       list
     end
 
-    def load
-      # Load information about a specific domain
-      @id = list[@name][:cloudware_id]
-      @networkcidr = list[@name][:network_cidr]
-      @prvsubnetcidr = list[@name][:prv_subnet_cidr]
-      @mgtsubnetcidr = list[@name][:mgt_subnet_cidr]
-      @region = list[@name][:region] 
-      @provider = list[@name][:provider]
-    end
-
     def destroy
       # Provide hardcoded 'domain' name to `provider.destroy`
       # the domain deployment is always labelled 'domain'
