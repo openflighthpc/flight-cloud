@@ -60,11 +60,11 @@ module Cloudware
       @cloud.destroy('domain', @domain)
     end
 
-    def provider
+    def get_provider
       list[@name][:provider]
     end
 
-    def id
+    def get_id
       list[@name][:cloudware_id]
     end
 
