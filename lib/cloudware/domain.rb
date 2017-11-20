@@ -54,7 +54,7 @@ module Cloudware
     end
 
     def get_domain_provider
-      domains[@name][:provider]
+      list[@name][:provider]
     end
 
     def validate_name

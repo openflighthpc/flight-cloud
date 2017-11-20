@@ -39,7 +39,7 @@ module Cloudware
       d = Cloudware::Domain.new
       domain_id = p.get_domain_id(@domain)
       d.name = @domain
-      provider = d.get_domain_provider
+      provider = d.domain_provider
       p.create_machine(@name,
                        @domain,
                        domain_id,
