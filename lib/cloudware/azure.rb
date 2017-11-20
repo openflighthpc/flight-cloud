@@ -68,11 +68,11 @@ module Cloudware
                            network_cidr: r.tags['cloudware_network_cidr'],
                            prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
                            mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
-                           provider: 'azure'
+                           provider: 'azure',
+                           region: r.tags['cloudware_domain_region']
                          })
         end
       end
-      abort('No available domains') if domains.empty?
       domains
     end
 
@@ -107,7 +107,6 @@ module Cloudware
           machines.merge!(r.tags['cloudware_machine_name'] => { cloudware_domain: r.tags['cloudware_domain'], cloudware_machine_type: r.tags['cloudware_machine_type'], prv_ip: r.tags['cloudware_prv_ip'], mgt_ip: r.tags['cloudware_mgt_ip'], provider: 'azure', size: r.tags['cloudware_machine_size'] })
         end
       end
-      abort('No available machines') if machines.empty?
       machines
     end
 
