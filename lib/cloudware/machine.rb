@@ -35,17 +35,17 @@ module Cloudware
 
     def initialize
       @d = Cloudware::Domain.new
+      case @d.provider
+      when 'azure'
+        @cloud = Cloudware::Azure.new
+      end
     end
 
     def create
       abort('Invalid machine name') unless validate_name
       @d.name = @domain
-      case @d.domain_provider
-      when 'azure'
-        provider = Cloudware::Azure.new
-      end
-      provider.create_machine(@name, @domain, provider.domain_id(@domain).to_s,
-                       @prvsubnetip, @mgtsubnetip, @type, @size)
+      @cloud.create_machine(@name, @domain, @d.id,
+             @prvsubnetip, @mgtsubnetip, @type, @size)
     end
 
     def list
@@ -59,11 +59,7 @@ module Cloudware
 
     def destroy
       @d.name = @domain
-      case @d.domain_provider
-      when 'azure'
-        provider = Cloudware::Azure.new
-      end
-      provider.destroy_machine(@name, @domain)
+      @cloud.destroy(@name, @domain)
     end
 
     def validate_name
