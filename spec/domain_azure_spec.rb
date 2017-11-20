@@ -11,9 +11,19 @@ describe Cloudware::Domain do
     @domain = Cloudware::Domain.new
   end
 
+  it 'should error when an incorrect name is given' do
+    @domain.name = 'invalid-name'
+    expect(@domain.name).to eq(false)
+  end
+
   it 'returns the correct name' do
     @domain.name = @name
     expect(@domain.name).to eq(@name)
+  end
+
+  it 'should error when an incorrect provider is given' do
+    @domain.provider = 'alces1234'
+    expect(@domain.provider).to eq(false)
   end
 
   it 'returns the correct provider' do

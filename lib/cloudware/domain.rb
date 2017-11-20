@@ -60,6 +60,19 @@ module Cloudware
       @cloud.destroy('domain', @domain)
     end
 
+    def name
+      return false unless validate_name
+      @name
+    end
+
+    def provider 
+      unless validate_provider
+        return false
+      else
+        @provider
+      end
+    end
+
     def get_provider
       list[@name][:provider]
     end
@@ -70,6 +83,10 @@ module Cloudware
 
     def validate_name
       !@name.match(/\A[a-zA-Z0-9]*\z/).nil?
+    end
+
+    def validate_provider
+      ['aws', 'azure', 'gcp'].include? @provider      
     end
   end
 end
