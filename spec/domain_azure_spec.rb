@@ -50,4 +50,8 @@ describe Cloudware::Domain do
     @domain.mgtsubnetcidr = @mgtsubnetcidr
     expect(@domain.mgtsubnetcidr).to eq(@mgtsubnetcidr)
   end
+
+  it 'returns a list of domains as a hash' do
+    expect(@domain.list).to be_an(Hash)
+  end
 end
