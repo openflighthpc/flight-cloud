@@ -39,10 +39,12 @@ module Cloudware
     end
 
     def create
-      abort('Invalid domain name') unless validate_name
+      abort('Invalid domain name') unless valid_name?
+      abort('Domain already exists') if exists?
+      abort('Invalid provider') unless valid_provider?
       load_cloud
       @cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,
-             @prvsubnetcidr, @mgtsubnetcidr, @region)
+                           @prvsubnetcidr, @mgtsubnetcidr, @region)
     end
 
     def list
@@ -61,16 +63,11 @@ module Cloudware
     end
 
     def name
-      return false unless validate_name
-      @name
+      return @name if valid_name? || abort('Invalid name')
     end
 
-    def provider 
-      unless validate_provider
-        return false
-      else
-        @provider
-      end
+    def provider
+      return @provider if valid_provider? || abort('Invalid provider')
     end
 
     def get_provider
@@ -81,12 +78,16 @@ module Cloudware
       list[@name][:cloudware_id]
     end
 
-    def validate_name
+    def exists?
+      list.include? @name
+    end
+
+    def valid_name?
       !@name.match(/\A[a-zA-Z0-9]*\z/).nil?
     end
 
-    def validate_provider
-      ['aws', 'azure', 'gcp'].include? @provider      
+    def valid_provider?
+      %w[aws azure gcp].include? @provider
     end
   end
 end

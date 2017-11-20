@@ -43,7 +43,7 @@ module Cloudware
       abort('Invalid machine name') unless validate_name
       load_cloud
       @cloud.create_machine(@name, @domain, @d.get_id,
-             @prvsubnetip, @mgtsubnetip, @type, @size)
+                            @prvsubnetip, @mgtsubnetip, @type, @size)
     end
 
     def list
