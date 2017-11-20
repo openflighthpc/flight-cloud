@@ -19,9 +19,6 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-require 'cloudware/domain'
-require 'cloudware/azure'
-
 module Cloudware
   class Machine < Domain
     attr_accessor :name
