@@ -31,7 +31,7 @@ module Cloudware
     attr_accessor :region
     attr_accessor :provider
 
-    def initialize
+    def load_cloud
       case @provider
       when 'azure'
         @cloud = Cloudware::Azure.new
@@ -40,8 +40,8 @@ module Cloudware
 
     def create
       abort('Invalid domain name') unless validate_name
-      @id = SecureRandom.uuid
-      @cloud.create_domain(@name, @id, @networkcidr,
+      load_cloud
+      @cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,
              @prvsubnetcidr, @mgtsubnetcidr, @region)
     end
 
@@ -54,6 +54,16 @@ module Cloudware
       list
     end
 
+    def load
+      # Load information about a specific domain
+      @id = list[@name][:cloudware_id]
+      @networkcidr = list[@name][:network_cidr]
+      @prvsubnetcidr = list[@name][:prv_subnet_cidr]
+      @mgtsubnetcidr = list[@name][:mgt_subnet_cidr]
+      @region = list[@name][:region] 
+      @provider = list[@name][:provider]
+    end
+
     def destroy
       # Provide hardcoded 'domain' name to `provider.destroy`
       # the domain deployment is always labelled 'domain'
@@ -61,8 +71,6 @@ module Cloudware
     end
 
     def provider
-      puts list
-      abort('die early')
       list[@name][:provider]
     end
 
