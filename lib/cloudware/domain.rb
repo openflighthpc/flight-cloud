@@ -61,6 +61,8 @@ module Cloudware
     end
 
     def provider
+      puts list
+      abort('die early')
       list[@name][:provider]
     end
 

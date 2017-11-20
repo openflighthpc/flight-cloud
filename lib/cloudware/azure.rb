@@ -72,6 +72,7 @@ module Cloudware
                          })
         end
       end
+      abort('No available domains') if domains.empty?
       domains
     end
 
@@ -106,6 +107,7 @@ module Cloudware
           machines.merge!(r.tags['cloudware_machine_name'] => { cloudware_domain: r.tags['cloudware_domain'], cloudware_machine_type: r.tags['cloudware_machine_type'], prv_ip: r.tags['cloudware_prv_ip'], mgt_ip: r.tags['cloudware_mgt_ip'], provider: 'azure', size: r.tags['cloudware_machine_size'] })
         end
       end
+      abort('No available machines') if machines.empty?
       machines
     end
 
