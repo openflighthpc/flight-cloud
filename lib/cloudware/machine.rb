@@ -33,8 +33,9 @@ module Cloudware
     # size: Provider specific VM size
     attr_accessor :size
 
-    def initialize
+    def load_cloud
       @d = Cloudware::Domain.new
+      @d.name = @domain
       case @d.provider
       when 'azure'
         @cloud = Cloudware::Azure.new
@@ -43,7 +44,7 @@ module Cloudware
 
     def create
       abort('Invalid machine name') unless validate_name
-      @d.name = @domain
+      load_cloud
       @cloud.create_machine(@name, @domain, @d.id,
              @prvsubnetip, @mgtsubnetip, @type, @size)
     end
@@ -58,7 +59,7 @@ module Cloudware
     end
 
     def destroy
-      @d.name = @domain
+      load_cloud
       @cloud.destroy(@name, @domain)
     end
 
