@@ -31,30 +31,41 @@ module Cloudware
     attr_accessor :region
     attr_accessor :provider
 
-    def create
-      abort('Invalid domain name') unless validate_name
+    def initialize
       case @provider
       when 'azure'
-        d = Cloudware::Azure.new
+        @cloud = Cloudware::Azure.new
       end
+    end
+
+    def create
+      abort('Invalid domain name') unless validate_name
       @id = SecureRandom.uuid
-      d.create_domain(@name,
-                      @id,
-                      @networkcidr,
-                      @prvsubnetcidr,
-                      @mgtsubnetcidr,
-                      @region)
+      @cloud.create_domain(@name, @id, @networkcidr,
+             @prvsubnetcidr, @mgtsubnetcidr, @region)
     end
 
     def list
       # @todo - once we have GCP/AWS providers, merge
       # all providers data into a single hash and return
+      list = {}
       azure = Cloudware::Azure.new
-      azure.list_domains
+      list.merge!(azure.list_domains)
+      list
     end
 
-    def domain_provider
+    def destroy
+      # Provide hardcoded 'domain' name to `provider.destroy`
+      # the domain deployment is always labelled 'domain'
+      @cloud.destroy('domain', @domain)
+    end
+
+    def provider
       list[@name][:provider]
+    end
+
+    def id
+      list[@name][:cloudware_id]
     end
 
     def validate_name
