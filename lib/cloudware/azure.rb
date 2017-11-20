@@ -83,8 +83,6 @@ module Cloudware
       resource
     end
 
-    def destroy_domain; end
-
     def create_machine(name, domain, id, prvip, mgtip, type, size)
       t = "azure-machine-#{type}.json"
       params = {
@@ -111,10 +109,6 @@ module Cloudware
       machines
     end
 
-    def destroy_machine(name, domain)
-      @client.deployments.delete(domain, name)
-    end
-
     def deploy(template, type, params, name)
       t = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
       d = @client.model_classes.deployment.new
@@ -136,6 +130,10 @@ module Cloudware
         end
       end
       puts '==> Deployment succeeded'
+    end
+
+    def destroy(name, domain)
+      @client.deployments.delete(domain, name)
     end
 
     def create_resource_group(region, id, name)
