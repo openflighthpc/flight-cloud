@@ -47,17 +47,14 @@ module Cloudware
     end
 
     def list
+      # @todo - once we have GCP/AWS providers, merge
+      # all providers data into a single hash and return
       azure = Cloudware::Azure.new
       azure.list_domains
     end
 
     def get_domain_provider
-      list.each do |d|
-        d.each do |l|
-          next unless l[0] == @name
-          l[4]
-        end
-      end
+      domains[@name][:provider]
     end
 
     def validate_name

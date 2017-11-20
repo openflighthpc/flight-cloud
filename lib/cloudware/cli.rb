@@ -71,19 +71,17 @@ module Cloudware
       c.description = 'List created domains'
       c.option '--provider NAME', String, 'Provider name'
       c.action do |_args, _options|
-        rows = []
         d = Cloudware::Domain.new
-        d.list
-        d.list.each do |l|
-          l.delete_at(5)
-          rows << l
+        r = []
+        d.list.each do |k, v|
+          r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider]]
         end
         table = Terminal::Table.new headings: ['Domain name'.bold,
                                                'Network CIDR'.bold,
                                                'Prv Subnet CIDR'.bold,
                                                'Mgt Subnet CIDR'.bold,
                                                'Provider'.bold],
-                                    rows: rows
+                                    rows: r
         puts table
       end
     end
@@ -113,18 +111,18 @@ module Cloudware
       c.syntax = 'cloudware machine list'
       c.description = 'List available machines'
       c.action do |_args, _options|
-        rows = []
         m = Cloudware::Machine.new
-        m.list.each do |l|
-          rows.concat(l)
+        r = []
+        m.list.each do |k, v|
+          r << [k, v[:cloudware_domain], v[:cloudware_machine_type], v[:prv_ip], v[:mgt_ip], v[:size]]
         end
-        table = Terminal::Table.new headings: ['Domain name'.bold,
-                                               'Machine name'.bold,
+        table = Terminal::Table.new headings: ['Machine name'.bold,
+                                               'Domain name'.bold,
                                                'Machine type'.bold,
                                                'Prv IP address'.bold,
                                                'Mgt IP address'.bold,
                                                'Size'.bold],
-                                    rows: rows
+                                    rows: r
         puts table
       end
     end

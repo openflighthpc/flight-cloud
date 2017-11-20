@@ -56,18 +56,20 @@ module Cloudware
     end
 
     def list_domains
-      domains = []
+      domains = {}
       list_resource_groups.each do |g|
         resources = @client.resources.list_by_resource_group(g)
         resources.each do |r|
-          next unless r.type == 'Microsoft.Network/virtualNetworks'
           next unless r.tags['cloudware_resource_type'] == 'domain'
-          domains.push([r.tags['cloudware_domain'],
-                        r.tags['cloudware_network_cidr'],
-                        r.tags['cloudware_prv_subnet_cidr'],
-                        r.tags['cloudware_mgt_subnet_cidr'],
-                        'azure',
-                        r.tags['cloudware_id']])
+          next unless r.type == 'Microsoft.Network/virtualNetworks'
+          domains.merge!(r.tags['cloudware_domain'] => {
+                           cloudware_domain: r.tags['cloudware_domain'],
+                           cloudware_id: r.tags['cloudware_id'],
+                           network_cidr: r.tags['cloudware_network_cidr'],
+                           prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
+                           mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
+                           provider: 'azure'
+                         })
         end
       end
       domains
@@ -97,21 +99,16 @@ module Cloudware
     end
 
     def list_machines
-      l = []
+      machines = {}
       list_resource_groups.each do |g|
-        r = @client.resources.list_by_resource_group(g)
-        r.each do |r|
-          next unless r.type == 'Microsoft.Compute/virtualMachines'
+        resources = @client.resources.list_by_resource_group(g)
+        resources.each do |r|
           next unless r.tags['cloudware_resource_type'] == 'machine'
-          l.push([r.tags['cloudware_domain'],
-                  r.tags['cloudware_machine_name'],
-                  r.tags['cloudware_machine_type'],
-                  r.tags['cloudware_prv_ip'],
-                  r.tags['cloudware_mgt_ip'],
-                  r.tags['cloudware_machine_size']])
+          next unless r.type == 'Microsoft.Compute/virtualMachines'
+          machines.merge!(r.tags['cloudware_machine_name'] => { cloudware_domain: r.tags['cloudware_domain'], cloudware_machine_type: r.tags['cloudware_machine_type'], prv_ip: r.tags['cloudware_prv_ip'], mgt_ip: r.tags['cloudware_mgt_ip'], provider: 'azure', size: r.tags['cloudware_machine_size'] })
         end
       end
-      l
+      machines
     end
 
     def destroy_machine; end

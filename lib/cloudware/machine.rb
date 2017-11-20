@@ -50,10 +50,10 @@ module Cloudware
     end
 
     def list
-      l = []
+      # @todo - once we have GCP/AWS providers, merge
+      # all providers data into a single hash and return
       azure = Cloudware::Azure.new
-      l.push(azure.list_machines)
-      l
+      azure.list_machines
     end
 
     def destroy; end
