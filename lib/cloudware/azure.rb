@@ -111,7 +111,9 @@ module Cloudware
       machines
     end
 
-    def destroy_machine; end
+    def destroy_machine(name, domain)
+      @client.deployments.delete(domain, name)
+    end
 
     def deploy(template, type, params, name)
       t = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
@@ -157,12 +159,13 @@ module Cloudware
       groups
     end
 
-    def get_domain_id(_name)
+    def domain_id(name)
       list_resource_groups.each do |g|
         r = @client.resources.list_by_resource_group(g)
         r.each do |r|
           next unless r.type == 'Microsoft.Network/virtualNetworks'
           next unless r.tags['cloudware_resource_type'] == 'domain'
+          next unless r.tags['cloudware_domain'] == name
           return r.tags['cloudware_id']
           break
         end

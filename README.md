@@ -13,7 +13,7 @@
 
 ##### Creating a new domain
 
-```bash
+```
 $ cloudware domain create \
   --name moose \
   --provider azure \
@@ -29,6 +29,26 @@ $ cloudware domain list
 +-------------+--------------+-----------------+-----------------+----------+--------------------------------------+
 | moose       | 10.0.0.0/16  | 10.0.1.0/24     | 10.0.2.0/24     | azure    | 2f0d0a97-091d-4f65-b6a3-60c24c373a42 |
 +-------------+--------------+-----------------+-----------------+----------+--------------------------------------+
+```
+
+##### Creating a new machine
+
+```
+$ cloudware machine create \
+  --name master1 \
+  --domain moose \
+  --type master \
+  --prvsubnetip 10.0.1.11 \
+  --mgtsubnetip 10.0.2.11 \
+  --size Standard_DS1_v2
+==> Creating new deployment. This may take a while..
+==> Deployment succeeded
+$ cloudware machine list
++--------------+-------------+--------------+----------------+----------------+-----------------+
+| Machine name | Domain name | Machine type | Prv IP address | Mgt IP address | Size            |
++--------------+-------------+--------------+----------------+----------------+-----------------+
+| master1      | moose       | master       | 10.0.1.11      | 10.0.2.11      | Standard_DS1_v2 |
++--------------+-------------+--------------+----------------+----------------+-----------------+
 ```
 
 #### License

@@ -33,30 +33,37 @@ module Cloudware
     # size: Provider specific VM size
     attr_accessor :size
 
+    def initialize
+      @d = Cloudware::Domain.new
+    end
+
     def create
       abort('Invalid machine name') unless validate_name
-      p = Cloudware::Azure.new
-      d = Cloudware::Domain.new
-      domain_id = p.get_domain_id(@domain)
-      d.name = @domain
-      provider = d.domain_provider
-      p.create_machine(@name,
-                       @domain,
-                       domain_id,
-                       @prvsubnetip,
-                       @mgtsubnetip,
-                       @type,
-                       @size)
+      @d.name = @domain
+      case @d.domain_provider
+      when 'azure'
+        provider = Cloudware::Azure.new
+      end
+      provider.create_machine(@name, @domain, provider.domain_id(@domain).to_s,
+                       @prvsubnetip, @mgtsubnetip, @type, @size)
     end
 
     def list
       # @todo - once we have GCP/AWS providers, merge
       # all providers data into a single hash and return
+      list = {}
       azure = Cloudware::Azure.new
-      azure.list_machines
+      list.merge!(azure.list_machines)
     end
 
-    def destroy; end
+    def destroy
+      @d.name = @domain
+      case @d.domain_provider
+      when 'azure'
+        provider = Cloudware::Azure.new
+      end
+      provider.destroy_machine(@name, @domain)
+    end
 
     def validate_name
       !@name.match(/\A[a-zA-Z0-9]*\z/).nil?

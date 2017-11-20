@@ -139,5 +139,26 @@ module Cloudware
         puts table
       end
     end
+
+    command :'machine destroy' do |c|
+      c.syntax = 'cloudware machine destroy [options]'
+      c.description = 'Destroy a machine'
+      c.option '--name NAME', String, 'Machine name'
+      c.option '--domain NAME', String, 'Domain identifier'
+      c.action do |_args, options|
+        m = Cloudware::Machine.new
+
+        options.name = ask('Machine name: ') if options.name.nil?
+        m.name = options.name.to_s
+
+        options.domain = ask('Domain identifier: ') if options.domain.nil?
+        m.domain = options.domain.to_s
+
+        puts "Destroying #{options.name} in domain #{options.domain}"
+        puts 'This may take a while...'
+        m.destroy
+        puts 'Operation complete'
+      end
+    end
   end
 end

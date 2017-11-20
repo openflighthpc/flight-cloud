@@ -53,7 +53,7 @@ module Cloudware
       azure.list_domains
     end
 
-    def get_domain_provider
+    def domain_provider
       list[@name][:provider]
     end
 
