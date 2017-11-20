@@ -57,7 +57,7 @@ module Cloudware
 
     def list_domains
       domains = {}
-      list_resource_groups.each do |g|
+      resource_groups.each do |g|
         resources = @client.resources.list_by_resource_group(g)
         resources.each do |r|
           next unless r.tags['cloudware_resource_type'] == 'domain'
@@ -100,7 +100,7 @@ module Cloudware
 
     def list_machines
       machines = {}
-      list_resource_groups.each do |g|
+      resource_groups.each do |g|
         resources = @client.resources.list_by_resource_group(g)
         resources.each do |r|
           next unless r.tags['cloudware_resource_type'] == 'machine'
@@ -150,7 +150,7 @@ module Cloudware
       @client.resource_groups.create_or_update(name, params)
     end
 
-    def list_resource_groups
+    def resource_groups
       groups = []
       @client.resource_groups.list.each do |g|
         next if g.tags.nil?
@@ -160,7 +160,7 @@ module Cloudware
     end
 
     def domain_id(name)
-      list_resource_groups.each do |g|
+      resource_groups.each do |g|
         r = @client.resources.list_by_resource_group(g)
         r.each do |r|
           next unless r.type == 'Microsoft.Network/virtualNetworks'
@@ -173,7 +173,7 @@ module Cloudware
     end
 
     def resource_group_exists(name)
-      list_resource_groups.include? name
+      resource_groups.include? name
     end
   end
 end
