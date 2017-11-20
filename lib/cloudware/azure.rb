@@ -159,19 +159,6 @@ module Cloudware
       groups
     end
 
-    def domain_id(name)
-      resource_groups.each do |g|
-        r = @client.resources.list_by_resource_group(g)
-        r.each do |r|
-          next unless r.type == 'Microsoft.Network/virtualNetworks'
-          next unless r.tags['cloudware_resource_type'] == 'domain'
-          next unless r.tags['cloudware_domain'] == name
-          return r.tags['cloudware_id']
-          break
-        end
-      end
-    end
-
     def resource_group_exists(name)
       resource_groups.include? name
     end
