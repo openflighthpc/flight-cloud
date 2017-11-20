@@ -54,6 +54,7 @@ module Cloudware
       list = {}
       azure = Cloudware::Azure.new
       list.merge!(azure.list_machines)
+      list
     end
 
     def destroy
