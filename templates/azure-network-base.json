@@ -44,6 +44,7 @@
       "tags": {
         "cloudware_id": "[parameters('cloudwareId')]",
         "cloudware_domain": "[parameters('cloudwareDomain')]",
+        "cloudware_domain_region": "[resourceGroup().location]",
         "cloudware_network_cidr": "[parameters('networkCIDR')]",
         "cloudware_prv_subnet_cidr": "[parameters('prvSubnetCIDR')]",
         "cloudware_mgt_subnet_cidr": "[parameters('mgtSubnetCIDR')]",
