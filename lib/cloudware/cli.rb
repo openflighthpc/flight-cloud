@@ -44,6 +44,7 @@ module Cloudware
       c.option '--region NAME', String, 'Provider region to create domain in'
       c.action do |_args, options|
         d = Cloudware::Domain.new
+
         options.name = ask('Domain identifier: ') if options.name.nil?
         d.name = options.name.to_s
 
@@ -73,6 +74,7 @@ module Cloudware
       c.action do |_args, _options|
         d = Cloudware::Domain.new
         r = []
+        abort('No available domains') if d.list.empty?
         d.list.each do |k, v|
           r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider]]
         end
