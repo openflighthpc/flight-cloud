@@ -97,12 +97,25 @@ module Cloudware
       c.option '--size NAME', String, 'Provider specific instance size'
       c.action do |_args, options|
         m = Cloudware::Machine.new
+
+        options.name = ask('Machine name: ') if options.name.nil?
         m.name = options.name.to_s
+
+        options.domain = ask('Domain identifier: ') if options.domain.nil?
         m.domain = options.domain.to_s
+
+        options.type = ask('Machine type [master,slave]: ') if options.type.nil?
         m.type = options.type.to_s
+
+        options.prvsubnetip = ask('Prv subnet IP: ') if options.prvsubnetip.nil?
         m.prvsubnetip = options.prvsubnetip.to_s
+
+        options.mgtsubnetip = ask('Mgt subnet IP: ') if options.mgtsubnetip.nil?
         m.mgtsubnetip = options.mgtsubnetip.to_s
+
+        options.size = ask('Machine size: ') if options.size.nil?
         m.size = options.size.to_s
+
         m.create
       end
     end
