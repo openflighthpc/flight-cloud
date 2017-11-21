@@ -1,0 +1,65 @@
+---
+Description: 'Cloudware machine [master] template'
+Parameters:
+  cloudwareId:
+    Type: String
+    Description: 'Enter the Cloudware UUID'
+  
+  cloudwareDomain:
+    Type: String
+    Description: 'Enter the Cloudware domain name'
+
+  networkId:
+    Type: String
+    Description: 'Enter the VPC/network ID'
+
+  prvSubnetId:
+    Type: String
+    Description: 'Enter the prv subnet ID'
+
+  mgtSubnetId:
+    Type: String
+    Description: 'Enter the mgt subnet ID'
+
+  prvSubnetIp:
+    Type: String
+    Description: 'Enter the prv subnet IP'
+
+  mgtSubnetIp:
+    Type: String
+    Description: 'Enter the mgt subnet IP'
+
+  prvSubnetCidr:
+    Type: String
+    Description: 'Enter the prv subnet CIDR'
+
+  mgtSubnetCidr:
+    Type: String
+    Description: 'Enter the mgt subnet CIDR'
+
+  keyPairName:
+    Type: String
+    Description: 'Select the AWS keypair to assign to the instance'
+
+Resources:
+  securityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Join ['-', [!Ref cloudwareDomain, 'sg']]
+      GroupDescription: 'Cloudware security group for master machine'
+      VpcId: !Ref networkId
+      SecurityGroupIngress:
+        -
+          IpProtocol: 'tcp'
+          FromPort: 22
+          ToPort: 22
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow inbound SSH access'
+        - 
+          IpProtocol: '-1'
+          CidrIp: !Ref prvSubnetCidr
+          Description: 'Allow unrestricted access from the prv subnet'
+        -
+          IpProtocol: '-1'
+          CidrIp: !Ref mgtSubnetCidr
+          Description: 'Allow unrestricted access from the mgt subnet'
