@@ -33,6 +33,8 @@ module Cloudware
 
     def load_cloud
       case @provider
+      when 'aws'
+        @cloud = Cloudware::Aws.new
       when 'azure'
         @cloud = Cloudware::Azure.new
       end
@@ -50,7 +52,9 @@ module Cloudware
       # all providers data into a single hash and return
       list = {}
       azure = Cloudware::Azure.new
+      aws = Cloudware::Aws.new
       list.merge!(azure.list_domains)
+      list.merge!(aws.domains)
       list
     end
 
@@ -61,7 +65,7 @@ module Cloudware
     end
 
     def name
-      @name if valid_name? || abort('Invalid name')
+      @name if valid_name?
     end
 
     def id
