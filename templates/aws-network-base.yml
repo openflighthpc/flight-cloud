@@ -13,6 +13,14 @@ Parameters:
     Type: String
     Description: 'Enter the desired network CIDR'
 
+  prvSubnetCidr:
+    Type: String
+    Description: 'Enter the desired prv subnet CIDR'
+
+  mgtSubnetCidr:
+    Type: String
+    Description: 'Enter the desired mgt subnet CIDR'
+
 Resources:
   Network:
     Type: AWS::EC2::VPC
@@ -27,3 +35,13 @@ Resources:
         - 
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
+
+        -
+          Key: 'cloudware_network_cidr'
+          Value: !Ref networkCidr
+        -
+          Key: 'cloudware_prv_subnet_cidr'
+          Value: !Ref prvSubnetCidr
+        -
+          Key: 'cloudware_mgt_subnet_cidr'
+          Value: !Ref mgtSubnetCidr
