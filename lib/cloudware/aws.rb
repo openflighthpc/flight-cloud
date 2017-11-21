@@ -60,12 +60,14 @@ module Cloudware
             @network_cidr = t.value if t.key == 'cloudware_network_cidr'
             @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
             @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
+            @vpc_id = v.vpc_id unless @cloudware_domain.nil?
           end
           next if @cloudware_domain.nil?
           domains.merge!(@cloudware_domain => {
                            cloudware_domain: @cloudware_domain, cloudware_id: @cloudware_id,
                            network_cidr: @network_cidr, prv_subnet_cidr: @prv_subnet_cidr,
-                           mgt_subnet_cidr: @mgt_subnet_cidr, region: r, provider: 'aws'
+                           mgt_subnet_cidr: @mgt_subnet_cidr, region: r, provider: 'aws',
+                           vpc_id: @vpc_id
                          })
         end
       end
