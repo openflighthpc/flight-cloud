@@ -41,11 +41,11 @@ module Cloudware
     end
 
     def regions
-      @regions = []
+      regions = []
       @ec2.describe_regions.regions.each do |r|
-        @regions.push(r.region_name)
+        regions.push(r.region_name)
       end
-      @regions
+      regions
     end
 
     def domains
@@ -101,10 +101,8 @@ module Cloudware
 
     def deploy(name, template, params)
       template = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
-      puts 'Starting deployment. This may take a while..'
       @cfn.create_stack stack_name: name, template_body: template, parameters: params
       @cfn.wait_until :stack_create_complete, stack_name: name
-      puts 'Deployment complete'
     end
 
     def destroy(name)
