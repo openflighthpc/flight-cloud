@@ -33,7 +33,7 @@ module Cloudware
     def load_cloud
       @d = Cloudware::Domain.new
       @d.name = @domain
-      case @d.get_provider
+      case @d.provider
       when 'azure'
         @cloud = Cloudware::Azure.new
       end
@@ -42,7 +42,7 @@ module Cloudware
     def create
       abort('Invalid machine name') unless validate_name
       load_cloud
-      @cloud.create_machine(@name, @domain, @d.get_id,
+      @cloud.create_machine(@name, @domain, @d.id,
                             @prvsubnetip, @mgtsubnetip, @type, @size)
     end
 
