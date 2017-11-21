@@ -61,19 +61,27 @@ module Cloudware
     end
 
     def name
-      return @name if valid_name? || abort('Invalid name')
+      @name if valid_name? || abort('Invalid name')
+    end
+
+    def id
+      list[@name][:cloudware_id] if exists? || @id
     end
 
     def provider
-      return @provider if valid_provider? || abort('Invalid provider')
+      list[@name][:provider] if exists? || @provider
     end
 
-    def get_provider
-      list[@name][:provider]
+    def networkcidr
+      list[@name][:network_cidr] if exists? || @networkcidr
     end
 
-    def get_id
-      list[@name][:cloudware_id]
+    def prvsubnetcidr
+      list[@name][:prv_subnet_cidr] if exists? || @prvsubnetcidr
+    end
+
+    def prvsubnetcidr
+      list[@name][:prv_subnet_cidr] if exists? || @prvsubnetcidr
     end
 
     def valid_create?
