@@ -38,5 +38,27 @@ module Cloudware
       end
       @regions
     end
+
+    def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr)
+      template = 'aws-network-base.json'
+      params = [
+        { parameter_key: 'cloudwareDomain', parameter_value: name },
+        { parameter_key: 'cloudwareId', parameter_value: id },
+        { parameter_key: 'networkCidr', parameter_value: networkcidr },
+        { parameter_key: 'prvsubnetcidr', parameter_value: prvsubnetcidr },
+        { parameter_key: 'mgtsubnetcidr', parameter_value: mgtsubnetcidr }
+      ]
+    end
+
+    def deploy(name, template, params)
+      template = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
+      @cfn.create_stack stack_name: name, template_body: template, parameters: params
+      @cfn.wait_until :stack_create_complete, stack_name: name
+    end
+
+    def destroy(name)
+      @cfn.delete_stack stack_name: name
+      @cfn.wait_until :stack_delete_complete, stack_name: name
+    end
   end
 end
