@@ -15,20 +15,30 @@
 
 ```
 $ cloudware domain create \
-  --name moose \
-  --provider azure \
-  --region uksouth \
-  --networkcidr 10.0.0.0/16 \
-  --prvsubnetcidr 10.0.1.0/24 \
-  --mgtsubnetcidr 10.0.2.0/24
-==> Creating new deployment. This may take a while..
-==> Deployment succeeded
+  --name prickly-pigeon \
+  --provider aws \
+  --region eu-west-1 \
+  --networkcidr 172.16.0.0/16 \
+  --prvsubnetcidr 172.16.1.0/24 \
+  --mgtsubnetcidr 172.16.2.0/24
+Starting deployment. This may take a while..
+Deployment complete
 $ cloudware domain list
-+-------------+--------------+-----------------+-----------------+----------+--------------------------------------+
-| Domain name | Network CIDR | Prv Subnet CIDR | Mgt Subnet CIDR | Provider | Identifier                           |
-+-------------+--------------+-----------------+-----------------+----------+--------------------------------------+
-| moose       | 10.0.0.0/16  | 10.0.1.0/24     | 10.0.2.0/24     | azure    | 2f0d0a97-091d-4f65-b6a3-60c24c373a42 |
-+-------------+--------------+-----------------+-----------------+----------+--------------------------------------+
++--------------------+----------------+-----------------+-----------------+----------+-----------+
+| Domain name        | Network CIDR   | Prv Subnet CIDR | Mgt Subnet CIDR | Provider | Region    |
++--------------------+----------------+-----------------+-----------------+----------+-----------+
+| ancient-aardvark   | 10.0.0.0/16    | 10.0.1.0/24     | 10.0.2.0/24     | azure    | uksouth   |
+| broad-buffalo      | 10.0.0.0/16    | 10.0.1.0/24     | 10.0.2.0/24     | azure    | uksouth   |
+| deafening-dugong   | 192.168.0.0/16 | 192.168.1.0/24  | 192.168.2.0/24  | azure    | uksouth   |
+| lonely-lion        | 192.168.0.0/16 | 192.168.1.0/24  | 192.168.2.0/24  | azure    | uksouth   |
+| yummy-yak          | 192.168.0.0/16 | 192.168.1.0/24  | 192.168.2.0/24  | azure    | uksouth   |
+| prickly-pigeon     | 172.16.0.0/16  | 172.16.1.0/24   | 172.16.2.0/24   | aws      | eu-west-1 |
+| calm-caterpillar   | 10.0.0.0/16    | 10.0.1.0/24     | 10.0.2.0/24     | aws      | us-east-1 |
+| gentle-grasshopper | 192.168.0.0/16 | 192.168.1.0/24  | 192.168.2.0/24  | aws      | us-east-1 |
+| annoying-albatross | 10.0.0.0/16    | 10.0.1.0/24     | 10.0.2.0/24     | aws      | us-east-2 |
+| precious-pelican   | 192.168.0.0/16 | 192.168.1.0/24  | 192.168.2.0/24  | aws      | us-east-2 |
+| tame-turtle        | 192.168.0.0/16 | 192.168.1.0/24  | 192.168.2.0/24  | aws      | us-west-2 |
++--------------------+----------------+-----------------+-----------------+----------+-----------+
 ```
 
 ##### Creating a new machine
