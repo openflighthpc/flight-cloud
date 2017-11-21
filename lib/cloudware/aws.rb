@@ -85,6 +85,20 @@ module Cloudware
       deploy(name, template, params)
     end
 
+    def create_machine(name, domain, id, prvip, mgtip, type, size, region)
+      load_config(region)
+      template = "aws-machine-#{type}.yml"
+      params = [
+        { parameter_key: 'cloudwareDomain', parameter_value: domain },
+        { parameter_key: 'cloudwareId', parameter_value: id },
+        { parameter_key: 'prvIp', parameter_value: prvip },
+        { parameter_key: 'mgtIp', parameter_value: mgtip },
+        { parameter_key: 'vmType', parameter_value: type },
+        { parameter_key: 'vmSize', parameter_value: size }
+      ]
+      deploy(name, template, params)
+    end
+
     def deploy(name, template, params)
       template = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
       puts 'Starting deployment. This may take a while..'
