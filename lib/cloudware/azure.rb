@@ -41,7 +41,7 @@ module Cloudware
     end
 
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
-      abort('Domain already exists') if resource_group_exists(name) == true
+      abort('Domain already exists') if resource_group_exists?(name)
       create_resource_group(region, id, name)
 
       t = 'azure-network-base.json'
@@ -158,7 +158,7 @@ module Cloudware
       groups
     end
 
-    def resource_group_exists(name)
+    def resource_group_exists?(name)
       resource_groups.include? name
     end
   end
