@@ -42,7 +42,7 @@ module Cloudware
 
     def regions
       @regions = []
-      @ec2.describe_regions().regions.each do |r|
+      @ec2.describe_regions.regions.each do |r|
         @regions.push(r.region_name)
       end
       @regions
@@ -60,13 +60,13 @@ module Cloudware
             @network_cidr = t.value if t.key == 'cloudware_network_cidr'
             @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
             @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
-            end
-            unless @cloudware_domain.nil?
-                domains.merge!(@cloudware_domain => {
-                               cloudware_domain: @cloudware_domain, cloudware_id: @cloudware_id,
-                               network_cidr: @network_cidr, prv_subnet_cidr: @prv_subnet_cidr,
-                               mgt_subnet_cidr: @mgt_subnet_cidr, region: r, provider: 'aws'})
           end
+          next if @cloudware_domain.nil?
+          domains.merge!(@cloudware_domain => {
+                           cloudware_domain: @cloudware_domain, cloudware_id: @cloudware_id,
+                           network_cidr: @network_cidr, prv_subnet_cidr: @prv_subnet_cidr,
+                           mgt_subnet_cidr: @mgt_subnet_cidr, region: r, provider: 'aws'
+                         })
         end
       end
       domains
