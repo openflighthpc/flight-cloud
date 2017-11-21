@@ -39,9 +39,7 @@ module Cloudware
     end
 
     def create
-      abort('Invalid domain name') unless valid_name?
-      abort('Domain already exists') if exists?
-      abort('Invalid provider') unless valid_provider?
+      valid_create?
       load_cloud
       @cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,
                            @prvsubnetcidr, @mgtsubnetcidr, @region)
@@ -76,6 +74,12 @@ module Cloudware
 
     def get_id
       list[@name][:cloudware_id]
+    end
+
+    def valid_create?
+      exists?
+      valid_name?
+      valid_provider?
     end
 
     def exists?
