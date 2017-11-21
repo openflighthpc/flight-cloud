@@ -30,6 +30,9 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         -
+          Key: 'Name'
+          Value: !Join ['-', ['cloudware', 'domain', !Ref cloudwareDomain]]
+        -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
         - 
