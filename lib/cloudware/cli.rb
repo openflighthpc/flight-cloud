@@ -78,13 +78,14 @@ module Cloudware
         r = []
         abort('No available domains') if d.list.empty?
         d.list.each do |k, v|
-          r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider]]
+          r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider], v[:region]]
         end
         table = Terminal::Table.new headings: ['Domain name'.bold,
                                                'Network CIDR'.bold,
                                                'Prv Subnet CIDR'.bold,
                                                'Mgt Subnet CIDR'.bold,
-                                               'Provider'.bold],
+                                               'Provider'.bold,
+                                               'Region'.bold],
                                     rows: r
         puts table
       end
