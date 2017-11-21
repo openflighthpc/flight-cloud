@@ -1,0 +1,29 @@
+---
+Description: 'Cloudware domain template'
+Parameters:
+  cloudwareId:
+    Type: String
+    Description: 'Enter the Cloudware UUID'
+  
+  cloudwareDomain:
+    Type: String
+    Description: 'Enter the desired domain name'
+
+  networkCidr:
+    Type: String
+    Description: 'Enter the desired network CIDR'
+
+Resources:
+  Network:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref networkCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        - 
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
