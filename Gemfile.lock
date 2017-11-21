@@ -125,6 +125,3 @@ DEPENDENCIES
   google-cloud-resource_manager
   rspec
   terminal-table
-
-BUNDLED WITH
-   1.16.0

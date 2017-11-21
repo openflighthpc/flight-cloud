@@ -63,7 +63,9 @@ module Cloudware
         options.mgtsubnetcidr = ask('Mgt subnet CIDR: ') if options.mgtsubnetcidr.nil?
         d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
 
+        puts 'Starting deployment. This may take a while..'.bold
         d.create
+        puts 'Deployment complete'.bold.green
       end
     end
 

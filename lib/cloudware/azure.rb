@@ -120,7 +120,6 @@ module Cloudware
       debug_settings = @client.model_classes.debug_setting.new
       debug_settings.detail_level = 'requestContent, responseContent'
       d.properties.debug_setting = debug_settings
-      puts '==> Creating new deployment. This may take a while..'
       @client.deployments.create_or_update(name, type.to_s, d)
       operation_results = @client.deployment_operations.list(name, type.to_s)
       unless operation_results.nil?
@@ -130,7 +129,6 @@ module Cloudware
           end
         end
       end
-      puts '==> Deployment succeeded'
     end
 
     def destroy(name, domain)
