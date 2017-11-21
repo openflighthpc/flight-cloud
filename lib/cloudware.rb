@@ -24,6 +24,7 @@ require 'cloudware/domain'
 require 'cloudware/machine'
 require 'cloudware/azure'
 require 'cloudware/gcp'
+require 'cloudware/aws'
 
 module Cloudware
   class << self
