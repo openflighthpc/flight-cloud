@@ -36,7 +36,7 @@ module Cloudware
     end
 
     def load_config(region)
-			@cfn = CloudFormation::Client.new(region: region)
+      @cfn = CloudFormation::Client.new(region: region)
       @ec2 = EC2::Client.new(region: region)
     end
 
