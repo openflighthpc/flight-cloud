@@ -27,7 +27,11 @@ EC2 = Aws::EC2
 
 module Cloudware
   class Aws
-    def initialize(region)
+    attr_accessor :region
+
+    def initialize
+      # Load a default region, which we'll override later
+      @region = 'us-east-1'
       load_config(region)
     end
 
@@ -51,44 +55,42 @@ module Cloudware
         resp = @ec2.describe_vpcs
         resp.vpcs.each do |v|
           v.tags.each do |t|
-            next unless t.key.include? 'cloudware_'
-            cloudware_id = t.value if t.key == 'cloudware_id'
-            cloudware_domain = t.value if t.key == 'cloudware_domain'
-            network_cidr = t.value if t.key == 'cloudware_network_cidr'
-            prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
-            mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
-            domains.merge!(cloudware_domain => {
-                           cloudware_domain: cloudware_domain,
-                           cloudware_id: cloudware_id,
-                           network_cidr: network_cidr,
-                           prv_subnet_cidr: prv_subnet_cidr,
-                           mgt_subnet_cidr: mgt_subnet_cidr,
-                           region: r,
-                           provider: 'aws'
-                          })
-            break
+            @cloudware_domain = t.value if t.key == 'cloudware_domain'
+            @cloudware_id = t.value if t.key == 'cloudware_id'
+            @network_cidr = t.value if t.key == 'cloudware_network_cidr'
+            @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
+            @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
+            end
+            unless @cloudware_domain.nil?
+                domains.merge!(@cloudware_domain => {
+                               cloudware_domain: @cloudware_domain, cloudware_id: @cloudware_id,
+                               network_cidr: @network_cidr, prv_subnet_cidr: @prv_subnet_cidr,
+                               mgt_subnet_cidr: @mgt_subnet_cidr, region: r, provider: 'aws'})
           end
         end
       end
       domains
     end
 
-    def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr)
-      template = 'aws-network-base.json'
+    def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
+      load_config(region)
+      template = 'aws-network-base.yml'
       params = [
         { parameter_key: 'cloudwareDomain', parameter_value: name },
         { parameter_key: 'cloudwareId', parameter_value: id },
         { parameter_key: 'networkCidr', parameter_value: networkcidr },
-        { parameter_key: 'prvsubnetcidr', parameter_value: prvsubnetcidr },
-        { parameter_key: 'mgtsubnetcidr', parameter_value: mgtsubnetcidr }
+        { parameter_key: 'prvSubnetCidr', parameter_value: prvsubnetcidr },
+        { parameter_key: 'mgtSubnetCidr', parameter_value: mgtsubnetcidr }
       ]
       deploy(name, template, params)
     end
 
     def deploy(name, template, params)
       template = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
+      puts 'Starting deployment. This may take a while..'
       @cfn.create_stack stack_name: name, template_body: template, parameters: params
       @cfn.wait_until :stack_create_complete, stack_name: name
+      puts 'Deployment complete'
     end
 
     def destroy(name)
