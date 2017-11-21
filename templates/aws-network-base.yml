@@ -38,7 +38,6 @@ Resources:
         - 
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
-
         -
           Key: 'cloudware_network_cidr'
           Value: !Ref networkCidr
@@ -48,3 +47,35 @@ Resources:
         -
           Key: 'cloudware_mgt_subnet_cidr'
           Value: !Ref mgtSubnetCidr
+
+  PrvSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref prvSubnetCidr
+      VpcId: !Ref Network
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        - 
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  MgtSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref mgtSubnetCidr
+      VpcId: !Ref Network
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        - 
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
