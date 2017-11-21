@@ -3,13 +3,17 @@ GEM
   specs:
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
-    aws-sdk (2.10.87)
-      aws-sdk-resources (= 2.10.87)
-    aws-sdk-core (2.10.87)
+    aws-partitions (1.37.0)
+    aws-sdk-cloudformation (1.2.0)
+      aws-sdk-core (~> 3)
+      aws-sigv4 (~> 1.0)
+    aws-sdk-core (3.9.0)
+      aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.10.87)
-      aws-sdk-core (= 2.10.87)
+    aws-sdk-ec2 (1.18.0)
+      aws-sdk-core (~> 3)
+      aws-sigv4 (~> 1.0)
     aws-sigv4 (1.0.2)
     azure_mgmt_resources (0.15.1)
       ms_rest_azure (~> 0.9.0)
@@ -113,7 +117,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aws-sdk (~> 2)
+  aws-sdk-cloudformation
+  aws-sdk-ec2
   azure_mgmt_resources
   colorize
   commander
