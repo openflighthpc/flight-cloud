@@ -61,7 +61,9 @@ module Cloudware
     def destroy
       # Provide hardcoded 'domain' name to `provider.destroy`
       # the domain deployment is always labelled 'domain'
-      @cloud.destroy('domain', @domain)
+      @provider = provider
+      load_cloud
+      @cloud.destroy('domain', @name)
     end
 
     def name
