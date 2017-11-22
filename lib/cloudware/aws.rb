@@ -55,16 +55,6 @@ module Cloudware
       regions
     end
 
-    # Return any subnets belonging to a given VPC
-    def subnet_list(vpc_id)
-      @ec2.describe_subnets(filters: [
-                              {
-                                name: 'vpc-id',
-                                values: [vpc_id]
-                              }
-                            ])
-    end
-
     # TOneverDO - tidy this
     def domains
       domains = {}
