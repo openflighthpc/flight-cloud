@@ -48,6 +48,27 @@ Resources:
           Key: 'cloudware_mgt_subnet_cidr'
           Value: !Ref mgtSubnetCidr
 
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: Network
+    Properties:
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', ['cloudware', 'domain', !Ref cloudwareDomain]]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref Network
+
   PrvSubnet:
     Type: AWS::EC2::Subnet
     Properties:
