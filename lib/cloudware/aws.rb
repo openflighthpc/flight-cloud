@@ -57,35 +57,38 @@ module Cloudware
 
     # TOneverDO - tidy this
     def domains
-      domains = {}
-      vpc_list = @ec2.describe_vpcs
-      regions.each do |r|
-        load_config(r)
-        vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
-        vpc_list.vpcs.each do |v|
-          v.tags.each do |t|
-            @cloudware_domain = t.value if t.key == 'cloudware_domain'
-            @cloudware_id = t.value if t.key == 'cloudware_id'
-            @network_cidr = t.value if t.key == 'cloudware_network_cidr'
-            @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
-            @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
-            @region = r
-          end
-          subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
-          subnet_list.subnets.each do |s|
-            s.tags.each do |t|
-              @prv_subnet_id = t.value if t.key == "cloudware_#{@cloudware_domain}_prv_subnet_id"
-              @mgt_subnet_id = t.value if t.key == "cloudware_#{@cloudware_domain}_mgt_subnet_id"
+      @domains || begin
+        domain_list = {}
+        vpc_list = @ec2.describe_vpcs
+        regions.each do |r|
+          load_config(r)
+          vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
+          vpc_list.vpcs.each do |v|
+            v.tags.each do |t|
+              @cloudware_domain = t.value if t.key == 'cloudware_domain'
+              @cloudware_id = t.value if t.key == 'cloudware_id'
+              @network_cidr = t.value if t.key == 'cloudware_network_cidr'
+              @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
+              @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
+              @networkid = v.vpc_id
+              @region = r
             end
+            subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
+            subnet_list.subnets.each do |s|
+              s.tags.each do |t|
+                @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_prv_subnet_id"
+                @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_mgt_subnet_id"
+              end
+            end
+            domain_list.merge!(@cloudware_domain => { cloudware_domain: @cloudware_domain,
+                                                  cloudware_id: @cloudware_id, network_cidr: @network_cidr,
+                                                  prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
+                                                  prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
+                                                  region: @region, provider: 'aws', networkid: @networkid })
           end
-          domains.merge!(@cloudware_domain => { cloudware_domain: @cloudware_domain,
-                                                cloudware_id: @cloudware_id, network_cidr: @network_cidr,
-                                                prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
-                                                prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
-                                                region: @region, provider: 'aws' })
         end
+        @domains = domain_list
       end
-      domains
     end
 
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
@@ -102,6 +105,8 @@ module Cloudware
     end
 
     def create_machine(name, domain, id, prvip, mgtip, type, size, region)
+      d = Cloudware::Domain.new
+      d.name = domain
       load_config(region)
       template = "aws-machine-#{type}.yml"
       params = [
@@ -110,9 +115,12 @@ module Cloudware
         { parameter_key: 'prvIp', parameter_value: prvip },
         { parameter_key: 'mgtIp', parameter_value: mgtip },
         { parameter_key: 'vmType', parameter_value: type },
-        { parameter_key: 'vmSize', parameter_value: size }
+        { parameter_key: 'vmSize', parameter_value: size },
+        { parameter_key: 'networkId', parameter_value: d.networkid },
+        { parameter_key: 'prvSubnetId', parameter_value: d.prvsubnetid },
+        { parameter_key: 'mgtSubnetId', parameter_value: d.mgtsubnetid }
       ]
-      deploy(name, template, params)
+      deploy("#{domain}-#{name}", template, params)
     end
 
     def deploy(name, template, params)

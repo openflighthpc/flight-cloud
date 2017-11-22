@@ -84,7 +84,7 @@ module Cloudware
       resource
     end
 
-    def create_machine(name, domain, id, prvip, mgtip, type, size)
+    def create_machine(name, domain, id, prvip, mgtip, type, size, _region)
       t = "azure-machine-#{type}.json"
       params = {
         cloudwareDomain: domain,

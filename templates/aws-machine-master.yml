@@ -38,6 +38,7 @@ Parameters:
     Description: 'Enter the mgt subnet CIDR'
 
   keyPairName:
+    DefaultValue: 'cloudware'
     Type: String
     Description: 'Select the AWS keypair to assign to the instance'
 

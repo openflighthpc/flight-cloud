@@ -30,6 +30,8 @@ module Cloudware
     attr_accessor :mgtsubnetcidr
     attr_accessor :region
     attr_accessor :provider
+    # aws provider specific
+    attr_accessor :prvsubnetid, :mgtsubnetid, :networkid
 
     def load_cloud
       case @provider
@@ -82,12 +84,25 @@ module Cloudware
       list[@name][:network_cidr] if exists? || @networkcidr
     end
 
-    def prvsubnetcidr
-      list[@name][:prv_subnet_cidr] if exists? || @prvsubnetcidr
+    def mgtsubnetcidr
+      list[@name][:prv_subnet_cidr] if exists? || @mgtsubnetcidr
     end
 
     def prvsubnetcidr
       list[@name][:prv_subnet_cidr] if exists? || @prvsubnetcidr
+    end
+
+    def mgtsubnetid
+      list[@name][:mgt_subnet_id] if exists? || @mgtsubnetid
+    end
+
+    def prvsubnetid
+      puts list[@name]
+      list[@name][:prv_subnet_id] if exists? || @prvsubnetid
+    end
+
+    def networkid
+      list[@name][:network_id] if exists? || @networkid
     end
 
     def region

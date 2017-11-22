@@ -36,6 +36,8 @@ module Cloudware
       case @d.provider
       when 'azure'
         @cloud = Cloudware::Azure.new
+      when 'aws'
+        @cloud = Cloudware::Aws.new
       end
     end
 
@@ -43,7 +45,7 @@ module Cloudware
       abort('Invalid machine name') unless validate_name
       load_cloud
       @cloud.create_machine(@name, @domain, @d.id,
-                            @prvsubnetip, @mgtsubnetip, @type, @size)
+                            @prvsubnetip, @mgtsubnetip, @type, @size, @d.region)
     end
 
     def list

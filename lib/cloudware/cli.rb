@@ -137,7 +137,10 @@ module Cloudware
         options.size = ask('Machine size: ') if options.size.nil?
         m.size = options.size.to_s
 
+        puts "Creating #{options.name} in domain #{options.domain}".bold
+        puts "This may take a while.."
         m.create
+        puts "Operation complete".green.bold
       end
     end
 
