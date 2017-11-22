@@ -101,9 +101,9 @@ module Cloudware
         options.name = ask('Domain name: ') if options.name.nil?
         m.name = options.name.to_s
 
-        puts "Destroying domain #{options.name}. This may take a while.."
+        puts "Destroying domain #{options.name}. This may take a while..".bold
         m.destroy
-        puts 'Operation complete'
+        puts 'Operation complete'.green.bold
       end
     end
 
