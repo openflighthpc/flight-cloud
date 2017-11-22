@@ -91,6 +91,22 @@ module Cloudware
       end
     end
 
+    command :'domain destroy' do |c|
+      c.syntax = 'cloudware domain destroy [options]'
+      c.description = 'Destroy a machine'
+      c.option '--name NAME', String, 'Domain name'
+      c.action do |_args, options|
+        m = Cloudware::Domain.new
+
+        options.name = ask('Domain name: ') if options.name.nil?
+        m.name = options.name.to_s
+
+        puts "Destroying domain #{options.name}. This may take a while.."
+        m.destroy
+        puts 'Operation complete'
+      end
+    end
+
     command :'machine create' do |c|
       c.syntax = 'cloudware machine create [options]'
       c.description = 'Create a new machine'
