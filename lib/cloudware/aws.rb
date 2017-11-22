@@ -71,7 +71,7 @@ module Cloudware
       vpc_list = @ec2.describe_vpcs
       regions.each do |r|
         load_config(r)
-        vpc_list = @ec2.describe_vpcs({filters: [{name: "tag-key", values: ["cloudware_id"]}]})
+        vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
         vpc_list.vpcs.each do |v|
           v.tags.each do |t|
             @cloudware_domain = t.value if t.key == 'cloudware_domain'
@@ -81,18 +81,18 @@ module Cloudware
             @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
             @region = r
           end
-          subnet_list = @ec2.describe_subnets({filters: [{name: "vpc-id", values: [v.vpc_id]}]})
+          subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
           subnet_list.subnets.each do |s|
             s.tags.each do |t|
               @prv_subnet_id = t.value if t.key == "cloudware_#{@cloudware_domain}_prv_subnet_id"
               @mgt_subnet_id = t.value if t.key == "cloudware_#{@cloudware_domain}_mgt_subnet_id"
             end
           end
-          domains.merge!({@cloudware_domain => {cloudware_domain: @cloudware_domain,
-                          cloudware_id: @cloudware_id, network_cidr: @network_cidr,
-                          prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
-                          prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
-                          region: @region, provider: 'aws'}})
+          domains.merge!(@cloudware_domain => { cloudware_domain: @cloudware_domain,
+                                                cloudware_id: @cloudware_id, network_cidr: @network_cidr,
+                                                prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
+                                                prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
+                                                region: @region, provider: 'aws' })
         end
       end
       domains
