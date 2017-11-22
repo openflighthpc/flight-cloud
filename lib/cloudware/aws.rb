@@ -144,7 +144,8 @@ module Cloudware
       @cfn.wait_until :stack_create_complete, stack_name: name
     end
 
-    def destroy(_type, name)
+    def destroy(_type, name, region)
+      load_config(region)
       @cfn.delete_stack stack_name: name
       @cfn.wait_until :stack_delete_complete, stack_name: name
     end
