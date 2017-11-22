@@ -63,7 +63,7 @@ module Cloudware
       # the domain deployment is always labelled 'domain'
       @provider = provider
       load_cloud
-      @cloud.destroy('domain', @name)
+      @cloud.destroy('domain', @name, region)
     end
 
     def name
@@ -88,6 +88,10 @@ module Cloudware
 
     def prvsubnetcidr
       list[@name][:prv_subnet_cidr] if exists? || @prvsubnetcidr
+    end
+
+    def region
+      list[@name][:region] if exists? || @region
     end
 
     def valid_create?
