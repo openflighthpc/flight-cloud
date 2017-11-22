@@ -67,47 +67,27 @@ module Cloudware
             @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
             @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
             @vpc_id = v.vpc_id unless @cloudware_domain.nil?
+            @region = r
+            puts "\n----------------------------"
+            puts "cloudware_domain is #{@cloudware_domain}"
+            puts "region is #{@region}\n"
           end
-        end
-        subnets.each do |s|
-          s.tags.each do |t|
-            @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_prv_subnet_id"
-            @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_mgt_subnet_id"
+          v.subnets.each do |s|
+            s.tags.each do |t|
+              @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_prv_subnet_id"
+              @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_mgt_subnet_id"
+            end
           end
         end
         next if @cloudware_domain.nil?
-        domains.merge!(@cloudware_domain => {
-                         cloudware_domain: @cloudware_domain, cloudware_id: @cloudware_id,
-                         network_cidr: @network_cidr, prv_subnet_cidr: @prv_subnet_cidr,
-                         mgt_subnet_cidr: @mgt_subnet_cidr, region: r, provider: 'aws',
-                         vpc_id: @vpc_id, prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id
-                       })
+        #domains.merge!(@cloudware_domain => {
+        #                 cloudware_domain: @cloudware_domain, cloudware_id: @cloudware_id,
+        #                 network_cidr: @network_cidr, prv_subnet_cidr: @prv_subnet_cidr,
+        #                 mgt_subnet_cidr: @mgt_subnet_cidr, region: @region, provider: 'aws',
+        #                 vpc_id: @vpc_id, prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id
+        #               })
       end
-    end
-
-    def domains
-      domains = {}
-      regions.each do |r|
-        load_config(r)
-        resp = @ec2.describe_vpcs
-        resp.vpcs.each do |v|
-          v.tags.each do |t|
-            @cloudware_domain = t.value if t.key == 'cloudware_domain'
-            @cloudware_id = t.value if t.key == 'cloudware_id'
-            @network_cidr = t.value if t.key == 'cloudware_network_cidr'
-            @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
-            @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
-            @vpc_id = v.vpc_id unless @cloudware_domain.nil?
-          end
-          next if @cloudware_domain.nil?
-          domains.merge!(@cloudware_domain => {
-                           cloudware_domain: @cloudware_domain, cloudware_id: @cloudware_id,
-                           network_cidr: @network_cidr, prv_subnet_cidr: @prv_subnet_cidr,
-                           mgt_subnet_cidr: @mgt_subnet_cidr, region: r, provider: 'aws',
-                           vpc_id: @vpc_id
-                         })
-        end
-      end
+      abort('end at domains')
       domains
     end
 
