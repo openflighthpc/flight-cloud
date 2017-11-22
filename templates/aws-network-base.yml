@@ -63,6 +63,9 @@ Resources:
         - 
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
+        -
+          Key: !Join ['_', ['cloudware', !Ref cloudwareDomain, 'prv_subnet_id']]
+          Value: 'null'
 
   MgtSubnet:
     Type: AWS::EC2::Subnet
@@ -79,3 +82,6 @@ Resources:
         - 
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
+        -
+          Key: !Join ['_', ['cloudware', !Ref cloudwareDomain, 'prv_subnet_id']]
+          Value: 'null'
