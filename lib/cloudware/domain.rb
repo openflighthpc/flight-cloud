@@ -43,7 +43,7 @@ module Cloudware
     end
 
     def create
-      valid_create?
+      raise('Invalid parameters') unless valid_create?
       load_cloud
       @cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,
                            @prvsubnetcidr, @mgtsubnetcidr, @region)
@@ -69,7 +69,7 @@ module Cloudware
     end
 
     def name
-      @name if valid_name?
+      raise('Invalid name') unless valid_name? || @name
     end
 
     def id
@@ -119,7 +119,7 @@ module Cloudware
     end
 
     def valid_name?
-      !@name.match(/\A[a-zA-Z0-9]*\z/).nil?
+      !@name.match(/\A[a-zA-Z0-9-]*\z/).nil?
     end
 
     def valid_provider?
