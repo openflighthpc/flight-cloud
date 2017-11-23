@@ -128,16 +128,20 @@ module Cloudware
 
     def deploy(name, template, params)
       template = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
-      @cfn.create_stack stack_name: name, template_body: template, parameters: params
-      @cfn.wait_until :stack_create_complete, stack_name: name
+      begin
+        @cfn.create_stack stack_name: name, template_body: template, parameters: params
+        @cfn.wait_until :stack_create_complete, stack_name: name
+      rescue Aws::Cloudformation::Errors::ServiceError; end
     end
 
     def destroy(name, domain)
       d = Cloudware::Domain.new
       d.name = domain
       load_config(d.region)
-      @cfn.delete_stack stack_name: "#{domain}-#{name}"
-      @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
+      begin
+        @cfn.delete_stack stack_name: "#{domain}-#{name}"
+        @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
+      rescue Aws::Cloudformation::Errors::ServiceError; end
     end
   end
 end
