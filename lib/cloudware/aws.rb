@@ -116,6 +116,7 @@ module Cloudware
         { parameter_key: 'mgtSubnetIp', parameter_value: mgtip },
         { parameter_key: 'vmType', parameter_value: type },
         { parameter_key: 'vmSize', parameter_value: size },
+        { parameter_key: 'vmName', parameter_value: name },
         { parameter_key: 'networkId', parameter_value: d.networkid },
         { parameter_key: 'prvSubnetId', parameter_value: d.prvsubnetid },
         { parameter_key: 'mgtSubnetId', parameter_value: d.mgtsubnetid },
