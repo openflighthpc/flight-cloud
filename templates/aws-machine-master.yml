@@ -60,11 +60,11 @@ Mappings:
       "AMI": "ami-55c36f2c"
 
 Resources:
-  securityGroupSSH:
+  securityGroupMaster:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Join ['-', [!Ref cloudwareDomain, 'ssh']]
-      GroupDescription: 'Cloudware seucirty group for master machine SSH access'
+      GroupName: !Join ['-', [!Ref cloudwareDomain]]
+      GroupDescription: 'Cloudware seucirty group for master machine'
       VpcId: !Ref networkId
       SecurityGroupIngress:
         -
@@ -73,10 +73,16 @@ Resources:
           ToPort: 22
           CidrIp: '0.0.0.0/0'
           Description: 'Allow inbound SSH access'
+        -
+          IpProtocol: 'icmp'
+          FromPort: '8'
+          ToPort: '-1'
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow ping'
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', [!Ref cloudwareDomain, !Ref vmName, 'ssh']]
+          Value: !Join ['-', [!Ref cloudwareDomain, !Ref vmName]]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -134,7 +140,7 @@ Resources:
       Description: !Join [' ', [!Ref cloudwareDomain, !Ref vmName, 'prv network interface']]
       GroupSet:
         - !Ref securityGroupPrv
-        - !Ref securityGroupSSH
+        - !Ref securityGroupMaster
       PrivateIpAddress: !Ref prvSubnetIp
       SubnetId: !Ref prvSubnetId
       Tags:

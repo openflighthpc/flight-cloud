@@ -164,6 +164,37 @@ module Cloudware
       end
     end
 
+    command :'machine info' do |c|
+      c.syntax = 'cloudware machine info [options]'
+      c.description = 'List detailed information about a given machine'
+      c.option '--name NAME', String, 'Machine name'
+      c.option '--domain NAME', String, 'Domain name'
+      c.option '--output TYPE', String, 'Output type [json, table]. Default: table'
+      c.action do |_args, options|
+        options.default :output => 'table'
+        m = Cloudware::Machine.new
+        m.name = options.name.to_s
+        m.domain = options.domain.to_s
+
+        case options.output.to_s
+        when 'table'
+          table = Terminal::Table.new do |t|
+            t.add_row ['Machine name'.bold, m.name]
+            t.add_row ['Domain name'.bold, m.domain]
+            t.add_row ['Machine type'.bold, m.type]
+            t.add_row ['Prv subnet IP'.bold, m.prvsubnetip]
+            t.add_row ['Mgt subnet IP'.bold, m.mgtsubnetip]
+            t.add_row ['External IP'.bold, m.extip]
+            t.add_row ['Instance state'.bold, m.state]
+            t.add_row ['Instance size'.bold, m.size]
+            t.add_row ['Provider'.bold, m.provider]
+            t.style = {:all_separators => true}
+          end
+          puts table
+        end
+      end
+    end
+
     command :'machine destroy' do |c|
       c.syntax = 'cloudware machine destroy [options]'
       c.description = 'Destroy a machine'

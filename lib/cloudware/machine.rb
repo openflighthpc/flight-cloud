@@ -53,8 +53,38 @@ module Cloudware
       # all providers data into a single hash and return
       list = {}
       azure = Cloudware::Azure.new
+      aws = Cloudware::Aws.new
       list.merge!(azure.list_machines)
+      list.merge!(aws.machines)
       list
+    end
+
+    def prvsubnetip
+      list[@name][:prv_ip] || @prvsubnetip
+    end
+
+    def mgtsubnetip
+      list[@name][:mgt_ip] || @mgtsubnetip
+    end
+
+    def extip
+      list[@name][:extip] || @extip
+    end
+
+    def state
+      list[@name][:state] || @state
+    end
+
+    def size
+      list[@name][:size] || @size
+    end
+
+    def type
+      list[@name][:cloudware_machine_type] || @type
+    end
+
+    def provider
+      list[@name][:provider] || @provider
     end
 
     def destroy

@@ -91,6 +91,32 @@ module Cloudware
       end
     end
 
+    def machines
+      machines = {}
+      regions.each do |r|
+        load_config(r)
+        @ec2.describe_instances({filters: [{name: 'tag-key', values: ['cloudware_id']}]}).reservations.each do |reservation|
+          reservation.instances.each do |instance|
+            @extip = instance.public_ip_address
+            @state = instance.state.name
+            @size = instance.instance_type
+            instance.tags.each do |tag|
+              @domain = tag.value if tag.key == 'cloudware_domain'
+              @id = tag.value if tag.key == 'cloudware_id'
+              @type = tag.value if tag.key == 'cloudware_machine_type'
+              @prvsubnetip = tag.value if tag.key == 'cloudware_prv_subnet_ip'
+              @mgtsubnetip = tag.value if tag.key == 'cloudware_mgt_subnet_ip'
+              @name = tag.value if tag.key == 'cloudware_machine_name'
+            end
+            machines.merge!(@name => {name: @name, cloudware_domain: @domain, state: @state,
+                            cloudware_id: @id, size: @size, cloudware_machine_type: @type, mgt_ip: @mgtsubnetip,
+                            prv_ip: @prvsubnetip, extip: @extip, provider: 'aws'})
+          end
+        end
+      end
+      machines
+    end
+
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
       load_config(region)
       template = 'aws-network-base.yml'

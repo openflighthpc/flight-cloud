@@ -4,7 +4,7 @@ Parameters:
   cloudwareId:
     Type: String
     Description: 'Enter the Cloudware UUID'
-  
+
   cloudwareDomain:
     Type: String
     Description: 'Enter the desired domain name'
@@ -35,7 +35,7 @@ Resources:
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
-        - 
+        -
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
         -
@@ -81,7 +81,7 @@ Resources:
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
-        - 
+        -
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
         -
@@ -100,9 +100,28 @@ Resources:
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
-        - 
+        -
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
         -
           Key: !Join ['_', ['cloudware', !Ref cloudwareDomain, 'mgt_subnet_id']]
           Value: 'null'
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Network
+      Tags:
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  RouteInternetGateway:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
