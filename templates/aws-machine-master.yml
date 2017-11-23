@@ -50,12 +50,17 @@ Parameters:
     Type: String
     Description: 'Enter the Cloudware instance type'
 
+Mappings:
+  RegionMap:
+    eu-west-1:
+      "AMI": "ami-37c2f643"
+
 Resources:
-  securityGroup:
+  securityGroupPrv:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: !Join ['-', [!Ref cloudwareDomain, 'sg']]
-      GroupDescription: 'Cloudware security group for master machine'
+      GroupDescription: 'Cloudware security group for master machine prv interface'
       VpcId: !Ref networkId
       SecurityGroupIngress:
         -
@@ -68,7 +73,107 @@ Resources:
           IpProtocol: '-1'
           CidrIp: !Ref prvSubnetCidr
           Description: 'Allow unrestricted access from the prv subnet'
+      Tags:
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  securityGroupMgt:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Join ['-', [!Ref cloudwareDomain, 'sg']]
+      GroupDescription: 'Cloudware security group for master machine mgt interface'
+      VpcId: !Ref networkId
+      SecurityGroupIngress:
         -
           IpProtocol: '-1'
           CidrIp: !Ref mgtSubnetCidr
           Description: 'Allow unrestricted access from the mgt subnet'
+      Tags:
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  prvInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: !Join [' ', [!Ref cloudwareDomain, !Ref vmName, 'prv network interface']]
+      GroupSet:
+        - securityGroupPrv
+      PrivateIpAddress: !Ref prvSubnetIp
+      SubnetId: !Ref prvSubnetId
+      Tags:
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  mgtInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: !Join [' ', [!Ref cloudwareDomain, !Ref vmName, 'mgt network interface']]
+      GroupSet:
+        - securityGroupMgt
+      PrivateIpAddress: !Ref mgtSubnetIp
+      SubnetId: !Ref mgtSubnetId
+      Tags:
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  master:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !FindInMap ["RegionMap", !Ref "AWS::Region", "AMI"]
+      InstanceType: !Ref vmSize
+      Monitoring: true
+      KeyName: !Ref keyPairName
+      Tags:
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+        -
+          Key: 'cloudware_machine_type'
+          Value: !Ref vmType
+        -
+          Key: 'cloudware_machine_name'
+          Value: !Ref vmName
+
+  prvInterfaceAttachment:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    DependsOn:
+      - prvInterface
+      - master
+    Properties:
+      DeleteOnTermination: true
+      DeviceIndex: 0
+      InstanceId: !Ref master
+      NetworkInterfaceId: !Ref prvInterface
+
+  mgtInterfaceAttachment:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    DependsOn:
+      - mgtInterface
+      - master
+    Properties:
+      DeleteOnTermination: true
+      DeviceIndex: 0
+      InstanceId: !Ref master
+      NetworkInterfaceId: !Ref mgtInterface
