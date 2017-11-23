@@ -97,7 +97,6 @@ module Cloudware
     end
 
     def prvsubnetid
-      puts list[@name]
       list[@name][:prv_subnet_id] if exists? || @prvsubnetid
     end
 

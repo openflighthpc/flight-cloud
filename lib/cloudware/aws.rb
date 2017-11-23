@@ -84,7 +84,7 @@ module Cloudware
                                                   cloudware_id: @cloudware_id, network_cidr: @network_cidr,
                                                   prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
                                                   prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
-                                                  region: @region, provider: 'aws', networkid: @networkid })
+                                                  region: @region, provider: 'aws', network_id: @networkid })
           end
         end
         @domains = domain_list
@@ -112,13 +112,15 @@ module Cloudware
       params = [
         { parameter_key: 'cloudwareDomain', parameter_value: domain },
         { parameter_key: 'cloudwareId', parameter_value: id },
-        { parameter_key: 'prvIp', parameter_value: prvip },
-        { parameter_key: 'mgtIp', parameter_value: mgtip },
+        { parameter_key: 'prvSubnetIp', parameter_value: prvip },
+        { parameter_key: 'mgtSubnetIp', parameter_value: mgtip },
         { parameter_key: 'vmType', parameter_value: type },
         { parameter_key: 'vmSize', parameter_value: size },
         { parameter_key: 'networkId', parameter_value: d.networkid },
         { parameter_key: 'prvSubnetId', parameter_value: d.prvsubnetid },
-        { parameter_key: 'mgtSubnetId', parameter_value: d.mgtsubnetid }
+        { parameter_key: 'mgtSubnetId', parameter_value: d.mgtsubnetid },
+        { parameter_key: 'prvSubnetCidr', parameter_value: d.prvsubnetcidr },
+        { parameter_key: 'mgtSubnetCidr', parameter_value: d.mgtsubnetcidr }
       ]
       deploy("#{domain}-#{name}", template, params)
     end

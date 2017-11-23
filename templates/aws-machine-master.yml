@@ -38,9 +38,17 @@ Parameters:
     Description: 'Enter the mgt subnet CIDR'
 
   keyPairName:
-    DefaultValue: 'cloudware'
+    Default: 'cloudware'
     Type: String
     Description: 'Select the AWS keypair to assign to the instance'
+
+  vmSize:
+    Type: String
+    Description: 'Enter the size of the instance'
+
+  vmType:
+    Type: String
+    Description: 'Enter the Cloudware instance type'
 
 Resources:
   securityGroup:
