@@ -142,6 +142,13 @@ Resources:
       InstanceType: !Ref vmSize
       Monitoring: true
       KeyName: !Ref keyPairName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref prvInterface
+          DeviceIndex: 0
+        -
+          NetworkInterfaceId: !Ref mgtInterface
+          DeviceIndex: 1
       Tags:
         -
           Key: 'cloudware_id'
@@ -156,24 +163,13 @@ Resources:
           Key: 'cloudware_machine_name'
           Value: !Ref vmName
 
-  prvInterfaceAttachment:
-    Type: AWS::EC2::NetworkInterfaceAttachment
-    DependsOn:
-      - prvInterface
-      - master
+  publicIp:
+    Type: AWS::EC2::EIP
     Properties:
-      DeleteOnTermination: true
-      DeviceIndex: 0
-      InstanceId: !Ref master
-      NetworkInterfaceId: !Ref prvInterface
+      Domain: vpc
 
-  mgtInterfaceAttachment:
-    Type: AWS::EC2::NetworkInterfaceAttachment
-    DependsOn:
-      - mgtInterface
-      - master
+  publicIpAttachment:
+    Type: AWS::EC2::EIPAssociation
     Properties:
-      DeleteOnTermination: true
-      DeviceIndex: 0
-      InstanceId: !Ref master
-      NetworkInterfaceId: !Ref mgtInterface
+      AllocationId: !Get publicIp.AllocationId
+      NetworkInterfaceId: !Ref prvInterface
