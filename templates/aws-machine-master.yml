@@ -4,7 +4,7 @@ Parameters:
   cloudwareId:
     Type: String
     Description: 'Enter the Cloudware UUID'
-  
+
   cloudwareDomain:
     Type: String
     Description: 'Enter the Cloudware domain name'
@@ -50,16 +50,20 @@ Parameters:
     Type: String
     Description: 'Enter the Cloudware instance type'
 
+  vmName:
+    Type: String
+    Description: 'Enter the desired instance name'
+
 Mappings:
   RegionMap:
     eu-west-1:
-      "AMI": "ami-37c2f643"
+      "AMI": "ami-55c36f2c"
 
 Resources:
   securityGroupPrv:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Join ['-', [!Ref cloudwareDomain, 'sg']]
+      GroupName: !Join ['-', [!Ref cloudwareDomain, 'prv']]
       GroupDescription: 'Cloudware security group for master machine prv interface'
       VpcId: !Ref networkId
       SecurityGroupIngress:
@@ -84,7 +88,7 @@ Resources:
   securityGroupMgt:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Join ['-', [!Ref cloudwareDomain, 'sg']]
+      GroupName: !Join ['-', [!Ref cloudwareDomain, 'mgt']]
       GroupDescription: 'Cloudware security group for master machine mgt interface'
       VpcId: !Ref networkId
       SecurityGroupIngress:
@@ -105,7 +109,7 @@ Resources:
     Properties:
       Description: !Join [' ', [!Ref cloudwareDomain, !Ref vmName, 'prv network interface']]
       GroupSet:
-        - securityGroupPrv
+        - !Ref securityGroupPrv
       PrivateIpAddress: !Ref prvSubnetIp
       SubnetId: !Ref prvSubnetId
       Tags:
@@ -121,7 +125,7 @@ Resources:
     Properties:
       Description: !Join [' ', [!Ref cloudwareDomain, !Ref vmName, 'mgt network interface']]
       GroupSet:
-        - securityGroupMgt
+        - !Ref securityGroupMgt
       PrivateIpAddress: !Ref mgtSubnetIp
       SubnetId: !Ref mgtSubnetId
       Tags:
@@ -167,9 +171,3 @@ Resources:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
-
-  publicIpAttachment:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      AllocationId: !Get publicIp.AllocationId
-      NetworkInterfaceId: !Ref prvInterface
