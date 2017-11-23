@@ -171,3 +171,9 @@ Resources:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
+
+  publicIpAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      NetworkInterfaceId: !Ref prvInterface
+      AllocationId: !GetAtt publicIp.AllocationId
