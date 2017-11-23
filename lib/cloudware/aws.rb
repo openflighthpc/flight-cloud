@@ -101,7 +101,7 @@ module Cloudware
         { parameter_key: 'prvSubnetCidr', parameter_value: prvsubnetcidr },
         { parameter_key: 'mgtSubnetCidr', parameter_value: mgtsubnetcidr }
       ]
-      deploy(name, template, params)
+      deploy("#{name}-domain", template, params)
     end
 
     def create_machine(name, domain, id, prvip, mgtip, type, size, region)
@@ -132,10 +132,12 @@ module Cloudware
       @cfn.wait_until :stack_create_complete, stack_name: name
     end
 
-    def destroy(_type, name, region)
-      load_config(region)
-      @cfn.delete_stack stack_name: name
-      @cfn.wait_until :stack_delete_complete, stack_name: name
+    def destroy(name, domain)
+      d = Cloudware::Domain.new
+      d.name = domain
+      load_config(d.region)
+      @cfn.delete_stack stack_name: "#{domain}-#{name}"
+      @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
     end
   end
 end
