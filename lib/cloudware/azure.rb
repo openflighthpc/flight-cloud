@@ -63,14 +63,14 @@ module Cloudware
           next unless r.tags['cloudware_resource_type'] == 'domain'
           next unless r.type == 'Microsoft.Network/virtualNetworks'
           @domains.merge!(r.tags['cloudware_domain'] => {
-                           cloudware_domain: r.tags['cloudware_domain'],
-                           cloudware_id: r.tags['cloudware_id'],
-                           network_cidr: r.tags['cloudware_network_cidr'],
-                           prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
-                           mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
-                           provider: 'azure',
-                           region: r.tags['cloudware_domain_region']
-                         })
+                            cloudware_domain: r.tags['cloudware_domain'],
+                            cloudware_id: r.tags['cloudware_id'],
+                            network_cidr: r.tags['cloudware_network_cidr'],
+                            prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
+                            mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
+                            provider: 'azure',
+                            region: r.tags['cloudware_domain_region']
+                          })
         end
       end
       @domains

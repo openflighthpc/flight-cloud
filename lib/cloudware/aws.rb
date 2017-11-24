@@ -80,10 +80,10 @@ module Cloudware
             end
           end
           @domains.merge!(@cloudware_domain => { cloudware_domain: @cloudware_domain,
-                                                    cloudware_id: @cloudware_id, network_cidr: @network_cidr,
-                                                    prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
-                                                    prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
-                                                    region: @region, provider: 'aws', network_id: @networkid })
+                                                 cloudware_id: @cloudware_id, network_cidr: @network_cidr,
+                                                 prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
+                                                 prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
+                                                 region: @region, provider: 'aws', network_id: @networkid })
         end
       end
       @domains
@@ -107,8 +107,8 @@ module Cloudware
               @name = tag.value if tag.key == 'cloudware_machine_name'
             end
             @machines.merge!(@name => { name: @name, cloudware_domain: @domain, state: @state,
-                                       cloudware_id: @id, size: @size, cloudware_machine_type: @type, mgt_ip: @mgtsubnetip,
-                                       prv_ip: @prvsubnetip, ext_ip: @extip, provider: 'aws' })
+                                        cloudware_id: @id, size: @size, cloudware_machine_type: @type, mgt_ip: @mgtsubnetip,
+                                        prv_ip: @prvsubnetip, ext_ip: @extip, provider: 'aws' })
           end
         end
       end
@@ -151,9 +151,11 @@ module Cloudware
     end
 
     def deploy(name, tpl_file, params)
-      @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
-      @cfn.wait_until :stack_create_complete, stack_name: name
-    rescue Cloudformation::Errors::ServiceError
+      begin
+        @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
+        @cfn.wait_until :stack_create_complete, stack_name: name
+      rescue Cloudformation::Errors::ServiceError
+      end
     end
 
     def destroy(name, domain)
@@ -163,7 +165,8 @@ module Cloudware
       begin
         @cfn.delete_stack stack_name: "#{domain}-#{name}"
         @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
-      rescue Cloudformation::Errors::ServiceError; end
+      rescue Cloudformation::Errors::ServiceError
+      end
     end
 
     def render_template(template)
