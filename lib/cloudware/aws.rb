@@ -117,7 +117,7 @@ module Cloudware
 
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
       load_config(region)
-      template = 'aws-network-base.yml'
+      template = 'aws/domain.yml'
       params = [
         { parameter_key: 'cloudwareDomain', parameter_value: name },
         { parameter_key: 'cloudwareId', parameter_value: id },
@@ -132,7 +132,7 @@ module Cloudware
       d = Cloudware::Domain.new
       d.name = domain
       load_config(region)
-      template = "aws-machine-#{type}.yml"
+      template = "aws/machine-#{type}.yml"
       params = [
         { parameter_key: 'cloudwareDomain', parameter_value: domain },
         { parameter_key: 'cloudwareId', parameter_value: id },

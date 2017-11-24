@@ -44,7 +44,7 @@ module Cloudware
       abort('Domain already exists') if resource_group_exists?(name)
       create_resource_group(region, id, name)
 
-      t = 'azure-network-base.json'
+      t = 'azure/domain.json'
       params = {
         cloudwareDomain: name,
         cloudwareId: id,
@@ -77,7 +77,7 @@ module Cloudware
     end
 
     def create_machine(name, domain, id, prvip, mgtip, type, size, _region)
-      t = "azure-machine-#{type}.json"
+      t = "azure/machine-#{type}.json"
       params = {
         cloudwareDomain: domain,
         cloudwareId: id,
