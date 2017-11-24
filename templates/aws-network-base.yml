@@ -119,6 +119,18 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
 
+  PrvSubnetRouteTableAssocation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrvSubnet
+      RouteTableId: !Ref RouteTable
+
+  MgtSubnetRouteTableAssocation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref MgtSubnet
+      RouteTableId: !Ref RouteTable
+
   RouteInternetGateway:
     Type: AWS::EC2::Route
     Properties:
