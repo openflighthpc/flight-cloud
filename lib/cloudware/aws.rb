@@ -106,7 +106,7 @@ module Cloudware
         @ec2.describe_instances({filters: [{name: 'tag-key', values: ['cloudware_id']}]}).reservations.each do |reservation|
           reservation.instances.each do |instance|
             @extip = instance.public_ip_address
-            @state = instance.state.name
+            @state = instance.state.name unless instance.state.name == 'terminated'
             @size = instance.instance_type
             instance.tags.each do |tag|
               @domain = tag.value if tag.key == 'cloudware_domain'
