@@ -55,6 +55,14 @@ module Cloudware
       deploy(t, 'domain', params, name)
     end
 
+    def domain_list
+      @domain_list ||= list_domains
+    end
+
+    def machine_list
+      @machine_list ||= list_machines
+    end
+
     def list_domains
       domains = {}
       resource_groups.each do |g|
