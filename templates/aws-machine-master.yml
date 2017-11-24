@@ -57,13 +57,13 @@ Parameters:
 Mappings:
   RegionMap:
     eu-west-1:
-      "AMI": "ami-55c36f2c"
+      "AMI": "ami-0d063c6b"
 
 Resources:
   securityGroupMaster:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Join ['-', [!Ref cloudwareDomain]]
+      GroupName: !Join ['-', [!Ref cloudwareDomain, !Ref vmName]]
       GroupDescription: 'Cloudware seucirty group for master machine'
       VpcId: !Ref networkId
       SecurityGroupIngress:
