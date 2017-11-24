@@ -63,7 +63,7 @@ module Cloudware
     def destroy
       @provider = provider
       load_cloud
-      @cloud.destroy('domain', @name, region)
+      @cloud.destroy('domain', @name)
     end
 
     def name
