@@ -33,12 +33,19 @@ module Cloudware
     # aws provider specific
     attr_accessor :prvsubnetid, :mgtsubnetid, :networkid
 
+    def initialize
+      @items = {}
+    end
+
     def load_cloud
-      case get_provider
+      case @provider
       when 'aws'
         @cloud = Cloudware::Aws.new
       when 'azure'
         @cloud = Cloudware::Azure.new
+      else
+        @aws = Cloudware::Aws.new
+        @azure = Cloudware::Azure.new
       end
     end
 
@@ -50,69 +57,26 @@ module Cloudware
     end
 
     def list
-      # @todo - once we have GCP/AWS providers, merge
-      # all providers data into a single hash and return
-      list = {}
-      azure = Cloudware::Azure.new
-      aws = Cloudware::Aws.new
-      list.merge!(azure.domain_list)
-      list.merge!(aws.domain_list)
-      puts list
-      list
-    end
-
-    def get_list
-      get_list ||= list
+      @list ||= begin
+                  @list = {}
+                  aws = Cloudware::Aws.new
+                  azure = Cloudware::Azure.new
+                  @list.merge!(aws.domains)
+                  @list.merge!(azure.domains)
+                  @list
+                end
     end
 
     def destroy
-      @provider = provider
+      @provider = get_item('provider')
       load_cloud
       @cloud.destroy('domain', @name)
     end
 
-    def fail_domain_exist
-      raise('Domain does not exist')
-    end
-
-    def get_name
-      get_list[@name][:cloudware_domain] if exists? || fail_domain_exist
-    end
-
-    def get_id
-      get_list[@name][:cloudware_id] if exists?
-    end
-
-    def get_provider
-      get_list[@name][:provider] if exists?
-    end
-
-    def get_networkcidr
-      get_list[@name][:network_cidr] if exists?
-    end
-
-    def get_mgtsubnetcidr
-      get_list[@name][:prv_subnet_cidr] if exists?
-    end
-
-    def get_prvsubnetcidr
-      get_list[@name][:prv_subnet_cidr] if exists?
-    end
-
-    def get_mgtsubnetid
-      get_list[@name][:mgt_subnet_id] if exists?
-    end
-
-    def get_prvsubnetid
-      get_list[@name][:prv_subnet_id] if exists?
-    end
-
-    def get_networkid
-      get_list[@name][:network_id] if exists?
-    end
-
-    def get_region
-      get_list[@name][:region] if exists?
+    def get_item(item)
+      @items[item] = begin
+                       list[@name][item.to_sym]
+                     end
     end
 
     def valid_create?
@@ -122,7 +86,7 @@ module Cloudware
     end
 
     def exists?
-      get_list.include? @name
+      list.include? @name
     end
 
     def valid_name?

@@ -30,23 +30,29 @@ module Cloudware
     # size: Provider specific VM size
     attr_accessor :size
 
+    def initialize
+      @items = {}
+    end
+
     def load_cloud
       @d = Cloudware::Domain.new
       @d.name = @domain
-      p = @d.get_provider
-      case @d.get_provider
+      case @d.get_item('provider')
       when 'azure'
         @cloud = Cloudware::Azure.new
       when 'aws'
         @cloud = Cloudware::Aws.new
+      else
+        @aws = Cloudware::Aws.new
+        @azure = Cloudware::Azure.new
       end
     end
 
     def create
       raise('Invalid machine name') unless validate_name?
       load_cloud
-      @cloud.create_machine(@name, @domain, @d.get_id,
-                            @prvsubnetip, @mgtsubnetip, @type, @size, @d.get_region)
+      @cloud.create_machine(@name, @domain, @d.get_item('cloudware_id'),
+                            @prvsubnetip, @mgtsubnetip, @type, @size, @d.get_item('region'))
     end
 
     def destroy
@@ -55,44 +61,21 @@ module Cloudware
     end
 
     def list
-      list = {}
-      aws = Cloudware::Aws.new
-      azure = Cloudware::Azure.new
-      list.merge!(aws.machine_list)
-      list.merge!(azure.machine_list)
-      list
+      @list ||= begin
+                  @list = {}
+                  aws = Cloudware::Aws.new
+                  azure = Cloudware::Azure.new
+                  @list.merge!(aws.machines)
+                  @list.merge!(azure.machines)
+                  @list
+                end
     end
 
-    def get_list
-      get_list ||= list
-    end
-
-    def get_prvsubnetip
-      get_list[@name][:prv_ip]
-    end
-
-    def get_mgtsubnetip
-      get_list[@name][:mgt_ip]
-    end
-
-    def get_extip
-      get_list[@name][:extip]
-    end
-
-    def get_state
-      get_list[@name][:state]
-    end
-
-    def get_size
-      get_list[@name][:size]
-    end
-
-    def get_type
-      get_list[@name][:cloudware_machine_type]
-    end
-
-    def get_provider
-      get_list[@name][:provider]
+    def get_item(item)
+      return @items[item] unless @items[item].nil?
+      @items[item] = begin
+                       list[@name][item.to_sym]
+                     end
     end
 
     def validate_name?

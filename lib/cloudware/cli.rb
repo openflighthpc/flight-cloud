@@ -180,14 +180,14 @@ module Cloudware
         when 'table'
           table = Terminal::Table.new do |t|
             t.add_row ['Machine name'.bold, m.name]
-            t.add_row ['Domain name'.bold, m.domain]
-            t.add_row ['Machine type'.bold, m.type]
-            t.add_row ['Prv subnet IP'.bold, m.prvsubnetip]
-            t.add_row ['Mgt subnet IP'.bold, m.mgtsubnetip]
-            t.add_row ['External IP'.bold, m.extip]
-            t.add_row ['Instance state'.bold, m.state]
-            t.add_row ['Instance size'.bold, m.size]
-            t.add_row ['Provider'.bold, m.provider]
+            t.add_row ['Domain name'.bold, m.get_item('cloudware_domain')]
+            t.add_row ['Machine type'.bold, m.get_item('cloudware_machine_type')]
+            t.add_row ['Prv subnet IP'.bold, m.get_item('prv_ip')]
+            t.add_row ['Mgt subnet IP'.bold, m.get_item('mgt_ip')]
+            t.add_row ['External IP'.bold, m.get_item('ext_ip')]
+            t.add_row ['Instance state'.bold, m.get_item('state')]
+            t.add_row ['Instance size'.bold, m.get_item('size')]
+            t.add_row ['Provider'.bold, m.get_item('provider')]
             t.style = { all_separators: true }
           end
           puts table

@@ -55,52 +55,42 @@ module Cloudware
       regions
     end
 
-    def domain_list
-      @domain_list ||= domains
-    end
-
-    def machine_list
-      @machine_list ||= machines
-    end
-
     # TOneverDO - tidy this
     def domains
-      @domains || begin
-        domain_list = {}
-        vpc_list = @ec2.describe_vpcs
-        regions.each do |r|
-          load_config(r)
-          vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
-          vpc_list.vpcs.each do |v|
-            v.tags.each do |t|
-              @cloudware_domain = t.value if t.key == 'cloudware_domain'
-              @cloudware_id = t.value if t.key == 'cloudware_id'
-              @network_cidr = t.value if t.key == 'cloudware_network_cidr'
-              @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
-              @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
-              @networkid = v.vpc_id
-              @region = r
-            end
-            subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
-            subnet_list.subnets.each do |s|
-              s.tags.each do |t|
-                @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_prv_subnet_id"
-                @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_mgt_subnet_id"
-              end
-            end
-            domain_list.merge!(@cloudware_domain => { cloudware_domain: @cloudware_domain,
-                                                      cloudware_id: @cloudware_id, network_cidr: @network_cidr,
-                                                      prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
-                                                      prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
-                                                      region: @region, provider: 'aws', network_id: @networkid })
+      @domains = {}
+      vpc_list = @ec2.describe_vpcs
+      regions.each do |r|
+        load_config(r)
+        vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
+        vpc_list.vpcs.each do |v|
+          v.tags.each do |t|
+            @cloudware_domain = t.value if t.key == 'cloudware_domain'
+            @cloudware_id = t.value if t.key == 'cloudware_id'
+            @network_cidr = t.value if t.key == 'cloudware_network_cidr'
+            @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
+            @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
+            @networkid = v.vpc_id
+            @region = r
           end
+          subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
+          subnet_list.subnets.each do |s|
+            s.tags.each do |t|
+              @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_prv_subnet_id"
+              @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_mgt_subnet_id"
+            end
+          end
+          @domains.merge!(@cloudware_domain => { cloudware_domain: @cloudware_domain,
+                                                    cloudware_id: @cloudware_id, network_cidr: @network_cidr,
+                                                    prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
+                                                    prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
+                                                    region: @region, provider: 'aws', network_id: @networkid })
         end
-        @domains = domain_list
       end
+      @domains
     end
 
     def machines
-      machines = {}
+      @machines = {}
       regions.each do |r|
         load_config(r)
         @ec2.describe_instances(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).reservations.each do |reservation|
@@ -116,13 +106,13 @@ module Cloudware
               @mgtsubnetip = tag.value if tag.key == 'cloudware_mgt_subnet_ip'
               @name = tag.value if tag.key == 'cloudware_machine_name'
             end
-            machines.merge!(@name => { name: @name, cloudware_domain: @domain, state: @state,
+            @machines.merge!(@name => { name: @name, cloudware_domain: @domain, state: @state,
                                        cloudware_id: @id, size: @size, cloudware_machine_type: @type, mgt_ip: @mgtsubnetip,
-                                       prv_ip: @prvsubnetip, extip: @extip, provider: 'aws' })
+                                       prv_ip: @prvsubnetip, ext_ip: @extip, provider: 'aws' })
           end
         end
       end
-      machines
+      @machines
     end
 
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
@@ -151,11 +141,11 @@ module Cloudware
         { parameter_key: 'vmType', parameter_value: type },
         { parameter_key: 'vmSize', parameter_value: size },
         { parameter_key: 'vmName', parameter_value: name },
-        { parameter_key: 'networkId', parameter_value: d.get_networkid },
-        { parameter_key: 'prvSubnetId', parameter_value: d.get_prvsubnetid },
-        { parameter_key: 'mgtSubnetId', parameter_value: d.get_mgtsubnetid },
-        { parameter_key: 'prvSubnetCidr', parameter_value: d.get_prvsubnetcidr },
-        { parameter_key: 'mgtSubnetCidr', parameter_value: d.get_mgtsubnetcidr }
+        { parameter_key: 'networkId', parameter_value: d.get_item('network_id') },
+        { parameter_key: 'prvSubnetId', parameter_value: d.get_item('prv_subnet_id') },
+        { parameter_key: 'mgtSubnetId', parameter_value: d.get_item('mgt_subnet_id') },
+        { parameter_key: 'prvSubnetCidr', parameter_value: d.get_item('prv_subnet_cidr') },
+        { parameter_key: 'mgtSubnetCidr', parameter_value: d.get_item('mgt_subnet_cidr') }
       ]
       deploy("#{domain}-#{name}", template, params)
     end
@@ -169,7 +159,7 @@ module Cloudware
     def destroy(name, domain)
       d = Cloudware::Domain.new
       d.name = domain
-      load_config(d.get_region)
+      load_config(d.get_item('region'))
       begin
         @cfn.delete_stack stack_name: "#{domain}-#{name}"
         @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"

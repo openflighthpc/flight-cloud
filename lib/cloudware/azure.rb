@@ -55,22 +55,14 @@ module Cloudware
       deploy(t, 'domain', params, name)
     end
 
-    def domain_list
-      @domain_list ||= list_domains
-    end
-
-    def machine_list
-      @machine_list ||= list_machines
-    end
-
-    def list_domains
-      domains = {}
+    def domains
+      @domains = {}
       resource_groups.each do |g|
         resources = @client.resources.list_by_resource_group(g)
         resources.each do |r|
           next unless r.tags['cloudware_resource_type'] == 'domain'
           next unless r.type == 'Microsoft.Network/virtualNetworks'
-          domains.merge!(r.tags['cloudware_domain'] => {
+          @domains.merge!(r.tags['cloudware_domain'] => {
                            cloudware_domain: r.tags['cloudware_domain'],
                            cloudware_id: r.tags['cloudware_id'],
                            network_cidr: r.tags['cloudware_network_cidr'],
@@ -81,7 +73,7 @@ module Cloudware
                          })
         end
       end
-      domains
+      @domains
     end
 
     def create_machine(name, domain, id, prvip, mgtip, type, size, _region)
@@ -97,17 +89,17 @@ module Cloudware
       deploy(t, name, params, domain)
     end
 
-    def list_machines
-      machines = {}
+    def machines
+      @machines = {}
       resource_groups.each do |g|
         resources = @client.resources.list_by_resource_group(g)
         resources.each do |r|
           next unless r.tags['cloudware_resource_type'] == 'machine'
           next unless r.type == 'Microsoft.Compute/virtualMachines'
-          machines.merge!(r.tags['cloudware_machine_name'] => { cloudware_domain: r.tags['cloudware_domain'], cloudware_machine_type: r.tags['cloudware_machine_type'], prv_ip: r.tags['cloudware_prv_ip'], mgt_ip: r.tags['cloudware_mgt_ip'], provider: 'azure', size: r.tags['cloudware_machine_size'] })
+          @machines.merge!(r.tags['cloudware_machine_name'] => { cloudware_domain: r.tags['cloudware_domain'], cloudware_machine_type: r.tags['cloudware_machine_type'], prv_ip: r.tags['cloudware_prv_ip'], mgt_ip: r.tags['cloudware_mgt_ip'], provider: 'azure', size: r.tags['cloudware_machine_size'] })
         end
       end
-      machines
+      @machines
     end
 
     def deploy(template, type, params, name)
