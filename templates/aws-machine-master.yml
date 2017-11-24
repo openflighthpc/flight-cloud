@@ -100,7 +100,7 @@ Resources:
   securityGroupPrv:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Join ['-', [!Ref cloudwareDomain, 'prv']]
+      GroupName: !Join ['-', [!Ref cloudwareDomain, !Ref vmName, 'prv']]
       GroupDescription: 'Cloudware security group for master machine prv interface'
       VpcId: !Ref networkId
       SecurityGroupIngress:
@@ -122,7 +122,7 @@ Resources:
   securityGroupMgt:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Join ['-', [!Ref cloudwareDomain, 'mgt']]
+      GroupName: !Join ['-', [!Ref cloudwareDomain, !Ref vmName, 'mgt']]
       GroupDescription: 'Cloudware security group for master machine mgt interface'
       VpcId: !Ref networkId
       SecurityGroupIngress:
