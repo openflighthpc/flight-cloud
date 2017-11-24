@@ -55,6 +55,14 @@ module Cloudware
       regions
     end
 
+    def domain_list
+      @domain_list ||= domains
+    end
+
+    def machine_list
+      @machine_list ||= machines
+    end
+
     # TOneverDO - tidy this
     def domains
       @domains || begin
@@ -152,15 +160,14 @@ module Cloudware
       deploy("#{domain}-#{name}", template, params)
     end
 
-    def deploy(name, template, params)
-      template = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
+    def deploy(name, tpl_file, params)
       begin
-        @cfn.create_stack stack_name: name, template_body: template, parameters: params
+        @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
         @cfn.wait_until :stack_create_complete, stack_name: name
       rescue Aws::Cloudformation::Errors::ServiceError; end
     end
 
-    def destroy(name, domain)
+    def destroy(name, domain, region)
       d = Cloudware::Domain.new
       d.name = domain
       load_config(d.region)
@@ -168,6 +175,10 @@ module Cloudware
         @cfn.delete_stack stack_name: "#{domain}-#{name}"
         @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
       rescue Aws::Cloudformation::Errors::ServiceError; end
+    end
+
+    def render_template(template)
+      File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
     end
   end
 end
