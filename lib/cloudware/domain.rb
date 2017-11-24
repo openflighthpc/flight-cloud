@@ -55,14 +55,12 @@ module Cloudware
       list = {}
       azure = Cloudware::Azure.new
       aws = Cloudware::Aws.new
-      list.merge!(azure.list_domains)
-      list.merge!(aws.domains)
+      list.merge!(azure.domain_list)
+      list.merge!(aws.domain_list)
       list
     end
 
     def destroy
-      # Provide hardcoded 'domain' name to `provider.destroy`
-      # the domain deployment is always labelled 'domain'
       @provider = provider
       load_cloud
       @cloud.destroy('domain', @name, region)
