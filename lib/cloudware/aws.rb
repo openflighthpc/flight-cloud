@@ -106,7 +106,7 @@ module Cloudware
         @ec2.describe_instances({filters: [{name: 'tag-key', values: ['cloudware_id']}]}).reservations.each do |reservation|
           reservation.instances.each do |instance|
             @extip = instance.public_ip_address
-            @state = instance.state.name unless instance.state.name == 'terminated'
+            next if instance.state.name == 'terminated' || @state = instance.state.name
             @size = instance.instance_type
             instance.tags.each do |tag|
               @domain = tag.value if tag.key == 'cloudware_domain'
@@ -164,17 +164,17 @@ module Cloudware
       begin
         @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
         @cfn.wait_until :stack_create_complete, stack_name: name
-      rescue Aws::Cloudformation::Errors::ServiceError; end
+      rescue Cloudformation::Errors::ServiceError; end
     end
 
-    def destroy(name, domain, region)
+    def destroy(name, domain)
       d = Cloudware::Domain.new
       d.name = domain
       load_config(d.region)
       begin
         @cfn.delete_stack stack_name: "#{domain}-#{name}"
         @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
-      rescue Aws::Cloudformation::Errors::ServiceError; end
+      rescue Cloudformation::Errors::ServiceError; end
     end
 
     def render_template(template)
