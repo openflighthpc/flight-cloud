@@ -33,7 +33,8 @@ module Cloudware
     def load_cloud
       @d = Cloudware::Domain.new
       @d.name = @domain
-      case @d.provider
+      p = @d.get_provider
+      case @d.get_provider
       when 'azure'
         @cloud = Cloudware::Azure.new
       when 'aws'
@@ -42,49 +43,10 @@ module Cloudware
     end
 
     def create
-      abort('Invalid machine name') unless validate_name
+      raise('Invalid machine name') unless validate_name?
       load_cloud
-      @cloud.create_machine(@name, @domain, @d.id,
-                            @prvsubnetip, @mgtsubnetip, @type, @size, @d.region)
-    end
-
-    def list
-      # @todo - once we have GCP/AWS providers, merge
-      # all providers data into a single hash and return
-      list = {}
-      azure = Cloudware::Azure.new
-      aws = Cloudware::Aws.new
-      list.merge!(azure.list_machines)
-      list.merge!(aws.machines)
-      list
-    end
-
-    def prvsubnetip
-      list[@name][:prv_ip] || @prvsubnetip
-    end
-
-    def mgtsubnetip
-      list[@name][:mgt_ip] || @mgtsubnetip
-    end
-
-    def extip
-      list[@name][:extip] || @extip
-    end
-
-    def state
-      list[@name][:state] || @state
-    end
-
-    def size
-      list[@name][:size] || @size
-    end
-
-    def type
-      list[@name][:cloudware_machine_type] || @type
-    end
-
-    def provider
-      list[@name][:provider] || @provider
+      @cloud.create_machine(@name, @domain, @d.get_id,
+                            @prvsubnetip, @mgtsubnetip, @type, @size, @d.get_region)
     end
 
     def destroy
@@ -92,7 +54,48 @@ module Cloudware
       @cloud.destroy(@name, @domain)
     end
 
-    def validate_name
+    def list
+      list = {}
+      aws = Cloudware::Aws.new
+      azure = Cloudware::Azure.new
+      list.merge!(aws.machine_list)
+      list.merge!(azure.machine_list)
+      list
+    end
+
+    def get_list
+      get_list ||= list
+    end
+
+    def get_prvsubnetip
+      get_list[@name][:prv_ip]
+    end
+
+    def get_mgtsubnetip
+      get_list[@name][:mgt_ip]
+    end
+
+    def get_extip
+      get_list[@name][:extip]
+    end
+
+    def get_state
+      get_list[@name][:state]
+    end
+
+    def get_size
+      get_list[@name][:size]
+    end
+
+    def get_type
+      get_list[@name][:cloudware_machine_type]
+    end
+
+    def get_provider
+      get_list[@name][:provider]
+    end
+
+    def validate_name?
       !@name.match(/\A[a-zA-Z0-9]*\z/).nil?
     end
   end

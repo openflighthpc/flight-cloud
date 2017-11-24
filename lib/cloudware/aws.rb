@@ -106,7 +106,7 @@ module Cloudware
         @ec2.describe_instances(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).reservations.each do |reservation|
           reservation.instances.each do |instance|
             @extip = instance.public_ip_address
-            next if instance.state.name == 'terminated' || @state = instance.state.name
+            @state = instance.state.name
             @size = instance.instance_type
             instance.tags.each do |tag|
               @domain = tag.value if tag.key == 'cloudware_domain'
@@ -151,11 +151,11 @@ module Cloudware
         { parameter_key: 'vmType', parameter_value: type },
         { parameter_key: 'vmSize', parameter_value: size },
         { parameter_key: 'vmName', parameter_value: name },
-        { parameter_key: 'networkId', parameter_value: d.networkid },
-        { parameter_key: 'prvSubnetId', parameter_value: d.prvsubnetid },
-        { parameter_key: 'mgtSubnetId', parameter_value: d.mgtsubnetid },
-        { parameter_key: 'prvSubnetCidr', parameter_value: d.prvsubnetcidr },
-        { parameter_key: 'mgtSubnetCidr', parameter_value: d.mgtsubnetcidr }
+        { parameter_key: 'networkId', parameter_value: d.get_networkid },
+        { parameter_key: 'prvSubnetId', parameter_value: d.get_prvsubnetid },
+        { parameter_key: 'mgtSubnetId', parameter_value: d.get_mgtsubnetid },
+        { parameter_key: 'prvSubnetCidr', parameter_value: d.get_prvsubnetcidr },
+        { parameter_key: 'mgtSubnetCidr', parameter_value: d.get_mgtsubnetcidr }
       ]
       deploy("#{domain}-#{name}", template, params)
     end
@@ -169,7 +169,7 @@ module Cloudware
     def destroy(name, domain)
       d = Cloudware::Domain.new
       d.name = domain
-      load_config(d.region)
+      load_config(d.get_region)
       begin
         @cfn.delete_stack stack_name: "#{domain}-#{name}"
         @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"

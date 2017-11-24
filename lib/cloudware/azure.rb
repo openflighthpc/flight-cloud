@@ -84,14 +84,6 @@ module Cloudware
       domains
     end
 
-    def describe(name)
-      resource = []
-      @client.resource_groups.list_resources(name).value.each do |_r|
-        a.push('resource.tags')
-      end
-      resource
-    end
-
     def create_machine(name, domain, id, prvip, mgtip, type, size, _region)
       t = "azure-machine-#{type}.json"
       params = {
