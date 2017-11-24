@@ -89,10 +89,10 @@ module Cloudware
               end
             end
             domain_list.merge!(@cloudware_domain => { cloudware_domain: @cloudware_domain,
-                                                  cloudware_id: @cloudware_id, network_cidr: @network_cidr,
-                                                  prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
-                                                  prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
-                                                  region: @region, provider: 'aws', network_id: @networkid })
+                                                      cloudware_id: @cloudware_id, network_cidr: @network_cidr,
+                                                      prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
+                                                      prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
+                                                      region: @region, provider: 'aws', network_id: @networkid })
           end
         end
         @domains = domain_list
@@ -103,7 +103,7 @@ module Cloudware
       machines = {}
       regions.each do |r|
         load_config(r)
-        @ec2.describe_instances({filters: [{name: 'tag-key', values: ['cloudware_id']}]}).reservations.each do |reservation|
+        @ec2.describe_instances(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).reservations.each do |reservation|
           reservation.instances.each do |instance|
             @extip = instance.public_ip_address
             next if instance.state.name == 'terminated' || @state = instance.state.name
@@ -116,9 +116,9 @@ module Cloudware
               @mgtsubnetip = tag.value if tag.key == 'cloudware_mgt_subnet_ip'
               @name = tag.value if tag.key == 'cloudware_machine_name'
             end
-            machines.merge!(@name => {name: @name, cloudware_domain: @domain, state: @state,
-                            cloudware_id: @id, size: @size, cloudware_machine_type: @type, mgt_ip: @mgtsubnetip,
-                            prv_ip: @prvsubnetip, extip: @extip, provider: 'aws'})
+            machines.merge!(@name => { name: @name, cloudware_domain: @domain, state: @state,
+                                       cloudware_id: @id, size: @size, cloudware_machine_type: @type, mgt_ip: @mgtsubnetip,
+                                       prv_ip: @prvsubnetip, extip: @extip, provider: 'aws' })
           end
         end
       end
@@ -161,10 +161,9 @@ module Cloudware
     end
 
     def deploy(name, tpl_file, params)
-      begin
-        @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
-        @cfn.wait_until :stack_create_complete, stack_name: name
-      rescue Cloudformation::Errors::ServiceError; end
+      @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
+      @cfn.wait_until :stack_create_complete, stack_name: name
+    rescue Cloudformation::Errors::ServiceError
     end
 
     def destroy(name, domain)

@@ -138,9 +138,9 @@ module Cloudware
         m.size = options.size.to_s
 
         puts "Creating #{options.name} in domain #{options.domain}".bold
-        puts "This may take a while.."
+        puts 'This may take a while..'
         m.create
-        puts "Operation complete".green.bold
+        puts 'Operation complete'.green.bold
       end
     end
 
@@ -171,7 +171,7 @@ module Cloudware
       c.option '--domain NAME', String, 'Domain name'
       c.option '--output TYPE', String, 'Output type [json, table]. Default: table'
       c.action do |_args, options|
-        options.default :output => 'table'
+        options.default output: 'table'
         m = Cloudware::Machine.new
         m.name = options.name.to_s
         m.domain = options.domain.to_s
@@ -188,7 +188,7 @@ module Cloudware
             t.add_row ['Instance state'.bold, m.state]
             t.add_row ['Instance size'.bold, m.size]
             t.add_row ['Provider'.bold, m.provider]
-            t.style = {:all_separators => true}
+            t.style = { all_separators: true }
           end
           puts table
         end
