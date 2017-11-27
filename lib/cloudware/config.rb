@@ -32,18 +32,14 @@ module Cloudware
       self.log_file = config['general']['log_file']
 
       # Provider: azure
-      unless config['provider']['azure'].to_s.empty?
-        self.azure_tenant_id = config['provider']['azure']['tenant_id'] unless config['provider']['azure']['tenant_id'].to_s.empty? || ENV['AZURE_TENANT_ID']
-        self.azure_subscription_id = config['provider']['azure']['subscription_id'] unless config['provider']['azure']['subscription_id'].to_s.empty? || ENV['AZURE_SUBSCRIPTION_ID']
-        self.azure_client_secret = config['provider']['azure']['client_secret'] unless config['provider']['azure']['client_secret'].to_s.empty? || ENV['AZURE_CLIENT_SECRET']
-        self.azure_client_id = config['provider']['azure']['client_id'] unless config['provider']['azure']['client_id'].to_s.empty? || ENV['AZURE_CLIENT_ID']
-      end
+      self.azure_tenant_id = config['provider']['azure']['tenant_id'] || ENV['AZURE_TENANT_ID']
+      self.azure_subscription_id = config['provider']['azure']['subscription_id'] || ENV['AZURE_SUBSCRIPTION_ID']
+      self.azure_client_id = config['provider']['azure']['client_id'] || ENV['AZURE_TENANT_SECRET']
+      self.azure_client_secret = config['provider']['azure']['client_secret'] || ENV['AZURE_CLIENT_SECRET']
 
       # Provider: aws
-      unless config['provider']['aws'].to_s.empty?
-        self.aws_access_key_id = config['provider']['aws']['access_key_id'] unless config['provider']['aws']['access_key_id'].to_s.empty? || ENV['AWS_ACCESS_KEY_ID']
-        self.aws_secret_access_key = config['provider']['aws']['secret_access_key'] unless config['provider']['aws']['secret_access_key'].to_s.empty? || ENV['AWS_SECRET_ACCESS_KEY']
-      end
+      self.aws_access_key_id = config['provider']['aws']['access_key_id'] || ENV['AWS_ACCESS_KEY_ID']
+      self.aws_secret_access_key = config['provider']['aws']['secret_access_key'] || ENV['AWS_SECRET_ACCESS_KEY']
     end
   end
 end
