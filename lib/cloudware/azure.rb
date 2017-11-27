@@ -26,11 +26,11 @@ Resources = Azure::Resources::Profiles::Latest::Mgmt
 module Cloudware
   class Azure
     def initialize
-      subscription_id = ENV['AZURE_SUBSCRIPTION_ID']
+      subscription_id = config.azure_subscription_id
       provider = MsRestAzure::ApplicationTokenProvider.new(
-        ENV['AZURE_TENANT_ID'],
-        ENV['AZURE_CLIENT_ID'],
-        ENV['AZURE_CLIENT_SECRET']
+        config.azure_tenant_id,
+        config.azure_client_id,
+        config.azure_client_secret
       )
       credentials = MsRest::TokenCredentials.new(provider)
       options = {
@@ -41,10 +41,14 @@ module Cloudware
       @client = Resources::Client.new(options)
     end
 
+    def config
+      Cloudware.config
+    end
+
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
       abort('Domain already exists') if resource_group_exists?(name)
       create_resource_group(region, id, name)
-
+      ENV['AZURE_CLIENT_ID']
       t = 'azure/domain.json'
       params = {
         cloudwareDomain: name,
@@ -66,14 +70,14 @@ module Cloudware
                          next unless r.tags['cloudware_resource_type'] == 'domain'
                          next unless r.type == 'Microsoft.Network/virtualNetworks'
                          @domains.merge!(r.tags['cloudware_domain'] => {
-                           domain: r.tags['cloudware_domain'],
-                           id: r.tags['cloudware_id'],
-                           network_cidr: r.tags['cloudware_network_cidr'],
-                           prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
-                           mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
-                           provider: 'azure',
-                           region: r.tags['cloudware_domain_region']
-                         })
+                                           domain: r.tags['cloudware_domain'],
+                                           id: r.tags['cloudware_id'],
+                                           network_cidr: r.tags['cloudware_network_cidr'],
+                                           prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
+                                           mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
+                                           provider: 'azure',
+                                           region: r.tags['cloudware_domain_region']
+                                         })
                        end
                      end
                      @domains
@@ -102,13 +106,13 @@ module Cloudware
                           next unless r.tags['cloudware_resource_type'] == 'machine'
                           next unless r.type == 'Microsoft.Compute/virtualMachines'
                           @machines.merge!(r.tags['cloudware_machine_name'] => {
-                            domain: r.tags['cloudware_domain'],
-                            role: r.tags['cloudware_machine_role'],
-                            prv_ip: r.tags['cloudware_prv_ip'],
-                            mgt_ip: r.tags['cloudware_mgt_ip'],
-                            provider: 'azure',
-                            type: r.tags['cloudware_machine_type']
-                          })
+                                             domain: r.tags['cloudware_domain'],
+                                             role: r.tags['cloudware_machine_role'],
+                                             prv_ip: r.tags['cloudware_prv_ip'],
+                                             mgt_ip: r.tags['cloudware_mgt_ip'],
+                                             provider: 'azure',
+                                             type: r.tags['cloudware_machine_type']
+                                           })
                         end
                       end
                       @machines

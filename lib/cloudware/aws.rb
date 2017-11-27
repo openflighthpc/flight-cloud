@@ -24,6 +24,7 @@ require 'aws-sdk-ec2'
 
 CloudFormation = Aws::CloudFormation
 EC2 = Aws::EC2
+Credentials = Aws::Credentials
 
 module Cloudware
   class Aws
@@ -42,7 +43,15 @@ module Cloudware
       load_config(region)
     end
 
+    def config
+      Cloudware.config
+    end
+
     def load_config(region)
+      unless config.aws_access_key_id.nil? && config.aws_secret_access_key.nil?
+        log.info('Using AWS credentials stored in config/environment')
+        Credentials.new(config.aws_access_key_id, config.aws_secret_access_key)
+      end
       log.info('Loading CloudFormation client')
       @cfn = CloudFormation::Client.new(region: region)
       log.info('Loading EC2 client')
@@ -83,15 +92,15 @@ module Cloudware
           subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
           subnet_list.subnets.each do |s|
             s.tags.each do |t|
-              @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_prv_subnet_id"
-              @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_mgt_subnet_id"
+              @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_prv_subnet_id"
+              @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_mgt_subnet_id"
             end
           end
           @domains.merge!(@domain => { domain: @domain,
-                                                 id: @id, network_cidr: @network_cidr,
-                                                 prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
-                                                 prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
-                                                 region: @region, provider: 'aws', network_id: @networkid })
+                                       id: @id, network_cidr: @network_cidr,
+                                       prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
+                                       prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
+                                       region: @region, provider: 'aws', network_id: @networkid })
         end
       end
       @domains
@@ -161,14 +170,12 @@ module Cloudware
     end
 
     def deploy(name, tpl_file, params)
-      begin
-        log.info("Starting deployment of #{name}")
-        @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
-        log.info("Deployment for #{name} finished, waiting for deployment to reach complete")
-        @cfn.wait_until :stack_create_complete, stack_name: name
-        log.info("Deployment for #{name} reached complete status")
-      rescue CloudFormation::Errors::ServiceError
-      end
+      log.info("Deploying new stack\nName: #{name}\nTemplate: #{tpl_file}\nParams: #{params}")
+      @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
+      log.info("Deployment for #{name} finished, waiting for deployment to reach complete")
+      @cfn.wait_until :stack_create_complete, stack_name: name
+      log.info("Deployment for #{name} reached complete status")
+    rescue CloudFormation::Errors::ServiceError
     end
 
     def destroy(name, domain)

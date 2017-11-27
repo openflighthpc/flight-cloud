@@ -187,7 +187,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !FindInMap ["RegionMap", !Ref "AWS::Region", "AMI"]
-      InstanceType: !Ref vmSize
+      InstanceType: !Ref vmType
       Monitoring: true
       KeyName: !Ref keyPairName
       NetworkInterfaces:

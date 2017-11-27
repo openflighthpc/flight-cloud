@@ -64,19 +64,19 @@ module Cloudware
         options.mgtsubnetcidr = ask('Mgt subnet CIDR: ') if options.mgtsubnetcidr.nil?
         d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
 
-        Whirly.start spinner: "dots2", status: "Verifying provider is valid".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: 'Verifying provider is valid'.bold, stop: '[OK]'.green
         raise("Provider #{options.provider} does not exist") unless d.valid_provider?
         Whirly.stop
 
-        Whirly.start spinner: "dots2", status: "Checking domain name is valid".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: 'Checking domain name is valid'.bold, stop: '[OK]'.green
         raise("Domain name #{options.name} is not valid") unless d.valid_name?
         Whirly.stop
 
-        Whirly.start spinner: "dots2", status: "Checking domain does not already exist".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: 'Checking domain does not already exist'.bold, stop: '[OK]'.green
         raise("Domain name #{options.name} already exists") if d.exists?
         Whirly.stop
 
-        Whirly.start spinner: "dots2", status: "Creating new deployment".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: 'Creating new deployment'.bold, stop: '[OK]'.green
         d.create
         Whirly.stop
       end
@@ -93,8 +93,8 @@ module Cloudware
         d.region = options.region.to_s unless options.region.nil?
         d.name = options.name.to_s unless options.name.nil?
         r = []
-        Whirly.start spinner: "dots2", status: "Fetching available domains".bold, stop: "[OK]".green
-        raise("No available domains") if d.list.empty?
+        Whirly.start spinner: 'dots2', status: 'Fetching available domains'.bold, stop: '[OK]'.green
+        raise('No available domains') if d.list.empty?
         Whirly.stop
         d.list.each do |k, v|
           r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider], v[:region]]
@@ -120,11 +120,11 @@ module Cloudware
         options.name = ask('Domain name: ') if options.name.nil?
         d.name = options.name.to_s
 
-        Whirly.start spinner: "dots2", status: "Checking domain exists".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: 'Checking domain exists'.bold, stop: '[OK]'.green
         raise("Domain name #{options.name} does not exist") unless d.exists?
         Whirly.stop
 
-        Whirly.start spinner: "dots2", status: "Destroying domain #{options.name}".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: "Destroying domain #{options.name}".bold, stop: '[OK]'.green
         d.destroy
         Whirly.stop
       end
@@ -160,15 +160,15 @@ module Cloudware
         options.type = ask('Machine type: ') if options.type.nil?
         m.type = options.type.to_s
 
-        Whirly.start spinner: "dots2", status: "Verifying domain exists".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: 'Verifying domain exists'.bold, stop: '[OK]'.green
         raise("Domain #{options.domain} does not exist") unless m.valid_domain?
         Whirly.stop
 
-        Whirly.start spinner: "dots2", status: "Checking machine name is valid".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: 'Checking machine name is valid'.bold, stop: '[OK]'.green
         raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
         Whirly.stop
 
-        Whirly.start spinner: "dots2", status: "Creating new deployment".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: 'Creating new deployment'.bold, stop: '[OK]'.green
         m.create
         Whirly.stop
       end
@@ -180,8 +180,8 @@ module Cloudware
       c.action do |_args, _options|
         m = Cloudware::Machine.new
         r = []
-        Whirly.start spinner: "dots2", status: "Fetching available machines".bold, stop: "[OK]".green
-        raise("No available machines") if m.list.empty?
+        Whirly.start spinner: 'dots2', status: 'Fetching available machines'.bold, stop: '[OK]'.green
+        raise('No available machines') if m.list.empty?
         Whirly.stop
         m.list.each do |k, v|
           r << [k, v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type]]
@@ -212,7 +212,7 @@ module Cloudware
         case options.output.to_s
         when 'table'
           table = Terminal::Table.new do |t|
-            Whirly.start spinner: "dots2", status: "Fetching machine info".bold, stop: "[OK]".green
+            Whirly.start spinner: 'dots2', status: 'Fetching machine info'.bold, stop: '[OK]'.green
             t.add_row ['Machine name'.bold, m.name]
             t.add_row ['Domain name'.bold, m.get_item('domain')]
             t.add_row ['Machine role'.bold, m.get_item('role')]
@@ -244,11 +244,11 @@ module Cloudware
         options.domain = ask('Domain identifier: ') if options.domain.nil?
         m.domain = options.domain.to_s
 
-        Whirly.start spinner: "dots2", status: "Checking machine exists".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: 'Checking machine exists'.bold, stop: '[OK]'.green
         raise('Machine does not exist') unless m.exists?
         Whirly.stop
 
-        Whirly.start spinner: "dots2", status: "Destroying #{options.name} in domain #{options.domain}".bold, stop: "[OK]".green
+        Whirly.start spinner: 'dots2', status: "Destroying #{options.name} in domain #{options.domain}".bold, stop: '[OK]'.green
         m.destroy
         Whirly.stop
       end
