@@ -54,6 +54,7 @@ GEM
       multi_json (~> 1.11)
       os (~> 0.9)
       signet (~> 0.7)
+    haikunator (1.1.0)
     highline (1.7.8)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
@@ -126,6 +127,7 @@ DEPENDENCIES
   colorize
   commander
   google-cloud-resource_manager
+  haikunator
   ipaddr
   rspec
   terminal-table
