@@ -60,15 +60,34 @@ module Cloudware
     end
 
     def list
-      log.info('Listing available domains')
       @list ||= begin
                   @list = {}
-                  aws = Cloudware::Aws.new
-                  azure = Cloudware::Azure.new
-                  @list.merge!(aws.domains)
-                  @list.merge!(azure.domains)
+                  if (@provider) && (@region.nil?)
+                    log.info("Filtering domains by:\nProvider: #{@provider}")
+                    load_cloud
+                    @list.merge!(@cloud.domains)
+                  elsif (@provider) && (@region)
+                    log.info("Filtering domains by:\nProvider: #{@provider}\nRegion: #{@region}")
+                    load_cloud
+                    @list.merge!(domains_by_region(region))
+                  else
+                    load_cloud
+                    @list.merge!(@aws.domains)
+                    @list.merge!(@azure.domains)
+                  end
                   @list
                 end
+    end
+
+    def domains_by_region(region)
+      @domains_by_region ||= begin
+                               load_cloud
+                               @domains_by_region = @cloud.domains
+                               @domains_by_region.each do |k, v|
+                                 k.delete(k) if v[:region] != region
+                               end
+                               @domains_by_region
+                             end
     end
 
     def destroy

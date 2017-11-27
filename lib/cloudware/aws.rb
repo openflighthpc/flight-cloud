@@ -50,12 +50,14 @@ module Cloudware
     end
 
     def regions
-      log.info('Loading available regions')
-      regions = []
-      @ec2.describe_regions.regions.each do |r|
-        regions.push(r.region_name)
-      end
-      regions
+      @regions ||= begin
+                     log.warn('Loading available regions from API')
+                     @regions = []
+                     @ec2.describe_regions.regions.each do |r|
+                       @regions.push(r.region_name)
+                     end
+                     @regions
+                   end
     end
 
     # TOneverDO - tidy this
@@ -85,8 +87,8 @@ module Cloudware
               @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_mgt_subnet_id"
             end
           end
-          @domains.merge!(@domain => { domain: @cloudware_domain,
-                                                 id: @cloudware_id, network_cidr: @network_cidr,
+          @domains.merge!(@domain => { domain: @domain,
+                                                 id: @id, network_cidr: @network_cidr,
                                                  prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
                                                  prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
                                                  region: @region, provider: 'aws', network_id: @networkid })
@@ -140,7 +142,7 @@ module Cloudware
       d = Cloudware::Domain.new
       d.name = domain
       load_config(region)
-      template = "aws/machine-#{type}.yml"
+      template = "aws/machine-#{role}.yml"
       params = [
         { parameter_key: 'cloudwareDomain', parameter_value: domain },
         { parameter_key: 'cloudwareId', parameter_value: id },
@@ -165,7 +167,7 @@ module Cloudware
         log.info("Deployment for #{name} finished, waiting for deployment to reach complete")
         @cfn.wait_until :stack_create_complete, stack_name: name
         log.info("Deployment for #{name} reached complete status")
-      rescue Cloudformation::Errors::ServiceError
+      rescue CloudFormation::Errors::ServiceError
       end
     end
 
@@ -179,7 +181,7 @@ module Cloudware
         log.info("Waiting until stack reaches deleted status: #{name}-#{domain}")
         @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
         log.info("Stack reached deleted status: #{domain}-#{name}")
-      rescue Cloudformation::Errors::ServiceError
+      rescue CloudFormation::Errors::ServiceError
       end
     end
 

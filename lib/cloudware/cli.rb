@@ -85,11 +85,17 @@ module Cloudware
     command :'domain list' do |c|
       c.syntax = 'cloudware domain list [options]'
       c.description = 'List created domains'
-      c.option '--provider NAME', String, 'Provider name'
-      c.action do |_args, _options|
+      c.option '--provider NAME', String, 'Provider name to filter by'
+      c.option '--region NAME', String, 'Provider region to filter by'
+      c.action do |_args, options|
         d = Cloudware::Domain.new
+        d.provider = options.provider.to_s unless options.provider.nil?
+        d.region = options.region.to_s unless options.region.nil?
+        d.name = options.name.to_s unless options.name.nil?
         r = []
-        abort('No available domains') if d.list.empty?
+        Whirly.start spinner: "dots2", status: "Fetching available domains".bold, stop: "[OK]".green
+        raise("No available domains") if d.list.empty?
+        Whirly.stop
         d.list.each do |k, v|
           r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider], v[:region]]
         end
@@ -109,14 +115,18 @@ module Cloudware
       c.description = 'Destroy a machine'
       c.option '--name NAME', String, 'Domain name'
       c.action do |_args, options|
-        m = Cloudware::Domain.new
+        d = Cloudware::Domain.new
 
         options.name = ask('Domain name: ') if options.name.nil?
-        m.name = options.name.to_s
+        d.name = options.name.to_s
 
-        puts "Destroying domain #{options.name}. This may take a while..".bold
-        m.destroy
-        puts 'Operation complete'.green.bold
+        Whirly.start spinner: "dots2", status: "Checking domain exists".bold, stop: "[OK]".green
+        raise("Domain name #{options.name} does not exist") unless d.exists?
+        Whirly.stop
+
+        Whirly.start spinner: "dots2", status: "Destroying domain #{options.name}".bold, stop: "[OK]".green
+        d.destroy
+        Whirly.stop
       end
     end
 
@@ -141,10 +151,10 @@ module Cloudware
         options.role = choose('Machine role?', :master, :slave) if options.role.nil?
         m.role = options.role.to_s
 
-        options.prvsubnetip = ask('Prv subnet IP: ') if options.prvip.nil?
+        options.prvip = ask('Prv subnet IP: ') if options.prvip.nil?
         m.prvip = options.prvip.to_s
 
-        options.mgtsubnetip = ask('Mgt subnet IP: ') if options.mgtip.nil?
+        options.mgtip = ask('Mgt subnet IP: ') if options.mgtip.nil?
         m.mgtip = options.mgtip.to_s
 
         options.type = ask('Machine type: ') if options.type.nil?
@@ -170,11 +180,14 @@ module Cloudware
       c.action do |_args, _options|
         m = Cloudware::Machine.new
         r = []
+        Whirly.start spinner: "dots2", status: "Fetching available machines".bold, stop: "[OK]".green
+        raise("No available machines") if m.list.empty?
+        Whirly.stop
         m.list.each do |k, v|
           r << [k, v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type]]
         end
-        table = Terminal::Table.new headings: ['Machine name'.bold,
-                                               'Domain name'.bold,
+        table = Terminal::Table.new headings: ['Name'.bold,
+                                               'Domain'.bold,
                                                'Role'.bold,
                                                'Prv IP address'.bold,
                                                'Mgt IP address'.bold,
@@ -199,6 +212,7 @@ module Cloudware
         case options.output.to_s
         when 'table'
           table = Terminal::Table.new do |t|
+            Whirly.start spinner: "dots2", status: "Fetching machine info".bold, stop: "[OK]".green
             t.add_row ['Machine name'.bold, m.name]
             t.add_row ['Domain name'.bold, m.get_item('domain')]
             t.add_row ['Machine role'.bold, m.get_item('role')]
@@ -208,6 +222,7 @@ module Cloudware
             t.add_row ['Machine state'.bold, m.get_item('state')]
             t.add_row ['Machine type'.bold, m.get_item('type')]
             t.add_row ['Provider'.bold, m.get_item('provider')]
+            Whirly.stop
             t.style = { all_separators: true }
           end
           puts table
@@ -229,10 +244,13 @@ module Cloudware
         options.domain = ask('Domain identifier: ') if options.domain.nil?
         m.domain = options.domain.to_s
 
-        puts "Destroying #{options.name} in domain #{options.domain}"
-        puts 'This may take a while...'
+        Whirly.start spinner: "dots2", status: "Checking machine exists".bold, stop: "[OK]".green
+        raise('Machine does not exist') unless m.exists?
+        Whirly.stop
+
+        Whirly.start spinner: "dots2", status: "Destroying #{options.name} in domain #{options.domain}".bold, stop: "[OK]".green
         m.destroy
-        puts 'Operation complete'
+        Whirly.stop
       end
     end
   end

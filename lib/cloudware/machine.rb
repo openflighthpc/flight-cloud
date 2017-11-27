@@ -76,6 +76,10 @@ module Cloudware
                      end
     end
 
+    def exists?
+      list[@name][:domain].include? @domain
+    end
+
     def validate_name?
       !@name.match(/\A[a-zA-Z0-9]*\z/).nil?
     end
