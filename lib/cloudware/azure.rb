@@ -37,6 +37,7 @@ module Cloudware
         credentials: credentials,
         subscription_id: subscription_id
       }
+      log.info('Loading Azure client')
       @client = Resources::Client.new(options)
     end
 
@@ -58,6 +59,7 @@ module Cloudware
     def domains
       @domains = {}
       resource_groups.each do |g|
+        log.info("Listing available resources in group #{g}")
         resources = @client.resources.list_by_resource_group(g)
         resources.each do |r|
           next unless r.tags['cloudware_resource_type'] == 'domain'
@@ -112,6 +114,7 @@ module Cloudware
       debug_settings = @client.model_classes.debug_setting.new
       debug_settings.detail_level = 'requestContent, responseContent'
       d.properties.debug_setting = debug_settings
+      log.info("Creating new deployment: #{type} #{name}")
       @client.deployments.create_or_update(name, type.to_s, d)
       operation_results = @client.deployment_operations.list(name, type.to_s)
       unless operation_results.nil?
@@ -121,9 +124,11 @@ module Cloudware
           end
         end
       end
+      log.info("Deployment #{type} #{name} complete")
     end
 
     def destroy(name, domain)
+      log.info("Destroying deployment #{name} #{domain}")
       @client.deployments.delete(domain, name)
     end
 
@@ -136,11 +141,13 @@ module Cloudware
           region: region
         }
       end
+      log.info("Creating new resource group\nRegion: #{region}\nID: #{id}\n#{name}")
       @client.resource_groups.create_or_update(name, params)
     end
 
     def resource_groups
       groups = []
+      log.info('Loading available resource groups')
       @client.resource_groups.list.each do |g|
         next if g.tags.nil?
         groups.push(g.tags['cloudware_domain']) unless g.tags['cloudware_domain'].nil?
@@ -150,6 +157,10 @@ module Cloudware
 
     def resource_group_exists?(name)
       resource_groups.include? name
+    end
+
+    def log
+      Cloudware.log
     end
   end
 end

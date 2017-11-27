@@ -40,11 +40,15 @@ module Cloudware
     def load_cloud
       case @provider
       when 'aws'
+        log.info('Loading provider AWS')
         @cloud = Cloudware::Aws.new
       when 'azure'
+        log.info('Loading provider Azure')
         @cloud = Cloudware::Azure.new
       else
+        log.info('Loading provider AWS')
         @aws = Cloudware::Aws.new
+        log.info('Loading provider Azure')
         @azure = Cloudware::Azure.new
       end
     end
@@ -57,6 +61,7 @@ module Cloudware
     end
 
     def list
+      log.info('Listing available domains')
       @list ||= begin
                   @list = {}
                   aws = Cloudware::Aws.new
@@ -75,6 +80,7 @@ module Cloudware
 
     def get_item(item)
       @items[item] = begin
+                       log.warn("Loading #{item} from API")
                        list[@name][item.to_sym]
                      end
     end
@@ -95,6 +101,10 @@ module Cloudware
 
     def valid_provider?
       %w[aws azure gcp].include? @provider
+    end
+
+    def log
+      Cloudware.log
     end
   end
 end

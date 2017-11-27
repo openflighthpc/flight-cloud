@@ -43,11 +43,14 @@ module Cloudware
     end
 
     def load_config(region)
+      log.info('Loading CloudFormation client')
       @cfn = CloudFormation::Client.new(region: region)
+      log.info('Loading EC2 client')
       @ec2 = EC2::Client.new(region: region)
     end
 
     def regions
+      log.info('Loading available regions')
       regions = []
       @ec2.describe_regions.regions.each do |r|
         regions.push(r.region_name)
@@ -57,10 +60,12 @@ module Cloudware
 
     # TOneverDO - tidy this
     def domains
+      log.info('Loading available domains')
       @domains = {}
       vpc_list = @ec2.describe_vpcs
       regions.each do |r|
         load_config(r)
+        log.info("Listing available VPCs in #{r}")
         vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
         vpc_list.vpcs.each do |v|
           v.tags.each do |t|
@@ -72,6 +77,7 @@ module Cloudware
             @networkid = v.vpc_id
             @region = r
           end
+          log.info("Listing available subnets for VPC #{v.vpc_id} in region #{r}")
           subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
           subnet_list.subnets.each do |s|
             s.tags.each do |t|
@@ -90,9 +96,11 @@ module Cloudware
     end
 
     def machines
+      log.info('Listing available machines')
       @machines = {}
       regions.each do |r|
         load_config(r)
+        log.info("Listing available instances in #{region}")
         @ec2.describe_instances(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).reservations.each do |reservation|
           reservation.instances.each do |instance|
             @extip = instance.public_ip_address
@@ -152,8 +160,11 @@ module Cloudware
 
     def deploy(name, tpl_file, params)
       begin
+        log.info("Starting deployment of #{name}")
         @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
+        log.info("Deployment for #{name} finished, waiting for deployment to reach complete")
         @cfn.wait_until :stack_create_complete, stack_name: name
+        log.info("Deployment for #{name} reached complete status")
       rescue Cloudformation::Errors::ServiceError
       end
     end
@@ -163,14 +174,21 @@ module Cloudware
       d.name = domain
       load_config(d.get_item('region'))
       begin
+        log.info("Beginning stack deletion for stack #{name}-#{domain}")
         @cfn.delete_stack stack_name: "#{domain}-#{name}"
+        log.info("Waiting until stack reaches deleted status: #{name}-#{domain}")
         @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
+        log.info("Stack reached deleted status: #{domain}-#{name}")
       rescue Cloudformation::Errors::ServiceError
       end
     end
 
     def render_template(template)
       File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
+    end
+
+    def log
+      Cloudware.log
     end
   end
 end

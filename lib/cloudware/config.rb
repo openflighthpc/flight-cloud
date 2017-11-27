@@ -23,8 +23,11 @@ require 'yaml'
 
 module Cloudware
   class Config
+    attr_accessor :log_file
+
     def initialize(cfg_file)
       config = YAML.load_file(cfg_file)
+      self.log_file = config['general']['log_file']
     end
   end
 end

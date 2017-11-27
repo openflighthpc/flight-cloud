@@ -1,0 +1,4 @@
+---
+general:
+  # Location to store Cloudware logs
+  log_file: '/var/log/cloudware.log'

@@ -13,29 +13,22 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You hould have received a copy of the GNU General Public License
 # along with this package.  If not, see <http://www.gnu.org/licenses/>.
 #
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-require 'cloudware/cli'
-require 'cloudware/domain'
-require 'cloudware/machine'
-require 'cloudware/azure'
-require 'cloudware/gcp'
-require 'cloudware/aws'
-require 'cloudware/config'
 require 'logger'
 
 module Cloudware
-  class << self
-    def config
-      @config ||= Config.new(ENV['CLOUDWARE_CONFIG'] || ENV['HOME']+'/.cloudware.yml')
-    end
-
+  class Log
     def log
       @log ||= Logger.new(config.log_file)
+    end
+
+    def config
+      Cloudware.config
     end
   end
 end
