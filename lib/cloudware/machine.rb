@@ -19,6 +19,8 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
+require 'ipaddr'
+
 module Cloudware
   class Machine < Domain
     attr_accessor :name
@@ -88,6 +90,11 @@ module Cloudware
       domain = Cloudware::Domain.new
       domain.name = @domain
       true if domain.exists? || false
+    end
+
+    def valid_ip?(subnet, ip)
+      subnet_ip = IPAddr.new(subnet)
+      subnet_ip.include?(ip)
     end
   end
 end

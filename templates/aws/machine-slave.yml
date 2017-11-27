@@ -21,11 +21,11 @@ Parameters:
     Type: String
     Description: 'Enter the mgt subnet ID'
 
-  prvSubnetIp:
+  prvIp:
     Type: String
     Description: 'Enter the prv subnet IP'
 
-  mgtSubnetIp:
+  mgtIp:
     Type: String
     Description: 'Enter the mgt subnet IP'
 
@@ -42,11 +42,11 @@ Parameters:
     Type: String
     Description: 'Select the AWS keypair to assign to the instance'
 
-  vmSize:
+  vmType:
     Type: String
     Description: 'Enter the size of the instance'
 
-  vmType:
+  vmRole:
     Type: String
     Description: 'Enter the Cloudware instance type'
 
@@ -142,7 +142,7 @@ Resources:
       GroupSet:
         - !Ref securityGroupPrv
         - !Ref securityGroupSlave
-      PrivateIpAddress: !Ref prvSubnetIp
+      PrivateIpAddress: !Ref prvIp
       SubnetId: !Ref prvSubnetId
       Tags:
         -
@@ -161,7 +161,7 @@ Resources:
       Description: !Join [' ', [!Ref cloudwareDomain, !Ref vmName, 'mgt network interface']]
       GroupSet:
         - !Ref securityGroupMgt
-      PrivateIpAddress: !Ref mgtSubnetIp
+      PrivateIpAddress: !Ref mgtIp
       SubnetId: !Ref mgtSubnetId
       Tags:
         -
@@ -181,7 +181,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !FindInMap ["RegionMap", !Ref "AWS::Region", "AMI"]
-      InstanceType: !Ref vmSize
+      InstanceType: !Ref vmType
       Monitoring: true
       KeyName: !Ref keyPairName
       NetworkInterfaces:
@@ -202,14 +202,14 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
         -
-          Key: 'cloudware_machine_type'
-          Value: !Ref vmType
+          Key: 'cloudware_machine_role'
+          Value: !Ref vmRole
         -
           Key: 'cloudware_machine_name'
           Value: !Ref vmName
         -
           Key: 'cloudware_prv_subnet_ip'
-          Value: !Ref prvSubnetIp
+          Value: !Ref prvIp
         -
           Key: 'cloudware_mgt_subnet_ip'
-          Value: !Ref mgtSubnetIp
+          Value: !Ref mgtIp

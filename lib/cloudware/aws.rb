@@ -77,7 +77,7 @@ module Cloudware
                      regions.each do |r|
                        load_config(r)
                        log.info("Loading VPCs for region #{r}")
-                       vpc_list = @ec2.describe_vpcs(filters:[{name: 'tag-key', values: ['cloudware_id']}])
+                       vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
                        vpc_list.vpcs.each do |v|
                          v.tags.each do |t|
                            @domain = t.value if t.key == 'cloudware_domain'
@@ -89,7 +89,7 @@ module Cloudware
                            @region = r
                          end
                          log.info("Loading subnets for VPC #{v.vpc_id} in region #{r}")
-                         subnet_list = @ec2.describe_subnets(filters: [{name: 'vpc-id', values: [v.vpc_id]}])
+                         subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
                          subnet_list.subnets.each do |s|
                            s.tags.each do |t|
                              @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_prv_subnet_id"
@@ -97,10 +97,11 @@ module Cloudware
                            end
                          end
                          @domains.merge!(@domain => {
-                           domain: @domain, id: @id, network_cidr: @network_cidr,
-                           prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
-                           prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
-                           region: @region, provider: 'aws', network_id: @networkid })
+                                           domain: @domain, id: @id, network_cidr: @network_cidr,
+                                           prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
+                                           prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
+                                           region: @region, provider: 'aws', network_id: @networkid
+                                         })
                        end
                      end
                      @domains
@@ -113,7 +114,7 @@ module Cloudware
                       regions.each do |r|
                         load_config(r)
                         log.info("Loading instances in region #{r}")
-                        @ec2.describe_instances(filters: [{name: 'tag-key', values: ['cloudware_id']}]).reservations.each do |reservation|
+                        @ec2.describe_instances(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).reservations.each do |reservation|
                           reservation.instances.each do |instance|
                             next if instance.state.name == 'terminated'
                             @state = instance.state.name
@@ -128,10 +129,10 @@ module Cloudware
                               @name = tag.value if tag.key == 'cloudware_machine_name'
                             end
                             @machines.merge!(@name => {
-                              name: @name, domain: @domain, state: @state,
-                              id: @id, type: @type, role: @role, mgt_ip: @mgtip,
-                              prv_ip: @prvip, ext_ip: @extip, provider: 'aws'
-                            })
+                                               name: @name, domain: @domain, state: @state,
+                                               id: @id, type: @type, role: @role, mgt_ip: @mgtip,
+                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws'
+                                             })
                           end
                         end
                       end
@@ -180,7 +181,6 @@ module Cloudware
       log.info("Deployment for #{name} finished, waiting for deployment to reach complete")
       @cfn.wait_until :stack_create_complete, stack_name: name
       log.info("Deployment for #{name} reached complete status")
-    rescue CloudFormation::Errors::ServiceError
     end
 
     def destroy(name, domain)

@@ -54,6 +54,13 @@ module Cloudware
       end
     end
 
+    def describe
+      @describe ||= begin
+                    domain = Struct.new :name, :region, :provider, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr
+                    @describe = domain.new(get_item('domain'), get_item('region'), get_item('provider'), get_item('network_cidr'), get_item('prv_subnet_cidr'), get_item('mgt_subnet_cidr'))
+                  end
+    end
+
     def create
       load_cloud
       @cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,

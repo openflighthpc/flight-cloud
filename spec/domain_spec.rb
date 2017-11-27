@@ -1,11 +1,23 @@
 require 'cloudware/domain'
 require 'cloudware/azure'
 require 'cloudware/aws'
+require 'cloudware/config'
+require 'cloudware/log'
+require 'cloudware'
+require 'haikunator'
+
 describe Cloudware::Domain do
   context 'with provider azure' do
     before do
+      @name = 'cloudware-azure-test'
+      @provider = 'azure'
+      @region = 'uksouth'
+      @networkcidr = '10.0.0.0/16'
+      @prvsubnetcidr = '10.0.1.0/24'
+      @mgtsubnetcidr = '10.0.2.0/24'
       @domain = Cloudware::Domain.new
-      @domain.provider = 'azure'
+      @domain.name = @name
+      @domain.provider = @provider
     end
 
     it 'returns correct provider' do
@@ -13,8 +25,7 @@ describe Cloudware::Domain do
     end
 
     it 'returns the correct name' do
-      @domain.name = 'cloudware-test'
-      expect(@domain.name).to eq('cloudware-test')
+      expect(@domain.name).to eq(@name)
     end
 
     it 'returns the correct region' do
@@ -23,22 +34,50 @@ describe Cloudware::Domain do
     end
 
     it 'returns the correct network cidr' do
-      @domain.networkcidr = '10.0.0.0/16'
-      expect(@domain.networkcidr).to eq('10.0.0.0/16')
+      @domain.networkcidr = @networkcidr
+      expect(@domain.networkcidr).to eq(@networkcidr)
+    end
+
+    it 'validates the network cidr' do
+      expect(@domain.is_valid_cidr?(@networkcidr)).to be(true)
     end
 
     it 'returns the correct prv subnet cidr' do
-      @domain.prvsubnetcidr = '10.0.1.0/24'
-      expect(@domain.prvsubnetcidr).to eq('10.0.1.0/24')
+      @domain.prvsubnetcidr = @prvsubnetcidr
+      expect(@domain.prvsubnetcidr).to eq(@prvsubnetcidr)
+    end
+
+    it 'validates the prv/mgt subnet cidrs' do
+      expect(@domain.is_valid_subnet_cidr?(@networkcidr, @prvsubnetcidr)).to be(true)
+      expect(@domain.is_valid_subnet_cidr?(@networkcidr, @mgtsubnetcidr)).to be(true)
     end
 
     it 'returns the correct mgt subnet cidr' do
-      @domain.prvsubnetcidr = '10.0.2.0/24'
-      expect(@domain.prvsubnetcidr).to eq('10.0.2.0/24')
+      @domain.mgtsubnetcidr = @mgtsubnetcidr
+      expect(@domain.mgtsubnetcidr).to eq(@mgtsubnetcidr)
     end
 
-    it 'should not return a provider' do
-      expect(@domain.get_item('provider').to be(nil)
+    it 'creates a new domain' do
+      @domain.region = 'uksouth'
+      @domain.networkcidr = @networkcidr
+      @domain.prvsubnetcidr = @prvsubnetcidr
+      @domain.mgtsubnetcidr = @mgtsubnetcidr
+      @domain.create
+      expect(@domain.exists?).to be(true)
+    end
+
+    it 'should return a list of domains as a hash' do
+      expect(@domain.list).to be_a(Hash)
+    end
+
+    it 'should return the correct domain information from API' do
+      domain = @domain.describe
+      expect(domain).to have_attributes(:name => @name)
+      expect(domain).to have_attributes(:region => @region)
+      expect(domain).to have_attributes(:provider => @provider)
+      expect(domain).to have_attributes(:networkcidr => @networkcidr)
+      expect(domain).to have_attributes(:prvsubnetcidr => @prvsubnetcidr)
+      expect(domain).to have_attributes(:mgtsubnetcidr => @mgtsubnetcidr)
     end
   end
 end
