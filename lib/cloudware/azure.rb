@@ -48,7 +48,6 @@ module Cloudware
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
       abort('Domain already exists') if resource_group_exists?(name)
       create_resource_group(region, id, name)
-      ENV['AZURE_CLIENT_ID']
       t = 'azure/domain.json'
       params = {
         cloudwareDomain: name,
