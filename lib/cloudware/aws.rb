@@ -71,67 +71,72 @@ module Cloudware
 
     # TOneverDO - tidy this
     def domains
-      log.info('Loading available domains')
-      @domains = {}
-      vpc_list = @ec2.describe_vpcs
-      regions.each do |r|
-        load_config(r)
-        log.info("Listing available VPCs in #{r}")
-        vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
-        vpc_list.vpcs.each do |v|
-          v.tags.each do |t|
-            @domain = t.value if t.key == 'cloudware_domain'
-            @id = t.value if t.key == 'cloudware_id'
-            @network_cidr = t.value if t.key == 'cloudware_network_cidr'
-            @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
-            @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
-            @networkid = v.vpc_id
-            @region = r
-          end
-          log.info("Listing available subnets for VPC #{v.vpc_id} in region #{r}")
-          subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
-          subnet_list.subnets.each do |s|
-            s.tags.each do |t|
-              @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_prv_subnet_id"
-              @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_mgt_subnet_id"
-            end
-          end
-          @domains.merge!(@domain => { domain: @domain,
-                                       id: @id, network_cidr: @network_cidr,
-                                       prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
-                                       prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
-                                       region: @region, provider: 'aws', network_id: @networkid })
-        end
-      end
-      @domains
+      @domains ||= begin
+                     log.warn('Loading domains from API')
+                     @domains = {}
+                     regions.each do |r|
+                       load_config(r)
+                       log.info("Loading VPCs for region #{r}")
+                       vpc_list = @ec2.describe_vpcs(filters:[{name: 'tag-key', values: ['cloudware_id']}])
+                       vpc_list.vpcs.each do |v|
+                         v.tags.each do |t|
+                           @domain = t.value if t.key == 'cloudware_domain'
+                           @id = t.value if t.key == 'cloudware_id'
+                           @network_cidr = t.value if t.key == 'cloudware_network_cidr'
+                           @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
+                           @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
+                           @networkid = v.vpc_id
+                           @region = r
+                         end
+                         log.info("Loading subnets for VPC #{v.vpc_id} in region #{r}")
+                         subnet_list = @ec2.describe_subnets(filters: [{name: 'vpc-id', values: [v.vpc_id]}])
+                         subnet_list.subnets.each do |s|
+                           s.tags.each do |t|
+                             @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_prv_subnet_id"
+                             @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_mgt_subnet_id"
+                           end
+                         end
+                         @domains.merge!(@domain => {
+                           domain: @domain, id: @id, network_cidr: @network_cidr,
+                           prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
+                           prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
+                           region: @region, provider: 'aws', network_id: @networkid })
+                       end
+                     end
+                     @domains
+                   end
     end
 
     def machines
-      log.info('Listing available machines')
-      @machines = {}
-      regions.each do |r|
-        load_config(r)
-        log.info("Listing available instances in #{region}")
-        @ec2.describe_instances(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).reservations.each do |reservation|
-          reservation.instances.each do |instance|
-            @extip = instance.public_ip_address
-            @state = instance.state.name
-            @type = instance.instance_type
-            instance.tags.each do |tag|
-              @domain = tag.value if tag.key == 'cloudware_domain'
-              @id = tag.value if tag.key == 'cloudware_id'
-              @role = tag.value if tag.key == 'cloudware_machine_role'
-              @prvsubnetip = tag.value if tag.key == 'cloudware_prv_subnet_ip'
-              @mgtsubnetip = tag.value if tag.key == 'cloudware_mgt_subnet_ip'
-              @name = tag.value if tag.key == 'cloudware_machine_name'
-            end
-            @machines.merge!(@name => { name: @name, domain: @domain, state: @state,
-                                        id: @id, type: @type, role: @role, mgt_ip: @mgtsubnetip,
-                                        prv_ip: @prvsubnetip, ext_ip: @extip, provider: 'aws' })
-          end
-        end
-      end
-      @machines
+      @machines ||= begin
+                      @machines = {}
+                      regions.each do |r|
+                        load_config(r)
+                        log.info("Loading instances in region #{r}")
+                        @ec2.describe_instances(filters: [{name: 'tag-key', values: ['cloudware_id']}]).reservations.each do |reservation|
+                          reservation.instances.each do |instance|
+                            next if instance.state.name == 'terminated'
+                            @state = instance.state.name
+                            @extip = instance.public_ip_address || @extip = 'N/A'
+                            @type = instance.instance_type
+                            instance.tags.each do |tag|
+                              @domain = tag.value if tag.key == 'cloudware_domain'
+                              @id = tag.value if tag.key == 'cloudware_id'
+                              @role = tag.value if tag.key == 'cloudware_machine_role'
+                              @prvip = tag.value if tag.key == 'cloudware_prv_subnet_ip'
+                              @mgtip = tag.value if tag.key == 'cloudware_mgt_subnet_ip'
+                              @name = tag.value if tag.key == 'cloudware_machine_name'
+                            end
+                            @machines.merge!(@name => {
+                              name: @name, domain: @domain, state: @state,
+                              id: @id, type: @type, role: @role, mgt_ip: @mgtip,
+                              prv_ip: @prvip, ext_ip: @extip, provider: 'aws'
+                            })
+                          end
+                        end
+                      end
+                      @machines
+                    end
     end
 
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
@@ -155,8 +160,8 @@ module Cloudware
       params = [
         { parameter_key: 'cloudwareDomain', parameter_value: domain },
         { parameter_key: 'cloudwareId', parameter_value: id },
-        { parameter_key: 'prvSubnetIp', parameter_value: prvip },
-        { parameter_key: 'mgtSubnetIp', parameter_value: mgtip },
+        { parameter_key: 'prvIp', parameter_value: prvip },
+        { parameter_key: 'mgtIp', parameter_value: mgtip },
         { parameter_key: 'vmRole', parameter_value: role },
         { parameter_key: 'vmType', parameter_value: type },
         { parameter_key: 'vmName', parameter_value: name },
