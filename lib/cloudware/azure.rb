@@ -65,8 +65,8 @@ module Cloudware
           next unless r.tags['cloudware_resource_type'] == 'domain'
           next unless r.type == 'Microsoft.Network/virtualNetworks'
           @domains.merge!(r.tags['cloudware_domain'] => {
-                            cloudware_domain: r.tags['cloudware_domain'],
-                            cloudware_id: r.tags['cloudware_id'],
+                            domain: r.tags['cloudware_domain'],
+                            id: r.tags['cloudware_id'],
                             network_cidr: r.tags['cloudware_network_cidr'],
                             prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
                             mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
@@ -98,7 +98,7 @@ module Cloudware
         resources.each do |r|
           next unless r.tags['cloudware_resource_type'] == 'machine'
           next unless r.type == 'Microsoft.Compute/virtualMachines'
-          @machines.merge!(r.tags['cloudware_machine_name'] => { cloudware_domain: r.tags['cloudware_domain'], cloudware_machine_type: r.tags['cloudware_machine_type'], prv_ip: r.tags['cloudware_prv_ip'], mgt_ip: r.tags['cloudware_mgt_ip'], provider: 'azure', size: r.tags['cloudware_machine_size'] })
+          @machines.merge!(r.tags['cloudware_machine_name'] => { domain: r.tags['cloudware_domain'], role: r.tags['cloudware_machine_role'], prv_ip: r.tags['cloudware_prv_ip'], mgt_ip: r.tags['cloudware_mgt_ip'], provider: 'azure', type: r.tags['cloudware_machine_type'] })
         end
       end
       @machines

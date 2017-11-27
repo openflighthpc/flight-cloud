@@ -42,11 +42,11 @@ Parameters:
     Type: String
     Description: 'Select the AWS keypair to assign to the instance'
 
-  vmSize:
+  vmType:
     Type: String
     Description: 'Enter the size of the instance'
 
-  vmType:
+  vmRole:
     Type: String
     Description: 'Enter the Cloudware instance type'
 
@@ -208,8 +208,8 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
         -
-          Key: 'cloudware_machine_type'
-          Value: !Ref vmType
+          Key: 'cloudware_machine_role'
+          Value: !Ref vmRole
         -
           Key: 'cloudware_machine_name'
           Value: !Ref vmName

@@ -147,7 +147,7 @@
 				"cloudware_domain": "[parameters('cloudwareDomain')]",
 				"cloudware_id": "[parameters('cloudwareId')]",
 				"cloudware_machine_name": "[parameters('vmName')]",
-				"cloudware_machine_type": "master",
+				"cloudware_machine_role": "master",
 				"cloudware_machine_size": "[parameters('vmType')]",
 				"cloudware_resource_type": "machine",
 				"cloudware_prv_ip": "[parameters('prvSubnetIp')]",

@@ -69,8 +69,8 @@ module Cloudware
         vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
         vpc_list.vpcs.each do |v|
           v.tags.each do |t|
-            @cloudware_domain = t.value if t.key == 'cloudware_domain'
-            @cloudware_id = t.value if t.key == 'cloudware_id'
+            @domain = t.value if t.key == 'cloudware_domain'
+            @id = t.value if t.key == 'cloudware_id'
             @network_cidr = t.value if t.key == 'cloudware_network_cidr'
             @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
             @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
@@ -85,8 +85,8 @@ module Cloudware
               @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@cloudware_domain}_mgt_subnet_id"
             end
           end
-          @domains.merge!(@cloudware_domain => { cloudware_domain: @cloudware_domain,
-                                                 cloudware_id: @cloudware_id, network_cidr: @network_cidr,
+          @domains.merge!(@domain => { domain: @cloudware_domain,
+                                                 id: @cloudware_id, network_cidr: @network_cidr,
                                                  prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
                                                  prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
                                                  region: @region, provider: 'aws', network_id: @networkid })
@@ -105,17 +105,17 @@ module Cloudware
           reservation.instances.each do |instance|
             @extip = instance.public_ip_address
             @state = instance.state.name
-            @size = instance.instance_type
+            @type = instance.instance_type
             instance.tags.each do |tag|
               @domain = tag.value if tag.key == 'cloudware_domain'
               @id = tag.value if tag.key == 'cloudware_id'
-              @type = tag.value if tag.key == 'cloudware_machine_type'
+              @role = tag.value if tag.key == 'cloudware_machine_role'
               @prvsubnetip = tag.value if tag.key == 'cloudware_prv_subnet_ip'
               @mgtsubnetip = tag.value if tag.key == 'cloudware_mgt_subnet_ip'
               @name = tag.value if tag.key == 'cloudware_machine_name'
             end
-            @machines.merge!(@name => { name: @name, cloudware_domain: @domain, state: @state,
-                                        cloudware_id: @id, size: @size, cloudware_machine_type: @type, mgt_ip: @mgtsubnetip,
+            @machines.merge!(@name => { name: @name, domain: @domain, state: @state,
+                                        id: @id, type: @type, role: @role, mgt_ip: @mgtsubnetip,
                                         prv_ip: @prvsubnetip, ext_ip: @extip, provider: 'aws' })
           end
         end
@@ -136,7 +136,7 @@ module Cloudware
       deploy("#{name}-domain", template, params)
     end
 
-    def create_machine(name, domain, id, prvip, mgtip, type, size, region)
+    def create_machine(name, domain, id, prvip, mgtip, role, type, region)
       d = Cloudware::Domain.new
       d.name = domain
       load_config(region)
@@ -146,8 +146,8 @@ module Cloudware
         { parameter_key: 'cloudwareId', parameter_value: id },
         { parameter_key: 'prvSubnetIp', parameter_value: prvip },
         { parameter_key: 'mgtSubnetIp', parameter_value: mgtip },
+        { parameter_key: 'vmRole', parameter_value: role },
         { parameter_key: 'vmType', parameter_value: type },
-        { parameter_key: 'vmSize', parameter_value: size },
         { parameter_key: 'vmName', parameter_value: name },
         { parameter_key: 'networkId', parameter_value: d.get_item('network_id') },
         { parameter_key: 'prvSubnetId', parameter_value: d.get_item('prv_subnet_id') },

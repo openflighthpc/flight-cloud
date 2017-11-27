@@ -23,12 +23,10 @@ module Cloudware
   class Machine < Domain
     attr_accessor :name
     attr_accessor :domain
-    attr_accessor :prvsubnetip
-    attr_accessor :mgtsubnetip
-    # type: Cloudware instance type, e.g. master,slave
+    attr_accessor :prvip
+    attr_accessor :mgtip
+    attr_accessor :role
     attr_accessor :type
-    # size: Provider specific VM size
-    attr_accessor :size
 
     def initialize
       @items = {}
@@ -51,8 +49,8 @@ module Cloudware
     def create
       raise('Invalid machine name') unless validate_name?
       load_cloud
-      @cloud.create_machine(@name, @domain, @d.get_item('cloudware_id'),
-                            @prvsubnetip, @mgtsubnetip, @type, @size, @d.get_item('region'))
+      @cloud.create_machine(@name, @domain, @d.get_item('id'),
+                            @prvip, @mgtip, @role, @type, @d.get_item('region'))
     end
 
     def destroy
@@ -80,6 +78,12 @@ module Cloudware
 
     def validate_name?
       !@name.match(/\A[a-zA-Z0-9]*\z/).nil?
+    end
+
+    def valid_domain?
+      domain = Cloudware::Domain.new
+      domain.name = @domain
+      true if domain.exists? || false
     end
   end
 end

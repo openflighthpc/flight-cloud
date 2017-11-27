@@ -22,6 +22,7 @@
 require 'commander'
 require 'terminal-table'
 require 'colorize'
+require 'whirly'
 
 module Cloudware
   class CLI
@@ -48,7 +49,7 @@ module Cloudware
         options.name = ask('Domain identifier: ') if options.name.nil?
         d.name = options.name.to_s
 
-        options.provider = ask('Provider name: ') if options.provider.nil?
+        options.provider = choose('Provider name?', :aws, :azure, :gcp) if options.provider.nil?
         d.provider = options.provider.to_s
 
         options.region = ask('Provider region: ') if options.region.nil?
@@ -63,9 +64,21 @@ module Cloudware
         options.mgtsubnetcidr = ask('Mgt subnet CIDR: ') if options.mgtsubnetcidr.nil?
         d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
 
-        puts 'Starting deployment. This may take a while..'.bold
+        Whirly.start spinner: "dots2", status: "Verifying provider is valid".bold, stop: "[OK]".green
+        raise("Provider #{options.provider} does not exist") unless d.valid_provider?
+        Whirly.stop
+
+        Whirly.start spinner: "dots2", status: "Checking domain name is valid".bold, stop: "[OK]".green
+        raise("Domain name #{options.name} is not valid") unless d.valid_name?
+        Whirly.stop
+
+        Whirly.start spinner: "dots2", status: "Checking domain does not already exist".bold, stop: "[OK]".green
+        raise("Domain name #{options.name} already exists") if d.exists?
+        Whirly.stop
+
+        Whirly.start spinner: "dots2", status: "Creating new deployment".bold, stop: "[OK]".green
         d.create
-        puts 'Deployment complete'.bold.green
+        Whirly.stop
       end
     end
 
@@ -112,10 +125,10 @@ module Cloudware
       c.description = 'Create a new machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
-      c.option '--type TYPE', String, 'Machine type to create'
-      c.option '--prvsubnetip ADDR', String, 'Prv subnet IP address'
-      c.option '--mgtsubnetip ADDR', String, 'Mgt subnet IP address'
-      c.option '--size NAME', String, 'Provider specific instance size'
+      c.option '--role NAME', String, 'Machine role to inherit'
+      c.option '--prvip ADDR', String, 'Prv subnet IP address'
+      c.option '--mgtip ADDR', String, 'Mgt subnet IP address'
+      c.option '--type NAME', String, 'Machine type to deploy'
       c.action do |_args, options|
         m = Cloudware::Machine.new
 
@@ -125,22 +138,29 @@ module Cloudware
         options.domain = ask('Domain identifier: ') if options.domain.nil?
         m.domain = options.domain.to_s
 
-        options.type = ask('Machine type [master,slave]: ') if options.type.nil?
+        options.role = choose('Machine role?', :master, :slave) if options.role.nil?
+        m.role = options.role.to_s
+
+        options.prvsubnetip = ask('Prv subnet IP: ') if options.prvip.nil?
+        m.prvip = options.prvip.to_s
+
+        options.mgtsubnetip = ask('Mgt subnet IP: ') if options.mgtip.nil?
+        m.mgtip = options.mgtip.to_s
+
+        options.type = ask('Machine type: ') if options.type.nil?
         m.type = options.type.to_s
 
-        options.prvsubnetip = ask('Prv subnet IP: ') if options.prvsubnetip.nil?
-        m.prvsubnetip = options.prvsubnetip.to_s
+        Whirly.start spinner: "dots2", status: "Verifying domain exists".bold, stop: "[OK]".green
+        raise("Domain #{options.domain} does not exist") unless m.valid_domain?
+        Whirly.stop
 
-        options.mgtsubnetip = ask('Mgt subnet IP: ') if options.mgtsubnetip.nil?
-        m.mgtsubnetip = options.mgtsubnetip.to_s
+        Whirly.start spinner: "dots2", status: "Checking machine name is valid".bold, stop: "[OK]".green
+        raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
+        Whirly.stop
 
-        options.size = ask('Machine size: ') if options.size.nil?
-        m.size = options.size.to_s
-
-        puts "Creating #{options.name} in domain #{options.domain}".bold
-        puts 'This may take a while..'
+        Whirly.start spinner: "dots2", status: "Creating new deployment".bold, stop: "[OK]".green
         m.create
-        puts 'Operation complete'.green.bold
+        Whirly.stop
       end
     end
 
@@ -151,14 +171,14 @@ module Cloudware
         m = Cloudware::Machine.new
         r = []
         m.list.each do |k, v|
-          r << [k, v[:cloudware_domain], v[:cloudware_machine_type], v[:prv_ip], v[:mgt_ip], v[:size]]
+          r << [k, v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type]]
         end
         table = Terminal::Table.new headings: ['Machine name'.bold,
                                                'Domain name'.bold,
-                                               'Machine type'.bold,
+                                               'Role'.bold,
                                                'Prv IP address'.bold,
                                                'Mgt IP address'.bold,
-                                               'Size'.bold],
+                                               'Type'.bold],
                                     rows: r
         puts table
       end
@@ -180,13 +200,13 @@ module Cloudware
         when 'table'
           table = Terminal::Table.new do |t|
             t.add_row ['Machine name'.bold, m.name]
-            t.add_row ['Domain name'.bold, m.get_item('cloudware_domain')]
-            t.add_row ['Machine type'.bold, m.get_item('cloudware_machine_type')]
+            t.add_row ['Domain name'.bold, m.get_item('domain')]
+            t.add_row ['Machine role'.bold, m.get_item('role')]
             t.add_row ['Prv subnet IP'.bold, m.get_item('prv_ip')]
             t.add_row ['Mgt subnet IP'.bold, m.get_item('mgt_ip')]
             t.add_row ['External IP'.bold, m.get_item('ext_ip')]
-            t.add_row ['Instance state'.bold, m.get_item('state')]
-            t.add_row ['Instance size'.bold, m.get_item('size')]
+            t.add_row ['Machine state'.bold, m.get_item('state')]
+            t.add_row ['Machine type'.bold, m.get_item('type')]
             t.add_row ['Provider'.bold, m.get_item('provider')]
             t.style = { all_separators: true }
           end

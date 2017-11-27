@@ -112,6 +112,8 @@ GEM
       unf_ext
     unf_ext (0.0.7.4)
     unicode-display_width (1.3.0)
+    whirly (0.2.6)
+      unicode-display_width (~> 1.1)
 
 PLATFORMS
   ruby
@@ -125,3 +127,7 @@ DEPENDENCIES
   google-cloud-resource_manager
   rspec
   terminal-table
+  whirly
+
+BUNDLED WITH
+   1.16.0

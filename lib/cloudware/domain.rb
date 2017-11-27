@@ -54,7 +54,6 @@ module Cloudware
     end
 
     def create
-      raise('Invalid parameters') unless valid_create?
       load_cloud
       @cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,
                            @prvsubnetcidr, @mgtsubnetcidr, @region)
@@ -83,12 +82,6 @@ module Cloudware
                        log.warn("Loading #{item} from API")
                        list[@name][item.to_sym]
                      end
-    end
-
-    def valid_create?
-      exists?
-      valid_name?
-      valid_provider?
     end
 
     def exists?
