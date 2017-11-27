@@ -20,6 +20,7 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 require 'securerandom'
+require 'ipaddr'
 
 module Cloudware
   class Domain
@@ -117,6 +118,16 @@ module Cloudware
 
     def log
       Cloudware.log
+    end
+
+    def is_valid_cidr?(cidr)
+      IPAddr.new(cidr).ipv4?
+    end
+
+    def is_valid_subnet_cidr?(network, subnet)
+      network_cidr = IPAddr.new(network)
+      subnet_cidr = IPAddr.new(subnet)
+      network_cidr.include?(subnet_cidr)
     end
   end
 end

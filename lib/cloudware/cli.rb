@@ -66,6 +66,12 @@ module Cloudware
 
         Whirly.start spinner: 'dots2', status: 'Verifying provider is valid'.bold, stop: '[OK]'.green
         raise("Provider #{options.provider} does not exist") unless d.valid_provider?
+        Whirly.status = 'Verifying network CIDR is valid'.bold
+        raise("Network CIDR #{options.networkcidr} is not a valid IPV4 address") unless d.is_valid_cidr?(options.networkcidr.to_s)
+        Whirly.status = 'Verifying prv subnet CIDR is valid'.bold
+        raise("Prv subnet CIDR #{options.prvsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.prvsubnetcidr.to_s)
+        Whirly.status = 'Verifying mgt subnet CIDR is valid'.bold
+        raise("Mgt subnet CIDR #{options.mgtsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.mgtsubnetcidr.to_s)
         Whirly.stop
 
         Whirly.start spinner: 'dots2', status: 'Checking domain name is valid'.bold, stop: '[OK]'.green
