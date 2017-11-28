@@ -198,7 +198,7 @@ module Cloudware
     end
 
     def render_template(template)
-      File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
+      File.read(File.expand_path(File.join(__dir__, "../../providers/aws/templates/#{template}")))
     end
 
     def log

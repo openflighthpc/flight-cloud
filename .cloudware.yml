@@ -1,10 +1,10 @@
 ---
+# Location to store Cloudware logs
 general:
-  # Location to store Cloudware logs
   log_file: '/var/log/cloudware.log'
 
+# Azure provider configuration
 provider:
-  # Azure provider configuration
   azure:
     tenant_id: '%TENANT_ID%'
     subscription_id: '%SUBSCRIPTION_ID%'
@@ -15,3 +15,35 @@ provider:
     # AWS provider configuration
     access_key_id: '%ACCESS_KEY%'
     secret_access_key: '%SECRET_KEY%'
+
+# Optional machine type overrides
+machine_types:
+  azure:
+    compute:
+      tiny: 'Standard_DS1_v2'
+      small: ''
+      medium: ''
+      large: ''
+      xlarge: ''
+    generic:
+      tiny: 'Standard_DS1_v2'
+      small: ''
+      medium: ''
+      large: ''
+      xlarge: ''
+    memory:
+      tiny: 'Standard_DS1_v2'
+      small: ''
+      medium: ''
+      large: ''
+      xlarge: ''
+    gpu:
+      tiny: 'Standard_DS1_v2'
+      small: ''
+      medium: ''
+      large: ''
+      xlarge: ''
+
+  aws:
+    compute:
+      tiny:

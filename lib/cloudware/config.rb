@@ -29,6 +29,9 @@ module Cloudware
 
     def initialize(cfg_file)
       config = YAML.load_file(cfg_file)
+      aws_mappings = YAML.load_file(File.expand_path(File.join(__dir__, '../../providers/aws/templates/machine_types.yml'))))
+      azure_mappings = YAML.load_file(File.expand_path(File.join(__dir__, '../../providers/azure/templates/machine_types.yml'))))
+
       self.log_file = config['general']['log_file']
 
       # Provider: azure
@@ -40,6 +43,29 @@ module Cloudware
       # Provider: aws
       self.aws_access_key_id = config['provider']['aws']['access_key_id'] || ENV['AWS_ACCESS_KEY_ID']
       self.aws_secret_access_key = config['provider']['aws']['secret_access_key'] || ENV['AWS_SECRET_ACCESS_KEY']
+
+      # Azure machine `type` mappings
+      self.azure_machine_type_compute_tiny = azure_mappings['compute']['tiny']
+      self.azure_machine_type_compute_small = azure_mappings['compute']['small']
+      self.azure_machine_type_compute_medium = azure_mappings['compute']['medium']
+      self.azure_machine_type_compute_large = azure_mappings['compute']['large']
+      self.azure_machine_type_compute_xlarge = azure_mappings['compute']['xlarge']
+
+      self.azure_machine_type_generic_tiny = azure_mappings['generic']['tiny']
+      self.azure_machine_type_generic_small = azure_mappings['generic']['small']
+      self.azure_machine_type_generic_medium = azure_mappings['generic']['medium']
+      self.azure_machine_type_generic_large = azure_mappings['generic']['large']
+      self.azure_machine_type_generic_xlarge = azure_mappings['generic']['xlarge']
+
+      self.azure_machine_type_gpu_small = azure_mappings['gpu']['small']
+      self.azure_machine_type_gpu_medium = azure_mappings['gpu']['medium']
+      self.azure_machine_type_gpu_large = azure_mappings['gpu']['large']
+
+      self.azure_machine_type_memory_tiny = azure_mappings['memory']['tiny']
+      self.azure_machine_type_memory_small = azure_mappings['memory']['small']
+      self.azure_machine_type_memory_medium = azure_mappings['memory']['medium']
+      self.azure_machine_type_memory_large = azure_mappings['memory']['large']
+      self.azure_machine_type_memory_xlarge = azure_mappings['memory']['xlarge']
     end
   end
 end

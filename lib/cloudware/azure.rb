@@ -119,7 +119,7 @@ module Cloudware
     end
 
     def deploy(template, type, params, name)
-      t = File.read(File.expand_path(File.join(__dir__, "../../templates/#{template}")))
+      t = File.read(File.expand_path(File.join(__dir__, "../../providers/azure/templates/#{template}")))
       d = @client.model_classes.deployment.new
       d.properties = @client.model_classes.deployment_properties.new
       d.properties.template = JSON.parse(t)
