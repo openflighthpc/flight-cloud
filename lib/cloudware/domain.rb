@@ -70,19 +70,9 @@ module Cloudware
     def list
       @list ||= begin
                   @list = {}
-                  if @provider && @region.nil?
-                    log.info("Filtering domains by:\nProvider: #{@provider}")
-                    load_cloud
-                    @list.merge!(@cloud.domains)
-                  elsif @provider && @region
-                    log.info("Filtering domains by:\nProvider: #{@provider}\nRegion: #{@region}")
-                    load_cloud
-                    @list.merge!(domains_by_region(region))
-                  else
-                    load_cloud
-                    @list.merge!(@aws.domains)
-                    @list.merge!(@azure.domains)
-                  end
+                  load_cloud
+                  @list.merge!(@aws.domains)
+                  @list.merge!(@azure.domains)
                   @list
                 end
     end

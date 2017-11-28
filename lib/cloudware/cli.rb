@@ -145,7 +145,10 @@ module Cloudware
       c.option '--prvip ADDR', String, 'Prv subnet IP address'
       c.option '--mgtip ADDR', String, 'Mgt subnet IP address'
       c.option '--type NAME', String, 'Machine type to deploy'
+      c.option '--flavour NAME', String, 'Machine flavour'
       c.action do |_args, options|
+        options.default flavour: 'compute'
+
         m = Cloudware::Machine.new
 
         options.name = ask('Machine name: ') if options.name.nil?
@@ -165,6 +168,7 @@ module Cloudware
 
         options.type = ask('Machine type: ') if options.type.nil?
         m.type = options.type.to_s
+        m.flavour = options.flavour.to_s
 
         Whirly.start spinner: 'dots2', status: 'Verifying domain exists'.bold, stop: '[OK]'.green
         raise("Domain #{options.domain} does not exist") unless m.valid_domain?

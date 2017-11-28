@@ -72,12 +72,12 @@ describe Cloudware::Domain do
 
     it 'should return the correct domain information from API' do
       domain = @domain.describe
-      expect(domain).to have_attributes(:name => @name)
-      expect(domain).to have_attributes(:region => @region)
-      expect(domain).to have_attributes(:provider => @provider)
-      expect(domain).to have_attributes(:networkcidr => @networkcidr)
-      expect(domain).to have_attributes(:prvsubnetcidr => @prvsubnetcidr)
-      expect(domain).to have_attributes(:mgtsubnetcidr => @mgtsubnetcidr)
+      expect(domain).to have_attributes(name: @name)
+      expect(domain).to have_attributes(region: @region)
+      expect(domain).to have_attributes(provider: @provider)
+      expect(domain).to have_attributes(networkcidr: @networkcidr)
+      expect(domain).to have_attributes(prvsubnetcidr: @prvsubnetcidr)
+      expect(domain).to have_attributes(mgtsubnetcidr: @mgtsubnetcidr)
     end
   end
 end

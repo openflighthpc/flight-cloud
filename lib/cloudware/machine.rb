@@ -29,6 +29,7 @@ module Cloudware
     attr_accessor :mgtip
     attr_accessor :role
     attr_accessor :type
+    attr_accessor :flavour
 
     def initialize
       @items = {}
@@ -52,7 +53,7 @@ module Cloudware
       raise('Invalid machine name') unless validate_name?
       load_cloud
       @cloud.create_machine(@name, @domain, @d.get_item('id'),
-                            @prvip, @mgtip, @role, @type, @d.get_item('region'))
+                            @prvip, @mgtip, @role, render_type, @d.get_item('region'))
     end
 
     def destroy
@@ -76,6 +77,11 @@ module Cloudware
       @items[item] = begin
                        list[@name][item.to_sym]
                      end
+    end
+
+    def render_type
+      mappings = YAML.load_file(Cloudware.render_file_path("#{@d.get_item('provider')}/mappings/machine_types.yml"))
+      mappings[@flavour][@type]
     end
 
     def exists?
