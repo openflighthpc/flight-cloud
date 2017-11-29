@@ -148,8 +148,12 @@ module Cloudware
       c.option '--flavour NAME', String, 'Machine flavour'
       c.action do |_args, options|
         options.default flavour: 'compute'
+        options.default type: 'small'
 
         m = Cloudware::Machine.new
+
+        m.type = options.type.to_s
+        m.flavour = options.flavour.to_s
 
         options.name = ask('Machine name: ') if options.name.nil?
         m.name = options.name.to_s
@@ -165,10 +169,6 @@ module Cloudware
 
         options.mgtip = ask('Mgt subnet IP: ') if options.mgtip.nil?
         m.mgtip = options.mgtip.to_s
-
-        options.type = ask('Machine type: ') if options.type.nil?
-        m.type = options.type.to_s
-        m.flavour = options.flavour.to_s
 
         Whirly.start spinner: 'dots2', status: 'Verifying domain exists'.bold, stop: '[OK]'.green
         raise("Domain #{options.domain} does not exist") unless m.valid_domain?

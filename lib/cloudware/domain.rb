@@ -70,9 +70,14 @@ module Cloudware
     def list
       @list ||= begin
                   @list = {}
-                  load_cloud
-                  @list.merge!(@aws.domains)
-                  @list.merge!(@azure.domains)
+                  if @provider
+                    load_cloud
+                    @list.merge!(@cloud.domains)
+                  else
+                    load_cloud
+                    @list.merge!(@aws.domains)
+                    @list.merge!(@azure.domains)
+                  end
                   @list
                 end
     end
@@ -102,7 +107,7 @@ module Cloudware
     end
 
     def exists?
-      list.include? @name
+      list.include? @name || false
     end
 
     def valid_name?

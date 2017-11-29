@@ -20,8 +20,11 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 require 'azure_mgmt_resources'
+require 'azure_mgmt_compute'
+require 'azure_mgmt_network'
 
 Resources = Azure::Resources::Profiles::Latest::Mgmt
+Compute = Azure::Compute::Profiles::Latest::Mgmt
 
 module Cloudware
   class Azure
@@ -38,7 +41,8 @@ module Cloudware
         subscription_id: subscription_id
       }
       log.info('Loading Azure client')
-      @client = Resources::Client.new(options)
+      @resources_client = Resources::Client.new(options)
+      @compute_client = Compute::Client.new(options)
     end
 
     def config
@@ -48,7 +52,7 @@ module Cloudware
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
       abort('Domain already exists') if resource_group_exists?(name)
       create_resource_group(region, id, name)
-      t = 'azure/domain.json'
+      t = 'domain.json'
       params = {
         cloudwareDomain: name,
         cloudwareId: id,
@@ -64,7 +68,7 @@ module Cloudware
                      @domains = {}
                      resource_groups.each do |g|
                        log.info("Listing available resources in group #{g}")
-                       resources = @client.resources.list_by_resource_group(g)
+                       resources = @resources_client.resources.list_by_resource_group(g)
                        resources.each do |r|
                          next unless r.tags['cloudware_resource_type'] == 'domain'
                          next unless r.type == 'Microsoft.Network/virtualNetworks'
@@ -84,7 +88,7 @@ module Cloudware
     end
 
     def create_machine(name, domain, id, prvip, mgtip, type, size, _region)
-      t = "azure/machine-#{type}.json"
+      t = "machine-#{type}.json"
       params = {
         cloudwareDomain: domain,
         cloudwareId: id,
@@ -100,10 +104,11 @@ module Cloudware
       @machines ||= begin
                       @machines = {}
                       resource_groups.each do |g|
-                        resources = @client.resources.list_by_resource_group(g)
+                        resources = @resources_client.resources.list_by_resource_group(g)
                         resources.each do |r|
                           next unless r.tags['cloudware_resource_type'] == 'machine'
                           next unless r.type == 'Microsoft.Compute/virtualMachines'
+                          log.info("Deteched machine #{r.tags['cloudware_machine_name']} in domain #{r.tags['cloudware_domain']}")
                           @machines.merge!(r.tags['cloudware_machine_name'] => {
                                              domain: r.tags['cloudware_domain'],
                                              role: r.tags['cloudware_machine_role'],
@@ -120,17 +125,17 @@ module Cloudware
 
     def deploy(template, type, params, name)
       t = File.read(File.expand_path(File.join(__dir__, "../../providers/azure/templates/#{template}")))
-      d = @client.model_classes.deployment.new
-      d.properties = @client.model_classes.deployment_properties.new
+      d = @resources_client.model_classes.deployment.new
+      d.properties = @resources_client.model_classes.deployment_properties.new
       d.properties.template = JSON.parse(t)
       d.properties.mode = Resources::Models::DeploymentMode::Incremental
       d.properties.parameters = Hash[*params.map { |k, v| [k, { value: v }] }.flatten]
-      debug_settings = @client.model_classes.debug_setting.new
+      debug_settings = @resources_client.model_classes.debug_setting.new
       debug_settings.detail_level = 'requestContent, responseContent'
       d.properties.debug_setting = debug_settings
       log.info("Creating new deployment: #{type} #{name}")
-      @client.deployments.create_or_update(name, type.to_s, d)
-      operation_results = @client.deployment_operations.list(name, type.to_s)
+      @resources_client.deployments.create_or_update(name, type.to_s, d)
+      operation_results = @resources_client.deployment_operations.list(name, type.to_s)
       unless operation_results.nil?
         operation_results.each do |operation_result|
           until operation_result.properties.provisioning_state == 'Succeeded'
@@ -142,12 +147,57 @@ module Cloudware
     end
 
     def destroy(name, domain)
-      log.info("Destroying deployment #{name} #{domain}")
-      @client.deployments.delete(domain, name)
+      if name == 'domain'
+        destroy_resource_group(domain)
+      else
+        destroy_deployment(domain, name)
+        destroy_instance(domain, name)
+        destroy_network_interfaces(domain, name)
+        destroy_security_groups(domain, name)
+        desotry_public_ip_address(domain, name)
+      end
+      @resources_client.deployments.delete(domain, name)
+    end
+
+    def destroy_instance(domain, name)
+      log.info("Destroying instance #{name} in domain #{domain}")
+      @compute_client.virtual_machines.delete(domain, name)
+    end
+
+    def destroy_network_interfaces(domain, name)
+      log.info("Destroying prv interface for instance #{name} in domain #{domain}")
+      @network_client.network_interfaces.delete(domain, "#{name}prv")
+      log.info("Destroyed prv interface for instance #{name} in domain #{domain}")
+      log.info("Destroying mgt interface for instance #{name} in domain #{domain}")
+      @network_client.network_interfaces.delete(domain, "#{name}mgt")
+      log.info("Destroyed mgt interface for instance #{name} in domain #{domain}")
+    end
+
+    def destroy_security_groups(domain, name)
+      log.info("Destroying network security group #{name} in domain #{domain}")
+      @network_client.network_security_groups.delete(domain, name)
+      log.info("Destroyed network security group #{name} in domain #{domain}")
+    end
+
+    def destroy_public_ip_address(domain, name)
+      log.info("Destroying public IP address for instance #{name} in domain #{domain}")
+      @network_client.public_ipaddresses.delete(domain, name)
+    end
+
+    def destroy_deployment(domain, name)
+      log.info("Destroying deployment #{name} in resource group #{domain}")
+      @resources_client.deployments.delete(domain, name)
+      log.info("Finished destroying deployment #{name} in resource group #{domain}")
+    end
+
+    def destroy_resource_group(domain)
+      log.info("Destroying resource group #{domain}")
+      @resources_client.resource_groups.delete(domain)
+      log.info("Resource group #{domain} destroyed")
     end
 
     def create_resource_group(region, id, name)
-      params = @client.model_classes.resource_group.new.tap do |r|
+      params = @resources_client.model_classes.resource_group.new.tap do |r|
         r.location = region
         r.tags = {
           cloudware_id: id,
@@ -156,14 +206,14 @@ module Cloudware
         }
       end
       log.info("Creating new resource group\nRegion: #{region}\nID: #{id}\n#{name}")
-      @client.resource_groups.create_or_update(name, params)
+      @resources_client.resource_groups.create_or_update(name, params)
     end
 
     def resource_groups
       @resource_groups ||= begin
                     @resource_groups = []
                     log.warn('Loading resource groups from API')
-                    @client.resource_groups.list.each do |g|
+                    @resources_client.resource_groups.list.each do |g|
                       next if g.tags.nil?
                       @resource_groups.push(g.tags['cloudware_domain']) unless g.tags['cloudware_domain'].nil?
                     end

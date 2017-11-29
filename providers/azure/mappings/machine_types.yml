@@ -1,10 +1,10 @@
 ---
 compute:
-  tiny: 'Standard_F2s_v2'
-  small: 'Standard_F4s_v2'
-  medium: 'Standard_F8s_v2'
-  large: 'Standard_F16s_v2'
-  xlarge: 'Standard_F32s_v2'
+  tiny: 'Standard_F2s'
+  small: 'Standard_F4s'
+  medium: 'Standard_F8s'
+  large: 'Standard_F16s'
+  xlarge: 'Standard_F32s'
 generic:
   tiny: 'Standard_D2s_v3'
   small: 'Standard_D4s_v3'
