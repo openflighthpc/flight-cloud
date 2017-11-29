@@ -25,6 +25,7 @@ require 'azure_mgmt_network'
 
 Resources = Azure::Resources::Profiles::Latest::Mgmt
 Compute = Azure::Compute::Profiles::Latest::Mgmt
+Network = Azure::Network::Profiles::Latest::Mgmt
 
 module Cloudware
   class Azure
@@ -43,6 +44,7 @@ module Cloudware
       log.info('Loading Azure client')
       @resources_client = Resources::Client.new(options)
       @compute_client = Compute::Client.new(options)
+      @network_client = Network::Client.new(options)
     end
 
     def config
@@ -109,13 +111,18 @@ module Cloudware
                           next unless r.tags['cloudware_resource_type'] == 'machine'
                           next unless r.type == 'Microsoft.Compute/virtualMachines'
                           log.info("Deteched machine #{r.tags['cloudware_machine_name']} in domain #{r.tags['cloudware_domain']}")
+                          if r.tags['cloudware_machine_role'] == 'master'
+                            ext_ip = get_external_ip(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
+                          end
                           @machines.merge!(r.tags['cloudware_machine_name'] => {
                                              domain: r.tags['cloudware_domain'],
                                              role: r.tags['cloudware_machine_role'],
                                              prv_ip: r.tags['cloudware_prv_ip'],
                                              mgt_ip: r.tags['cloudware_mgt_ip'],
+                                             ext_ip: ext_ip,
                                              provider: 'azure',
-                                             type: r.tags['cloudware_machine_type']
+                                             type: r.tags['cloudware_machine_type'],
+                                             state: get_instance_state(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
                                            })
                         end
                       end
@@ -194,6 +201,28 @@ module Cloudware
       log.info("Destroying resource group #{domain}")
       @resources_client.resource_groups.delete(domain)
       log.info("Resource group #{domain} destroyed")
+    end
+
+    def get_external_ip(domain, name)
+      @network_client.public_ipaddresses.get(domain, name).ip_address
+    end
+
+    def get_instance_state(domain, name)
+      if instance_running?(domain, name)
+        'running'
+      elsif instance_stopped?(domain, name)
+        'stopped'
+      end
+    end
+
+    def instance_running?(domain, name)
+      log.info("Querying machine #{name} in domain #{domain} running status")
+      !@compute_client.virtual_machines.instance_view(domain, name).statuses.find { |s| s.code =~ /PowerState\/running/ }.nil?
+    end
+
+    def instance_stopped?(domain, name)
+      log.info("Querying machine #{name} in domain #{domain} running status")
+      !@compute_client.virtual_machines.instance_view(domain, name).statuses.find { |s| s.code =~ /PowerState\/stopped/ }.nil?
     end
 
     def create_resource_group(region, id, name)

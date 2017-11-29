@@ -128,6 +128,7 @@ module Cloudware
                               @mgtip = tag.value if tag.key == 'cloudware_mgt_subnet_ip'
                               @name = tag.value if tag.key == 'cloudware_machine_name'
                             end
+                            log.info("Detected machine #{@name} in domain #{@domain}")
                             @machines.merge!(@name => {
                                                name: @name, domain: @domain, state: @state,
                                                id: @id, type: @type, role: @role, mgt_ip: @mgtip,
