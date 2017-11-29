@@ -159,9 +159,10 @@ module Cloudware
       else
         destroy_deployment(domain, name)
         destroy_instance(domain, name)
-        destroy_network_interfaces(domain, name)
+        destroy_network_interface(domain, "#{domain}#{name}prv")
+        destroy_network_interface(domain, "#{domain}#{name}mgt")
         destroy_security_groups(domain, name)
-        desotry_public_ip_address(domain, name)
+        destroy_public_ip_address(domain, name)
       end
       @resources_client.deployments.delete(domain, name)
     end
@@ -171,13 +172,11 @@ module Cloudware
       @compute_client.virtual_machines.delete(domain, name)
     end
 
-    def destroy_network_interfaces(domain, name)
-      log.info("Destroying prv interface for instance #{name} in domain #{domain}")
-      @network_client.network_interfaces.delete(domain, "#{name}prv")
-      log.info("Destroyed prv interface for instance #{name} in domain #{domain}")
-      log.info("Destroying mgt interface for instance #{name} in domain #{domain}")
-      @network_client.network_interfaces.delete(domain, "#{name}mgt")
-      log.info("Destroyed mgt interface for instance #{name} in domain #{domain}")
+    def destroy_network_interface(domain, name)
+      log.info("Destroying interface #{name} in domain #{domain}")
+      @network_client.network_interfaces.delete(domain, name.to_s)
+      wait_until_network_interface_destroyed(domain, "#{domain}#{name}prv")
+      log.info("Destroyed interface #{name} in domain #{domain}")
     end
 
     def destroy_security_groups(domain, name)
@@ -201,6 +200,17 @@ module Cloudware
       log.info("Destroying resource group #{domain}")
       @resources_client.resource_groups.delete(domain)
       log.info("Resource group #{domain} destroyed")
+    end
+
+    def network_interface_exists?(domain, name)
+      !@network_client.network_interfaces.get(domain, name).nil?
+    end
+
+    def wait_until_network_interface_destroyed(domain, name)
+      while network_interface_exists?(domain, name)
+        log.info("Sleeping until network interface #{name} in domain #{domain} is destroyed")
+        sleep(5)
+      end
     end
 
     def get_external_ip(domain, name)
