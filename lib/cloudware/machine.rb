@@ -85,7 +85,8 @@ module Cloudware
     end
 
     def exists?
-      list[@name][:domain].include? @domain
+      return false unless !list[@name].nil?
+      return true if list[@name][:domain].include? @domain
     end
 
     def validate_name?
