@@ -175,7 +175,7 @@ module Cloudware
     def destroy_network_interface(domain, name)
       log.info("Destroying interface #{name} in domain #{domain}")
       @network_client.network_interfaces.delete(domain, name.to_s)
-      wait_until_network_interface_destroyed(domain, "#{domain}#{name}prv")
+      wait_until_network_interface_destroyed(domain, name.to_s)
       log.info("Destroyed interface #{name} in domain #{domain}")
     end
 
