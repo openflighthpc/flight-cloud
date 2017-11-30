@@ -190,7 +190,7 @@ module Cloudware
         m = Cloudware::Machine.new
         r = []
         Whirly.start spinner: 'dots2', status: 'Fetching available machines'.bold, stop: '[OK]'.green
-        raise('No available machines') if m.list.empty?
+        raise('No available machines') if m.list.nil?
         Whirly.stop
         m.list.each do |k, v|
           r << [k, v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type]]

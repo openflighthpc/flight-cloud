@@ -93,6 +93,7 @@ module Cloudware
                              @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_mgt_subnet_id"
                            end
                          end
+                         log.info("Detected domain #{@domain} in region #{@region}")
                          @domains.merge!(@domain => {
                                            domain: @domain, id: @id, network_cidr: @network_cidr,
                                            prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
@@ -135,6 +136,7 @@ module Cloudware
                           end
                         end
                       end
+                      log.info("#{self.class.to_s} found machines:\n#{@machines}")
                       @machines
                     end
     end

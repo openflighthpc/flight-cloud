@@ -108,6 +108,7 @@ module Cloudware
                       resource_groups.each do |g|
                         resources = @resources_client.resources.list_by_resource_group(g)
                         resources.each do |r|
+                          next unless r.tags
                           next unless r.tags['cloudware_resource_type'] == 'machine'
                           next unless r.type == 'Microsoft.Compute/virtualMachines'
                           log.info("Deteched machine #{r.tags['cloudware_machine_name']} in domain #{r.tags['cloudware_domain']}")
@@ -158,12 +159,8 @@ module Cloudware
       if name == 'domain'
         destroy_resource_group(domain)
       else
-        # destroy_deployment(domain, name)
+        destroy_deployment(domain, name)
         destroy_instance(domain, name)
-        destroy_network_interface(domain, "#{domain}#{name}prv")
-        destroy_network_interface(domain, "#{domain}#{name}mgt")
-        destroy_security_groups(domain, name)
-        destroy_public_ip_address(domain, name)
       end
       @resources_client.deployments.delete(domain, name)
     end
@@ -172,17 +169,8 @@ module Cloudware
       @resources_client.resources.list_by_resource_group(domain).each do |r|
         log.info(r.inspect)
         @instance_id = r.id if r.tags['cloudware_machine_name'] == name && r.tags['cloudware_domain'] == domain && r.type == 'Microsoft.Compute/virtualMachines'
-        @public_ip_id = r.id if r.tags['cloudware_machine_name'] == name && r.tags['cloudware_domain'] == domain && r.type == 'Microsoft.Network/publicIPAddresses'
-        @security_group_id = r.id if r.tags['cloudware_machine_name'] == name && r.tags['cloudware_domain'] == domain && r.type == 'Microsoft.Network/networkSecurityGroups'
-        @disk_id = r.id if r.tags['cloudware_machine_name'] == name && r.tags['cloudware_domain'] == domain && r.type == 'Microsoft.Compute/disks'
-        next
       end
       delete_by_id(@instance_id)
-      delete_by_id(@public_ip_id)
-      delete_by_id(@disk_id)
-      raise('ending early')
-      # log.info("Destroying instance #{name} in domain #{domain}")
-      # @compute_client.virtual_machines.delete(domain, name)
     end
 
     def delete_by_id(id)
