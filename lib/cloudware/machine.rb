@@ -53,7 +53,7 @@ module Cloudware
       raise('Invalid machine name') unless validate_name?
       load_cloud
       @cloud.create_machine(@name, @domain, @d.get_item('id'),
-                            @prvip, @mgtip, @role, render_type, @d.get_item('region'))
+                            @prvip, @mgtip, @role, render_type, @d.get_item('region'), flavour: @flavour)
     end
 
     def destroy

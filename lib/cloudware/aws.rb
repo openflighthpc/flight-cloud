@@ -124,6 +124,7 @@ module Cloudware
                               @prvip = tag.value if tag.key == 'cloudware_prv_subnet_ip'
                               @mgtip = tag.value if tag.key == 'cloudware_mgt_subnet_ip'
                               @name = tag.value if tag.key == 'cloudware_machine_name'
+                              @flavour = tag.value if tag.key == 'cloudware_machine_flavour'
                             end
                             log.info("Detected machine #{@name} in domain #{@domain}")
                             @machines.merge!(@name => {
@@ -151,7 +152,7 @@ module Cloudware
       deploy("#{name}-domain", template, params)
     end
 
-    def create_machine(name, domain, id, prvip, mgtip, role, type, region)
+    def create_machine(name, domain, id, prvip, mgtip, role, type, region, flavour)
       d = Cloudware::Domain.new
       d.name = domain
       load_config(region)
@@ -168,7 +169,8 @@ module Cloudware
         { parameter_key: 'prvSubnetId', parameter_value: d.get_item('prv_subnet_id') },
         { parameter_key: 'mgtSubnetId', parameter_value: d.get_item('mgt_subnet_id') },
         { parameter_key: 'prvSubnetCidr', parameter_value: d.get_item('prv_subnet_cidr') },
-        { parameter_key: 'mgtSubnetCidr', parameter_value: d.get_item('mgt_subnet_cidr') }
+        { parameter_key: 'mgtSubnetCidr', parameter_value: d.get_item('mgt_subnet_cidr') },
+        { parameter_key: 'vmFlavour', parameter_value: flavour }
       ]
       deploy("#{domain}-#{name}", template, params)
     end

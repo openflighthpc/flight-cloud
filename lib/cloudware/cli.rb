@@ -231,6 +231,7 @@ module Cloudware
             t.add_row ['External IP'.bold, m.get_item('ext_ip')]
             t.add_row ['Machine state'.bold, m.get_item('state')]
             t.add_row ['Machine type'.bold, m.get_item('type')]
+            t.add_row ['Machine flavour'.bold, m.get_item('flavour')]
             t.add_row ['Provider'.bold, m.get_item('provider')]
             Whirly.stop
             t.style = { all_separators: true }

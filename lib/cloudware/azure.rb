@@ -88,7 +88,7 @@ module Cloudware
                    end
     end
 
-    def create_machine(name, domain, id, prvip, mgtip, type, size, _region)
+    def create_machine(name, domain, id, prvip, mgtip, type, size, _region, flavour)
       t = "machine-#{type}.json"
       params = {
         cloudwareDomain: domain,
@@ -96,7 +96,8 @@ module Cloudware
         vmName: name,
         vmType: size,
         prvSubnetIp: prvip,
-        mgtSubnetIp: mgtip
+        mgtSubnetIp: mgtip,
+        vmFlavour: flavour
       }
       deploy(t, name, params, domain)
     end
@@ -121,6 +122,7 @@ module Cloudware
                                              ext_ip: ext_ip,
                                              provider: 'azure',
                                              type: r.tags['cloudware_machine_type'],
+                                             flavour: r.tags['cloudware_machine_flavour'],
                                              state: get_instance_state(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
                                            })
                         end
@@ -211,6 +213,7 @@ module Cloudware
         sleep(5)
       end
     end
+
 
     def get_external_ip(domain, name)
       @network_client.public_ipaddresses.get(domain, name).ip_address
