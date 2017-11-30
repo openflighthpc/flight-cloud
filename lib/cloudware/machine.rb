@@ -52,8 +52,9 @@ module Cloudware
     def create
       raise('Invalid machine name') unless validate_name?
       load_cloud
+      log.info("Creating new machine:\nName: #{name}\nDomain: #{domain}\nID: #{id}\nPrv IP: #{prvip}\nMgt IP: #{mgtip}\nType: #{type}\nFlavour: #{flavour}")
       @cloud.create_machine(@name, @domain, @d.get_item('id'),
-                            @prvip, @mgtip, @role, render_type, @d.get_item('region'), flavour: @flavour)
+                            @prvip, @mgtip, @role, render_type, @d.get_item('region'), @flavour)
     end
 
     def destroy
@@ -85,7 +86,7 @@ module Cloudware
     end
 
     def exists?
-      return false unless !list[@name].nil?
+      return false if list[@name].nil?
       return true if list[@name][:domain].include? @domain
     end
 
