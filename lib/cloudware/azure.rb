@@ -141,7 +141,7 @@ module Cloudware
       debug_settings = @resources_client.model_classes.debug_setting.new
       debug_settings.detail_level = 'requestContent, responseContent'
       d.properties.debug_setting = debug_settings
-      log.info("Creating new deployment: #{type} #{name}")
+      log.info("Creating new deployment: #{type} #{name}\nTemplate: #{template}\nParams: #{params}")
       @resources_client.deployments.create_or_update(name, type.to_s, d)
       operation_results = @resources_client.deployment_operations.list(name, type.to_s)
       unless operation_results.nil?
@@ -158,7 +158,7 @@ module Cloudware
       if name == 'domain'
         destroy_resource_group(domain)
       else
-        destroy_deployment(domain, name)
+        # destroy_deployment(domain, name)
         destroy_instance(domain, name)
         destroy_network_interface(domain, "#{domain}#{name}prv")
         destroy_network_interface(domain, "#{domain}#{name}mgt")
@@ -169,32 +169,26 @@ module Cloudware
     end
 
     def destroy_instance(domain, name)
-      log.info("Destroying instance #{name} in domain #{domain}")
-      @compute_client.virtual_machines.delete(domain, name)
+      @resources_client.resources.list_by_resource_group(domain).each do |r|
+        log.info(r.inspect)
+        @instance_id = r.id if r.tags['cloudware_machine_name'] == name && r.tags['cloudware_domain'] == domain && r.type == 'Microsoft.Compute/virtualMachines'
+        @public_ip_id = r.id if r.tags['cloudware_machine_name'] == name && r.tags['cloudware_domain'] == domain && r.type == 'Microsoft.Network/publicIPAddresses'
+        @security_group_id = r.id if r.tags['cloudware_machine_name'] == name && r.tags['cloudware_domain'] == domain && r.type == 'Microsoft.Network/networkSecurityGroups'
+        @disk_id = r.id if r.tags['cloudware_machine_name'] == name && r.tags['cloudware_domain'] == domain && r.type == 'Microsoft.Compute/disks'
+        next
+      end
+      delete_by_id(@instance_id)
+      delete_by_id(@public_ip_id)
+      delete_by_id(@disk_id)
+      raise('ending early')
+      # log.info("Destroying instance #{name} in domain #{domain}")
+      # @compute_client.virtual_machines.delete(domain, name)
     end
 
-    def destroy_network_interface(domain, name)
-      log.info("Destroying interface #{name} in domain #{domain}")
-      @network_client.network_interfaces.delete(domain, name.to_s)
-      wait_until_network_interface_destroyed(domain, name.to_s)
-      log.info("Destroyed interface #{name} in domain #{domain}")
-    end
-
-    def destroy_security_groups(domain, name)
-      log.info("Destroying network security group #{name} in domain #{domain}")
-      @network_client.network_security_groups.delete(domain, name)
-      log.info("Destroyed network security group #{name} in domain #{domain}")
-    end
-
-    def destroy_public_ip_address(domain, name)
-      log.info("Destroying public IP address for instance #{name} in domain #{domain}")
-      @network_client.public_ipaddresses.delete(domain, name)
-    end
-
-    def destroy_deployment(domain, name)
-      log.info("Destroying deployment #{name} in resource group #{domain}")
-      @resources_client.deployments.delete(domain, name)
-      log.info("Finished destroying deployment #{name} in resource group #{domain}")
+    def delete_by_id(id)
+      log.info("Destroying resource #{id}")
+      @resources_client.resources.delete_by_id(id, '2017-12-01')
+      log.info("Finished destroying resource #{id}")
     end
 
     def destroy_resource_group(domain)
@@ -202,18 +196,6 @@ module Cloudware
       @resources_client.resource_groups.delete(domain)
       log.info("Resource group #{domain} destroyed")
     end
-
-    def network_interface_exists?(domain, name)
-      !@network_client.network_interfaces.get(domain, name).nil?
-    end
-
-    def wait_until_network_interface_destroyed(domain, name)
-      while network_interface_exists?(domain, name)
-        log.info("Sleeping until network interface #{name} in domain #{domain} is destroyed")
-        sleep(5)
-      end
-    end
-
 
     def get_external_ip(domain, name)
       @network_client.public_ipaddresses.get(domain, name).ip_address

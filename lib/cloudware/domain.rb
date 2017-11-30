@@ -118,7 +118,7 @@ module Cloudware
       Cloudware.log
     end
 
-    def is_valid_cidr?(cidr)
+    def valid_cidr?(cidr)
       IPAddr.new(cidr).ipv4?
     end
 

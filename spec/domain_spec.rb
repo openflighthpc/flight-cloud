@@ -39,7 +39,7 @@ describe Cloudware::Domain do
     end
 
     it 'validates the network cidr' do
-      expect(@domain.is_valid_cidr?(@networkcidr)).to be(true)
+      expect(@domain.valid_cidr?(@networkcidr)).to be(true)
     end
 
     it 'returns the correct prv subnet cidr' do
