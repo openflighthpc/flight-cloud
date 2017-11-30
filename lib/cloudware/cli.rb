@@ -147,8 +147,7 @@ module Cloudware
       c.option '--type NAME', String, 'Machine type to deploy'
       c.option '--flavour NAME', String, 'Machine flavour'
       c.action do |_args, options|
-        options.default flavour: 'compute'
-        options.default type: 'small'
+        options.default flavour: 'compute', type: 'small'
 
         m = Cloudware::Machine.new
 
