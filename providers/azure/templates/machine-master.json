@@ -171,7 +171,10 @@
 				},
 				"storageProfile": {
 					"imageReference": {
-						"id": "[variables('azureConfig').imageSubscription]"
+            "publisher": "OpenLogic",
+            "offer": "CentOS",
+            "sku": "7.3",
+            "version": "latest"
 					},
 					"osDisk": {
 						"createOption": "fromImage",
