@@ -49,12 +49,9 @@ module Cloudware
 
     def load_config(region)
       unless config.aws_access_key_id.nil? && config.aws_secret_access_key.nil?
-        log.info('Using AWS credentials stored in config/environment')
         Credentials.new(config.aws_access_key_id, config.aws_secret_access_key)
       end
-      log.info('Loading CloudFormation client')
       @cfn = CloudFormation::Client.new(region: region)
-      log.info('Loading EC2 client')
       @ec2 = EC2::Client.new(region: region)
     end
 

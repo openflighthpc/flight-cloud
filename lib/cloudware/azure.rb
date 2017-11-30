@@ -41,7 +41,6 @@ module Cloudware
         credentials: credentials,
         subscription_id: subscription_id
       }
-      log.info('Loading Azure client')
       @resources_client = Resources::Client.new(options)
       @compute_client = Compute::Client.new(options)
       @network_client = Network::Client.new(options)
