@@ -26,7 +26,7 @@
 				"description": "Choose the VM size to launch"
 			}
 		},
-		"vmFlavor": {
+		"vmFlavour": {
 			"type": "string",
 			"metadata": {
 				"description": "Choose the VM flavour"
@@ -59,7 +59,8 @@
 			"name": "[parameters('vmName')]",
 			"apiVersion": "2017-03-01",
 			"tags": {
-				"cloudware_domain": "[parameters('vmName')]"
+				"cloudware_domain": "[parameters('cloudwareDomain')]",
+				"cloudware_machine_name": "[parameters('vmName')]"
 			},
 			"location": "[resourceGroup().location]",
 			"properties": {
@@ -83,7 +84,8 @@
 			"name": "[parameters('vmName')]",
 			"apiVersion": "2017-03-01",
 			"tags": {
-				"cloudware_domain": "[parameters('cloudwareDomain')]"
+				"cloudware_domain": "[parameters('cloudwareDomain')]",
+				"cloudware_machine_name": "[parameters('vmName')]"
 			},
 			"location": "[resourceGroup().location]",
 			"properties": {
@@ -99,7 +101,8 @@
 			"name": "[variables('prvInterfaceName')]",
 			"apiVersion": "2017-03-01",
 			"tags": {
-				"cloudware_domain": "[parameters('cloudwareDomain')]"
+				"cloudware_domain": "[parameters('cloudwareDomain')]",
+				"cloudware_machine_name": "[parameters('vmName')]"
 			},
 			"location": "[resourceGroup().location]",
 			"properties": {
@@ -129,7 +132,8 @@
 			"name": "[variables('mgtInterfaceName')]",
 			"apiVersion": "2017-03-01",
 			"tags": {
-				"cloudware_domain": "[parameters('cloudwareDomain')]"
+				"cloudware_domain": "[parameters('cloudwareDomain')]",
+				"cloudware_machine_name": "[parameters('vmName')]"
 			},
 			"location": "[resourceGroup().location]",
 			"properties": {
