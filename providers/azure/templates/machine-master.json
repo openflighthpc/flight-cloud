@@ -26,6 +26,12 @@
 				"description": "Choose the VM size to launch"
 			}
 		},
+		"vmFlavor": {
+			"type": "string",
+			"metadata": {
+				"description": "Choose the VM flavour"
+			}
+		},
 		"prvSubnetIp": {
 			"type": "string",
 			"metadata": {
@@ -149,6 +155,7 @@
 				"cloudware_machine_name": "[parameters('vmName')]",
 				"cloudware_machine_role": "master",
 				"cloudware_machine_type": "[parameters('vmType')]",
+				"cloudware_machine_flavour": "[parameters('vmFlavour')]",
 				"cloudware_resource_type": "machine",
 				"cloudware_prv_ip": "[parameters('prvSubnetIp')]",
 				"cloudware_mgt_ip": "[parameters('mgtSubnetIp')]"

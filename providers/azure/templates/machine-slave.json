@@ -26,6 +26,12 @@
 				"description": "Choose the VM size to launch"
 			}
 		},
+		"vmFlavour": {
+			"type": "string",
+			"metadata": {
+				"description": "Choose the VM flavour"
+			}
+		},
 		"prvSubnetIp": {
 			"type": "string",
 			"metadata": {
@@ -128,8 +134,9 @@
 				"cloudware_domain": "[parameters('cloudwareDomain')]",
 				"cloudware_id": "[parameters('cloudwareId')]",
 				"cloudware_machine_name": "[parameters('vmName')]",
-				"cloudware_machine_type": "slave",
-				"cloudware_machine_size": "[parameters('vmType')]",
+				"cloudware_machine_role": "slave",
+				"cloudware_machine_type": "[parameters('vmType')]",
+				"cloudware_machine_flavour": "[parameters('vmFlavour')]",
 				"cloudware_resource_type": "machine",
 				"cloudware_prv_ip": "[parameters('prvSubnetIp')]",
 				"cloudware_mgt_ip": "[parameters('mgtSubnetIp')]"

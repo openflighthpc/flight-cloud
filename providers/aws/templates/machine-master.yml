@@ -54,6 +54,10 @@ Parameters:
     Type: String
     Description: 'Enter the desired instance name'
 
+  vmFlavour:
+    Type: String
+    Description: 'Enter the VM flavour'
+
 Mappings:
   RegionMap:
     eu-west-1:
@@ -213,6 +217,9 @@ Resources:
         -
           Key: 'cloudware_machine_name'
           Value: !Ref vmName
+        -
+          Key: 'cloudware_machine_flavour'
+          Value: !Ref vmFlavour
         -
           Key: 'cloudware_prv_subnet_ip'
           Value: !Ref prvIp
