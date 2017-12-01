@@ -53,7 +53,6 @@ module Cloudware
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
       abort('Domain already exists') if resource_group_exists?(name)
       create_resource_group(region, id, name)
-      t = 'domain.json'
       params = {
         cloudwareDomain: name,
         cloudwareId: id,
@@ -61,7 +60,7 @@ module Cloudware
         prvSubnetCIDR: prvsubnetcidr,
         mgtSubnetCIDR: mgtsubnetcidr
       }
-      deploy(t, 'domain', params, name)
+      deploy(name, 'domain', 'domain', params)
     end
 
     def domains
@@ -88,8 +87,10 @@ module Cloudware
                    end
     end
 
-    def create_machine(name, domain, id, prvip, mgtip, type, size, _region, flavour)
-      t = "machine-#{type}.json"
+    def create_machine(name, domain, id, prvip, mgtip, type, size, region, flavour)
+      rg = "#{domain.to_s}-#{name.to_s}"
+      abort('Machine already exists') if resource_group_exists?(rg)
+      create_resource_group(region, id, rg)
       params = {
         cloudwareDomain: domain,
         cloudwareId: id,
@@ -99,7 +100,7 @@ module Cloudware
         mgtSubnetIp: mgtip,
         vmFlavour: flavour
       }
-      deploy(t, name, params, domain)
+      deploy(rg, name, "machine-#{type}", params)
     end
 
     def machines
@@ -132,61 +133,53 @@ module Cloudware
                     end
     end
 
-    def deploy(template, type, params, name)
-      t = File.read(File.expand_path(File.join(__dir__, "../../providers/azure/templates/#{template}")))
-      d = @resources_client.model_classes.deployment.new
-      d.properties = @resources_client.model_classes.deployment_properties.new
-      d.properties.template = JSON.parse(t)
-      d.properties.mode = Resources::Models::DeploymentMode::Incremental
-      d.properties.parameters = Hash[*params.map { |k, v| [k, { value: v }] }.flatten]
+    def deploy(resource_group, name, type, params)
+      deployment = @resources_client.model_classes.deployment.new
+      deployment.properties = @resources_client.model_classes.deployment_properties.new
+      deployment.properties.template = JSON.parse(render_template(type))
+      deployment.properties.mode = Resources::Models::DeploymentMode::Incremental
+      deployment.properties.parameters = render_params(params)
       debug_settings = @resources_client.model_classes.debug_setting.new
       debug_settings.detail_level = 'requestContent, responseContent'
-      d.properties.debug_setting = debug_settings
-      log.info("Creating new deployment: #{type} #{name}\nTemplate: #{template}\nParams: #{params}")
-      @resources_client.deployments.create_or_update(name, type.to_s, d)
-      operation_results = @resources_client.deployment_operations.list(name, type.to_s)
-      unless operation_results.nil?
-        operation_results.each do |operation_result|
-          until operation_result.properties.provisioning_state == 'Succeeded'
+      deployment.properties.debug_setting = debug_settings
+      @resources_client.deployments.create_or_update(resource_group, name, deployment)
+      @operation_results = @resources_client.deployment_operations.list(resource_group, name)
+      wait_for_deployment_complete(resource_group, name)
+    end
+
+    def render_template(type)
+      File.read(File.expand_path(File.join(__dir__, "../../providers/azure/templates/#{type}.json")))
+    end
+
+    def render_params(params)
+      Hash[*params.map { |k, v| [k, { value: v }] }.flatten]
+    end
+
+    def wait_for_deployment_complete(resource_group, name)
+      unless @operation_results.nil?
+        log.info("Waiting for deployment #{name} in resource group #{resource_group} to finish")
+        @operation_results.each do |r|
+          until r.properties.provisioning_state == 'Succeeded'
             sleep(1)
           end
         end
+        log.info("Deployment #{name} in resource group #{resource_group} finished")
       end
-      log.info("Deployment #{type} #{name} complete")
     end
 
     def destroy(name, domain)
       if name == 'domain'
-        destroy_resource_group(domain)
+        rg = domain
       else
-        destroy_deployment(domain, name)
-        destroy_instance(domain, name)
+        rg = "#{domain}-#{name}"
       end
-      @resources_client.deployments.delete(domain, name)
-    end
-
-    def destroy_instance(domain, name)
-      @resources_client.resources.list_by_resource_group(domain).each do |r|
-        log.info(r.inspect)
-        @instance_id = r.id if r.tags['cloudware_machine_name'] == name && r.tags['cloudware_domain'] == domain && r.type == 'Microsoft.Compute/virtualMachines'
-      end
-      delete_by_id(@instance_id)
-    end
-
-    def delete_by_id(id)
-      log.info("Destroying resource #{id}")
-      @resources_client.resources.delete_by_id(id, '2017-12-01')
-      log.info("Finished destroying resource #{id}")
-    end
-
-    def destroy_resource_group(domain)
-      log.info("Destroying resource group #{domain}")
-      @resources_client.resource_groups.delete(domain)
-      log.info("Resource group #{domain} destroyed")
+      log.info("Destroying resource group #{rg}")
+      @resources_client.resource_groups.delete(rg)
+      log.info("Resource group #{rg} destroyed")
     end
 
     def get_external_ip(domain, name)
-      @network_client.public_ipaddresses.get(domain, name).ip_address
+      @network_client.public_ipaddresses.get("#{domain}-#{name}", name).ip_address
     end
 
     def get_instance_state(domain, name)
@@ -199,12 +192,12 @@ module Cloudware
 
     def instance_running?(domain, name)
       log.info("Querying machine #{name} in domain #{domain} running status")
-      !@compute_client.virtual_machines.instance_view(domain, name).statuses.find { |s| s.code =~ /PowerState\/running/ }.nil?
+      !@compute_client.virtual_machines.instance_view("#{domain}-#{name}", name).statuses.find { |s| s.code =~ /PowerState\/running/ }.nil?
     end
 
     def instance_stopped?(domain, name)
       log.info("Querying machine #{name} in domain #{domain} running status")
-      !@compute_client.virtual_machines.instance_view(domain, name).statuses.find { |s| s.code =~ /PowerState\/stopped/ }.nil?
+      !@compute_client.virtual_machines.instance_view("#{domain}-#{name}", name).statuses.find { |s| s.code =~ /PowerState\/stopped/ }.nil?
     end
 
     def create_resource_group(region, id, name)

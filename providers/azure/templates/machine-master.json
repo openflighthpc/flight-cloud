@@ -115,7 +115,7 @@
 							"id": "[resourceId('Microsoft.Network/publicIpAddresses', parameters('vmName'))]"
 						},
 						"subnet": {
-							"id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'network', 'prv')]"
+							"id": "[resourceId(parameters('cloudwareDomain'), 'Microsoft.Network/virtualNetworks/subnets', 'network', 'prv')]"
 						}
 					}
 				}],
@@ -143,7 +143,7 @@
 						"privateIPAllocationMethod": "Static",
 						"privateIPAddress": "[parameters('mgtSubnetIp')]",
 						"subnet": {
-							"id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'network', 'mgt')]"
+							"id": "[resourceId(parameters('cloudwareDomain'), 'Microsoft.Network/virtualNetworks/subnets', 'network', 'mgt')]"
 						}
 					}
 				}]
