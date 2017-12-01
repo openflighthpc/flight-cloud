@@ -28,7 +28,7 @@ module Cloudware
     attr_accessor :aws_access_key_id, :aws_secret_access_key
 
     def initialize(cfg_file)
-      config = YAML.load_file(cfg_file)
+      config = YAML.load_file(cfg_file) || raise("Couldn't load config file #{cfg_file}")
 
       self.log_file = config['general']['log_file']
 
