@@ -69,8 +69,8 @@ module Cloudware
                   azure = Cloudware::Azure.new
                   log.info("Loaded machines from AWS:\n#{aws.machines}")
                   @list.merge!(aws.machines)
-#                  log.info("Loaded machines from Azure:\n#{azure.machines}")
-#                  @list.merge!(azure.machines)
+                  log.info("Loaded machines from Azure:\n#{azure.machines}")
+                  @list.merge!(azure.machines)
                   log.info("Detected machines:\n#{@list}")
                   @list
                 end
