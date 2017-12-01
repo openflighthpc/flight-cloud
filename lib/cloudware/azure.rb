@@ -126,6 +126,7 @@ module Cloudware
               ext_ip = get_external_ip(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
             end
             @machines.merge!("#{r.tags['cloudware_domain']}-#{r.tags['cloudware_machine_name']}" => {
+                name: r.tags['cloudware_machine_name'],
                 domain: r.tags['cloudware_domain'],
                 role: r.tags['cloudware_machine_role'],
                 prv_ip: r.tags['cloudware_prv_ip'],
