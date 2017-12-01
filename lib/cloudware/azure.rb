@@ -30,61 +30,70 @@ Network = Azure::Network::Profiles::Latest::Mgmt
 module Cloudware
   class Azure
     def initialize
-      subscription_id = config.azure_subscription_id
-      provider = MsRestAzure::ApplicationTokenProvider.new(
-        config.azure_tenant_id,
-        config.azure_client_id,
-        config.azure_client_secret
-      )
-      credentials = MsRest::TokenCredentials.new(provider)
-      options = {
-        credentials: credentials,
-        subscription_id: subscription_id
-      }
       @resources_client = Resources::Client.new(options)
       @compute_client = Compute::Client.new(options)
       @network_client = Network::Client.new(options)
+    end
+
+    def options
+      @options ||= begin
+        subscription_id = config.azure_subscription_id
+        provider = MsRestAzure::ApplicationTokenProvider.new(
+            config.azure_tenant_id,
+            config.azure_client_id,
+            config.azure_client_secret)
+        credentials = MsRest::TokenCredentials.new(provider)
+        @options = {
+            credentials: credentials,
+            subscription_id: subscription_id }
+        @options
+      end
     end
 
     def config
       Cloudware.config
     end
 
+    def log
+      Cloudware.log
+    end
+
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
-      abort('Domain already exists') if resource_group_exists?(name)
+      raise('Domain already exists') if resource_group_exists?(name)
       create_resource_group(region, id, name)
       params = {
-        cloudwareDomain: name,
-        cloudwareId: id,
-        networkCIDR: networkcidr,
-        prvSubnetCIDR: prvsubnetcidr,
-        mgtSubnetCIDR: mgtsubnetcidr
+          cloudwareDomain: name,
+          cloudwareId: id,
+          networkCIDR: networkcidr,
+          prvSubnetCIDR: prvsubnetcidr,
+          mgtSubnetCIDR: mgtsubnetcidr
       }
       deploy(name, 'domain', 'domain', params)
     end
 
     def domains
       @domains ||= begin
-                     @domains = {}
-                     resource_groups.each do |g|
-                       log.info("Listing available resources in group #{g}")
-                       resources = @resources_client.resources.list_by_resource_group(g)
-                       resources.each do |r|
-                         next unless r.tags['cloudware_resource_type'] == 'domain'
-                         next unless r.type == 'Microsoft.Network/virtualNetworks'
-                         @domains.merge!(r.tags['cloudware_domain'] => {
-                                           domain: r.tags['cloudware_domain'],
-                                           id: r.tags['cloudware_id'],
-                                           network_cidr: r.tags['cloudware_network_cidr'],
-                                           prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
-                                           mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
-                                           provider: 'azure',
-                                           region: r.tags['cloudware_domain_region']
-                                         })
-                       end
-                     end
-                     @domains
-                   end
+        @domains = {}
+        resource_groups.each do |g|
+          log.info("Listing available resources in group #{g}")
+          resources = @resources_client.resources.list_by_resource_group(g)
+          resources.each do |r|
+            next unless r.tags['cloudware_resource_type'] == 'domain'
+            next unless r.type == 'Microsoft.Network/virtualNetworks'
+            log.info("Detected domain #{r.tags['cloudware_domain']} in region #{r.tags['cloudware_domain_region']}")
+            @domains.merge!(r.tags['cloudware_domain'] => {
+                domain: r.tags['cloudware_domain'],
+                id: r.tags['cloudware_id'],
+                network_cidr: r.tags['cloudware_network_cidr'],
+                prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
+                mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
+                provider: 'azure',
+                region: r.tags['cloudware_domain_region']
+            })
+          end
+        end
+        @domains
+      end
     end
 
     def create_machine(name, domain, id, prvip, mgtip, type, size, region, flavour)
@@ -92,45 +101,45 @@ module Cloudware
       abort('Machine already exists') if resource_group_exists?(rg)
       create_resource_group(region, id, rg)
       params = {
-        cloudwareDomain: domain,
-        cloudwareId: id,
-        vmName: name,
-        vmType: size,
-        prvSubnetIp: prvip,
-        mgtSubnetIp: mgtip,
-        vmFlavour: flavour
+          cloudwareDomain: domain,
+          cloudwareId: id,
+          vmName: name,
+          vmType: size,
+          prvSubnetIp: prvip,
+          mgtSubnetIp: mgtip,
+          vmFlavour: flavour
       }
       deploy(rg, name, "machine-#{type}", params)
     end
 
     def machines
       @machines ||= begin
-                      @machines = {}
-                      resource_groups.each do |g|
-                        resources = @resources_client.resources.list_by_resource_group(g)
-                        resources.each do |r|
-                          next unless r.tags
-                          next unless r.tags['cloudware_resource_type'] == 'machine'
-                          next unless r.type == 'Microsoft.Compute/virtualMachines'
-                          log.info("Deteched machine #{r.tags['cloudware_machine_name']} in domain #{r.tags['cloudware_domain']}")
-                          if r.tags['cloudware_machine_role'] == 'master'
-                            ext_ip = get_external_ip(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
-                          end
-                          @machines.merge!(r.tags['cloudware_machine_name'] => {
-                                             domain: r.tags['cloudware_domain'],
-                                             role: r.tags['cloudware_machine_role'],
-                                             prv_ip: r.tags['cloudware_prv_ip'],
-                                             mgt_ip: r.tags['cloudware_mgt_ip'],
-                                             ext_ip: ext_ip,
-                                             provider: 'azure',
-                                             type: r.tags['cloudware_machine_type'],
-                                             flavour: r.tags['cloudware_machine_flavour'],
-                                             state: get_instance_state(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
-                                           })
-                        end
-                      end
-                      @machines
-                    end
+        @machines = {}
+        resource_groups.each do |g|
+          resources = @resources_client.resources.list_by_resource_group(g)
+          resources.each do |r|
+            next unless r.tags
+            next unless r.tags['cloudware_resource_type'] == 'machine'
+            next unless r.type == 'Microsoft.Compute/virtualMachines'
+            log.info("Detected machine #{r.tags['cloudware_machine_name']} in domain #{r.tags['cloudware_domain']}")
+            if r.tags['cloudware_machine_role'] == 'master'
+              ext_ip = get_external_ip(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
+            end
+            @machines.merge!("#{r.tags['cloudware_domain']}-#{r.tags['cloudware_machine_name']}" => {
+                domain: r.tags['cloudware_domain'],
+                role: r.tags['cloudware_machine_role'],
+                prv_ip: r.tags['cloudware_prv_ip'],
+                mgt_ip: r.tags['cloudware_mgt_ip'],
+                ext_ip: ext_ip,
+                provider: 'azure',
+                type: r.tags['cloudware_machine_type'],
+                flavour: r.tags['cloudware_machine_flavour'],
+                state: get_instance_state(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
+            })
+          end
+        end
+        @machines
+      end
     end
 
     def deploy(resource_group, name, type, params)
@@ -204,9 +213,9 @@ module Cloudware
       params = @resources_client.model_classes.resource_group.new.tap do |r|
         r.location = region
         r.tags = {
-          cloudware_id: id,
-          cloudware_domain: name,
-          region: region
+            cloudware_id: id,
+            cloudware_domain: name,
+            region: region
         }
       end
       log.info("Creating new resource group\nRegion: #{region}\nID: #{id}\n#{name}")
@@ -215,22 +224,18 @@ module Cloudware
 
     def resource_groups
       @resource_groups ||= begin
-                    @resource_groups = []
-                    log.warn('Loading resource groups from API')
-                    @resources_client.resource_groups.list.each do |g|
-                      next if g.tags.nil?
-                      @resource_groups.push(g.tags['cloudware_domain']) unless g.tags['cloudware_domain'].nil?
-                    end
-                    @resource_groups
-                  end
+        @resource_groups = []
+        log.warn('Loading resource groups from API')
+        @resources_client.resource_groups.list.each do |g|
+          next if g.tags.nil?
+          @resource_groups.push(g.tags['cloudware_domain']) unless g.tags['cloudware_domain'].nil?
+        end
+        @resource_groups
+      end
     end
 
     def resource_group_exists?(name)
       resource_groups.include? name
-    end
-
-    def log
-      Cloudware.log
     end
   end
 end

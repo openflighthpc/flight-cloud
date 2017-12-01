@@ -128,7 +128,7 @@ module Cloudware
                               @flavour = tag.value if tag.key == 'cloudware_machine_flavour'
                             end
                             log.info("Detected machine #{@name} in domain #{@domain}")
-                            @machines.merge!(@name => {
+                            @machines.merge!("#{@domain}-#{@name}" => {
                                                name: @name, domain: @domain, state: @state,
                                                id: @id, type: @type, role: @role, mgt_ip: @mgtip,
                                                prv_ip: @prvip, ext_ip: @extip, provider: 'aws'
