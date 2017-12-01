@@ -179,7 +179,7 @@ module Cloudware
     end
 
     def get_external_ip(domain, name)
-      @network_client.public_ipaddresses.get("#{domain}-#{name}", name).ip_address
+      @network_client.public_ipaddresses.get("#{domain}-#{name}", name).ip_address || 'N/A'
     end
 
     def get_instance_state(domain, name)
