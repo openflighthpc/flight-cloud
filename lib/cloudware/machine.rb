@@ -76,12 +76,6 @@ module Cloudware
                 end
     end
 
-    def list_by_domain
-      @list_by_domain ||= begin
-
-      end
-    end
-
     def get_item(item)
       return @items[item] unless @items[item].nil?
       @items[item] = begin
