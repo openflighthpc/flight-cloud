@@ -185,15 +185,22 @@ module Cloudware
 
     command :'machine list' do |c|
       c.syntax = 'cloudware machine list'
+      c.option '--domain NAME', String, 'Filter results by domain name'
       c.description = 'List available machines'
-      c.action do |_args, _options|
+      c.action do |_args, options|
         m = Cloudware::Machine.new
         r = []
         Whirly.start spinner: 'dots2', status: 'Fetching available machines'.bold, stop: '[OK]'.green
         raise('No available machines') if m.list.nil?
         Whirly.stop
         m.list.each do |_k, v|
-          r << [v[:name], v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type]]
+          if options.domain
+            if v[:domain] == options.domain
+              r << [v[:name], v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type]]
+            end
+          else
+            r << [v[:name], v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type]]
+          end
         end
         table = Terminal::Table.new headings: ['Name'.bold,
                                                'Domain'.bold,
