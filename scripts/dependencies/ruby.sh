@@ -19,55 +19,45 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-# ensure all children die when we do
-trap "/bin/kill -- -$BASHPID &>/dev/null" EXIT INT TERM
+alces_RUBYHOME="${target}/opt/ruby"
+alces_RUBY="${target}/opt/ruby/bin/ruby"
 
-toggle_spin() {
-        if [ -z "$spin_pid" ]; then
-            (
-                i=1
-                sp="/-\|"
-                printf " "
-                while true;
-                do
-                    printf "\b[1m${sp:i++%${#sp}:1}[0m"
-                    if [[ i -eq ${#sp} ]]; then
-                        i=0
-                    fi
-                    sleep 0.2
-                done
-            ) &
-            sleep 1
-            spin_pid=$!
-        else
-            sleep 1
-            kill $spin_pid
-            wait $spin_pid 2>/dev/null
-            printf "\b"
-            unset spin_pid
-        fi
+detect_ruby() {
+    [ -d "${target}/opt/ruby" ]
 }
 
-title() {
-    printf "\n > $1\n"
-}
-
-doing() {
-    if [ -z "$2" ]; then
-        pad=12
+fetch_ruby() {
+    title "Fetching Ruby"
+    if [ "$dep_source" == "fresh" ]; then
+        fetch_source https://cache.ruby-lang.org/pub/ruby/2.4/ruby-2.4.1.tar.gz ruby-source.tar.gz
     else
-        pad=$2
+        fetch_dist ruby-2.4.1
     fi
-    printf "    [36m%${pad}s[0m ... " "$1"
-    toggle_spin
 }
 
-say_done() {
-    toggle_spin
-    if [ $1 -gt 0 ]; then
-        echo '[31mFAIL[0m'
-        exit 1
+install_ruby() {
+    title "Installing Ruby"
+    if [ "$dep_source" == "fresh" ]; then
+        doing 'Extract'
+        tar -C "${dep_build}" -xzf "${dep_src}/ruby-source.tar.gz"
+        say_done $?
+
+        cd "${dep_build}"/ruby-*
+
+        doing 'Configure'
+        ./configure --prefix="${alces_RUBYHOME}" --enable-shared --disable-install-doc \
+            --with-libyaml --with-opt-dir="${target}/opt/lib" \
+            &> "${dep_logs}/ruby-configure.log"
+        say_done $?
+
+        doing 'Compile'
+        make &> "${dep_logs}/ruby-make.log"
+        say_done $?
+
+        doing 'Install'
+        make install &> "${dep_logs}/ruby-install.log"
+        say_done $?
     else
-        echo '[32mOK[0m '
+        install_dist ruby-2.4.1
     fi
 }

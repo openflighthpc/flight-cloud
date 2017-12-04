@@ -21,10 +21,13 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 source=$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)
+dep_source="fresh"
 target=/opt/cloudware
 log_file=/var/log/cloudware.log
 os=$1
 source $source/scripts/lib/ui.functions.sh
+source $source/scripts/lib/fetch.functions.sh
+source $source/scripts/lib/install.functions.sh
 deps="ruby bundler"
 
 cat <<EOF
@@ -59,6 +62,22 @@ if [[ ! -f $log_file ]]; then
   chmod 644 $log_file
 fi
 say_done $?
+
+title 'Creating initial directory structure'
+doing 'Create'
+mkdir -p /opt/cloudware
+cp -R "${source}/"{Gemfile,Gemfile.lock,bin,lib,providers} "${target}"
+say_done $?
+
+
+title 'Installing required packages'
+for dep in ${deps}; do
+  source "#{source}/scripts/dependencies/${dep}.sh"
+  if ! detect_${dep}; then
+    fetch_${dep}
+    install_${dep}
+  fi
+done
 
 cat <<EOF
 [33m

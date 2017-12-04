@@ -50,7 +50,7 @@ EOF
         tar -C "${src_dir}" --strip-components 1 -xz
 
     if [ $? -gt 0 ]; then
-        echo "Unable to retrieve metalware source, aborting."
+        echo "Unable to retrieve cloudware source, aborting."
         exit 1
     fi
 fi
