@@ -44,6 +44,18 @@ provider:
     secret_access_key: '<insert your secret key here>'
 ```
 
+#### Installation
+
+##### Available platforms
+
+* Enterprise Linux 7 distributions: RHEL, CentOS, Scientific Linux (`el7`)
+
+One-line installation, on compatible platforms:
+
+```bash
+curl -sL https://git.io/vbsTg | alces_OS=el7 /bin/bash
+```
+
 #### Usage
 
 ##### Creating a new domain
