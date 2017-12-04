@@ -88,6 +88,9 @@ title 'Configuring profile'
 doing 'Adding Ruby to $PATH'
 PATH="${PATH}:${target}/opt/ruby/bin"
 say_done $?
+doing 'Adding Cloudware to $PATH'
+PATH="${PATH}:${target}/bin"
+say_done $?
 
 cat <<EOF
 [33m
