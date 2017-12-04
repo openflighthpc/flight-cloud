@@ -178,9 +178,9 @@ module Cloudware
         Whirly.start spinner: 'dots2', status: 'Checking machine name is valid'.bold, stop: '[OK]'.green
         raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
         Whirly.status = 'Verifying prv IP address'.bold
-        raise("Invalid prv IP address #{options.prvip} in subnet #{d.get_item('prv_subnet_cidr')}") unless m.valid_ip?("#{d.get_item('prv_subnet_cidr')}", options.prvip.to_s)
+        raise("Invalid prv IP address #{options.prvip} in subnet #{d.get_item('prv_subnet_cidr')}") unless m.valid_ip?(d.get_item('prv_subnet_cidr').to_s, options.prvip.to_s)
         Whirly.status = 'Verifying mgt IP address'.bold
-        raise("Invalid mgt IP address #{options.mgtip} in subnet #{d.get_item('mgt_subnet_cidr')}") unless m.valid_ip?("#{d.get_item('mgt_subnet_cidr')}", options.mgtip.to_s)
+        raise("Invalid mgt IP address #{options.mgtip} in subnet #{d.get_item('mgt_subnet_cidr')}") unless m.valid_ip?(d.get_item('mgt_subnet_cidr').to_s, options.mgtip.to_s)
         Whirly.stop
 
         Whirly.start spinner: 'dots2', status: 'Creating new deployment'.bold, stop: '[OK]'.green

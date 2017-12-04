@@ -136,7 +136,7 @@ module Cloudware
                           end
                         end
                       end
-                      log.info("#{self.class.to_s} found machines:\n#{@machines}")
+                      log.info("#{self.class} found machines:\n#{@machines}")
                       @machines
                     end
     end

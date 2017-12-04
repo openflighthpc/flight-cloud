@@ -39,13 +39,15 @@ module Cloudware
       @options ||= begin
         subscription_id = config.azure_subscription_id
         provider = MsRestAzure::ApplicationTokenProvider.new(
-            config.azure_tenant_id,
-            config.azure_client_id,
-            config.azure_client_secret)
+          config.azure_tenant_id,
+          config.azure_client_id,
+          config.azure_client_secret
+        )
         credentials = MsRest::TokenCredentials.new(provider)
         @options = {
-            credentials: credentials,
-            subscription_id: subscription_id }
+          credentials: credentials,
+          subscription_id: subscription_id
+        }
         @options
       end
     end
@@ -62,11 +64,11 @@ module Cloudware
       raise('Domain already exists') if resource_group_exists?(name)
       create_resource_group(region, id, name)
       params = {
-          cloudwareDomain: name,
-          cloudwareId: id,
-          networkCIDR: networkcidr,
-          prvSubnetCIDR: prvsubnetcidr,
-          mgtSubnetCIDR: mgtsubnetcidr
+        cloudwareDomain: name,
+        cloudwareId: id,
+        networkCIDR: networkcidr,
+        prvSubnetCIDR: prvsubnetcidr,
+        mgtSubnetCIDR: mgtsubnetcidr
       }
       deploy(name, 'domain', 'domain', params)
     end
@@ -82,14 +84,14 @@ module Cloudware
             next unless r.type == 'Microsoft.Network/virtualNetworks'
             log.info("Detected domain #{r.tags['cloudware_domain']} in region #{r.tags['cloudware_domain_region']}")
             @domains.merge!(r.tags['cloudware_domain'] => {
-                domain: r.tags['cloudware_domain'],
-                id: r.tags['cloudware_id'],
-                network_cidr: r.tags['cloudware_network_cidr'],
-                prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
-                mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
-                provider: 'azure',
-                region: r.tags['cloudware_domain_region']
-            })
+                              domain: r.tags['cloudware_domain'],
+                              id: r.tags['cloudware_id'],
+                              network_cidr: r.tags['cloudware_network_cidr'],
+                              prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
+                              mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
+                              provider: 'azure',
+                              region: r.tags['cloudware_domain_region']
+                            })
           end
         end
         @domains
@@ -97,17 +99,17 @@ module Cloudware
     end
 
     def create_machine(name, domain, id, prvip, mgtip, type, size, region, flavour)
-      rg = "#{domain.to_s}-#{name.to_s}"
+      rg = "#{domain}-#{name}"
       abort('Machine already exists') if resource_group_exists?(rg)
       create_resource_group(region, id, rg)
       params = {
-          cloudwareDomain: domain,
-          cloudwareId: id,
-          vmName: name,
-          vmType: size,
-          prvSubnetIp: prvip,
-          mgtSubnetIp: mgtip,
-          vmFlavour: flavour
+        cloudwareDomain: domain,
+        cloudwareId: id,
+        vmName: name,
+        vmType: size,
+        prvSubnetIp: prvip,
+        mgtSubnetIp: mgtip,
+        vmFlavour: flavour
       }
       deploy(rg, name, "machine-#{type}", params)
     end
@@ -126,17 +128,17 @@ module Cloudware
               ext_ip = get_external_ip(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
             end
             @machines.merge!("#{r.tags['cloudware_domain']}-#{r.tags['cloudware_machine_name']}" => {
-                name: r.tags['cloudware_machine_name'],
-                domain: r.tags['cloudware_domain'],
-                role: r.tags['cloudware_machine_role'],
-                prv_ip: r.tags['cloudware_prv_ip'],
-                mgt_ip: r.tags['cloudware_mgt_ip'],
-                ext_ip: ext_ip,
-                provider: 'azure',
-                type: r.tags['cloudware_machine_type'],
-                flavour: r.tags['cloudware_machine_flavour'],
-                state: get_instance_state(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
-            })
+                               name: r.tags['cloudware_machine_name'],
+                               domain: r.tags['cloudware_domain'],
+                               role: r.tags['cloudware_machine_role'],
+                               prv_ip: r.tags['cloudware_prv_ip'],
+                               mgt_ip: r.tags['cloudware_mgt_ip'],
+                               ext_ip: ext_ip,
+                               provider: 'azure',
+                               type: r.tags['cloudware_machine_type'],
+                               flavour: r.tags['cloudware_machine_flavour'],
+                               state: get_instance_state(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
+                             })
           end
         end
         @machines
@@ -169,20 +171,18 @@ module Cloudware
       unless @operation_results.nil?
         log.info("Waiting for deployment #{name} in resource group #{resource_group} to finish")
         @operation_results.each do |r|
-          until r.properties.provisioning_state == 'Succeeded'
-            sleep(1)
-          end
+          sleep(1) until r.properties.provisioning_state == 'Succeeded'
         end
         log.info("Deployment #{name} in resource group #{resource_group} finished")
       end
     end
 
     def destroy(name, domain)
-      if name == 'domain'
-        rg = domain
-      else
-        rg = "#{domain}-#{name}"
-      end
+      rg = if name == 'domain'
+             domain
+           else
+             "#{domain}-#{name}"
+           end
       log.info("Destroying resource group #{rg}")
       @resources_client.resource_groups.delete(rg)
       log.info("Resource group #{rg} destroyed")
@@ -214,9 +214,9 @@ module Cloudware
       params = @resources_client.model_classes.resource_group.new.tap do |r|
         r.location = region
         r.tags = {
-            cloudware_id: id,
-            cloudware_domain: name,
-            region: region
+          cloudware_id: id,
+          cloudware_domain: name,
+          region: region
         }
       end
       log.info("Creating new resource group\nRegion: #{region}\nID: #{id}\n#{name}")
