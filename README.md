@@ -6,8 +6,43 @@
 </div>
 
 ### Contents
+* [Configuring](#configuring)
 * [Usage](#usage)
 * [License](#license)
+
+#### Configuring
+
+Cloudware can be configured using the global configuration file - Cloudware expects this configuration file to be located at `$HOME/.cloudware.yml`.
+
+##### Log configuration
+
+In order to set up logging - a file needs to be specified. You may either create the file with the correct permissions, or allow Cloudware to create the log file for you. Specify the log file location in the configuration file using the below example:
+
+```yaml
+general:
+  log_file: '/var/log/cloudware.log'
+```
+
+##### Provider configuration
+
+Provider credentials can be provided either:
+
+* Through environment variables (AWS and Azure both support this)
+* Configuring provider access keys in the Cloudware configuration file
+
+The following example shows the configuration required to setup both AWS and Azure providers in the Cloudware configuration file:
+
+```yaml
+provider:
+  azure:
+    tenant_id: '<insert your tenant ID here>'
+    subscription_id: '<insert your subscription ID here>'
+    client_secret: '<insert your client secret here>'
+    client_id: '<insert your client ID here>'
+  aws:
+    access_key_id: '<insert your access key here>'
+    secret_access_key: '<insert your secret key here>'
+```
 
 #### Usage
 
