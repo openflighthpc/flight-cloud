@@ -28,7 +28,7 @@ os=$1
 source $source/scripts/lib/ui.functions.sh
 source $source/scripts/lib/fetch.functions.sh
 source $source/scripts/lib/install.functions.sh
-deps="ruby bundler"
+deps="ruby bundler components"
 
 cat <<EOF
 [33m===============================================================================
