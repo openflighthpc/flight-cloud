@@ -36,6 +36,11 @@ cat <<EOF
 ===============================================================================[0m
 EOF
 
+mkdir -p ${source}/tmp/log ${source}/tmp/src ${source}/tmp/build
+dep_logs="${source}/tmp/log"
+dep_build="${source}/tmp/build"
+dep_src="${source}/tmp/src"
+
 title 'Configuring system'
 doing 'Creating example configuration file'
 if [[ ! -f $HOME/.cloudware.yml ]]; then
@@ -72,7 +77,7 @@ say_done $?
 
 title 'Installing required packages'
 for dep in ${deps}; do
-  source "#{source}/scripts/dependencies/${dep}.sh"
+  source "${source}/scripts/dependencies/${dep}.sh"
   if ! detect_${dep}; then
     fetch_${dep}
     install_${dep}
