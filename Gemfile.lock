@@ -105,6 +105,8 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.7.0)
     rspec-support (3.7.0)
+    rspec-wait (0.0.9)
+      rspec (>= 3, < 4)
     signet (0.8.1)
       addressable (~> 2.3)
       faraday (~> 0.9)
@@ -136,8 +138,6 @@ DEPENDENCIES
   haikunator
   ipaddr
   rspec
+  rspec-wait
   terminal-table
   whirly
-
-BUNDLED WITH
-   1.16.0

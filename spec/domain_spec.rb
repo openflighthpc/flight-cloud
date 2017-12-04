@@ -63,7 +63,7 @@ describe Cloudware::Domain do
       @domain.prvsubnetcidr = @prvsubnetcidr
       @domain.mgtsubnetcidr = @mgtsubnetcidr
       @domain.create
-      expect(@domain.exists?).to be(true)
+      wait_for(@domain.exists?).to be(true)
     end
 
     it 'should return a list of domains as a hash' do
@@ -82,7 +82,7 @@ describe Cloudware::Domain do
 
     it 'should destroy the domain' do
       @domain.destroy
-      expect(@domain.exists?).to be(false)
+      wait_for(@domain.exists?).to be(false)
     end
   end
 
@@ -108,7 +108,7 @@ describe Cloudware::Domain do
     end
 
     it 'returns the correct region' do
-      @domain.region = 'uksouth'
+      @domain.region = @region
       expect(@domain.region).to eq(@region)
     end
 
@@ -142,7 +142,7 @@ describe Cloudware::Domain do
       @domain.prvsubnetcidr = @prvsubnetcidr
       @domain.mgtsubnetcidr = @mgtsubnetcidr
       @domain.create
-      expect(@domain.exists?).to be(true)
+      wait_for(@domain.exists?).to be(true)
     end
 
     it 'should return a list of domains as a hash' do
@@ -161,7 +161,7 @@ describe Cloudware::Domain do
 
     it 'should destroy the domain' do
       @domain.destroy
-      expect(@domain.exists?).to be(false)
+      wait_for(@domain.exists?).to be(false)
     end
   end
 end

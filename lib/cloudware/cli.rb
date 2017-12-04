@@ -150,6 +150,7 @@ module Cloudware
         options.default flavour: 'compute', type: 'small'
 
         m = Cloudware::Machine.new
+        d = Cloudware::Domain.new
 
         m.type = options.type.to_s
         m.flavour = options.flavour.to_s
@@ -159,6 +160,7 @@ module Cloudware
 
         options.domain = ask('Domain identifier: ') if options.domain.nil?
         m.domain = options.domain.to_s
+        d.name = options.domain.to_s
 
         options.role = choose('Machine role?', :master, :slave) if options.role.nil?
         m.role = options.role.to_s
@@ -175,6 +177,10 @@ module Cloudware
 
         Whirly.start spinner: 'dots2', status: 'Checking machine name is valid'.bold, stop: '[OK]'.green
         raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
+        Whirly.status = 'Verifying prv IP address'.bold
+        raise("Invalid prv IP address #{options.prvip} in subnet #{d.get_item('prv_subnet_cidr')}") unless m.valid_ip?("#{d.get_item('prv_subnet_cidr')}", options.prvip.to_s)
+        Whirly.status = 'Verifying mgt IP address'.bold
+        raise("Invalid mgt IP address #{options.mgtip} in subnet #{d.get_item('mgt_subnet_cidr')}") unless m.valid_ip?("#{d.get_item('mgt_subnet_cidr')}", options.mgtip.to_s)
         Whirly.stop
 
         Whirly.start spinner: 'dots2', status: 'Creating new deployment'.bold, stop: '[OK]'.green
