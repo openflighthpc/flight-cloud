@@ -86,11 +86,11 @@ done
 
 title 'Configuring profile'
 doing 'Adding Ruby to $PATH'
-echo "PATH=\"\${PATH}:${target}/opt/ruby/bin" > /etc/profile.d/cloudware.sh
+echo "PATH=\"\${PATH}:${target}/opt/ruby/bin\"" > /etc/profile.d/cloudware.sh
 PATH="${PATH}:${target}/opt/ruby/bin"
 say_done $?
 doing 'Adding Cloudware to $PATH'
-echo "PATH=\"\${PATH}:${target}/bin" >> /etc/profile.d/cloudware.sh
+echo "PATH=\"\${PATH}:${target}/bin\"" >> /etc/profile.d/cloudware.sh
 PATH="${PATH}:${target}/bin"
 say_done $?
 
