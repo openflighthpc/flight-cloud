@@ -43,9 +43,15 @@ dep_build="${source}/tmp/build"
 dep_src="${source}/tmp/src"
 
 title 'Configuring system'
+doing 'Creating required directories'
+mkdir -p ${target}
+mkdir -p ${target}/etc
+cp -R "${source}/"{Gemfile,Gemfile.lock,bin,lib,providers} "${target}"
+say_done $?
+
 doing 'Creating example configuration file'
-if [[ ! -f $HOME/.cloudware.yml ]]; then
-  cat << EOF > $HOME/.cloudware.yml
+if [[ ! -f $target/etc/config.yml ]]; then
+  cat << EOF > $target/etc/config.yml
 ---
 general:
   log_file: '/var/log/cloudware.log'
@@ -67,12 +73,6 @@ if [[ ! -f $log_file ]]; then
   touch $log_file
   chmod 644 $log_file
 fi
-say_done $?
-
-title 'Creating initial directory structure'
-doing 'Create'
-mkdir -p /opt/cloudware
-cp -R "${source}/"{Gemfile,Gemfile.lock,bin,lib,providers} "${target}"
 say_done $?
 
 title 'Installing prerequisites'
