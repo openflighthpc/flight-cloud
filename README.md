@@ -7,6 +7,7 @@
 
 ### Contents
 * [Configuring](#configuring)
+* [Installation](#installation)
 * [Usage](#usage)
 * [License](#license)
 
