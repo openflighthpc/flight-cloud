@@ -80,7 +80,6 @@ doing 'Base'
 install_base_prerequisites &> "${dep_logs}/base-prereeqs.log"
 say_done $?
 
-title 'Installing dependencies'
 for dep in ${deps}; do
   source "${source}/scripts/dependencies/${dep}.sh"
   if ! detect_${dep}; then
