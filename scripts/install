@@ -100,6 +100,14 @@ cat <<EOF
  INSTALLATION COMPLETE
 ===============================================================================
 [0m[1m
+Global profile scripts have been installed in:
+
+    - /etc/profile.d/cloudware.sh
+
+Please login again, or manually run the following:
+
+    $ source /etc/profile.d/cloudware.sh
+
 Execute 'cloudware --help' for further information.
 [0m
 EOF
