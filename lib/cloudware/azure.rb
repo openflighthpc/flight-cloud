@@ -30,14 +30,16 @@ Network = Azure::Network::Profiles::Latest::Mgmt
 module Cloudware
   class Azure
     def initialize
+      log.debug("[#{self.class}] Loading Resources client")
       @resources_client = Resources::Client.new(options)
+      log.debug("[#{self.class}] Loading Compute client")
       @compute_client = Compute::Client.new(options)
+      log.debug("[#{self.class}] Loading Network client")
       @network_client = Network::Client.new(options)
     end
 
     def options
       @options ||= begin
-        subscription_id = config.azure_subscription_id
         provider = MsRestAzure::ApplicationTokenProvider.new(
           config.azure_tenant_id,
           config.azure_client_id,
@@ -46,7 +48,7 @@ module Cloudware
         credentials = MsRest::TokenCredentials.new(provider)
         @options = {
           credentials: credentials,
-          subscription_id: subscription_id
+          subscription_id: config.subscription_id.to_s
         }
         @options
       end
