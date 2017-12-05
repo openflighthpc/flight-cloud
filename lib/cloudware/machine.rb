@@ -52,7 +52,7 @@ module Cloudware
     def create
       raise('Invalid machine name') unless validate_name?
       load_cloud
-      log.info("Creating new machine:\nName: #{name}\nDomain: #{domain}\nID: #{id}\nPrv IP: #{prvip}\nMgt IP: #{mgtip}\nType: #{type}\nFlavour: #{flavour}")
+      log.info("[#{self.class}] Creating new machine:\nName: #{name}\nDomain: #{domain}\nID: #{id}\nPrv IP: #{prvip}\nMgt IP: #{mgtip}\nType: #{type}\nFlavour: #{flavour}")
       @cloud.create_machine(@name, @domain, @d.get_item('id'),
                             @prvip, @mgtip, @role, render_type, @d.get_item('region'), @flavour)
     end
@@ -67,11 +67,11 @@ module Cloudware
                   @list = {}
                   aws = Cloudware::Aws.new
                   azure = Cloudware::Azure.new
-                  log.info("Loaded machines from AWS:\n#{aws.machines}")
+                  log.debug("[#{self.class}] Loaded machines from AWS:\n#{aws.machines}")
                   @list.merge!(aws.machines)
-                  log.info("Loaded machines from Azure:\n#{azure.machines}")
+                  log.debug("#{self.class}] Loaded machines from Azure:\n#{azure.machines}")
                   @list.merge!(azure.machines)
-                  log.info("Detected machines:\n#{@list}")
+                  log.debug("#{self.class}] Detected machines:\n#{@list}")
                   @list
                 end
     end
@@ -85,7 +85,7 @@ module Cloudware
 
     def render_type
       mappings = YAML.load_file(Cloudware.render_file_path("#{@d.get_item('provider')}/mappings/machine_types.yml"))
-      log.info("Rendering type provider: #{@d.get_item('provider')} flavour: #{@flavour} type: #{@type}")
+      log.info("[#{self.class}] Rendering type provider: #{@d.get_item('provider')} flavour: #{@flavour} type: #{@type}")
       mappings[@flavour][@type]
     end
 

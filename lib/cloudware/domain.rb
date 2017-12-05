@@ -97,7 +97,7 @@ module Cloudware
 
     def get_item(item)
       @items[item] = begin
-                       log.warn("Loading #{item} from API")
+                       log.warn("[#{self.class}] Loading #{item} from API")
                        list[@name][item.to_sym]
                      end
     end

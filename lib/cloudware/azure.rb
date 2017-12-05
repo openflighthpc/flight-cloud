@@ -77,12 +77,12 @@ module Cloudware
       @domains ||= begin
         @domains = {}
         resource_groups.each do |g|
-          log.info("Listing available resources in group #{g}")
+          log.info("[#{self.class}] Listing available resources in group #{g}")
           resources = @resources_client.resources.list_by_resource_group(g)
           resources.each do |r|
             next unless r.tags['cloudware_resource_type'] == 'domain'
             next unless r.type == 'Microsoft.Network/virtualNetworks'
-            log.info("Detected domain #{r.tags['cloudware_domain']} in region #{r.tags['cloudware_domain_region']}")
+            log.info("[#{self.class}] Detected domain #{r.tags['cloudware_domain']} in region #{r.tags['cloudware_domain_region']}")
             @domains.merge!(r.tags['cloudware_domain'] => {
                               domain: r.tags['cloudware_domain'],
                               id: r.tags['cloudware_id'],
@@ -123,7 +123,7 @@ module Cloudware
             next unless r.tags
             next unless r.tags['cloudware_resource_type'] == 'machine'
             next unless r.type == 'Microsoft.Compute/virtualMachines'
-            log.info("Detected machine #{r.tags['cloudware_machine_name']} in domain #{r.tags['cloudware_domain']}")
+            log.info("[#{self.class}] Detected machine #{r.tags['cloudware_machine_name']} in domain #{r.tags['cloudware_domain']}")
             if r.tags['cloudware_machine_role'] == 'master'
               ext_ip = get_external_ip(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
             end
@@ -169,11 +169,11 @@ module Cloudware
 
     def wait_for_deployment_complete(resource_group, name)
       unless @operation_results.nil?
-        log.info("Waiting for deployment #{name} in resource group #{resource_group} to finish")
+        log.info("[#{self.class}] Waiting for deployment #{name} in resource group #{resource_group} to finish")
         @operation_results.each do |r|
           sleep(1) until r.properties.provisioning_state == 'Succeeded'
         end
-        log.info("Deployment #{name} in resource group #{resource_group} finished")
+        log.info("[#{self.class}] Deployment #{name} in resource group #{resource_group} finished")
       end
     end
 
@@ -183,9 +183,9 @@ module Cloudware
            else
              "#{domain}-#{name}"
            end
-      log.info("Destroying resource group #{rg}")
+      log.info("[#{self.class}] Destroying resource group #{rg}")
       @resources_client.resource_groups.delete(rg)
-      log.info("Resource group #{rg} destroyed")
+      log.info("[#{self.class}] Resource group #{rg} destroyed")
     end
 
     def get_external_ip(domain, name)
@@ -201,12 +201,12 @@ module Cloudware
     end
 
     def instance_running?(domain, name)
-      log.info("Querying machine #{name} in domain #{domain} running status")
+      log.info("[#{self.class}] Querying machine #{name} in domain #{domain} running status")
       !@compute_client.virtual_machines.instance_view("#{domain}-#{name}", name).statuses.find { |s| s.code =~ /PowerState\/running/ }.nil?
     end
 
     def instance_stopped?(domain, name)
-      log.info("Querying machine #{name} in domain #{domain} running status")
+      log.info("[#{self.class}] Querying machine #{name} in domain #{domain} running status")
       !@compute_client.virtual_machines.instance_view("#{domain}-#{name}", name).statuses.find { |s| s.code =~ /PowerState\/stopped/ }.nil?
     end
 
@@ -219,14 +219,14 @@ module Cloudware
           region: region
         }
       end
-      log.info("Creating new resource group\nRegion: #{region}\nID: #{id}\n#{name}")
+      log.info("[#{self.class}] Creating new resource group\nRegion: #{region}\nID: #{id}\n#{name}")
       @resources_client.resource_groups.create_or_update(name, params)
     end
 
     def resource_groups
       @resource_groups ||= begin
         @resource_groups = []
-        log.warn('Loading resource groups from API')
+        log.warn("[#{self.class}] Loading resource groups from API")
         @resources_client.resource_groups.list.each do |g|
           next if g.tags.nil?
           @resource_groups.push(g.tags['cloudware_domain']) unless g.tags['cloudware_domain'].nil?

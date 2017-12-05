@@ -49,6 +49,7 @@ module Cloudware
 
     def load_config(region)
       unless config.aws_access_key_id.nil? && config.aws_secret_access_key.nil?
+        log.debug("[#{self.class}] Loading credentials from Cloudware config")
         Credentials.new(config.aws_access_key_id, config.aws_secret_access_key)
       end
       @cfn = CloudFormation::Client.new(region: region)
@@ -57,7 +58,7 @@ module Cloudware
 
     def regions
       @regions ||= begin
-                     log.warn('Loading available regions from API')
+                     log.debug("[#{self.class}] Loading available regions from API")
                      @regions = []
                      @ec2.describe_regions.regions.each do |r|
                        @regions.push(r.region_name)
@@ -69,11 +70,11 @@ module Cloudware
     # TOneverDO - tidy this
     def domains
       @domains ||= begin
-                     log.warn('Loading domains from API')
+                     log.debug("[#{self.class}] Scanning regions for available domains")
                      @domains = {}
                      regions.each do |r|
                        load_config(r)
-                       log.info("Loading VPCs for region #{r}")
+                       log.info("[#{self.class}] Loading VPCs for region #{r}")
                        vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
                        vpc_list.vpcs.each do |v|
                          v.tags.each do |t|
@@ -85,7 +86,7 @@ module Cloudware
                            @networkid = v.vpc_id
                            @region = r
                          end
-                         log.info("Loading subnets for VPC #{v.vpc_id} in region #{r}")
+                         log.info("[#{self.class}] Loading subnets for VPC #{v.vpc_id}")
                          subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
                          subnet_list.subnets.each do |s|
                            s.tags.each do |t|
@@ -93,7 +94,7 @@ module Cloudware
                              @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_mgt_subnet_id"
                            end
                          end
-                         log.info("Detected domain #{@domain} in region #{@region}")
+                         log.info("[#{self.class}] Detected domain #{@domain} in region #{@region}")
                          @domains.merge!(@domain => {
                                            domain: @domain, id: @id, network_cidr: @network_cidr,
                                            prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
@@ -111,7 +112,7 @@ module Cloudware
                       @machines = {}
                       regions.each do |r|
                         load_config(r)
-                        log.info("Loading instances in region #{r}")
+                        log.info("[#{self.class}] Scanning instances in region #{r}")
                         @ec2.describe_instances(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).reservations.each do |reservation|
                           reservation.instances.each do |instance|
                             next if instance.state.name == 'terminated'
@@ -127,7 +128,7 @@ module Cloudware
                               @name = tag.value if tag.key == 'cloudware_machine_name'
                               @flavour = tag.value if tag.key == 'cloudware_machine_flavour'
                             end
-                            log.info("Detected machine #{@name} in domain #{@domain}")
+                            log.info("[#{self.class}] Detected machine #{@name} in domain #{@domain}")
                             @machines.merge!("#{@domain}-#{@name}" => {
                                                name: @name, domain: @domain, state: @state,
                                                id: @id, type: @type, role: @role, mgt_ip: @mgtip,
@@ -178,11 +179,11 @@ module Cloudware
     end
 
     def deploy(name, tpl_file, params)
-      log.info("Deploying new stack\nName: #{name}\nTemplate: #{tpl_file}\nParams: #{params}")
+      log.info("[#{self.class}] Deploying new stack\nName: #{name}\nTemplate: #{tpl_file}\nParams: #{params}")
       @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
-      log.info("Deployment for #{name} finished, waiting for deployment to reach complete")
+      log.info("[#{self.class}] Deployment for #{name} finished, waiting for deployment to reach complete")
       @cfn.wait_until :stack_create_complete, stack_name: name
-      log.info("Deployment for #{name} reached complete status")
+      log.info("[#{self.class}] Deployment for #{name} reached complete status")
     end
 
     def destroy(name, domain)
@@ -190,11 +191,11 @@ module Cloudware
       d.name = domain
       load_config(d.get_item('region'))
       begin
-        log.info("Beginning stack deletion for stack #{name}-#{domain}")
+        log.info("[#{self.class}] Beginning stack deletion for stack #{name}-#{domain}")
         @cfn.delete_stack stack_name: "#{domain}-#{name}"
-        log.info("Waiting until stack reaches deleted status: #{name}-#{domain}")
+        log.info("[#{self.class}] Waiting until stack reaches deleted status: #{name}-#{domain}")
         @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
-        log.info("Stack reached deleted status: #{domain}-#{name}")
+        log.info("[#{self.class}] Stack reached deleted status: #{domain}-#{name}")
       rescue CloudFormation::Errors::ServiceError
       end
     end
