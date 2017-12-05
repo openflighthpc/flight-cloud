@@ -28,6 +28,7 @@ os=$1
 source $source/scripts/lib/ui.functions.sh
 source $source/scripts/lib/fetch.functions.sh
 source $source/scripts/lib/install.functions.sh
+source "${source}/scripts/os/${os}.sh"
 deps="ruby bundler components"
 
 cat <<EOF
@@ -74,8 +75,12 @@ mkdir -p /opt/cloudware
 cp -R "${source}/"{Gemfile,Gemfile.lock,bin,lib,providers} "${target}"
 say_done $?
 
+title 'Installing prerequisites'
+doing 'Base'
+install_base_prerequisites &> "${dep_logs}/base-prereeqs.log"
+say_done $?
 
-title 'Installing required packages'
+title 'Installing dependencies'
 for dep in ${deps}; do
   source "${source}/scripts/dependencies/${dep}.sh"
   if ! detect_${dep}; then
