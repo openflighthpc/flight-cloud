@@ -48,7 +48,7 @@ module Cloudware
         credentials = MsRest::TokenCredentials.new(provider)
         @options = {
           credentials: credentials,
-          subscription_id: config.subscription_id.to_s
+          subscription_id: config.azure_subscription_id.to_s
         }
         @options
       end
