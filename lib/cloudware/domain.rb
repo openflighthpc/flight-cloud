@@ -90,6 +90,7 @@ module Cloudware
     end
 
     def destroy
+      raise('Unable to destroy domain with active machines') if has_machines?
       @provider = get_item('provider')
       load_cloud
       @cloud.destroy('domain', @name)
@@ -100,6 +101,13 @@ module Cloudware
                        log.warn("[#{self.class}] Loading #{item} from API")
                        list[@name][item.to_sym]
                      end
+    end
+
+    def has_machines?
+      machine = Cloudware::Machine.new
+      machine.list.each do |k, _v|
+        return true if /#{@name}/ =~ k
+      end
     end
 
     def exists?
