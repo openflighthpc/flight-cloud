@@ -33,14 +33,14 @@ module Cloudware
       self.log_file = config['general']['log_file'] || log.error('Unable to load log_file')
 
       # Provider: azure
-      self.azure_tenant_id = config['provider']['azure']['tenant_id'] || ENV['AZURE_TENANT_ID']
-      self.azure_subscription_id = config['provider']['azure']['subscription_id'] || ENV['AZURE_SUBSCRIPTION_ID']
-      self.azure_client_id = config['provider']['azure']['client_id'] || ENV['AZURE_CLIENT_ID']
-      self.azure_client_secret = config['provider']['azure']['client_secret'] || ENV['AZURE_CLIENT_SECRET']
+      self.azure_tenant_id = config['provider']['azure']['tenant_id']
+      self.azure_subscription_id = config['provider']['azure']['subscription_id']
+      self.azure_client_id = config['provider']['azure']['client_id']
+      self.azure_client_secret = config['provider']['azure']['client_secret']
 
       # Provider: aws
-      self.aws_access_key_id = config['provider']['aws']['access_key_id'] || ENV['AWS_ACCESS_KEY_ID']
-      self.aws_secret_access_key = config['provider']['aws']['secret_access_key'] || ENV['AWS_SECRET_ACCESS_KEY']
+      self.aws_access_key_id = config['provider']['aws']['access_key_id']
+      self.aws_secret_access_key = config['provider']['aws']['secret_access_key']
     end
 
     def log
