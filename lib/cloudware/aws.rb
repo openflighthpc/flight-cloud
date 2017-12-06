@@ -67,11 +67,8 @@ module Cloudware
 
     def regions
       @regions ||= begin
-                     log.debug("[#{self.class}] Loading available regions from API")
                      @regions = []
-                     @ec2.describe_regions.regions.each do |r|
-                       @regions.push(r.region_name)
-                     end
+                     @ec2.describe_regions.regions.each {|r| @regions.push(r.region_name)}
                      @regions
                    end
     end
