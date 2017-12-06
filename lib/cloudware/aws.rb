@@ -48,12 +48,21 @@ module Cloudware
     end
 
     def load_config(region)
-      unless config.aws_access_key_id.nil? && config.aws_secret_access_key.nil?
-        log.debug("[#{self.class}] Loading credentials from Cloudware config")
-        Credentials.new(config.aws_access_key_id, config.aws_secret_access_key)
+      if valid_credentials?
+        log.debug("[#{self.class}] Loading credentials from config file")
+        credentials = Credentials.new(config.aws_access_key_id, config.aws_secret_access_key)
+        @cfn = CloudFormation::Client.new(region: region, credentials: credentials)
+        @ec2 = EC2::Client.new(region: region, credentials: credentials)
+      else
+        # Assume at this point we have environment variables or profiles available
+        log.debug("[#{self.class}] Loading credentials from environment or profile")
+        @cfn = CloudFormation::Client.new(region: region)
+        @ec2 = EC2::Client.new(region: region)
       end
-      @cfn = CloudFormation::Client.new(region: region)
-      @ec2 = EC2::Client.new(region: region)
+    end
+
+    def valid_credentials?
+      !config.aws_access_key_id.nil? || !config.aws_secret_access_key.nil?
     end
 
     def regions
