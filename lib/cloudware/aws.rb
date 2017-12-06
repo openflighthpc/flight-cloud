@@ -188,11 +188,15 @@ module Cloudware
     end
 
     def deploy(name, tpl_file, params)
-      log.info("[#{self.class}] Deploying new stack\nName: #{name}\nTemplate: #{tpl_file}\nParams: #{params}")
-      @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
-      log.info("[#{self.class}] Deployment for #{name} finished, waiting for deployment to reach complete")
-      @cfn.wait_until :stack_create_complete, stack_name: name
-      log.info("[#{self.class}] Deployment for #{name} reached complete status")
+      begin
+        log.info("[#{self.class}] Deploying new stack\nName: #{name}\nTemplate: #{tpl_file}\nParams: #{params}")
+        @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
+        log.info("[#{self.class}] Deployment for #{name} finished, waiting for deployment to reach complete")
+        @cfn.wait_until :stack_create_complete, stack_name: name
+        log.info("[#{self.class}] Deployment for #{name} reached complete status")
+      rescue CloudFormation::Errors::ServiceError => error
+        log.error("Failed waiting for stack to create: #{error.message}")
+      end
     end
 
     def destroy(name, domain)
@@ -205,7 +209,8 @@ module Cloudware
         log.info("[#{self.class}] Waiting until stack reaches deleted status: #{name}-#{domain}")
         @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
         log.info("[#{self.class}] Stack reached deleted status: #{domain}-#{name}")
-      rescue CloudFormation::Errors::ServiceError
+      rescue CloudFormation::Errors::ServiceError => error
+        log.error("Failed waiting for stack to destroy: #{error.message}")
       end
     end
 
