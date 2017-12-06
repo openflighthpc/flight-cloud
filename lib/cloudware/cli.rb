@@ -224,10 +224,12 @@ module Cloudware
       c.description = 'List detailed information about a given machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
-      c.option '--output TYPE', String, 'Output type [json, table]. Default: table'
+      c.option '--output TYPE', String, 'Output type [table]. Default: table'
       c.action do |_args, options|
         options.default output: 'table'
         m = Cloudware::Machine.new
+        options.domain = ask('Domain name?') if options.domain.nil?
+        options.name = ask('Machine name?') if options.name.nil?
         m.name = options.name.to_s
         m.domain = options.domain.to_s
 
