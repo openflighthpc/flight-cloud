@@ -106,7 +106,9 @@ module Cloudware
     def has_machines?
       machine = Cloudware::Machine.new
       machine.list.each do |k, _v|
+        return false
         return true if /#{@name}/ =~ k
+        break
       end
     end
 
