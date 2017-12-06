@@ -51,7 +51,7 @@ module Cloudware
           subscription_id: config.azure_subscription_id.to_s,
           tenant_id: config.azure_tenant_id.to_s,
           client_id: config.azure_client_id.to_s,
-          client_secret: config.azure_client_secret.to_s,
+          client_secret: config.azure_client_secret.to_s
         }
         @options
       end
