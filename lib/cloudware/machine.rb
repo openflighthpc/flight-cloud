@@ -51,6 +51,8 @@ module Cloudware
 
     def create
       raise('Invalid machine name') unless validate_name?
+      raise("IP address #{prvip} is already in use") if ip_in_use? @prvip
+      raise("IP address #{mgtip} is already in use") if ip_in_use? @mgtip
       load_cloud
       log.info("[#{self.class}] Creating new machine:\nName: #{name}\nDomain: #{domain}\nID: #{id}\nPrv IP: #{prvip}\nMgt IP: #{mgtip}\nType: #{type}\nFlavour: #{flavour}")
       @cloud.create_machine(@name, @domain, @d.get_item('id'),
@@ -107,6 +109,20 @@ module Cloudware
     def valid_ip?(subnet, ip)
       subnet_ip = IPAddr.new(subnet)
       subnet_ip.include?(ip)
+    end
+
+    def ip_in_use?(ip)
+      list.each do |k, v|
+        if v[:domain] == @domain
+          if v[:mgt_ip] == ip || v[:prv_ip] == ip
+            log.warn("IP address #{ip} is in use by #{v[:name]}")
+            return true
+            break
+          else
+            return false
+          end
+        end
+      end
     end
   end
 end
