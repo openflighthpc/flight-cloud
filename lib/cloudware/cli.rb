@@ -277,6 +277,63 @@ module Cloudware
         m.destroy
         Whirly.stop
       end
+
+      command :'machine power status' do |c|
+          c.syntax = 'cloudware machine power status [options]'
+          c.description = 'Check the power status of a machine'
+          c.option '--name NAME', String, 'Machine name'
+          c.option '--domain NAME', String, 'Domain identifier'
+          c.action do |_args, options|
+              machine = Cloudware::Machine.new
+              options.name = ask('Machine name: ') if options.name.nil?
+              machine.name = options.name.to_s
+
+              options.domain = ask('Domain identifier: ') if options.domain.nil?
+              machine.domain = options.domain.to_s
+
+              puts "#{options.name.to_s}: Power status is #{machine.get_item('state')}"
+          end
+      end
+
+      command :'machine power on' do |c|
+          c.syntax = 'cloudware machine power on [options]'
+          c.description = 'Turn a machine on'
+          c.option '--name NAME', String, 'Machine name'
+          c.option '--domain NAME', String, 'Domain identifier'
+          c.action do |_args, options|
+              machine = Cloudware::Machine.new
+              options.name = ask('Machine name: ') if options.name.nil?
+              machine.name = options.name.to_s
+
+              options.domain = ask('Domain identifier: ') if options.domain.nil?
+              machine.domain = options.domain.to_s
+
+
+              Whirly.start spinner: 'dots2', status: "Powering on machine #{options.name}".bold, stop: '[OK]'.green
+              machine.power_on
+              Whirly.stop
+          end
+      end
+
+      command :'machine power off' do |c|
+          c.syntax = 'cloudware machine power off [options]'
+          c.description = 'Turn a machine off'
+          c.option '--name NAME', String, 'Machine name'
+          c.option '--domain NAME', String, 'Domain identifier'
+          c.action do |_args, options|
+              machine = Cloudware::Machine.new
+              options.name = ask('Machine name: ') if options.name.nil?
+              machine.name = options.name.to_s
+
+              options.domain = ask('Domain identifier: ') if options.domain.nil?
+              machine.domain = options.domain.to_s
+
+
+              Whirly.start spinner: 'dots2', status: "Powering off machine #{options.name}".bold, stop: '[OK]'.green
+              machine.power_off
+              Whirly.stop
+          end
+      end
     end
   end
 end
