@@ -364,6 +364,26 @@ module Cloudware
               Whirly.stop
           end
       end
+
+      command :'machine rebuild' do |c|
+          c.syntax = 'cloudware machine rebuild [options]'
+          c.description = 'Rebuild a machine'
+          c.option '--name NAME', String, 'Machine name'
+          c.option '--domain NAME', String, 'Domain identifier'
+          c.action do |_args, options|
+              machine = Cloudware::Machine.new
+              options.name = ask('Machine name: ') if options.name.nil?
+              machine.name = options.name.to_s
+
+              options.domain = ask('Domain identifier: ') if options.domain.nil?
+              machine.domain = options.domain.to_s
+
+
+              Whirly.start spinner: 'dots2', status: "Recreating machine #{options.name}".bold, stop: '[OK]'.green
+              machine.rebuild
+              Whirly.stop
+          end
+      end
     end
   end
 end
