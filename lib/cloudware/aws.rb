@@ -125,7 +125,7 @@ module Cloudware
                             @state = instance.state.name
                             @extip = instance.public_ip_address || @extip = 'N/A'
                             @type = instance.instance_type
-                            @instance_id = instance.id
+                            @instance_id = instance.instance_id
                             instance.tags.each do |tag|
                               @domain = tag.value if tag.key == 'cloudware_domain'
                               @id = tag.value if tag.key == 'cloudware_id'
@@ -166,11 +166,16 @@ module Cloudware
         @machine_info.merge!(instance_id: @instance_id, state: @state)
     end
 
+    def instance(name, domain)
+        @instance ||= @ec2.instance(machine_info(name, domain)['instance_id'])
+    end
+
     def machine_power_on(name, domain)
-        puts machine_info(name, domain)
+        instance(name, domain).start
     end
 
     def machine_power_off(name, domain)
+        instance(name, domain).stop
     end
 
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
