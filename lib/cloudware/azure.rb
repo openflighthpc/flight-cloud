@@ -150,6 +150,14 @@ module Cloudware
       end
     end
 
+    def machine_power_on(name, domain)
+        @compute_client.virtual_machines.start(domain, name)
+    end
+
+    def machine_power_off(name, domain)
+        @compute_client.virtual_machines.power_off(domain, name)
+    end
+
     def deploy(resource_group, name, type, params)
       deployment = @resources_client.model_classes.deployment.new
       deployment.properties = @resources_client.model_classes.deployment_properties.new

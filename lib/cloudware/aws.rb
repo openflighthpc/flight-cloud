@@ -125,6 +125,7 @@ module Cloudware
                             @state = instance.state.name
                             @extip = instance.public_ip_address || @extip = 'N/A'
                             @type = instance.instance_type
+                            @instance_id = instance.id
                             instance.tags.each do |tag|
                               @domain = tag.value if tag.key == 'cloudware_domain'
                               @id = tag.value if tag.key == 'cloudware_id'
@@ -138,7 +139,7 @@ module Cloudware
                             @machines.merge!("#{@domain}-#{@name}" => {
                                                name: @name, domain: @domain, state: @state,
                                                id: @id, type: @type, role: @role, mgt_ip: @mgtip,
-                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws'
+                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', insatnce_id: @instance_id
                                              })
                           end
                         end
@@ -146,6 +147,30 @@ module Cloudware
                       log.info("#{self.class} found machines:\n#{@machines}")
                       @machines
                     end
+    end
+
+    def machine_info(name, domain)
+        @machine_info = {}
+        regions.each do |r|
+            load_config(r)
+            @ec2.describe_instances(filters: [
+                { name: 'tag:cloudware_domain', values: ["#{domain}"] },
+                { name: 'tag:cloudware_machine_name', values: ["#{name}"] }
+            ]).reservations.each do |reservation|
+                reservation.instances.each do |instance|
+                    @instance_id = instance.instance_id
+                    @state = instance.state.name
+                end
+            end
+        end
+        @machine_info.merge!(instance_id: @instance_id, state: @state)
+    end
+
+    def machine_power_on(name, domain)
+        puts machine_info(name, domain)
+    end
+
+    def machine_power_off(name, domain)
     end
 
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
