@@ -50,23 +50,23 @@ module Cloudware
     end
 
     def info
-        {
-            name: @name,
-            domain: @domain,
-            id: get_item('id'),
-            prvip: get_item('prv_ip'),
-            mgtip: get_item('mgt_ip'),
-            role: get_item('role'),
-            type: get_item('type'),
-            region: get_item('region'),
-            state: get_item('state')
-        }
+      {
+        name: @name,
+        domain: @domain,
+        id: get_item('id'),
+        prvip: get_item('prv_ip'),
+        mgtip: get_item('mgt_ip'),
+        role: get_item('role'),
+        type: get_item('type'),
+        region: get_item('region'),
+        state: get_item('state')
+      }
     end
 
     def create
       raise('Invalid machine name') unless validate_name?
-      #raise("IP address #{prvip} is already in use") if ip_in_use? @prvip
-      #raise("IP address #{mgtip} is already in use") if ip_in_use? @mgtip
+      # raise("IP address #{prvip} is already in use") if ip_in_use? @prvip
+      # raise("IP address #{mgtip} is already in use") if ip_in_use? @mgtip
       load_cloud
       log.info("[#{self.class}] Creating new machine:\nName: #{name}\nDomain: #{domain}\nID: #{id}\nPrv IP: #{prvip}\nMgt IP: #{mgtip}\nType: #{type}\nFlavour: #{flavour}")
       @cloud.create_machine(@name, @domain, @d.get_item('id'),
@@ -79,18 +79,18 @@ module Cloudware
     end
 
     def rebuild
-        load_cloud
-        machine_info = info
-        destroy
-        @cloud.create_machine(machine_info[:name],
-                              machine_info[:domain],
-                              machine_info[:id],
-                              machine_info[:prvip],
-                              machine_info[:mgtip],
-                              machine_info[:role],
-                              machine_info[:type],
-                              @d.get_item('region'),
-                              machine_info[:type])
+      load_cloud
+      machine_info = info
+      destroy
+      @cloud.create_machine(machine_info[:name],
+                            machine_info[:domain],
+                            machine_info[:id],
+                            machine_info[:prvip],
+                            machine_info[:mgtip],
+                            machine_info[:role],
+                            machine_info[:type],
+                            @d.get_item('region'),
+                            machine_info[:type])
     end
 
     def list
@@ -115,17 +115,17 @@ module Cloudware
     end
 
     def power_status
-        info.state
+      info.state
     end
 
     def power_on
-        load_cloud
-        @cloud.machine_power_on(@name, @domain)
+      load_cloud
+      @cloud.machine_power_on(@name, @domain)
     end
 
     def power_off
-        load_cloud
-        @cloud.machine_power_on(@name, @domain)
+      load_cloud
+      @cloud.machine_power_on(@name, @domain)
     end
 
     def render_type
@@ -155,7 +155,7 @@ module Cloudware
     end
 
     def ip_in_use?(ip)
-      list.each do |k, v|
+      list.each do |_k, v|
         if v[:domain] == @domain
           if v[:mgt_ip] == ip || v[:prv_ip] == ip
             log.warn("IP address #{ip} is in use by #{v[:name]}")
