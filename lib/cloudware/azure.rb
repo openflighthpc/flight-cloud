@@ -134,6 +134,7 @@ module Cloudware
             end
             @machines.merge!("#{r.tags['cloudware_domain']}-#{r.tags['cloudware_machine_name']}" => {
                                name: r.tags['cloudware_machine_name'],
+                               id: r.tags['cloudware_id'],
                                domain: r.tags['cloudware_domain'],
                                role: r.tags['cloudware_machine_role'],
                                prv_ip: r.tags['cloudware_prv_ip'],
