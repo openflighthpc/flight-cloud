@@ -58,7 +58,8 @@ module Cloudware
             mgtip: get_item('mgt_ip'),
             role: get_item('role'),
             type: get_item('type'),
-            region: get_item('region')
+            region: get_item('region'),
+            state: get_item('state')
         }
     end
 
@@ -78,6 +79,7 @@ module Cloudware
     end
 
     def rebuild
+        load_cloud
         machine_info = info
         destroy
         @cloud.create_machine(machine_info[:name],
@@ -110,6 +112,20 @@ module Cloudware
       @items[item] = begin
                        list["#{@domain}-#{@name}"][item.to_sym]
                      end
+    end
+
+    def power_status
+        info.state
+    end
+
+    def power_on
+        load_cloud
+        @cloud.machine_power_on(@name, @domain)
+    end
+
+    def power_off
+        load_cloud
+        @cloud.machine_power_on(@name, @domain)
     end
 
     def render_type
