@@ -49,6 +49,19 @@ module Cloudware
       end
     end
 
+    def info
+        {
+            name: @name,
+            domain: @domain,
+            id: get_item('id'),
+            prvip: get_item('prv_ip'),
+            mgtip: get_item('mgt_ip'),
+            role: get_item('role'),
+            type: get_item('type'),
+            region: get_item('region')
+        }
+    end
+
     def create
       raise('Invalid machine name') unless validate_name?
       #raise("IP address #{prvip} is already in use") if ip_in_use? @prvip
@@ -62,6 +75,20 @@ module Cloudware
     def destroy
       load_cloud
       @cloud.destroy(@name, @domain)
+    end
+
+    def rebuild
+        machine_info = info
+        destroy
+        @cloud.create_machine(machine_info[:name],
+                              machine_info[:domain],
+                              machine_info[:id],
+                              machine_info[:prvip],
+                              machine_info[:mgtip],
+                              machine_info[:role],
+                              machine_info[:type],
+                              @d.get_item('region'),
+                              machine_info[:type])
     end
 
     def list
