@@ -152,8 +152,8 @@ module Cloudware
 
     def machine_state(name, domain)
       state = @compute_client.virtual_machines.instance_view("#{domain}-#{name}", name)
-      'running' unless state.statuses.find { |s| s.code =~ /PowerState\/running/ }.nil?
-      'stopped' if !state.statuses.find { |s| s.code =~ /PowerState\/stopped/ }.nil? || 'unknown'
+      return 'running' if !state.statuses.find { |s| s.code =~ /PowerState\/running/ }.nil?
+      return 'stopped' if !state.statuses.find { |s| s.code =~ /PowerState\/stopped/ }.nil?
     end
 
     def machine_power_on(name, domain)
