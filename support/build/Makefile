@@ -22,7 +22,7 @@ QEMU_IMG_BIN=$(VM_DIR)/qemu-img
 XML=domain.xml
 XML_RENDERED=$(IMAGE_NAME).xml
 
-all: setup build prepare convert upload
+azure: setup build prepare upload-azure
 
 setup:
 	[ -d $(VM_DIR)/converted ] || mkdir -p $(VM_DIR)/converted
@@ -42,3 +42,28 @@ prepare:
 	[ -f $(VM_DIR)/$(IMAGE_NAME).qcow2 ] || exit
 	@echo "Preparing $(IMAGE_NAME)"
 	virt-sysprep -a $(VM_DIR)/$(IMAGE_NAME).qcow2
+	@echo "Sparsifying $(IMAGE_NAME)"
+	virt-sparsify --tmp $(VM_DIR)/tmp \
+		--compress --format qcow2 \
+		$(VM_DIR)/$(IMAGE_NAME).qcow2 \
+		$(VM_DIR)/converted/$(IMAGE_NAME).qcow2
+
+upload-azure:
+	@echo "Converting $(IMAGE_NAME) to RAW format"
+	$(QEMU_IMG_BIN) convert -f qcow2 -O raw \
+		$(VM_DIR)/converted/$(IMAGE_NAME).qcow2 \
+		$(VM_DIR)/$(IMAGE_NAME).raw
+	@echo "Converting $(IMAGE_NAME) to VHD format"
+	$(QEMU_IMG_BIN) convert -f raw -O vpc -o subformat=fixed,force_size \
+		$(VM_DIR)/$(IMAGE_NAME).raw \
+		$(VM_DIR)/$(IMAGE_NAME).vhd
+	@echo "Uploading $(IMAGE_NAME) to $(AZURE_IMAGE_URL)"
+	az storage blob upload --account-name $(AZURE_STORAGE_ACCOUNT) \
+		--container-name $(AZURE_STORAGE_CONTAINER) \
+		--type page \
+		--file $(VM_DIR)/$(IMAGE_NAME).vhd \
+		--name $(IMAGE_NAME).vhd
+	az image create --resource-group $(AZURE_RESOURCE_GROUP) \
+	  	--location uksouth \
+	    --os-type Linux \
+	   	--source $(AZURE_IMAGE_URL)
