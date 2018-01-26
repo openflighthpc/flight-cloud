@@ -1,6 +1,5 @@
 auth --enableshadow --passalgo=sha512
 reboot
-url --url="mirror.centos.org/centos/7/os/x86_64"
 firewall --enabled --service=ssh
 firstboot --disable
 ignoredisk --only-use=vda
