@@ -22,6 +22,14 @@ QEMU_IMG_BIN=$(VM_DIR)/qemu-img
 XML=domain.xml
 XML_RENDERED=$(IMAGE_NAME).xml
 
+# AWS config
+
+# Azure config
+AZURE_STORAGE_ACCOUNT=alces-cloudware
+AZURE_STORAGE_CONTAINER=images
+AZURE_RESOURCE_GROUP=alces-cloudware
+AZURE_IMAGE_URL="https://$(STORAGE_ACCOUNT).blob.core.windows.net/$(AZURE_STORAGE_CONTAINER)/$(IMAGE_NAME).vhd"
+
 azure: setup build prepare upload-azure
 
 setup:
