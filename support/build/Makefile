@@ -33,7 +33,7 @@ build:
 	cp -v $(TDL) $(TDL_RENDERED)
 	cp -v $(KICKSTART) $(KICKSTART_RENDERED)
 	sed -i -e 's,c7,$(IMAGE_NAME),g' $(TDL_RENDERED)
-	sed -i -e 's,%BUILD_RELEASE%,$(IMAGE_VERSION),g' $(KS_RENDERED)
+	sed -i -e 's,%BUILD_RELEASE%,$(IMAGE_VERSION),g' $(KICKSTART_RENDERED)
 	@echo "Building image $(IMAGE_NAME)"
 	oz-install -d3 -u $(TDL_RENDERED) -x /tmp/$(IMAGE_NAME).xml \
 				   -p -a $(KICKSTART_RENDERED) -c $(OZ_CFG) -t 1800
