@@ -88,8 +88,12 @@ upload-aws:
 	$(QEMU_IMG_BIN) convert -f qcow2 -O raw \
 		$(VM_DIR)/converted/$(IMAGE_NAME).qcow2 \
 		$(VM_DIR)/$(IMAGE_NAME).raw
+	cp container.json /tmp/$(IMAGE_NAME).json
+	sed -i -e 's/%IMAGE_NAME%/$(IMAGE_NAME)/g' \
+	       -e 's/%AWS_BUCKET_NAME%/$(AWS_BUCKET)/g' \
+		   -e 's/%AWS_BUCKET_DIR%/$(AWS_BUCKET_DIR)/g' \
+		   /tmp/$(IMAGE_NAME).json
 	aws --region $(AWS_REGION) s3 cp $(VM_DIR)/$(IMAGE_NAME).raw s3://$(AWS_BUCKET)/$(AWS_BUCKET_DIR)/$(IMAGE_NAME).raw
-	echo "{\"Description\":\"$(IMAGE_NAME)\",\"Format\":\"raw\",\"UserBucket\":{\"S3Bucket\":\"$(AWS_BUCKET)\",\"S3Key\":\"$(AWS_BUCKET_DIR)/$(IMAGE_NAME).raw\"}}" > /tmp/$(IMAGE_NAME).json
 	aws ec2 import-image --architecture x86_64 \
 		--description "$(IMAGE_NAME)" \
 		--disk-containers /tmp/$(IMAGE_NAME).json \

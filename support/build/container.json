@@ -1,0 +1,10 @@
+[
+  {
+    "Description": "%IMAGE_NAME%",
+    "Format": "raw",
+    "UserBucket": {
+      "S3Bucket": "%AWS_BUCKET_NAME%",
+      "S3Key": "%AWS_BUCKET_DIR%/%IMAGE_NAME%.raw"
+    }
+  }
+]
