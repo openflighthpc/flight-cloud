@@ -50,6 +50,10 @@ module Cloudware
       end
     end
 
+    def aws
+      Cloudware::Aws.new
+    end
+
     def describe
       @describe ||= begin
                     domain = Struct.new :name, :region, :provider, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr
@@ -64,18 +68,7 @@ module Cloudware
     end
 
     def list
-      @list ||= begin
-                  @list = {}
-                  if @provider
-                    load_cloud
-                    @list.merge!(@cloud.domains)
-                  else
-                    load_cloud
-                    @list.merge!(@aws.domains)
-                    @list.merge!(@azure.domains)
-                  end
-                  @list
-                end
+      puts aws.domains
     end
 
     def domains_by_region(region)

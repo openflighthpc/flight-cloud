@@ -47,6 +47,9 @@ Resources:
         -
           Key: 'cloudware_mgt_subnet_cidr'
           Value: !Ref mgtSubnetCidr
+        -
+          Key: 'cloudware_region'
+          Value: !Ref "AWS::Region"
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway

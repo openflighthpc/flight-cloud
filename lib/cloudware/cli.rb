@@ -95,24 +95,25 @@ module Cloudware
       c.option '--region NAME', String, 'Provider region to filter by'
       c.action do |_args, options|
         d = Cloudware::Domain.new
-        d.provider = options.provider.to_s unless options.provider.nil?
-        d.region = options.region.to_s unless options.region.nil?
-        d.name = options.name.to_s unless options.name.nil?
-        r = []
-        Whirly.start spinner: 'dots2', status: 'Fetching available domains'.bold, stop: '[OK]'.green
-        raise('No available domains') if d.list.empty?
-        Whirly.stop
-        d.list.each do |k, v|
-          r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider], v[:region]]
-        end
-        table = Terminal::Table.new headings: ['Domain name'.bold,
-                                               'Network CIDR'.bold,
-                                               'Prv Subnet CIDR'.bold,
-                                               'Mgt Subnet CIDR'.bold,
-                                               'Provider'.bold,
-                                               'Region'.bold],
-                                    rows: r
-        puts table
+        #d.provider = options.provider.to_s unless options.provider.nil?
+        #d.region = options.region.to_s unless options.region.nil?
+        #d.name = options.name.to_s unless options.name.nil?
+        #r = []
+        #Whirly.start spinner: 'dots2', status: 'Fetching available domains'.bold, stop: '[OK]'.green
+        #raise('No available domains') if d.list.empty?
+        #Whirly.stop
+        d.list
+        #d.list.each do |k, v|
+        #  r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider], v[:region]]
+        #end
+        #table = Terminal::Table.new headings: ['Domain name'.bold,
+        #                                       'Network CIDR'.bold,
+        #                                       'Prv Subnet CIDR'.bold,
+        #                                       'Mgt Subnet CIDR'.bold,
+        #                                       'Provider'.bold,
+        #                                       'Region'.bold],
+        #                            rows: r
+        #puts table
       end
     end
 
