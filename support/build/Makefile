@@ -23,6 +23,9 @@ XML=domain.xml
 XML_RENDERED=$(IMAGE_NAME).xml
 
 # AWS config
+AWS_BUCKET=alces-cloudware
+AWS_BUCKET_DIR=images
+AWS_REGION=eu-west-1
 
 # Azure config
 AZURE_STORAGE_ACCOUNT=alces-cloudware
@@ -30,7 +33,7 @@ AZURE_STORAGE_CONTAINER=images
 AZURE_RESOURCE_GROUP=alces-cloudware
 AZURE_IMAGE_URL="https://$(STORAGE_ACCOUNT).blob.core.windows.net/$(AZURE_STORAGE_CONTAINER)/$(IMAGE_NAME).vhd"
 
-azure: setup build prepare upload-azure
+image: setup build prepare
 
 setup:
 	[ -d $(VM_DIR)/converted ] || mkdir -p $(VM_DIR)/converted
@@ -55,6 +58,7 @@ prepare:
 		--compress --format qcow2 \
 		$(VM_DIR)/$(IMAGE_NAME).qcow2 \
 		$(VM_DIR)/converted/$(IMAGE_NAME).qcow2
+	@echo "Run upload-$(PLATFORM) to continue"
 
 upload-azure:
 	@echo "Converting $(IMAGE_NAME) to RAW format"
@@ -75,3 +79,15 @@ upload-azure:
 	  	--location uksouth \
 	    --os-type Linux \
 	   	--source $(AZURE_IMAGE_URL)
+
+upload-aws:
+	$(QEMU_IMG_BIN) convert -f qcow2 -O raw \
+		$(VM_DIR)/converted/$(IMAGE_NAME).qcow2 \
+		$(VM_DIR)/$(IMAGE_NAME).raw
+	aws --region $(AWS_REGION) s3 cp $(VM_DIR)/$(IMAGE_NAME).raw s3://$(AWS_BUCKET)/$(AWS_BUCKET_DIR)/$(IMAGE_NAME).raw
+	jo Description="$(IMAGE_NAME)" Format="raw" UserBucket="$$(jo S3Bucket="$(AWS_BUCKET)" S3Key="$(AWS_BUCKET_DIR)/$(IMAGE_NAME).raw")" > /tmp/$(IMAGE_NAME).json
+	aws ec2 import-image --architecture x86_64 \
+		--description "$(IMAGE_NAME)" \
+		--disk-containers /tmp/$(IMAGE_NAME).json \
+		--platform Linux \
+		--license-type BYOL
