@@ -139,7 +139,7 @@ module Cloudware
                             @machines.merge!("#{@domain}-#{@name}" => {
                                                name: @name, domain: @domain, state: @state,
                                                id: @id, type: @type, role: @role, mgt_ip: @mgtip,
-                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', insatnce_id: @instance_id
+                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id
                                              })
                           end
                         end
