@@ -21,6 +21,9 @@
 #==============================================================================
 require 'aws-sdk-cloudformation'
 require 'aws-sdk-ec2'
+require 'cloudware/provider/aws/deployment'
+require 'cloudware/provider/aws/domain'
+require 'cloudware/provider/aws/machine'
 
 EC2 = Aws::EC2
 CloudFormation = Aws::CloudFormation
@@ -29,57 +32,16 @@ Credentials = Aws::Credentials
 module Cloudware
   class Aws
     include Utils
+    include Deployment
+    include Domain
+    include Machine
 
     def initialize(options = {})
       @options = options
       @region = options[:region] || 'eu-west-1'
     end
 
-    def domains
-      if @options[:domain] && @options[:region]
-        find_domain
-      elsif @options[:domain] && options[:region].nil?
-        find_domain_by_name
-      elsif @options[:domain].nil? && @options[:region]
-        find_domains_by_region
-      elsif @options[:domain].nil? && @options[:region].nil?
-        find_domains
-      end
-    end
-
     private
-
-    def find_domain(name = @options[:name], region = options[:region])
-      vpcs.each do |vpc|
-        next unless vpc.tags[:cloudware_domain] == name
-        next unless vpc.tags[:cloudware_region] == region
-        search.merge!(render_domain_info(vpc))
-      end
-      puts search
-    end
-
-    def find_domains
-      vpcs.each do |vpc|
-        search.merge!(render_domain_info(vpc))
-      end
-      search
-    end
-
-    def find_domain_by_name(name = @options[:domain])
-      vpcs.each do |vpc|
-        next unless vpc.tags[:cloudware_domain] == name
-        search.merge!(render_domain_info(vpc))
-      end
-      search
-    end
-
-    def find_domain_by_region(region = @options[:region])
-      vpcs.each do |vpc|
-        next unless vpc.tags[:cloudware_region] == region
-        search.merge!(render_domain_info(vpc))
-      end
-      search
-    end
 
     def credentials
       @credentials ||= Credentials.new(
@@ -104,46 +66,6 @@ module Cloudware
         end
         @regions
       end
-    end
-
-    def vpcs
-      @vpcs ||= ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).vpcs
-    end
-
-    def render_domain_info(vpc)
-      domain.merge!(render_domain_tags(vpc.tags))
-      domain[:vpcid] = vpc.vpc_id
-      domain
-    end
-
-    def render_domain_tags(tags)
-      @tag_hash = {}
-      tags.each do |t|
-        @tag_hash[:domain] = t.value if t.key == 'cloudware_domain'
-        @tag_hash[:id] = t.value if t.key == 'cloudware_id'
-        @tag_hash[:networkcidr] = t.value if t.key == 'cloudware_network_cidr'
-        @tag_hash[:mgtcidr] = t.value if t.key == 'cloudware_mgt_subnet_cidr'
-        @tag_hash[:prvcidr] = t.value if t.key == 'cloudware_prv_subnet_cidr'
-        @tag_hash[:region] = t.value if t.key == 'cloudware_region'
-      end
-      render_domain_tag_hash(@tag_hash)
-    end
-
-    def render_domain_tag_hash(hash)
-      {
-        hash[:domain].to_s => {
-          id: hash[:id],
-          networkcidr: hash[:networkcidr],
-          mgtcidr: hash[:mgtcidr],
-          prvcidr: hash[:prvcidr],
-          region: hash[:region],
-          provider: 'aws'
-        }
-      }
-    end
-
-    def domain
-      @domain ||= {}
     end
 
     def search

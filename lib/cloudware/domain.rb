@@ -30,9 +30,6 @@ module Cloudware
 
         include Utils
 
-        def initialize
-        end
-
         def create
             client.create_domain(options)
         end
@@ -44,20 +41,19 @@ module Cloudware
         def list
             @list ||= begin
                 @list = {}
-                @list.merge!(client.domains) if @provider
+                @list.merge!(client.send(list_command)) if @provider
                 if not @provider
                     providers.each do |p|
-                        @list.merge!(client(p).domains)
+                        @list.merge!(client(p).send(list_command))
                     end
                 end
-                puts @list
                 @list
             end
         end
 
         private
 
-        def aws(region = @region)
+        def aws
             @aws ||= Cloudware::Aws.new(options)
         end
 
@@ -69,13 +65,18 @@ module Cloudware
             self.send(provider)
         end
 
+        def list_command
+            self.class == 'Cloudware::Domain' ? 'machines' : 'domains'
+        end
+
         def options
             {
                 domain: @name,
                 region: @region,
                 networkcidr: @networkcidr,
                 mgtcidr: @mgtcidr,
-                prvcidr: @prvcidr
+                prvcidr: @prvcidr,
+                provider: @provider
             }
         end
 
