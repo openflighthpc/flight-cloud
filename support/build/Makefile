@@ -33,7 +33,7 @@ AZURE_STORAGE_CONTAINER=images
 AZURE_RESOURCE_GROUP=alces-cloudware
 AZURE_IMAGE_URL="https://$(STORAGE_ACCOUNT).blob.core.windows.net/$(AZURE_STORAGE_CONTAINER)/$(IMAGE_NAME).vhd"
 
-image: setup build prepare
+image: setup build prepare upload
 
 setup:
 	[ -d $(VM_DIR)/converted ] || mkdir -p $(VM_DIR)/converted
@@ -59,6 +59,10 @@ prepare:
 		$(VM_DIR)/$(IMAGE_NAME).qcow2 \
 		$(VM_DIR)/converted/$(IMAGE_NAME).qcow2
 	@echo "Run upload-$(PLATFORM) to continue"
+
+upload:
+	if [ $(PLATFORM) = "aws" ]; then $(MAKE) upload-aws; fi
+	if [ $(PLATFORM) = "azure" ]; then $(MAKE) upload-azure; fi
 
 upload-azure:
 	@echo "Converting $(IMAGE_NAME) to RAW format"
