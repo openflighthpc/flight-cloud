@@ -58,7 +58,6 @@ prepare:
 		--compress --format qcow2 \
 		$(VM_DIR)/$(IMAGE_NAME).qcow2 \
 		$(VM_DIR)/converted/$(IMAGE_NAME).qcow2
-	@echo "Run upload-$(PLATFORM) to continue"
 
 upload:
 	if [ $(PLATFORM) = "aws" ]; then $(MAKE) upload-aws; fi
