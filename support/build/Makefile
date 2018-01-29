@@ -28,7 +28,7 @@ AWS_BUCKET_DIR=images
 AWS_REGION=eu-west-1
 
 # Azure config
-AZURE_STORAGE_ACCOUNT=alces-cloudware
+AZURE_STORAGE_ACCOUNT=alcescloudware
 AZURE_STORAGE_CONTAINER=images
 AZURE_RESOURCE_GROUP=alces-cloudware
 AZURE_IMAGE_URL="https://$(STORAGE_ACCOUNT).blob.core.windows.net/$(AZURE_STORAGE_CONTAINER)/$(IMAGE_NAME).vhd"
