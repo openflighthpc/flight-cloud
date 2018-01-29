@@ -79,6 +79,7 @@ upload-azure:
 		--file $(VM_DIR)/$(IMAGE_NAME).vhd \
 		--name $(IMAGE_NAME).vhd
 	az image create --resource-group $(AZURE_RESOURCE_GROUP) \
+		--name $(IMAGE_NAME) \
 	  	--location uksouth \
 	    --os-type Linux \
 	   	--source $(AZURE_IMAGE_URL)
