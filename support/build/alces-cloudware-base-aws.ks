@@ -102,6 +102,13 @@ EOL
 # make sure firstboot doesn't start
 echo "RUN_FIRSTBOOT=NO" > /etc/sysconfig/firstboot
 
+# write Cloudware version file
+cat << EOF > /etc/cloudware.yml
+---
+image:
+  version: '%BUILD_RELEASE%'
+EOF
+
 yum clean all
 
 # XXX instance type markers - MUST match CentOS Infra expectation

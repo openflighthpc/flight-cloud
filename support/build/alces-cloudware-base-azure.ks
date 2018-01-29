@@ -122,6 +122,13 @@ EOF
 systemctl enable cloud-init
 systemctl enable waagent
 
+# write Cloudware version file
+cat << EOF > /etc/cloudware.yml
+---
+image:
+  version: '%BUILD_RELEASE%'
+EOF
+
 ###################################################################
 # Cleanup
 ###################################################################
