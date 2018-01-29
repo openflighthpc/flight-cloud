@@ -94,8 +94,9 @@ upload-aws:
 		   -e 's/%AWS_BUCKET_DIR%/$(AWS_BUCKET_DIR)/g' \
 		   /tmp/$(IMAGE_NAME).json
 	aws --region $(AWS_REGION) s3 cp $(VM_DIR)/$(IMAGE_NAME).raw s3://$(AWS_BUCKET)/$(AWS_BUCKET_DIR)/$(IMAGE_NAME).raw
-	aws ec2 import-image --architecture x86_64 \
+	$(eval IMPORT_TASK := $(shell aws ec2 import-image --architecture x86_64 \
 		--description "$(IMAGE_NAME)" \
-		--disk-containers /tmp/$(IMAGE_NAME).json \
+		--disk-containers "/tmp/$(IMAGE_NAME).json" \
 		--platform Linux \
-		--license-type BYOL
+		--license-type BYOL))
+	$(eval AMI_IMPORT_TASK_ID := $(shell echo $(IMPORT_TASK) | jq -r '.ImportTaskId')
