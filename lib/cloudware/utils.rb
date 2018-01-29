@@ -28,5 +28,11 @@ module Cloudware
     def config
       Cloudware.config
     end
+
+    def providers
+        [
+            'aws'
+        ]
+    end
   end
 end

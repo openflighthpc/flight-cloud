@@ -23,112 +23,64 @@ require 'securerandom'
 require 'ipaddr'
 
 module Cloudware
-  class Domain
-    attr_accessor :name
-    attr_accessor :id
-    attr_accessor :networkcidr
-    attr_accessor :prvsubnetcidr
-    attr_accessor :mgtsubnetcidr
-    attr_accessor :region
-    attr_accessor :provider
-    # aws provider specific
-    attr_accessor :prvsubnetid, :mgtsubnetid, :networkid
+    class Domain
+        attr_accessor :name, :id, :region, :provider
+        attr_accessor :networkcidr, :prvcidr, :mgtcidr
+        attr_reader :mgtsubnetid, :prvsubnetid, :networkid
 
-    def initialize
-      @items = {}
-    end
+        include Utils
 
-    def load_cloud
-      case @provider
-      when 'aws'
-        @cloud = Cloudware::Aws.new
-      when 'azure'
-        @cloud = Cloudware::Azure.new
-      else
-        @aws = Cloudware::Aws.new
-        @azure = Cloudware::Azure.new
-      end
-    end
+        def initialize
+        end
 
-    def aws
-      Cloudware::Aws.new
-    end
+        def create
+            client.create_domain(options)
+        end
 
-    def describe
-      @describe ||= begin
-                    domain = Struct.new :name, :region, :provider, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr
-                    @describe = domain.new(get_item('domain'), get_item('region'), get_item('provider'), get_item('network_cidr'), get_item('prv_subnet_cidr'), get_item('mgt_subnet_cidr'))
-                  end
-    end
+        def destroy
+            client.destroy_domain(options)
+        end
 
-    def create
-      load_cloud
-      @cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,
-                           @prvsubnetcidr, @mgtsubnetcidr, @region)
-    end
+        def list
+            @list ||= begin
+                @list = {}
+                @list.merge!(client.domains) if @provider
+                if not @provider
+                    providers.each do |p|
+                        @list.merge!(client(p).domains)
+                    end
+                end
+                puts @list
+                @list
+            end
+        end
 
-    def list
-      puts aws.domains
-    end
+        private
 
-    def domains_by_region(region)
-      @domains_by_region ||= begin
-                               load_cloud
-                               @domains_by_region = @cloud.domains
-                               @domains_by_region.each do |k, v|
-                                 k.delete(k) if v[:region] != region
-                               end
-                               @domains_by_region
-                             end
-    end
+        def aws(region = @region)
+            @aws ||= Cloudware::Aws.new(options)
+        end
 
-    def destroy
-      raise('Unable to destroy domain with active machines') if has_machines?
-      @provider = get_item('provider')
-      load_cloud
-      @cloud.destroy('domain', @name)
-    end
+        def azure
+            @azure ||= Cloudware::Azure.new
+        end
 
-    def get_item(item)
-      @items[item] = begin
-                       log.warn("[#{self.class}] Loading #{item} from API")
-                       list[@name][item.to_sym]
-                     end
-    end
+        def client(provider = @provider)
+            self.send(provider)
+        end
 
-    def has_machines?
-      machine = Cloudware::Machine.new
-      machine.list.each do |k, _v|
-        return false
-        return true if /#{@name}/ =~ k
-        break
-      end
-    end
+        def options
+            {
+                domain: @name,
+                region: @region,
+                networkcidr: @networkcidr,
+                mgtcidr: @mgtcidr,
+                prvcidr: @prvcidr
+            }
+        end
 
-    def exists?
-      list.include? @name || false
+        def provider
+            self.instance_variable_set(provider, list[@name][:provider]) unless @provider
+        end
     end
-
-    def valid_name?
-      !@name.match(/\A[a-zA-Z0-9-]*\z/).nil?
-    end
-
-    def valid_provider?
-      %w[aws azure gcp].include? @provider
-    end
-
-    def log
-      Cloudware.log
-    end
-
-    def valid_cidr?(cidr)
-      IPAddr.new(cidr).ipv4?
-    end
-
-    def is_valid_subnet_cidr?(network, subnet)
-      network_cidr = IPAddr.new(network)
-      subnet_cidr = IPAddr.new(subnet)
-      network_cidr.include?(subnet_cidr)
-    end
-  end
 end

@@ -136,7 +136,8 @@ module Cloudware
           networkcidr: hash[:networkcidr],
           mgtcidr: hash[:mgtcidr],
           prvcidr: hash[:prvcidr],
-          region: hash[:region]
+          region: hash[:region],
+          provider: 'aws'
         }
       }
     end
