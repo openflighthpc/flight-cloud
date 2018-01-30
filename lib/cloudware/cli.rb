@@ -35,16 +35,16 @@ module Cloudware
     program :description, 'Cloud orchestration tool'
 
     command :'domain list' do |c|
-        c.syntax = 'cloudware domain list [options]'
-        c.description = 'List available domains'
-        c.option '--name NAME', String, 'Domain name'
-        c.option '--region NAME', String, 'Region name'
-        c.action do |_args, options|
-            client = Cloudware::Domain.new
-            client.domain = options.name.to_s if options.name
-            client.region = options.region.to_s if options.region
-            puts client.list
-        end
+      c.syntax = 'cloudware domain list [options]'
+      c.description = 'List available domains'
+      c.option '--name NAME', String, 'Domain name'
+      c.option '--region NAME', String, 'Region name'
+      c.action do |_args, options|
+        client = Cloudware::Domain.new
+        client.domain = options.name.to_s if options.name
+        client.region = options.region.to_s if options.region
+        puts client.list
+      end
     end
   end
 end

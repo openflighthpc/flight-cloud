@@ -52,16 +52,16 @@ module Cloudware
         @search = {}
         regions.each do |region|
           vpcs(region).each do |vpc|
-            vpc.tags.each do |t|
-              @search.merge!(render_domain_info(vpc)) 
+            vpc.tags.each do |_t|
+              @search.merge!(render_domain_info(vpc))
             end
           end
         end
-        return @search
+        @search
       end
 
       def find_domain_by_name(name = @options[:domain])
-        regions.each do |region|
+        regions.each do |_region|
           vpcs.each do |vpc|
             vpc.tags.each do |t|
               next unless t.value == name && t.key == 'cloudware_domain'
@@ -79,17 +79,32 @@ module Cloudware
             @search.merge!(render_domain_info(vpc))
           end
         end
-        return @search
+        @search
       end
 
       def render_domain_info(vpc)
         domain.merge!(render_domain_tags(vpc.tags, vpc.vpc_id))
-        return domain
+        domain
+      end
+
+      def render_domain_subnets(id)
+        @subnets = {}
+        subnets = ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [id] }]).subnets
+        subnets.each do |subnet|
+          subnet.tags.each do |t|
+            @subnets[:mgtid] = subnet.subnet_id if t.key == 'cloudware_mgt_subnet'
+            @subnets[:prvid] = subnet.subnet_id if t.key == 'cloudware_prv_subnet'
+          end
+        end
+        @subnets
       end
 
       def render_domain_tags(tags, vpcid)
         @tag_hash = {}
         @tag_hash[:vpcid] = vpcid
+        subnets = render_domain_subnets(vpcid)
+        @tag_hash[:mgtsubnetid] = subnets[:mgtid]
+        @tag_hash[:prvsubnetid] = subnets[:prvid]
         tags.each do |t|
           @tag_hash[:domain] = t.value if t.key == 'cloudware_domain'
           @tag_hash[:id] = t.value if t.key == 'cloudware_id'
@@ -98,21 +113,31 @@ module Cloudware
           @tag_hash[:prvcidr] = t.value if t.key == 'cloudware_prv_subnet_cidr'
           @tag_hash[:region] = t.value if t.key == 'cloudware_region'
         end
-        puts log.public_methods
-        log.info("Detected domain #{@tag_hash[:domain]}")
-        render_domain_tag_hash(@tag_hash)
+        render_domain_hash(@tag_hash)
       end
 
-      def render_domain_tag_hash(hash)
+      def render_domain_hash(hash)
         {
           hash[:domain].to_s => {
             id: hash[:id],
-            networkcidr: hash[:networkcidr],
-            mgtcidr: hash[:mgtcidr],
-            prvcidr: hash[:prvcidr],
             region: hash[:region],
-            vpcid: hash[:vpcid],
-            provider: 'aws'
+            provider: 'aws',
+	    'networks' => {
+              'primary' => {
+	        cidr: hash[:networkcidr],
+		id: hash[:vpcid]
+	      },
+	      'subnets' => {
+	        'mgt' => {
+	          cidr: hash[:mgtcidr],
+		  id: hash[:mgtsubnetid]
+		},
+		'prv' => {
+		  cidr: hash[:prvcidr],
+		  id: hash[:prvsubnetid]
+		}
+	      }
+	    }
           }
         }
       end

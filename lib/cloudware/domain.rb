@@ -20,44 +20,44 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 module Cloudware
-    class Domain
-        attr_accessor :domain, :id, :region, :provider
-        attr_writer :networkcidr, :prvcidr, :mgtcidr
+  class Domain
+    attr_accessor :domain, :id, :region, :provider
+    attr_writer :networkcidr, :prvcidr, :mgtcidr
 
-        include Utils
+    include Utils
 
-        def list
-            @list ||= begin
-              @list = {}
-              @list.merge!(client.send(list_command)) if @provider
-              if not @provider
-                  providers.each do |p|
-                    result = client(p).send(list_command)
-                    @list.merge!(result)
-                  end
-              end
-              @list
-            end
+    def list
+      @list ||= begin
+        @list = {}
+        @list.merge!(client.send(list_command)) if @provider
+        unless @provider
+          providers.each do |p|
+            result = client(p).send(list_command)
+            @list.merge!(result)
+          end
         end
-
-        private
-
-        def aws
-            @aws ||= Cloudware::Aws.new(options)
-        end
-
-        def client(provider = @provider)
-            self.send(provider)
-        end
-
-        def list_command
-            self.class == 'Cloudware::Domain' ? 'machines' : 'domains'
-        end
-
-        def options
-            instance_variables.map do |var|
-                [var[1..-1].to_sym, instance_variable_get(var)]
-            end.to_h
-        end
+        @list
+      end
     end
+
+    private
+
+    def aws
+      @aws ||= Cloudware::Aws.new(options)
+    end
+
+    def client(provider = @provider)
+      send(provider)
+    end
+
+    def list_command
+      self.class == 'Cloudware::Domain' ? 'machines' : 'domains'
+    end
+
+    def options
+      instance_variables.map do |var|
+        [var[1..-1].to_sym, instance_variable_get(var)]
+      end.to_h
+    end
+  end
 end

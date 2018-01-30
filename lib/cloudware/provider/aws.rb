@@ -26,39 +26,36 @@ Credentials = Aws::Credentials
 EC2 = Aws::EC2
 
 module Cloudware
-    class Aws
-        include Utils
-        include Domain
+  class Aws
+    include Utils
+    include Domain
 
-        def initialize(options = {})
-            @options = options
-        end
-
-        private
-
-        def credentials
-            @credentials ||= Credentials.new(
-                config.aws_access_key_id,
-                config.aws_secret_access_key
-            )
-        end
-
-        def ec2(region = 'eu-west-1')
-            EC2::Client.new(region: region, credentials: credentials)
-        end
-
-        def regions
-            @regions ||= begin
-              @regions = []
-              ec2.describe_regions.regions.each do |r|
-                  @regions.push(r.region_name)
-              end
-              @regions
-            end
-        end
-
-        def search
-            {}
-        end
+    def initialize(options = {})
+      @options = options
     end
+
+    private
+
+    def credentials
+      @credentials ||= Credentials.new(
+        config.aws_access_key_id,
+        config.aws_secret_access_key
+      )
+    end
+
+    def ec2(region = 'eu-west-1')
+      EC2::Client.new(region: region, credentials: credentials)
+    end
+
+    def regions
+      [
+        'eu-west-1',
+        'eu-west-2'
+      ]
+    end
+
+    def search
+      {}
+    end
+  end
 end

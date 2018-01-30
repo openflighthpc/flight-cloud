@@ -88,7 +88,7 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
         -
-          Key: !Join ['_', ['cloudware', !Ref cloudwareDomain, 'prv_subnet_id']]
+          Key: 'cloudware_prv_subnet'
           Value: 'null'
 
   MgtSubnet:
@@ -107,7 +107,7 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
         -
-          Key: !Join ['_', ['cloudware', !Ref cloudwareDomain, 'mgt_subnet_id']]
+          Key: 'cloudware_mgt_subnet'
           Value: 'null'
 
   RouteTable:

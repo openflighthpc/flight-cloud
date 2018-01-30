@@ -24,15 +24,15 @@ require 'cloudware/log'
 module Cloudware
   module Utils
     def log
-        @log ||= Cloudware::Log.new
+      @log ||= Cloudware::Log.new
     end
 
     def config
-        Cloudware.config
+      Cloudware.config
     end
 
     def providers
-        [ 'aws' ]
+      ['aws']
     end
   end
 end

@@ -24,12 +24,12 @@ require 'cloudware/config'
 
 module Cloudware
   class Log
-      def initialize
-          @log ||= Logger.new(config.log_file)
-      end
+    def initialize
+      @log ||= Logger.new(config.log_file)
+    end
 
-      def config
-        Cloudware::Config.new
-      end
+    def config
+      Cloudware::Config.new
+    end
   end
 end
