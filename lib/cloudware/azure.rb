@@ -158,10 +158,12 @@ module Cloudware
     end
 
     def machine_power_on(name, domain)
+      log.info("#{self.class} Attempting to power off #{name} in #{domain}")
       @compute_client.virtual_machines.start("#{domain}-#{name}", name)
     end
 
     def machine_power_off(name, domain)
+      log.info("#{self.class} Attempting to power on #{name} in #{domain}")
       @compute_client.virtual_machines.power_off("#{domain}-#{name}", name)
     end
 

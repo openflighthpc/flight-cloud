@@ -160,22 +160,23 @@ module Cloudware
           reservation.instances.each do |instance|
             @instance_id = instance.instance_id
             @state = instance.state.name
+            @region = r
           end
         end
       end
-      @machine_info.merge!(instance_id: @instance_id, state: @state)
-    end
-
-    def instance(name, domain)
-      @instance ||= @ec2.instance(machine_info(name, domain)['instance_id'])
+      @machine_info.merge!(instance_id: @instance_id, state: @state, region: @region)
     end
 
     def machine_power_on(name, domain)
-      instance(name, domain).start
+      log.info("#{self.class} Attempting to power on #{name} in #{domain}")
+      load_config(machine_info(name, domain)[:region])
+      @ec2.start_instances(instance_ids: [machine_info(name, domain)[:instance_id]])
     end
 
     def machine_power_off(name, domain)
-      instance(name, domain).stop
+      log.info("#{self.class} Attempting to power off #{name} in #{domain} - #{@region}")
+      load_config(machine_info(name, domain)[:region])
+      @ec2.stop_instances(instance_ids: [machine_info(name, domain)[:instance_id]])
     end
 
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
