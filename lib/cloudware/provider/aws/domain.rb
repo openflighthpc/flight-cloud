@@ -22,8 +22,18 @@
 module Cloudware
   class Aws
     module Domain
+      include Utils
+
       def domains
-        find_domain
+        if @options[:domain] && @options[:region]
+          find_domain
+        elsif @options[:domain].nil? && @options[:region].nil?
+          find_domains
+        elsif @options[:domain] && @options[:region].nil?
+          find_domain_by_name
+        elsif @options[:domain].nil? && @options[:region]
+          find_domains_by_region
+        end
       end
 
       private
@@ -32,19 +42,54 @@ module Cloudware
         vpcs.each do |vpc|
           vpc.tags.each do |t|
             next unless t.value == name && t.key == 'cloudware_domain'
+            next unless t.value == region && t.key == 'cloudware_region'
             return render_domain_info(vpc)
           end
         end
       end
 
+      def find_domains
+        @search = {}
+        regions.each do |region|
+          vpcs(region).each do |vpc|
+            vpc.tags.each do |t|
+              @search.merge!(render_domain_info(vpc)) 
+            end
+          end
+        end
+        return @search
+      end
+
+      def find_domain_by_name(name = @options[:domain])
+        regions.each do |region|
+          vpcs.each do |vpc|
+            vpc.tags.each do |t|
+              next unless t.value == name && t.key == 'cloudware_domain'
+              return render_domain_info(vpc)
+            end
+          end
+        end
+      end
+
+      def find_domains_by_region(region = @options[:region])
+        @search = {}
+        vpcs.each do |vpc|
+          vpc.tags.each do |t|
+            next unless t.value == region && t.key == 'cloudware_region'
+            @search.merge!(render_domain_info(vpc))
+          end
+        end
+        return @search
+      end
+
       def render_domain_info(vpc)
-        domain.merge!(render_domain_tags(vpc.tags))
-        domain[:vpcid] = vpc.vpc_id
+        domain.merge!(render_domain_tags(vpc.tags, vpc.vpc_id))
         return domain
       end
 
-      def render_domain_tags(tags)
+      def render_domain_tags(tags, vpcid)
         @tag_hash = {}
+        @tag_hash[:vpcid] = vpcid
         tags.each do |t|
           @tag_hash[:domain] = t.value if t.key == 'cloudware_domain'
           @tag_hash[:id] = t.value if t.key == 'cloudware_id'
@@ -53,6 +98,8 @@ module Cloudware
           @tag_hash[:prvcidr] = t.value if t.key == 'cloudware_prv_subnet_cidr'
           @tag_hash[:region] = t.value if t.key == 'cloudware_region'
         end
+        puts log.public_methods
+        log.info("Detected domain #{@tag_hash[:domain]}")
         render_domain_tag_hash(@tag_hash)
       end
 
@@ -64,13 +111,14 @@ module Cloudware
             mgtcidr: hash[:mgtcidr],
             prvcidr: hash[:prvcidr],
             region: hash[:region],
+            vpcid: hash[:vpcid],
             provider: 'aws'
           }
         }
       end
 
-      def vpcs
-        @vpcs ||= ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).vpcs
+      def vpcs(region = @options[:region])
+        ec2(region).describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).vpcs
       end
 
       def domain

@@ -19,6 +19,8 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
+require 'cloudware/log'
+
 module Cloudware
   module Utils
     def log

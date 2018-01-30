@@ -30,7 +30,7 @@ module Cloudware
 
     include Utils
 
-    def initialize(cfg_file)
+    def initialize(cfg_file = '/opt/cloudware/etc/config.yml')
       config = YAML.load_file(cfg_file) || raise("Couldn't load config file #{cfg_file}")
 
       self.log_file = config['general']['log_file'] || log.error('Unable to load log_file')

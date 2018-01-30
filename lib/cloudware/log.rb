@@ -20,13 +20,16 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 require 'logger'
+require 'cloudware/config'
 
 module Cloudware
   class Log
-      include Utils
-
       def initialize
           @log ||= Logger.new(config.log_file)
+      end
+
+      def config
+        Cloudware::Config.new
       end
   end
 end

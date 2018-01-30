@@ -44,7 +44,7 @@ module Cloudware
         end
 
         def ec2(region = 'eu-west-1')
-            @ec2 ||= EC2::Client.new(region: region, credentials: credentials)
+            EC2::Client.new(region: region, credentials: credentials)
         end
 
         def regions
