@@ -125,7 +125,7 @@ module Cloudware
 
     def power_off
       load_cloud
-      @cloud.machine_power_on(@name, @domain)
+      @cloud.machine_power_off(@name, @domain)
     end
 
     def render_type
