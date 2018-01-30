@@ -20,27 +20,15 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 require 'cloudware/cli'
-require 'cloudware/utils'
-require 'cloudware/domain'
-require 'cloudware/machine'
-require 'cloudware/gcp'
 require 'cloudware/config'
+require 'cloudware/domain'
 require 'cloudware/provider/aws'
-require 'cloudware/provider/aws/deployment'
-require 'logger'
+require 'cloudware/utils'
 
 module Cloudware
   class << self
     def config
       @config ||= Config.new(ENV['CLOUDWARE_CONFIG'] || '/opt/cloudware/etc/config.yml')
-    end
-
-    def log
-      @log ||= Logger.new(config.log_file)
-    end
-
-    def render_file_path(path)
-      File.expand_path(File.join(__dir__, "../providers/#{path}"))
     end
   end
 end

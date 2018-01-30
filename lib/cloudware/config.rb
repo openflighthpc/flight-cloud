@@ -20,12 +20,15 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 require 'yaml'
+require 'cloudware/utils'
 
 module Cloudware
   class Config
     attr_accessor :log_file
     attr_accessor :azure_tenant_id, :azure_subscription_id, :azure_client_secret, :azure_client_id
     attr_accessor :aws_access_key_id, :aws_secret_access_key
+
+    include Utils
 
     def initialize(cfg_file)
       config = YAML.load_file(cfg_file) || raise("Couldn't load config file #{cfg_file}")
@@ -41,10 +44,6 @@ module Cloudware
       # Provider: aws
       self.aws_access_key_id = config['provider']['aws']['access_key_id']
       self.aws_secret_access_key = config['provider']['aws']['secret_access_key']
-    end
-
-    def log
-      Cloudware.log
     end
   end
 end

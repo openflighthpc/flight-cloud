@@ -13,41 +13,30 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You hould have received a copy of the GNU General Public License
 # along with this package.  If not, see <http://www.gnu.org/licenses/>.
 #
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-require 'securerandom'
-require 'ipaddr'
-
 module Cloudware
     class Domain
-        attr_accessor :name, :id, :region, :provider
-        attr_accessor :networkcidr, :prvcidr, :mgtcidr
-        attr_reader :mgtsubnetid, :prvsubnetid, :networkid
+        attr_accessor :domain, :id, :region, :provider
+        attr_writer :networkcidr, :prvcidr, :mgtcidr
 
         include Utils
 
-        def create
-            client.create_domain(options)
-        end
-
-        def destroy
-            client.destroy_domain(options)
-        end
-
         def list
             @list ||= begin
-                @list = {}
-                @list.merge!(client.send(list_command)) if @provider
-                if not @provider
-                    providers.each do |p|
-                        @list.merge!(client(p).send(list_command))
-                    end
-                end
-                @list
+              @list = {}
+              @list.merge!(client.send(list_command)) if @provider
+              if not @provider
+                  providers.each do |p|
+                    result = client(p).send(list_command)
+                    @list.merge!(result)
+                  end
+              end
+              @list
             end
         end
 
@@ -55,10 +44,6 @@ module Cloudware
 
         def aws
             @aws ||= Cloudware::Aws.new(options)
-        end
-
-        def azure
-            @azure ||= Cloudware::Azure.new
         end
 
         def client(provider = @provider)
@@ -70,18 +55,9 @@ module Cloudware
         end
 
         def options
-            {
-                domain: @name,
-                region: @region,
-                networkcidr: @networkcidr,
-                mgtcidr: @mgtcidr,
-                prvcidr: @prvcidr,
-                provider: @provider
-            }
-        end
-
-        def provider
-            self.instance_variable_set(provider, list[@name][:provider]) unless @provider
+            instance_variables.map do |var|
+                [var[1..-1].to_sym, instance_variable_get(var)]
+            end.to_h
         end
     end
 end

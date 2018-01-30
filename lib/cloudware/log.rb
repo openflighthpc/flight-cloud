@@ -23,12 +23,10 @@ require 'logger'
 
 module Cloudware
   class Log
-    def log
-      @log ||= Logger.new(config.log_file)
-    end
+      include Utils
 
-    def config
-      Cloudware.config
-    end
+      def initialize
+          @log ||= Logger.new(config.log_file)
+      end
   end
 end

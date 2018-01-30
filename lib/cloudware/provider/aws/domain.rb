@@ -23,59 +23,24 @@ module Cloudware
   class Aws
     module Domain
       def domains
-        if @options[:domain] && @options[:region]
-          find_domain
-        elsif @options[:domain] && options[:region].nil?
-          find_domain_by_name
-        elsif @options[:domain].nil? && @options[:region]
-          find_domains_by_region
-        elsif @options[:domain].nil? && @options[:region].nil?
-          find_domains
-        end
+        find_domain
       end
 
       private
 
-      def find_domain(name = @options[:name], region = options[:region])
+      def find_domain(name = @options[:domain], region = @options[:region])
         vpcs.each do |vpc|
-          next unless vpc.tags[:cloudware_domain] == name
-          next unless vpc.tags[:cloudware_region] == region
-          search.merge!(render_domain_info(vpc))
+          vpc.tags.each do |t|
+            next unless t.value == name && t.key == 'cloudware_domain'
+            return render_domain_info(vpc)
+          end
         end
-        search
-      end
-
-      def find_domains
-        vpcs.each do |vpc|
-          search.merge!(render_domain_info(vpc))
-        end
-        search
-      end
-
-      def find_domain_by_name(name = @options[:domain])
-        vpcs.each do |vpc|
-          next unless vpc.tags[:cloudware_domain] == name
-          search.merge!(render_domain_info(vpc))
-        end
-        search
-      end
-
-      def find_domain_by_region(region = @options[:region])
-        vpcs.each do |vpc|
-          next unless vpc.tags[:cloudware_region] == region
-          search.merge!(render_domain_info(vpc))
-        end
-        search
-      end
-
-      def vpcs
-        @vpcs ||= ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).vpcs
       end
 
       def render_domain_info(vpc)
         domain.merge!(render_domain_tags(vpc.tags))
         domain[:vpcid] = vpc.vpc_id
-        domain
+        return domain
       end
 
       def render_domain_tags(tags)
@@ -104,8 +69,16 @@ module Cloudware
         }
       end
 
+      def vpcs
+        @vpcs ||= ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).vpcs
+      end
+
       def domain
         @domain ||= {}
+      end
+
+      def search
+        @search ||= {}
       end
     end
   end

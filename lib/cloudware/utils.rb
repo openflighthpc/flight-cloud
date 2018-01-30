@@ -22,17 +22,15 @@
 module Cloudware
   module Utils
     def log
-      @log ||= Logger.new(config.log_file)
+        @log ||= Cloudware::Log.new
     end
 
     def config
-      Cloudware.config
+        Cloudware.config
     end
 
     def providers
-        [
-            'aws'
-        ]
+        [ 'aws' ]
     end
   end
 end

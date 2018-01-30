@@ -19,57 +19,46 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-require 'aws-sdk-cloudformation'
 require 'aws-sdk-ec2'
-require 'cloudware/provider/aws/deployment'
 require 'cloudware/provider/aws/domain'
-require 'cloudware/provider/aws/machine'
 
-EC2 = Aws::EC2
-CloudFormation = Aws::CloudFormation
 Credentials = Aws::Credentials
+EC2 = Aws::EC2
 
 module Cloudware
-  class Aws
-    include Utils
-    include Deployment
-    include Domain
-    include Machine
+    class Aws
+        include Utils
+        include Domain
 
-    def initialize(options = {})
-      @options = options
-      @region = options[:region] || 'eu-west-1'
-    end
-
-    private
-
-    def credentials
-      @credentials ||= Credentials.new(
-        config.aws_access_key_id,
-        config.aws_secret_access_key
-      )
-    end
-
-    def cfn
-      @cfn ||= CloudFormation::Client.new(region: @region, credentials: credentials)
-    end
-
-    def ec2(region = @options[:region] || 'eu-west-1')
-      @ec2 ||= EC2::Client.new(region: region, credentials: credentials)
-    end
-
-    def regions
-      @regions ||= begin
-        @regions = []
-        ec2.describe_regions.regions.each do |region|
-          @regions.push(region.region_name)
+        def initialize(options = {})
+            @options = options
         end
-        @regions
-      end
-    end
 
-    def search
-      @search ||= {}
+        private
+
+        def credentials
+            @credentials ||= Credentials.new(
+                config.aws_access_key_id,
+                config.aws_secret_access_key
+            )
+        end
+
+        def ec2(region = 'eu-west-1')
+            @ec2 ||= EC2::Client.new(region: region, credentials: credentials)
+        end
+
+        def regions
+            @regions ||= begin
+              @regions = []
+              ec2.describe_regions.regions.each do |r|
+                  @regions.push(r.region_name)
+              end
+              @regions
+            end
+        end
+
+        def search
+            {}
+        end
     end
-  end
 end
