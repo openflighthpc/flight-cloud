@@ -8,7 +8,7 @@
 # Image config
 PLATFORM=azure # default to azure
 IMAGE_TYPE=alces-cloudware-base
-IMAGE_VERSION=2018.1-alpha
+IMAGE_VERSION=2018.2.1
 IMAGE_NAME=$(IMAGE_TYPE)-$(IMAGE_VERSION)-$(PLATFORM)
 
 # Libvirt/Oz config
