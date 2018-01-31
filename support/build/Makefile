@@ -38,7 +38,7 @@ image: setup build prepare upload
 setup:
 	[ -d $(VM_DIR)/converted ] || mkdir -p $(VM_DIR)/converted
 	[ -d $(VM_DIR)/tmp ] || mkdir -p $(VM_DIR)/tmp
-	[ -f $(QEMU_IMG_BIN) ] || echo "$(QEMU_IMG_BIN) not present" && exit
+	[ -f $(QEMU_IMG_BIN) ] || exit
 
 build:
 	cp -v $(TDL) $(TDL_RENDERED)
@@ -94,9 +94,8 @@ upload-aws:
 		   -e 's/%AWS_BUCKET_DIR%/$(AWS_BUCKET_DIR)/g' \
 		   /tmp/$(IMAGE_NAME).json
 	aws --region $(AWS_REGION) s3 cp $(VM_DIR)/$(IMAGE_NAME).raw s3://$(AWS_BUCKET)/$(AWS_BUCKET_DIR)/$(IMAGE_NAME).raw
-	$(eval IMPORT_TASK := $(shell aws ec2 import-image --architecture x86_64 \
+	aws ec2 import-image --architecture x86_64 \
 		--description "$(IMAGE_NAME)" \
-		--disk-containers "/tmp/$(IMAGE_NAME).json" \
+		--disk-containers "file:///tmp/$(IMAGE_NAME).json" \
 		--platform Linux \
-		--license-type BYOL))
-	$(eval AMI_IMPORT_TASK_ID := $(shell echo $(IMPORT_TASK) | jq -r '.ImportTaskId')
+		--license-type BYOL
