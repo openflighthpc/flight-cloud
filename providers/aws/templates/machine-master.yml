@@ -193,7 +193,7 @@ Resources:
       ImageId: !FindInMap ["RegionMap", !Ref "AWS::Region", "AMI"]
       InstanceType: !Ref vmType
       Monitoring: true
-      SourceDestCheck: false,
+      SourceDestCheck: false
       KeyName: !Ref keyPairName
       NetworkInterfaces:
         -
