@@ -193,6 +193,7 @@ module Cloudware
         log.info("[#{self.class}] Deployment for #{name} reached complete status")
       rescue CloudFormation::Errors::ServiceError => error
         log.error("Failed waiting for stack to create: #{error.message}")
+        raise error.message
       end
     end
 
