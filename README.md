@@ -13,11 +13,15 @@
 
 #### Configuring
 
-Cloudware can be configured using the global configuration file - Cloudware expects this configuration file to be located at `$HOME/.cloudware.yml`.
+Cloudware can be configured using the global configuration file - Cloudware
+expects this configuration file to be located at `$HOME/.cloudware.yml`.
 
 ##### Log configuration
 
-In order to set up logging - a file needs to be specified. You may either create the file with the correct permissions, or allow Cloudware to create the log file for you. Specify the log file location in the configuration file using the below example:
+In order to set up logging - a file needs to be specified. You may either
+create the file with the correct permissions, or allow Cloudware to create the
+log file for you. Specify the log file location in the configuration file using
+the below example:
 
 ```yaml
 general:
@@ -31,7 +35,8 @@ Provider credentials can be provided either:
 * Through environment variables (AWS and Azure both support this)
 * Configuring provider access keys in the Cloudware configuration file
 
-The following example shows the configuration required to setup both AWS and Azure providers in the Cloudware configuration file:
+The following example shows the configuration required to setup both AWS and
+Azure providers in the Cloudware configuration file:
 
 ```yaml
 provider:
