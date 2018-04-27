@@ -97,6 +97,13 @@ doing 'Adding Cloudware to $PATH'
 echo "PATH=\"\${PATH}:${target}/bin\"" >> /etc/profile.d/cloudware.sh
 PATH="${PATH}:${target}/bin"
 say_done $?
+doing 'Adding $CLOUDWARE_CONFIG to environment'
+cat << EOF >> /etc/profile.d/cloudware.sh
+if [ -f \$HOME/.cloudware.yml ] ; then
+    export CLOUDWARE_CONFIG=\$HOME/.cloudware.yml
+fi
+EOF
+say_done $?
 
 cat <<EOF
 [33m
