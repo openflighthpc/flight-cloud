@@ -149,6 +149,7 @@ Resources:
     Type: AWS::EC2::NetworkInterface
     Properties:
       Description: !Join [' ', [!Ref cloudwareDomain, !Ref vmName, 'prv network interface']]
+      SourceDestCheck: false
       GroupSet:
         - !Ref securityGroupPrv
         - !Ref securityGroupMaster
@@ -193,7 +194,6 @@ Resources:
       ImageId: !FindInMap ["RegionMap", !Ref "AWS::Region", "AMI"]
       InstanceType: !Ref vmType
       Monitoring: true
-      SourceDestCheck: false
       KeyName: !Ref keyPairName
       NetworkInterfaces:
         -
