@@ -37,9 +37,9 @@ module Cloudware
     command :'domain create' do |c|
       c.syntax = 'cloudware domain create [options]'
       c.description = 'Create a new domain'
-      c.option '--name NAME', String, 'Domain name'
-      c.option '--networkcidr CIDR', String, 'Primary network CIDR, e.g. 10.0.0.0/16'
-      c.option '--provider NAME', String, 'Provider name'
+      c.option '--name NAME', String, 'Name of cloud domain'
+      c.option '--networkcidr CIDR', String, 'Entire network CIDR, e.g. 10.0.0.0/16. The prv and mgt subnet must be within this range'
+      c.option '--provider NAME', String, 'Cloud service provider name'
       c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
       c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
       c.option '--region NAME', String, 'Provider region to create domain in'
@@ -91,8 +91,8 @@ module Cloudware
     command :'domain list' do |c|
       c.syntax = 'cloudware domain list [options]'
       c.description = 'List created domains'
-      c.option '--provider NAME', String, 'Provider name to filter by'
-      c.option '--region NAME', String, 'Provider region to filter by'
+      c.option '--provider NAME', String, 'Cloud provider name to filter by'
+      c.option '--region NAME', String, 'Cloud provider region to filter by'
       c.action do |_args, options|
         d = Cloudware::Domain.new
         d.provider = options.provider.to_s unless options.provider.nil?
@@ -141,11 +141,11 @@ module Cloudware
       c.description = 'Create a new machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
-      c.option '--role NAME', String, 'Machine role to inherit'
+      c.option '--role NAME', String, 'Machine role to inherit (master or slave)'
       c.option '--prvip ADDR', String, 'Prv subnet IP address'
       c.option '--mgtip ADDR', String, 'Mgt subnet IP address'
-      c.option '--type NAME', String, 'Machine type to deploy'
-      c.option '--flavour NAME', String, 'Machine flavour'
+      c.option '--type NAME', String, 'Type of machine to deploy, e.g. gpu'
+      c.option '--flavour NAME', String, 'Flavour of machine type to deploy, e.g. medium'
       c.action do |_args, options|
         options.default flavour: 'compute', type: 'small'
 

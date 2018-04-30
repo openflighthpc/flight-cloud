@@ -68,7 +68,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: !Join ['-', [!Ref cloudwareDomain, !Ref vmName]]
-      GroupDescription: 'Cloudware seucirty group for slave machine'
+      GroupDescription: 'Cloudware security group for slave machine'
       VpcId: !Ref networkId
       SecurityGroupIngress:
         -
