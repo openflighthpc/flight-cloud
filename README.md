@@ -5,18 +5,66 @@
     </p>
 </div>
 
-### Contents
-* [Configuring](#configuring)
+## Contents
+* [Configuring Cloud Authentication](#configuring-cloud-authentication)
+* [Configuring Cloudware](#configuring-cloudware)
 * [Installation](#installation)
 * [Usage](#usage)
 * [License](#license)
 
-#### Configuring
+## Configuring Cloud Authentication
+
+The cloudware configuration file requires authentication tokens for the cloud platforms which are to be used. These can be obtained as follows
+
+### AWS
+
+#### Access Key ID & Secret
+
+- In the AWS console, Navigate to _IAM_
+- If part of an organisation, select _Users_ and then click on yourself in that list
+- Toggle to the _Security Credentials_ tab
+- Click _Create Access Key_
+
+This will generate the ID and secret key required to access AWS.
+
+### Azure
+
+#### Tenant ID
+
+**Tenant ID** can be found under _Properties_ of the _Active Directory_ tab in the Azure portal, it is referred to on this page as _Directory ID_.
+
+Direct Link - https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Properties
+
+#### Subscription ID
+
+**Subscription ID** is found from either the _Subscriptions_ or _Cost Management and Billing_ tab of the Azure portal.
+
+Direct Link - https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade
+
+#### Client Secret & ID
+
+* Create an _App Registration_ in _Active Directory_ and request the following permissions (_Setting → Required permissions_)
+    * _Windows Azure Service Management API_
+    * _Windows Azure Active Directory_
+    * Click _Grant Permissions_ to apply them to the registration
+* **Client ID** = _Application ID_
+* In the _App Registration_ page for the new app get the **Client Secret** via _Settings → Keys_ and creating one by adding a key description
+* Ensure the App has at least Contributor permissions in the IAM Role management of the Subscription
+    * As the Global Administrator navigate to the **subscription's** _Access Control (IAM)_
+    * Click _Add_ at the top of the page
+    * Set _Role_ to _Contributor_, _Assign access to to Azure AD user, group, or application_ and search for the app name set above
+    * Save to add the user to the subscription
+
+#### Notes
+
+Only Global Administrator can create apps if App Registrations under User settings in  Active Directory is set to no
+
+## Configuring Cloudware
 
 Cloudware can be configured using the global configuration file - Cloudware
 expects this configuration file to be located at `$HOME/.cloudware.yml`.
 
-##### Log configuration
+### Log configuration
 
 In order to set up logging - a file needs to be specified. You may either
 create the file with the correct permissions, or allow Cloudware to create the
@@ -28,7 +76,7 @@ general:
   log_file: '/var/log/cloudware.log'
 ```
 
-##### Provider configuration
+### Provider configuration
 
 Provider credentials can be provided either:
 
@@ -50,9 +98,9 @@ provider:
     secret_access_key: '<insert your secret key here>'
 ```
 
-#### Installation
+## Installation
 
-##### Available platforms
+### Available platforms
 
 * Enterprise Linux 7 distributions: RHEL, CentOS, Scientific Linux (`el7`)
 
@@ -62,9 +110,9 @@ One-line installation, on compatible platforms:
 curl -sL https://git.io/vbsTg | alces_OS=el7 /bin/bash
 ```
 
-#### Usage
+## Usage
 
-##### Creating a new domain
+### Creating a new domain
 
 ```
 $ cloudware domain create \
@@ -94,7 +142,7 @@ $ cloudware domain list
 +--------------------+----------------+-----------------+-----------------+----------+-----------+
 ```
 
-##### Creating a new machine
+### Creating a new machine
 
 ```
 $ cloudware machine create \
@@ -103,7 +151,8 @@ $ cloudware machine create \
   --role master \
   --prvip 10.0.1.11 \
   --mgtip 10.0.2.11 \
-  --flavour tiny
+  --flavour compute \
+  --type tiny
 ==> Creating new deployment. This may take a while..
 ==> Deployment succeeded
 $ cloudware machine list
@@ -114,7 +163,7 @@ $ cloudware machine list
 +-------------+----------------+--------+----------------+----------------+--------------+---------+
 ```
 
-#### License
+## License
 
 AGPLv3+ License, see LICENSE.txt for details.
 
