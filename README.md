@@ -100,18 +100,18 @@ $ cloudware domain list
 $ cloudware machine create \
   --name master1 \
   --domain moose \
-  --type master \
-  --prvsubnetip 10.0.1.11 \
-  --mgtsubnetip 10.0.2.11 \
-  --size Standard_DS1_v2
+  --role master \
+  --prvip 10.0.1.11 \
+  --mgtip 10.0.2.11 \
+  --flavour tiny
 ==> Creating new deployment. This may take a while..
 ==> Deployment succeeded
 $ cloudware machine list
-+--------------+-------------+--------------+----------------+----------------+-----------------+
-| Machine name | Domain name | Machine type | Prv IP address | Mgt IP address | Size            |
-+--------------+-------------+--------------+----------------+----------------+-----------------+
-| master1      | moose       | master       | 10.0.1.11      | 10.0.2.11      | Standard_DS1_v2 |
-+--------------+-------------+--------------+----------------+----------------+-----------------+
++-------------+----------------+--------+----------------+----------------+--------------+---------+
+| Name        | Domain         | Role   | Prv IP address | Mgt IP address | Type         | State   |
++-------------+----------------+--------+----------------+----------------+--------------+---------+
+| master1     | crafty-caribou | master | 10.10.1.11     | 10.10.2.11     | Standard_F4s | running |
++-------------+----------------+--------+----------------+----------------+--------------+---------+
 ```
 
 #### License
