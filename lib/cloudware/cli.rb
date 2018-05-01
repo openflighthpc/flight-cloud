@@ -159,8 +159,8 @@ module Cloudware
       c.option '--role NAME', String, 'Machine role to inherit (master or slave)'
       c.option '--prvip ADDR', String, 'Prv subnet IP address'
       c.option '--mgtip ADDR', String, 'Mgt subnet IP address'
-      c.option '--type NAME', String, 'Type of machine to deploy, e.g. gpu'
-      c.option '--flavour NAME', String, 'Flavour of machine type to deploy, e.g. medium'
+      c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
+      c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
       c.action do |_args, options|
         begin
           options.default flavour: 'compute', type: 'small'
@@ -307,13 +307,15 @@ module Cloudware
           raise error.message
         end
       end
+    end
 
-      command :'machine power status' do |c|
-        c.syntax = 'cloudware machine power status [options]'
-        c.description = 'Check the power status of a machine'
-        c.option '--name NAME', String, 'Machine name'
-        c.option '--domain NAME', String, 'Domain identifier'
-        c.action do |_args, options|
+    command :'machine power status' do |c|
+      c.syntax = 'cloudware machine power status [options]'
+      c.description = 'Check the power status of a machine'
+      c.option '--name NAME', String, 'Machine name'
+      c.option '--domain NAME', String, 'Domain identifier'
+      c.action do |_args, options|
+        begin
           machine = Cloudware::Machine.new
           options.name = ask('Machine name: ') if options.name.nil?
           machine.name = options.name.to_s
@@ -322,15 +324,20 @@ module Cloudware
           machine.domain = options.domain.to_s
 
           puts "#{options.name}: Power status is #{machine.get_item('state')}"
+        rescue RuntimeError => error
+          Cloudware.log.error("Failed when checking machine power status: #{error.message}")
+          raise error.message
         end
       end
+    end
 
-      command :'machine power on' do |c|
-        c.syntax = 'cloudware machine power on [options]'
-        c.description = 'Turn a machine on'
-        c.option '--name NAME', String, 'Machine name'
-        c.option '--domain NAME', String, 'Domain identifier'
-        c.action do |_args, options|
+    command :'machine power on' do |c|
+      c.syntax = 'cloudware machine power on [options]'
+      c.description = 'Turn a machine on'
+      c.option '--name NAME', String, 'Machine name'
+      c.option '--domain NAME', String, 'Domain identifier'
+      c.action do |_args, options|
+        begin
           machine = Cloudware::Machine.new
           options.name = ask('Machine name: ') if options.name.nil?
           machine.name = options.name.to_s
@@ -341,15 +348,20 @@ module Cloudware
           Whirly.start spinner: 'dots2', status: "Powering on machine #{options.name}".bold, stop: '[OK]'.green
           machine.power_on
           Whirly.stop
+        rescue RuntimeError => error
+          Cloudware.log.error("Failed when powering on machine: #{error.message}")
+          raise error.message
         end
       end
+    end
 
-      command :'machine power off' do |c|
-        c.syntax = 'cloudware machine power off [options]'
-        c.description = 'Turn a machine off'
-        c.option '--name NAME', String, 'Machine name'
-        c.option '--domain NAME', String, 'Domain identifier'
-        c.action do |_args, options|
+    command :'machine power off' do |c|
+      c.syntax = 'cloudware machine power off [options]'
+      c.description = 'Turn a machine off'
+      c.option '--name NAME', String, 'Machine name'
+      c.option '--domain NAME', String, 'Domain identifier'
+      c.action do |_args, options|
+        begin
           machine = Cloudware::Machine.new
           options.name = ask('Machine name: ') if options.name.nil?
           machine.name = options.name.to_s
@@ -360,15 +372,20 @@ module Cloudware
           Whirly.start spinner: 'dots2', status: "Powering off machine #{options.name}".bold, stop: '[OK]'.green
           machine.power_off
           Whirly.stop
+        rescue RuntimeError => error
+          Cloudware.log.error("Failed when powering off machine: #{error.message}")
+          raise error.message
         end
       end
+    end
 
-      command :'machine rebuild' do |c|
-        c.syntax = 'cloudware machine rebuild [options]'
-        c.description = 'Rebuild a machine'
-        c.option '--name NAME', String, 'Machine name'
-        c.option '--domain NAME', String, 'Domain identifier'
-        c.action do |_args, options|
+    command :'machine rebuild' do |c|
+      c.syntax = 'cloudware machine rebuild [options]'
+      c.description = 'Rebuild a machine'
+      c.option '--name NAME', String, 'Machine name'
+      c.option '--domain NAME', String, 'Domain identifier'
+      c.action do |_args, options|
+        begin
           machine = Cloudware::Machine.new
           options.name = ask('Machine name: ') if options.name.nil?
           machine.name = options.name.to_s
@@ -379,6 +396,9 @@ module Cloudware
           Whirly.start spinner: 'dots2', status: "Recreating machine #{options.name}".bold, stop: '[OK]'.green
           machine.rebuild
           Whirly.stop
+        rescue RuntimeError => error
+          Cloudware.log.error("Failed when rebuilding machine: #{error.message}")
+          raise error.message
         end
       end
     end
