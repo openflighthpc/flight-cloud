@@ -27,7 +27,7 @@ EC2 = Aws::EC2
 Credentials = Aws::Credentials
 
 module Cloudware
-  class Aws
+  class Aws2
     attr_accessor :cloudware_domain
     attr_accessor :cloudware_id
     attr_accessor :network_cidr

@@ -42,9 +42,9 @@ module Cloudware
       when 'azure'
         @cloud = Cloudware::Azure.new
       when 'aws'
-        @cloud = Cloudware::Aws.new
+        @cloud = Cloudware::Aws2.new
       else
-        @aws = Cloudware::Aws.new
+        @aws = Cloudware::Aws2.new
         @azure = Cloudware::Azure.new
       end
     end
@@ -96,7 +96,7 @@ module Cloudware
     def list
       @list ||= begin
                   @list = {}
-                  aws = Cloudware::Aws.new
+                  aws = Cloudware::Aws2.new
                   azure = Cloudware::Azure.new
                   log.debug("[#{self.class}] Loaded machines from AWS:\n#{aws.machines}")
                   @list.merge!(aws.machines)

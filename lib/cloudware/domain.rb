@@ -41,11 +41,11 @@ module Cloudware
     def load_cloud
       case @provider
       when 'aws'
-        @cloud = Cloudware::Aws.new
+        @cloud = Cloudware::Aws2.new
       when 'azure'
         @cloud = Cloudware::Azure.new
       else
-        @aws = Cloudware::Aws.new
+        @aws = Cloudware::Aws2.new
         @azure = Cloudware::Azure.new
       end
     end
