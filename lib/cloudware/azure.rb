@@ -134,6 +134,7 @@ module Cloudware
             end
             @machines.merge!("#{r.tags['cloudware_domain']}-#{r.tags['cloudware_machine_name']}" => {
                                name: r.tags['cloudware_machine_name'],
+                               id: r.tags['cloudware_id'],
                                domain: r.tags['cloudware_domain'],
                                role: r.tags['cloudware_machine_role'],
                                prv_ip: r.tags['cloudware_prv_ip'],
@@ -142,12 +143,28 @@ module Cloudware
                                provider: 'azure',
                                type: r.tags['cloudware_machine_type'],
                                flavour: r.tags['cloudware_machine_flavour'],
-                               state: get_instance_state(r.tags['cloudware_domain'], r.tags['cloudware_machine_name'])
+                               state: machine_state(r.tags['cloudware_machine_name'], r.tags['cloudware_domain'])
                              })
           end
         end
         @machines
       end
+    end
+
+    def machine_state(name, domain)
+      state = @compute_client.virtual_machines.instance_view("#{domain}-#{name}", name)
+      return 'running' unless state.statuses.find { |s| s.code =~ /PowerState\/running/ }.nil?
+      return 'stopped' unless state.statuses.find { |s| s.code =~ /PowerState\/stopped/ }.nil?
+    end
+
+    def machine_power_on(name, domain)
+      log.info("#{self.class} Attempting to power off #{name} in #{domain}")
+      @compute_client.virtual_machines.start("#{domain}-#{name}", name)
+    end
+
+    def machine_power_off(name, domain)
+      log.info("#{self.class} Attempting to power on #{name} in #{domain}")
+      @compute_client.virtual_machines.power_off("#{domain}-#{name}", name)
     end
 
     def deploy(resource_group, name, type, params)
@@ -195,24 +212,6 @@ module Cloudware
 
     def get_external_ip(domain, name)
       @network_client.public_ipaddresses.get("#{domain}-#{name}", name).ip_address || 'N/A'
-    end
-
-    def get_instance_state(domain, name)
-      if instance_running?(domain, name)
-        'running'
-      elsif instance_stopped?(domain, name)
-        'stopped'
-      end
-    end
-
-    def instance_running?(domain, name)
-      log.info("[#{self.class}] Querying machine #{name} in domain #{domain} running status")
-      !@compute_client.virtual_machines.instance_view("#{domain}-#{name}", name).statuses.find { |s| s.code =~ /PowerState\/running/ }.nil?
-    end
-
-    def instance_stopped?(domain, name)
-      log.info("[#{self.class}] Querying machine #{name} in domain #{domain} running status")
-      !@compute_client.virtual_machines.instance_view("#{domain}-#{name}", name).statuses.find { |s| s.code =~ /PowerState\/stopped/ }.nil?
     end
 
     def create_resource_group(region, id, name)

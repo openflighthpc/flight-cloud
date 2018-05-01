@@ -68,7 +68,7 @@ module Cloudware
     def regions
       @regions ||= begin
                      @regions = []
-                     @ec2.describe_regions.regions.each {|r| @regions.push(r.region_name)}
+                     @ec2.describe_regions.regions.each { |r| @regions.push(r.region_name) }
                      @regions
                    end
     end
@@ -125,6 +125,7 @@ module Cloudware
                             @state = instance.state.name
                             @extip = instance.public_ip_address || @extip = 'N/A'
                             @type = instance.instance_type
+                            @instance_id = instance.instance_id
                             instance.tags.each do |tag|
                               @domain = tag.value if tag.key == 'cloudware_domain'
                               @id = tag.value if tag.key == 'cloudware_id'
@@ -138,7 +139,7 @@ module Cloudware
                             @machines.merge!("#{@domain}-#{@name}" => {
                                                name: @name, domain: @domain, state: @state,
                                                id: @id, type: @type, role: @role, mgt_ip: @mgtip,
-                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws'
+                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id
                                              })
                           end
                         end
@@ -146,6 +147,36 @@ module Cloudware
                       log.info("#{self.class} found machines:\n#{@machines}")
                       @machines
                     end
+    end
+
+    def machine_info(name, domain)
+      @machine_info = {}
+      regions.each do |r|
+        load_config(r)
+        @ec2.describe_instances(filters: [
+                                  { name: 'tag:cloudware_domain', values: [domain.to_s] },
+                                  { name: 'tag:cloudware_machine_name', values: [name.to_s] }
+                                ]).reservations.each do |reservation|
+          reservation.instances.each do |instance|
+            @instance_id = instance.instance_id
+            @state = instance.state.name
+            @region = r
+          end
+        end
+      end
+      @machine_info.merge!(instance_id: @instance_id, state: @state, region: @region)
+    end
+
+    def machine_power_on(name, domain)
+      log.info("#{self.class} Attempting to power on #{name} in #{domain}")
+      load_config(machine_info(name, domain)[:region])
+      @ec2.start_instances(instance_ids: [machine_info(name, domain)[:instance_id]])
+    end
+
+    def machine_power_off(name, domain)
+      log.info("#{self.class} Attempting to power off #{name} in #{domain} - #{@region}")
+      load_config(machine_info(name, domain)[:region])
+      @ec2.stop_instances(instance_ids: [machine_info(name, domain)[:instance_id]])
     end
 
     def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
