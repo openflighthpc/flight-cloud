@@ -222,8 +222,8 @@ module Cloudware
         log.info("[#{self.class}] Deployment for #{name} finished, waiting for deployment to reach complete")
         @cfn.wait_until :stack_create_complete, stack_name: name
         log.info("[#{self.class}] Deployment for #{name} reached complete status")
-      rescue CloudFormation::Errors::ServiceError => error
-        log.error("Failed waiting for stack to create: #{error.message}")
+      # Catch errors and hand it up the stack for `cli.rb` to handle
+      rescue CloudFormation::Errors::ServiceError, Aws::Waiters::Errors::FailureStateError => error
         raise error.message
       end
     end
@@ -238,8 +238,9 @@ module Cloudware
         log.info("[#{self.class}] Waiting until stack reaches deleted status: #{name}-#{domain}")
         @cfn.wait_until :stack_delete_complete, stack_name: "#{domain}-#{name}"
         log.info("[#{self.class}] Stack reached deleted status: #{domain}-#{name}")
+      # Catch errors and hand it up the stack for `cli.rb` to handle
       rescue CloudFormation::Errors::ServiceError => error
-        log.error("Failed waiting for stack to destroy: #{error.message}")
+        raise error.message
       end
     end
 
