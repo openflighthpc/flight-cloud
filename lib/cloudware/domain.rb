@@ -74,7 +74,7 @@ module Cloudware
         raise "Provider #{provider} doesn't exist"
       end
       log.debug("[#{self.class}] Loaded machines from #{provider}:\n#{cloud.domains}")
-      return cloud.machines
+      return cloud.domains
     end
 
     def list
