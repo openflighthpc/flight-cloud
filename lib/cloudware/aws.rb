@@ -119,6 +119,33 @@ module Cloudware
                       regions.each do |r|
                         load_config(r)
                         log.info("[#{self.class}] Scanning instances in region #{r}")
+                        
+                        # Find failed machines in CloudFormation [in state ROLLBACK*]
+                        @cfn.describe_stacks.stacks.each do |test|
+                          next if ! test.stack_status.include?('ROLLBACK')
+                          if test.parameters[0]
+                            @state = 'failed'
+                            @extip = 'N/A'
+                            @name = test.stack_name
+                            @instance_id = 'N/A'
+                            test.parameters.each_with_index do |val, index|
+                              @type = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmType'
+                              @domain = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'cloudwareDomain'
+                              @id = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'cloudwareId'
+                              @role = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmRole'
+                              @prvip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'prvIp'
+                              @mgtip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'mgtIp'
+                            end
+                            log.info("[#{self.class}] Detected machine #{@name} in domain #{@domain}")
+                            @machines.merge!("#{@domain}-#{@name}" => {
+                                               name: @name, domain: @domain, state: @state,
+                                               id: @id, type: @type, role: @role, mgt_ip: @mgtip,
+                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id
+                                             })
+                          end
+                        end
+
+                        # Find machines in ec2
                         @ec2.describe_instances(filters: [{ name: 'tag-key', values: ['cloudware_id'] }]).reservations.each do |reservation|
                           reservation.instances.each do |instance|
                             next if instance.state.name == 'terminated'
