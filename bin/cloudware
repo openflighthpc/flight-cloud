@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/opt/cloudware/opt/ruby/bin/ruby
 #==============================================================================
 # Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
 #
