@@ -119,9 +119,9 @@ $ cloudware domain create \
   --name prickly-pigeon \
   --provider aws \
   --region eu-west-1 \
-  --networkcidr 172.16.0.0/16 \
-  --prvsubnetcidr 172.16.1.0/24 \
-  --mgtsubnetcidr 172.16.2.0/24
+  --networkcidr 10.100.0.0/16 \
+  --prvsubnetcidr 10.100.1.0/24 \
+  --mgtsubnetcidr 10.100.2.0/24
 Starting deployment. This may take a while..
 Deployment complete
 $ cloudware domain list
@@ -149,8 +149,8 @@ $ cloudware machine create \
   --name master1 \
   --domain moose \
   --role master \
-  --prvip 10.0.1.11 \
-  --mgtip 10.0.2.11 \
+  --prvip 10.100.1.11 \
+  --mgtip 10.100.2.11 \
   --flavour compute \
   --type tiny
 ==> Creating new deployment. This may take a while..
