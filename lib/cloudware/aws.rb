@@ -84,6 +84,7 @@ module Cloudware
                        vpc_list = @ec2.describe_vpcs(filters: [{ name: 'tag-key', values: ['cloudware_id'] }])
                        vpc_list.vpcs.each do |v|
                          v.tags.each do |t|
+                           puts t
                            @domain = t.value if t.key == 'cloudware_domain'
                            @id = t.value if t.key == 'cloudware_id'
                            @network_cidr = t.value if t.key == 'cloudware_network_cidr'
@@ -171,7 +172,7 @@ module Cloudware
                           end
                         end
                       end
-                      log.info("#{self.class} found machines:\n#{@machines}")
+                      log.info("[#{self.class}] Found machines:\n#{@machines}")
                       @machines
                     end
     end

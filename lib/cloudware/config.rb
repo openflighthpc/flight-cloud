@@ -26,6 +26,7 @@ module Cloudware
     attr_accessor :log_file
     attr_accessor :azure_tenant_id, :azure_subscription_id, :azure_client_secret, :azure_client_id
     attr_accessor :aws_access_key_id, :aws_secret_access_key
+    attr_accessor :providers
 
     def initialize(cfg_file)
       config = YAML.load_file(cfg_file) || raise("Couldn't load config file #{cfg_file}")
@@ -33,14 +34,22 @@ module Cloudware
       self.log_file = config['general']['log_file'] || log.error('Unable to load log_file')
 
       # Provider: azure
-      self.azure_tenant_id = config['provider']['azure']['tenant_id']
-      self.azure_subscription_id = config['provider']['azure']['subscription_id']
-      self.azure_client_id = config['provider']['azure']['client_id']
-      self.azure_client_secret = config['provider']['azure']['client_secret']
+      self.azure_tenant_id = config['provider']['azure']['tenant_id'] rescue nil
+      self.azure_subscription_id = config['provider']['azure']['subscription_id'] rescue nil
+      self.azure_client_id = config['provider']['azure']['client_id'] rescue nil
+      self.azure_client_secret = config['provider']['azure']['client_secret'] rescue nil
 
       # Provider: aws
-      self.aws_access_key_id = config['provider']['aws']['access_key_id']
-      self.aws_secret_access_key = config['provider']['aws']['secret_access_key']
+      self.aws_access_key_id = config['provider']['aws']['access_key_id'] rescue nil
+      self.aws_secret_access_key = config['provider']['aws']['secret_access_key'] rescue nil
+
+      # Providers List (identifying valid/present providers)
+      self.providers = []
+      config['provider'].each do |a, b|
+        if b.first[1].nil? || ! b.first[1].empty?
+          self.providers << a
+        end
+      end
     end
 
     def log

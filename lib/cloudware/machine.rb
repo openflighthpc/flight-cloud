@@ -33,6 +33,7 @@ module Cloudware
 
     def initialize
       @items = {}
+      @provider = Cloudware.config.instance_variable_get(:@providers)
     end
 
     def load_cloud
@@ -93,16 +94,37 @@ module Cloudware
                             machine_info[:type])
     end
 
+    def _load_machines(provider)
+      case provider
+      when 'aws'
+        cloud = Cloudware::Aws2.new
+      when 'azure'
+        cloud = Cloudware::Azure.new
+      else
+        raise "Provider #{provider} doesn't exist"
+      end
+      log.debug("[#{self.class}] Loaded machines from #{provider}:\n#{cloud.machines}")
+      return cloud.machines
+    end
+
     def list
       @list ||= begin
                   @list = {}
-                  aws = Cloudware::Aws2.new
-                  azure = Cloudware::Azure.new
-                  log.debug("[#{self.class}] Loaded machines from AWS:\n#{aws.machines}")
-                  @list.merge!(aws.machines)
-                  log.debug("#{self.class}] Loaded machines from Azure:\n#{azure.machines}")
-                  @list.merge!(azure.machines)
-                  log.debug("#{self.class}] Detected machines:\n#{@list}")
+=begin
+                  case @provider
+                  when 'aws'
+                    @list.merge!(self._load_machines('aws'))
+                  when 'azure'
+                    @list.merge!(self._load_machines('azure'))
+                  else
+                    @list.merge!(self._load_machines('aws'))
+                    @list.merge!(self._load_machines('azure'))
+                  end
+=end
+                  @provider.each do |a|
+                    @list.merge!(self._load_machines(a))
+                  end
+                  log.debug("[#{self.class}] Detected machines:\n#{@list}")
                   @list
                 end
     end

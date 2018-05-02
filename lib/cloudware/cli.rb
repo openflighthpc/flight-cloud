@@ -101,7 +101,7 @@ module Cloudware
       c.action do |_args, options|
         begin
           d = Cloudware::Domain.new
-          d.provider = options.provider.to_s unless options.provider.nil?
+          d.provider = [options.provider] unless options.provider.nil?
           d.region = options.region.to_s unless options.region.nil?
           d.name = options.name.to_s unless options.name.nil?
           r = []
@@ -211,11 +211,12 @@ module Cloudware
 
     command :'machine list' do |c|
       c.syntax = 'cloudware machine list'
-      c.option '--domain NAME', String, 'Filter results by domain name'
+      c.option '--provider NAME', String, 'Cloud provider to show machines for'
       c.description = 'List available machines'
       c.action do |_args, options|
         begin
           m = Cloudware::Machine.new
+          m.provider = [options.provider] if ! options.provider.nil? 
           r = []
           Whirly.start spinner: 'dots2', status: 'Fetching available machines'.bold, stop: '[OK]'.green
           raise('No available machines') if m.list.nil?

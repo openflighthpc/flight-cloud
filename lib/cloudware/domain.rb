@@ -36,6 +36,7 @@ module Cloudware
 
     def initialize
       @items = {}
+      @provider = Cloudware.config.instance_variable_get(:@providers)
     end
 
     def load_cloud
@@ -63,16 +64,24 @@ module Cloudware
                            @prvsubnetcidr, @mgtsubnetcidr, @region)
     end
 
+    def _load_domains(provider)
+      case provider
+      when 'aws'
+        cloud = Cloudware::Aws2.new
+      when 'azure'
+        cloud = Cloudware::Azure.new
+      else
+        raise "Provider #{provider} doesn't exist"
+      end
+      log.debug("[#{self.class}] Loaded machines from #{provider}:\n#{cloud.domains}")
+      return cloud.machines
+    end
+
     def list
       @list ||= begin
                   @list = {}
-                  if @provider
-                    load_cloud
-                    @list.merge!(@cloud.domains)
-                  else
-                    load_cloud
-                    @list.merge!(@aws.domains)
-                    @list.merge!(@azure.domains)
+                  @provider.each do |a|
+                    @list.merge!(self._load_domains(a))
                   end
                   @list
                 end
