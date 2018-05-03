@@ -121,6 +121,7 @@ module Cloudware
     def get_item(item)
       return @items[item] unless @items[item].nil?
       @items[item] = begin
+                       log.debug("[#{self.class}] Loading #{item} from API")
                        list["#{@domain}-#{@name}"][item.to_sym]
                      end
     end

@@ -126,7 +126,6 @@ module Cloudware
                           if test.parameters[0]
                             @state = 'failed'
                             @extip = 'N/A'
-                            @name = test.stack_name
                             @instance_id = 'N/A'
                             test.parameters.each_with_index do |val, index|
                               @type = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmType'
@@ -135,12 +134,15 @@ module Cloudware
                               @role = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmRole'
                               @prvip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'prvIp'
                               @mgtip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'mgtIp'
+                              @flavour = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmFlavour'
                             end
+                            @name = test.stack_name.gsub("#{@domain}-", '')
                             log.info("[#{self.class}] Detected machine #{@name} in domain #{@domain}")
                             @machines.merge!("#{@domain}-#{@name}" => {
                                                name: @name, domain: @domain, state: @state,
                                                id: @id, type: @type, role: @role, mgt_ip: @mgtip,
-                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id
+                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id,
+                                               flavour: @flavour
                                              })
                           end
                         end
@@ -166,7 +168,8 @@ module Cloudware
                             @machines.merge!("#{@domain}-#{@name}" => {
                                                name: @name, domain: @domain, state: @state,
                                                id: @id, type: @type, role: @role, mgt_ip: @mgtip,
-                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id
+                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id,
+                                               flavour: @flavour
                                              })
                           end
                         end
