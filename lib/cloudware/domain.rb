@@ -83,6 +83,7 @@ module Cloudware
                   @provider.each do |a|
                     @list.merge!(self._load_domains(a))
                   end
+                  log.debug("[#{self.class}] Detected domains:\n#{@list}")
                   @list
                 end
     end

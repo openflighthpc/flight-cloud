@@ -110,17 +110,6 @@ module Cloudware
     def list
       @list ||= begin
                   @list = {}
-=begin
-                  case @provider
-                  when 'aws'
-                    @list.merge!(self._load_machines('aws'))
-                  when 'azure'
-                    @list.merge!(self._load_machines('azure'))
-                  else
-                    @list.merge!(self._load_machines('aws'))
-                    @list.merge!(self._load_machines('azure'))
-                  end
-=end
                   @provider.each do |a|
                     @list.merge!(self._load_machines(a))
                   end
