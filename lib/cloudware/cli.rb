@@ -112,7 +112,7 @@ module Cloudware
 
           r = []
           Whirly.start spinner: 'dots2', status: 'Fetching available domains'.bold, stop: '[OK]'.green
-          raise('No available domains') if d.list.empty?
+          raise('No available domains') if d.list.nil?
           Whirly.stop
           d.list.each do |k, v|
             r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider], v[:region]]
