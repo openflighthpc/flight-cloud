@@ -104,6 +104,12 @@ module Cloudware
           d.provider = [options.provider] unless options.provider.nil?
           d.region = options.region.to_s unless options.region.nil?
           d.name = options.name.to_s unless options.name.nil?
+
+          # Exit if the provider is not in the config list (which verifies details ahead of time)
+          if (Cloudware.config.instance_variable_get(:@providers) & d.provider).empty?
+            raise "The provider #{d.provider.join(',')} is not a valid provider - unknown or missing login details"
+          end
+
           r = []
           Whirly.start spinner: 'dots2', status: 'Fetching available domains'.bold, stop: '[OK]'.green
           raise('No available domains') if d.list.empty?
@@ -217,6 +223,12 @@ module Cloudware
         begin
           m = Cloudware::Machine.new
           m.provider = [options.provider] if ! options.provider.nil? 
+
+          # Exit if the provider is not in the config list (which verifies details ahead of time)
+          if (Cloudware.config.instance_variable_get(:@providers) & m.provider).empty?
+            raise "The provider #{m.provider.join(',')} is not a valid provider - unknown or missing login details"
+          end
+
           r = []
           Whirly.start spinner: 'dots2', status: 'Fetching available machines'.bold, stop: '[OK]'.green
           raise('No available machines') if m.list.nil?
