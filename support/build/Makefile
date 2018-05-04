@@ -95,6 +95,7 @@ upload-aws:
 		   /tmp/$(IMAGE_NAME).json
 	aws --region $(AWS_REGION) s3 cp $(VM_DIR)/$(IMAGE_NAME).raw s3://$(AWS_BUCKET)/$(AWS_BUCKET_DIR)/$(IMAGE_NAME).raw
 	aws ec2 import-image --architecture x86_64 \
+		--region $(AWS_REGION) \
 		--description "$(IMAGE_NAME)" \
 		--disk-containers "file:///tmp/$(IMAGE_NAME).json" \
 		--platform Linux \
