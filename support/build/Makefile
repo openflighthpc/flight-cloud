@@ -18,7 +18,7 @@ TDL=centos7.tdl
 TDL_RENDERED=/tmp/$(IMAGE_NAME).tdl
 OZ_CFG=oz.cfg
 VM_DIR=/mnt/resource
-QEMU_IMG_BIN=$(VM_DIR)/qemu-img
+QEMU_IMG_BIN=/usr/bin/qemu-img
 XML=domain.xml
 XML_RENDERED=$(IMAGE_NAME).xml
 

@@ -4,9 +4,10 @@ Notes on building and using Cloudware images on various platforms
 
 ## Prerequisites
 
-- Standard Alces Libvirt host setup
+- Standard Alces Libvirt host setup (including libguestfs-tools)
 - Large amount of disk space
 - AWS/Azure command-line tools installed
+- Binary of qemu-img (>version that comes with CentOS [1.5.3]) which will need to be set as `QEMU_IMG_BIN` in `Makefile` (if wanting to do Azure stuff, most likely a build from source - https://www.qemu.org/download/#source)
 
 ## General usage
 
