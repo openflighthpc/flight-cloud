@@ -1,0 +1,141 @@
+---
+Description: 'Flight Connector'
+Resources:
+  Network:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.78.100.0/24
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        -
+          Key: 'Name'
+          Value: 'FlightConnector'
+  
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: Network
+    Properties:
+      Tags:
+        -
+          Key: 'Name'
+          Value: 'FlightConnector'
+  
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref Network
+  
+  PrvSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.78.100.0/24
+      VpcId: !Ref Network
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+  
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      VpcId: !Ref Network
+   
+  PrvSubnetRouteTableAssocation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrvSubnet
+      RouteTableId: !Ref RouteTable
+
+  RouteInternetGateway:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+
+  securityGroupGateway:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: RouteInternetGateway
+    Properties:
+      GroupName: FlightConnectorGateway
+      GroupDescription: 'Flight Connector Gateway'
+      VpcId: !Ref Network
+      SecurityGroupIngress:
+        -
+          IpProtocol: 'tcp'
+          FromPort: 22
+          ToPort: 22
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow inbound SSH access'
+        -
+          IpProtocol: 'icmp'
+          FromPort: '8'
+          ToPort: '-1'
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow ping'
+        - 
+          IpProtocol: 'tcp'
+          FromPort: 2005
+          ToPort: 2005
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow inbound cluster VPN access'
+      SecurityGroupEgress:
+        -
+          IpProtocol: '-1'
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow outbound internet access'
+      Tags:
+        -
+          Key: 'Name'
+          Value: FlightConnectorGateway
+
+  prvInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: 'FlightConnectorGateway network interface'
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref securityGroupGateway
+      PrivateIpAddress: 10.78.100.10
+      SubnetId: !Ref PrvSubnet
+      Tags:
+        -
+          Key: 'Name'
+          Value: FlightConnectorprv
+
+  master:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: ami-d266dfab
+      InstanceType: c4.xlarge
+      Monitoring: true
+      KeyName: aws_ireland
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref prvInterface
+          DeviceIndex: 0
+      Tags:
+        -
+          Key: 'Name'
+          Value: FlightConnectorGateway
+
+  publicIp:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  publicIpAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      NetworkInterfaceId: !Ref prvInterface
+      AllocationId: !GetAtt publicIp.AllocationId
+
+
