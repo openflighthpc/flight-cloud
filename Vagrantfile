@@ -2,6 +2,8 @@
 # vi: set ft=ruby :
 
 $script = <<SHELL
+  echo 'sudo su -' > /home/vagrant/.bashrc
+  mv /home/vagrant/.cloudware.yml /root/.cloudware.yml
   yum install -y vim ntpdate
   ntpdate 0.pool.ntp.org
   (crontab -l ; echo '* * * * * /usr/sbin/ntpdate 0.pool.ntp.org') | crontab -
@@ -11,8 +13,8 @@ SHELL
 Vagrant.configure("2") do |config|
   config.vm.box = 'centos/7'
   config.vm.hostname = 'controller'
-  config.vm.provision "shell", inline: $script
   config.vm.provision "file",
                       source: "~/.cloudware.yml",
-                      destination: "~vagrant/.cloudware.yml"
+                      destination: "~/.cloudware.yml"
+  config.vm.provision "shell", inline: $script
 end
