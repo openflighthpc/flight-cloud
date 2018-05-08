@@ -35,8 +35,8 @@ set_var EASYRSA_TEMP_FILE      "$EASYRSA_PKI/extensions.temp"
 set_var EASYRSA_BATCH 		"true"
 EOF
 
-./easyrsa init-pki  
-./easyrsa --req-cn=cluster0 build-ca nopass 
+./easyrsa init-pki
+./easyrsa --req-cn=cluster0 build-ca nopass
 
 ./easyrsa --req-cn=cluster0 gen-req cluster0 nopass
 ./easyrsa sign-req server cluster0
@@ -211,7 +211,7 @@ systemctl enable openvpn@flightconnector
 systemctl disable iptables
 systemctl enable firewalld
 systemctl stop iptables
-systemcrl start firewalld
+systemctl start firewalld
 systemctl disable cloud-init
 systemctl disable cloud-init-local
 systemctl disable cloud-config
@@ -229,5 +229,5 @@ firewall-cmd --add-target=ACCEPT --zone cluster0 --permanent
 
 sed '/^ZONE=/{h;s/=.*/=external/};${x;/^$/{s//ZONE=external/;H};x}' /etc/sysconfig/network-scripts/ifcfg-eth0 -i
 
-echo "Please reboot" 
+echo "Please reboot"
 
