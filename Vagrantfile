@@ -4,6 +4,7 @@
 $script = <<SHELL
   echo 'sudo su -' > /home/vagrant/.bashrc
   mv /home/vagrant/.cloudware.yml /root/.cloudware.yml
+  echo 'cd /tmp/cloudware' >> /root/.bashrc
   yum install -y vim ntpdate
   ntpdate 0.pool.ntp.org
   (crontab -l ; echo '* * * * * /usr/sbin/ntpdate 0.pool.ntp.org') | crontab -
