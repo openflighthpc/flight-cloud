@@ -13,6 +13,8 @@ SHELL
 Vagrant.configure("2") do |config|
   config.vm.box = 'centos/7'
   config.vm.hostname = 'controller'
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.synced_folder '.', '/tmp/cloudware', type: 'rsync'
   config.vm.provision "file",
                       source: "~/.cloudware.yml",
                       destination: "~/.cloudware.yml"
