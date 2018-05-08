@@ -9,7 +9,7 @@ $script = <<SHELL
   yum install -y vim ntpdate
   ntpdate 0.pool.ntp.org
   (crontab -l ; echo '* * * * * /usr/sbin/ntpdate 0.pool.ntp.org') | crontab -
-  curl -sL https://git.io/vbsTg | alces_OS=el7 bash
+  bash "#{File.join($src_dir, 'scripts/install')}" "el7"
 SHELL
 
 Vagrant.configure("2") do |config|
