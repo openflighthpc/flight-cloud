@@ -1,4 +1,4 @@
-#!/opt/cloudware/opt/ruby/bin/ruby
+#!/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
 #
@@ -32,3 +32,4 @@ Bundler.setup(:default)
 require_relative cloud_path
 
 Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__
+
