@@ -31,7 +31,7 @@ require 'logger'
 module Cloudware
   class << self
     def config
-      @config ||= Config.new(ENV['CLOUDWARE_CONFIG'] || '/opt/cloudware/etc/config.yml')
+      @config ||= Config.new
     end
 
     def log

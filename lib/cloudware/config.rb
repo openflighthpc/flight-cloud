@@ -28,8 +28,8 @@ module Cloudware
     attr_accessor :aws_access_key_id, :aws_secret_access_key
     attr_accessor :providers
 
-    def initialize(cfg_file)
-      config = YAML.load_file(cfg_file) || raise("Couldn't load config file #{cfg_file}")
+    def initialize
+      config = YAML.load_file(config_path) || raise("Couldn't load config file #{cfg_file}")
 
       self.log_file = config['general']['log_file'] || log.error('Unable to load log_file')
 
@@ -54,6 +54,12 @@ module Cloudware
 
     def log
       Cloudware.log
+    end
+
+    private
+
+    def config_path
+      File.expand_path('~/.cloudware.yml')
     end
   end
 end
