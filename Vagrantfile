@@ -11,6 +11,7 @@ $script = <<SHELL
   (crontab -l ; echo '* * * * * /usr/sbin/ntpdate 0.pool.ntp.org') | crontab -
   rm -rf #{$src_dir}/tmp # Remove the old build logs
   bash "#{File.join($src_dir, 'scripts/install')}" "el7"
+  echo 'PATH=/opt/cloudware/opt/ruby/bin:$PATH' >> /root/.bashrc
 SHELL
 
 Vagrant.configure("2") do |config|
