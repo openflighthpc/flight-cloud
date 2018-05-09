@@ -26,7 +26,10 @@ require 'terminal-table'
 require 'colorize'
 require 'whirly'
 require 'exceptions'
-require 'commands'
+require 'command'
+
+require 'require_all'
+require_all 'lib/cloudware/commands/**/*.rb'
 
 module Cloudware
   class CLI

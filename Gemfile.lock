@@ -96,6 +96,7 @@ GEM
       declarative (< 0.1.0)
       declarative-option (< 0.2.0)
       uber (< 0.2.0)
+    require_all (2.0.0)
     retriable (3.1.1)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
@@ -151,6 +152,7 @@ DEPENDENCIES
   commander
   google-cloud-resource_manager
   ipaddr
+  require_all
   rspec
   rspec-wait
   rubocop (~> 0.52.1)
