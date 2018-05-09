@@ -23,6 +23,7 @@ require 'commander'
 require 'terminal-table'
 require 'colorize'
 require 'whirly'
+require 'exceptions'
 
 module Cloudware
   class CLI
