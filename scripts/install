@@ -49,25 +49,6 @@ mkdir -p ${target}/etc
 cp -R "${source}/"{Gemfile,Gemfile.lock,bin,lib,providers} "${target}"
 say_done $?
 
-doing 'Creating example configuration file'
-if [[ ! -f $target/etc/config.yml ]]; then
-  cat << EOF > $target/etc/config.yml
----
-general:
-  log_file: '/var/log/cloudware.log'
-
-provider:
-  aws:
-    access_key_id: ''
-    secret_access_key: ''
-  azure:
-    tenant_id: ''
-    subscription_id: ''
-    client_secret: ''
-    client_id: ''
-EOF
-fi
-say_done $?
 doing 'Creating log file'
 if [[ ! -f $log_file ]]; then
   touch $log_file
