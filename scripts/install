@@ -71,7 +71,7 @@ done
 
 title 'Configuring profile'
 doing 'Moving profile into place'
-mv $source/etc/profile.d/base.sh /etc/profile.d/cloudware.sh
+cp $source/etc/profile.d/base.sh /etc/profile.d/cloudware.sh
 sed -i "s#SED_TARGET_DURING_INSTALL#$target#" /etc/profile.d/cloudware.sh
 say_done $?
 
