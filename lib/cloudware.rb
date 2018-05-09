@@ -19,13 +19,13 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-require 'cloudware/cli'
-require 'cloudware/domain'
-require 'cloudware/machine'
-require 'cloudware/azure'
-require 'cloudware/gcp'
-require 'cloudware/aws'
-require 'cloudware/config'
+require 'cli'
+require 'domain'
+require 'machine'
+require 'azure'
+require 'gcp'
+require 'aws'
+require 'config'
 require 'logger'
 
 module Cloudware
