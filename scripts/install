@@ -89,20 +89,9 @@ for dep in ${deps}; do
 done
 
 title 'Configuring profile'
-doing 'Adding Ruby to $PATH'
-echo "PATH=\"\${PATH}:${target}/opt/ruby/bin\"" > /etc/profile.d/cloudware.sh
-PATH="${PATH}:${target}/opt/ruby/bin"
-say_done $?
-doing 'Adding Cloudware to $PATH'
-echo "PATH=\"\${PATH}:${target}/bin\"" >> /etc/profile.d/cloudware.sh
-PATH="${PATH}:${target}/bin"
-say_done $?
-doing 'Adding $CLOUDWARE_CONFIG to environment'
-cat << EOF >> /etc/profile.d/cloudware.sh
-if [ -f \$HOME/.cloudware.yml ] ; then
-    export CLOUDWARE_CONFIG=\$HOME/.cloudware.yml
-fi
-EOF
+doing 'Moving profile into place'
+mv $source/etc/profile.d/base.sh /etc/profile.d/cloudware.sh
+sed -i "s#SED_TARGET_DURING_INSTALL#$target#" /etc/profile.d/cloudware.sh
 say_done $?
 
 cat <<EOF
