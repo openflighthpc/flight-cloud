@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #==============================================================================
 # Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
 #
@@ -34,21 +36,43 @@ module Cloudware
       self.log_file = config['general']['log_file'] || log.error('Unable to load log_file')
 
       # Provider: azure
-      self.azure_tenant_id = config['provider']['azure']['tenant_id'] rescue nil
-      self.azure_subscription_id = config['provider']['azure']['subscription_id'] rescue nil
-      self.azure_client_id = config['provider']['azure']['client_id'] rescue nil
-      self.azure_client_secret = config['provider']['azure']['client_secret'] rescue nil
+      self.azure_tenant_id = begin
+                               config['provider']['azure']['tenant_id']
+                             rescue StandardError
+                               nil
+                             end
+      self.azure_subscription_id = begin
+                                     config['provider']['azure']['subscription_id']
+                                   rescue StandardError
+                                     nil
+                                   end
+      self.azure_client_id = begin
+                               config['provider']['azure']['client_id']
+                             rescue StandardError
+                               nil
+                             end
+      self.azure_client_secret = begin
+                                   config['provider']['azure']['client_secret']
+                                 rescue StandardError
+                                   nil
+                                 end
 
       # Provider: aws
-      self.aws_access_key_id = config['provider']['aws']['access_key_id'] rescue nil
-      self.aws_secret_access_key = config['provider']['aws']['secret_access_key'] rescue nil
+      self.aws_access_key_id = begin
+                                 config['provider']['aws']['access_key_id']
+                               rescue StandardError
+                                 nil
+                               end
+      self.aws_secret_access_key = begin
+                                     config['provider']['aws']['secret_access_key']
+                                   rescue StandardError
+                                     nil
+                                   end
 
       # Providers List (identifying valid/present providers)
       self.providers = []
       config['provider'].each do |a, b|
-        if b.first[1].nil? || ! b.first[1].empty?
-          self.providers << a
-        end
+        providers << a if b.first[1].nil? || !b.first[1].empty?
       end
     end
 

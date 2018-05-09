@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 #==============================================================================
 # Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
 #
@@ -22,7 +24,7 @@
 #==============================================================================
 base_dir = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 ENV['BUNDLE_GEMFILE'] ||= File.join(base_dir, 'Gemfile')
-cloud_path = File.join(base_dir, 'lib' ,'cloudware')
+cloud_path = File.join(base_dir, 'lib', 'cloudware')
 $LOAD_PATH << cloud_path
 
 require 'rubygems'
@@ -32,4 +34,3 @@ Bundler.setup(:default)
 require_relative cloud_path
 
 Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__
-

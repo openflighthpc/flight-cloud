@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -12,13 +14,13 @@ $script = <<SHELL
   echo 'PATH=/opt/cloudware/opt/ruby/bin:$PATH' >> /root/.bashrc
 SHELL
 
-Vagrant.configure("2") do |config|
+Vagrant.configure('2') do |config|
   config.vm.box = 'hfm4/centos7'
   config.vm.hostname = 'controller'
   config.vm.synced_folder '.', '/vagrant', disabled: true
   config.vm.synced_folder '.', $src_dir
-  config.vm.provision "file",
-                      source: "~/.cloudware.yml",
-                      destination: "~/.cloudware.yml"
-  config.vm.provision "shell", inline: $script
+  config.vm.provision 'file',
+                      source: '~/.cloudware.yml',
+                      destination: '~/.cloudware.yml'
+  config.vm.provision 'shell', inline: $script
 end

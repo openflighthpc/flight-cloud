@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #==============================================================================
 # Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
 #
@@ -60,7 +62,7 @@ module Cloudware
         role: get_item('role'),
         type: get_item('type'),
         region: get_item('region'),
-        state: get_item('state')
+        state: get_item('state'),
       }
     end
 
@@ -104,14 +106,14 @@ module Cloudware
         raise "Provider #{provider} doesn't exist"
       end
       log.debug("[#{self.class}] Loaded machines from #{provider}:\n#{cloud.machines}")
-      return cloud.machines
+      cloud.machines
     end
 
     def list
       @list ||= begin
                   @list = {}
                   @provider.each do |a|
-                    @list.merge!(self._load_machines(a))
+                    @list.merge!(_load_machines(a))
                   end
                   log.debug("[#{self.class}] Detected machines:\n#{@list}")
                   @list

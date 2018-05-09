@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #==============================================================================
 # Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
 #
@@ -223,7 +225,7 @@ module Cloudware
       c.action do |_args, options|
         begin
           m = Cloudware::Machine.new
-          m.provider = [options.provider] if ! options.provider.nil? 
+          m.provider = [options.provider] unless options.provider.nil?
 
           # Exit if the provider is not in the config list (which verifies details ahead of time)
           if (Cloudware.config.instance_variable_get(:@providers) & m.provider).empty?

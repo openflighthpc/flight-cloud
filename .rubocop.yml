@@ -1,0 +1,65 @@
+inherit_from: .rubocop_todo.yml
+
+require: rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 2.4
+  Exclude:
+    - src/gui/**/*
+    - tmp/**/*
+
+# Do not prefer various `%` ways of specifying things in Ruby - I
+# think these are less clear and unnecessary
+Style/PercentLiteralDelimiters:
+  Enabled: false
+Style/RegexpLiteral:
+  Enabled: false
+Style/SymbolArray:
+  Enabled: false
+Style/WordArray:
+  Enabled: false
+
+# Do not preder trailing commas in multi-line hash/array literals - better as
+# when something is added to a literal the previous last line does not also
+# need to be changed, which also makes diffs smaller
+Style/TrailingCommaInLiteral:
+  EnforcedStyleForMultiline: comma
+
+# Do not require documentation for top-level classes or modules - seems
+# unnecessary for the project at the moment.
+Style/Documentation:
+  Enabled: false
+
+# Do not limit block length - fails for any significant RSpec test file.
+Metrics/BlockLength:
+  Enabled: false
+
+# We trust the YAML we're loading, so don't warn if we don't use
+# `YAML.safe_load` instead of `YAML.load`.
+Security/YAMLLoad:
+  Enabled: false
+
+# I don't care if we use the compact way of declaring classes and modules.
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# If we need a boolean value, having it actually be a boolean rather than
+# checking if it is nil or not is clearer IMO, and `!!value` is a standard way
+# to get this.
+Style/DoubleNegation:
+  Enabled: false
+
+# Turn off Heredoc delimiter check. EOF is used extensively and will
+# continue to be used
+Naming/HeredocDelimiterNaming:
+  Enabled: false
+
+# Quite a few specs are nested 4 deep, however the default is 3
+RSpec/NestedGroups:
+  Max: 4
+
+# Requiring that the subject is explicitly named in order to use it
+# doesn't isn't that much clearer IMO.
+RSpec/NamedSubject:
+  Enabled: false
+

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rspec/wait'
 RSpec.configure do |config|
   config.wait_timeout = 120

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 gem 'aws-sdk-cloudformation'
@@ -14,3 +16,8 @@ gem 'rspec'
 gem 'rspec-wait'
 gem 'terminal-table'
 gem 'whirly'
+
+group :development do
+  gem 'rubocop', '~> 0.52.1', require: false
+  gem 'rubocop-rspec'
+end

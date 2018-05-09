@@ -3,6 +3,7 @@ GEM
   specs:
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
+    ast (2.4.0)
     aws-partitions (1.37.0)
     aws-sdk-cloudformation (1.2.0)
       aws-sdk-core (~> 3)
@@ -85,7 +86,12 @@ GEM
     multi_json (1.12.2)
     multipart-post (2.0.0)
     os (0.9.6)
+    parallel (1.12.1)
+    parser (2.5.1.0)
+      ast (~> 2.4.0)
+    powerpack (0.1.1)
     public_suffix (3.0.1)
+    rainbow (3.0.0)
     representable (3.0.4)
       declarative (< 0.1.0)
       declarative-option (< 0.2.0)
@@ -106,6 +112,16 @@ GEM
     rspec-support (3.7.0)
     rspec-wait (0.0.9)
       rspec (>= 3, < 4)
+    rubocop (0.52.1)
+      parallel (~> 1.10)
+      parser (>= 2.4.0.2, < 3.0)
+      powerpack (~> 0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (~> 1.0, >= 1.0.1)
+    rubocop-rspec (1.23.0)
+      rubocop (>= 0.52.1)
+    ruby-progressbar (1.9.0)
     signet (0.8.1)
       addressable (~> 2.3)
       faraday (~> 0.9)
@@ -137,8 +153,10 @@ DEPENDENCIES
   ipaddr
   rspec
   rspec-wait
+  rubocop (~> 0.52.1)
+  rubocop-rspec
   terminal-table
   whirly
 
 BUNDLED WITH
-   1.16.0
+   1.16.1
