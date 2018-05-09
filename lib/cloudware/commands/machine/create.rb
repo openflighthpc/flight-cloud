@@ -3,7 +3,7 @@
 module Cloudware
   module Commands
     module Machine
-      class Create < Cloudware::Command
+      class Create < Command
         def run
           options.default flavour: 'compute', type: 'small'
 
