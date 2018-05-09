@@ -6,9 +6,7 @@ $script = <<SHELL
   echo 'sudo su -' > /home/vagrant/.bashrc
   mv /home/vagrant/.cloudware.yml /root/.cloudware.yml
   echo 'cd #{$src_dir}' >> /root/.bashrc
-  yum install -y vim ntpdate
-  ntpdate 0.pool.ntp.org
-  (crontab -l ; echo '* * * * * /usr/sbin/ntpdate 0.pool.ntp.org') | crontab -
+  yum install -y vim tree
   rm -rf #{$src_dir}/tmp # Remove the old build logs
   bash "#{File.join($src_dir, 'scripts/install')}" "el7"
   echo 'PATH=/opt/cloudware/opt/ruby/bin:$PATH' >> /root/.bashrc
