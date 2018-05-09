@@ -26,6 +26,7 @@ require 'terminal-table'
 require 'colorize'
 require 'whirly'
 require 'exceptions'
+require 'commands'
 
 module Cloudware
   class CLI
@@ -36,6 +37,12 @@ module Cloudware
     program :name, 'cloudware'
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
+
+    def self.action(command, klass)
+      command.action do |args, options|
+        klass.new(args, options).run!
+      end
+    end
 
     command :'domain create' do |c|
       c.syntax = 'cloudware domain create [options]'
@@ -170,52 +177,7 @@ module Cloudware
       c.option '--mgtip ADDR', String, 'Mgt subnet IP address'
       c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
       c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
-      c.action do |_args, options|
-        begin
-          options.default flavour: 'compute', type: 'small'
-
-          m = Cloudware::Machine.new
-          d = Cloudware::Domain.new
-
-          m.type = options.type.to_s
-          m.flavour = options.flavour.to_s
-
-          options.name = ask('Machine name: ') if options.name.nil?
-          m.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          m.domain = options.domain.to_s
-          d.name = options.domain.to_s
-
-          options.role = choose('Machine role?', :master, :slave) if options.role.nil?
-          m.role = options.role.to_s
-
-          options.prvip = ask('Prv subnet IP: ') if options.prvip.nil?
-          m.prvip = options.prvip.to_s
-
-          options.mgtip = ask('Mgt subnet IP: ') if options.mgtip.nil?
-          m.mgtip = options.mgtip.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Verifying domain exists'.bold, stop: '[OK]'.green
-          raise("Domain #{options.domain} does not exist") unless m.valid_domain?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Checking machine name is valid'.bold, stop: '[OK]'.green
-          raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
-          Whirly.status = 'Verifying prv IP address'.bold
-          raise("Invalid prv IP address #{options.prvip} in subnet #{d.get_item('prv_subnet_cidr')}") unless m.valid_ip?(d.get_item('prv_subnet_cidr').to_s, options.prvip.to_s)
-          Whirly.status = 'Verifying mgt IP address'.bold
-          raise("Invalid mgt IP address #{options.mgtip} in subnet #{d.get_item('mgt_subnet_cidr')}") unless m.valid_ip?(d.get_item('mgt_subnet_cidr').to_s, options.mgtip.to_s)
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Creating new deployment'.bold, stop: '[OK]'.green
-          m.create
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when creating machine: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Create)
     end
 
     command :'machine list' do |c|
