@@ -1,3 +1,10 @@
+GIT
+  remote: https://github.com/alces-software/commander
+  revision: cd637ecd5c590b18daa9f044fd5c771c34699245
+  specs:
+    commander (4.4.4.pre.alces0)
+      highline (~> 1.7.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -23,8 +30,6 @@ GEM
     azure_mgmt_resources (0.15.1)
       ms_rest_azure (~> 0.9.0)
     colorize (0.8.1)
-    commander (4.4.3)
-      highline (~> 1.7.2)
     concurrent-ruby (1.0.5)
     declarative (0.0.10)
     declarative-option (0.1.0)
@@ -59,7 +64,7 @@ GEM
       multi_json (~> 1.11)
       os (~> 0.9)
       signet (~> 0.7)
-    highline (1.7.8)
+    highline (1.7.10)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     httpclient (2.8.3)
@@ -149,7 +154,7 @@ DEPENDENCIES
   azure_mgmt_network
   azure_mgmt_resources
   colorize
-  commander
+  commander!
   google-cloud-resource_manager
   ipaddr
   require_all
