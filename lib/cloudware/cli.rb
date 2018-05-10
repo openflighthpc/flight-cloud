@@ -83,6 +83,12 @@ module Cloudware
       action(c, Commands::Domain::Destroy)
     end
 
+    command :machine do |c|
+      c.syntax = 'flightconnector machine [options]'
+      c.description = 'Manage a cloud machine'
+      c.sub_command_group = true
+    end
+
     command :'machine create' do |c|
       c.syntax = 'flightconnector machine create [options]'
       c.description = 'Create a new machine'
@@ -93,6 +99,7 @@ module Cloudware
       c.option '--mgtip ADDR', String, 'Mgt subnet IP address'
       c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
       c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
+      c.hidden = true
       action(c, Commands::Machine::Create)
     end
 
@@ -100,6 +107,7 @@ module Cloudware
       c.syntax = 'flightconnector machine list'
       c.option '--provider NAME', String, 'Cloud provider to show machines for'
       c.description = 'List available machines'
+      c.hidden = true
       action(c, Commands::Machine::List)
     end
 
@@ -109,6 +117,7 @@ module Cloudware
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
       c.option '--output TYPE', String, 'Output type [table]. Default: table'
+      c.hidden = true
       action(c, Commands::Machine::Info)
     end
 
@@ -117,6 +126,7 @@ module Cloudware
       c.description = 'Destroy a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
+      c.hidden = true
       action(c, Commands::Machine::Destroy)
     end
 
@@ -125,6 +135,7 @@ module Cloudware
       c.description = 'Check the power status of a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
+      c.hidden = true
       action(c, Commands::Machine::Power::Status)
     end
 
@@ -133,6 +144,7 @@ module Cloudware
       c.description = 'Turn a machine on'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
+      c.hidden = true
       action(c, Commands::Machine::Power::On)
     end
 
@@ -141,6 +153,7 @@ module Cloudware
       c.description = 'Turn a machine off'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
+      c.hidden = true
       action(c, Commands::Machine::Power::Off)
     end
 
@@ -149,6 +162,7 @@ module Cloudware
       c.description = 'Rebuild a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
+      c.hidden = true
       action(c, Commands::Machine::Rebuild)
     end
   end
