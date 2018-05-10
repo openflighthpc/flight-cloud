@@ -45,7 +45,6 @@ Metrics/ClassLength:
     - 'lib/cloudware/machine.rb'
     - 'lib/cloudware/azure.rb'
     - 'lib/cloudware/domain.rb'
-    - 'lib/cloudware/cli.rb'
     - 'lib/cloudware/aws.rb'
     - 'lib/cloudware/commands/**/*.rb'
 
