@@ -12,7 +12,7 @@ module Cloudware
           options.domain = ask('Domain identifier: ') if options.domain.nil?
           machine.domain = options.domain.to_s
 
-          Whirly.start status: "Recreating machine #{options.name}".bold
+          Whirly.start status: "Recreating machine #{options.name}"
           machine.rebuild
           Whirly.stop
         end

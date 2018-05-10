@@ -16,7 +16,7 @@ module Cloudware
           end
 
           r = []
-          Whirly.start status: 'Fetching available domains'.bold
+          Whirly.start status: 'Fetching available domains'
           raise('No available domains') if d.list.nil?
           Whirly.stop
           d.list.each do |k, v|
