@@ -37,7 +37,7 @@ module Cloudware
     extend Commander::UI::AskForClass
     extend Commander::Delegates
 
-    program :name, 'cloudware'
+    program :name, 'flightconnector'
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
 
@@ -48,7 +48,7 @@ module Cloudware
     end
 
     command :'domain create' do |c|
-      c.syntax = 'cloudware domain create [options]'
+      c.syntax = 'flightconnector domain create [options]'
       c.description = 'Create a new domain'
       c.option '--name NAME', String, 'Name of cloud domain'
       c.option '--networkcidr CIDR', String, 'Entire network CIDR, e.g. 10.0.0.0/16. The prv and mgt subnet must be within this range'
@@ -60,7 +60,7 @@ module Cloudware
     end
 
     command :'domain list' do |c|
-      c.syntax = 'cloudware domain list [options]'
+      c.syntax = 'flightconnector domain list [options]'
       c.description = 'List created domains'
       c.option '--provider NAME', String, 'Cloud provider name to filter by'
       c.option '--region NAME', String, 'Cloud provider region to filter by'
@@ -68,14 +68,14 @@ module Cloudware
     end
 
     command :'domain destroy' do |c|
-      c.syntax = 'cloudware domain destroy [options]'
+      c.syntax = 'flightconnector domain destroy [options]'
       c.description = 'Destroy a machine'
       c.option '--name NAME', String, 'Domain name'
       action(c, Commands::Domain::Destroy)
     end
 
     command :'machine create' do |c|
-      c.syntax = 'cloudware machine create [options]'
+      c.syntax = 'flightconnector machine create [options]'
       c.description = 'Create a new machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
@@ -88,14 +88,14 @@ module Cloudware
     end
 
     command :'machine list' do |c|
-      c.syntax = 'cloudware machine list'
+      c.syntax = 'flightconnector machine list'
       c.option '--provider NAME', String, 'Cloud provider to show machines for'
       c.description = 'List available machines'
       action(c, Commands::Machine::List)
     end
 
     command :'machine info' do |c|
-      c.syntax = 'cloudware machine info [options]'
+      c.syntax = 'flightconnector machine info [options]'
       c.description = 'List detailed information about a given machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
@@ -104,7 +104,7 @@ module Cloudware
     end
 
     command :'machine destroy' do |c|
-      c.syntax = 'cloudware machine destroy [options]'
+      c.syntax = 'flightconnector machine destroy [options]'
       c.description = 'Destroy a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
@@ -112,7 +112,7 @@ module Cloudware
     end
 
     command :'machine power status' do |c|
-      c.syntax = 'cloudware machine power status [options]'
+      c.syntax = 'flightconnector machine power status [options]'
       c.description = 'Check the power status of a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
@@ -120,7 +120,7 @@ module Cloudware
     end
 
     command :'machine power on' do |c|
-      c.syntax = 'cloudware machine power on [options]'
+      c.syntax = 'flightconnector machine power on [options]'
       c.description = 'Turn a machine on'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
@@ -128,7 +128,7 @@ module Cloudware
     end
 
     command :'machine power off' do |c|
-      c.syntax = 'cloudware machine power off [options]'
+      c.syntax = 'flightconnector machine power off [options]'
       c.description = 'Turn a machine off'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
@@ -136,7 +136,7 @@ module Cloudware
     end
 
     command :'machine rebuild' do |c|
-      c.syntax = 'cloudware machine rebuild [options]'
+      c.syntax = 'flightconnector machine rebuild [options]'
       c.description = 'Rebuild a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'

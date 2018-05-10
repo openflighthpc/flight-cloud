@@ -83,7 +83,7 @@ module Cloudware
     private
 
     def config_path
-      File.expand_path('~/.cloudware.yml')
+      File.expand_path('~/.flightconnector.yml')
     end
   end
 end

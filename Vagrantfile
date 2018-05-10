@@ -4,7 +4,7 @@
 $src_dir = '/tmp/cloudware'
 $script = <<SHELL
   echo 'sudo su -' > /home/vagrant/.bashrc
-  mv /home/vagrant/.cloudware.yml /root/.cloudware.yml
+  mv /home/vagrant/.flightconnector.yml /root/.flightconnector.yml
   echo 'cd #{$src_dir}' >> /root/.bashrc
   yum install -y vim tree
   rm -rf #{$src_dir}/tmp # Remove the old build logs
@@ -18,7 +18,7 @@ Vagrant.configure('2') do |config|
   config.vm.synced_folder '.', '/vagrant', disabled: true
   config.vm.synced_folder '.', $src_dir
   config.vm.provision 'file',
-                      source: '~/.cloudware.yml',
-                      destination: '~/.cloudware.yml'
+                      source: '~/.flightconnector.yml',
+                      destination: '~/.flightconnector.yml'
   config.vm.provision 'shell', inline: $script
 end
