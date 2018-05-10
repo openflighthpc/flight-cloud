@@ -32,7 +32,7 @@ module Cloudware
     attr_accessor :log_file, :azure, :aws, :providers
 
     def initialize
-      config = YAML.load_file(config_path) || raise("Couldn't load config file #{cfg_file}")
+      config = YAML.load_file(config_path)
 
       self.log_file = config['general']['log_file'] || log.error('Unable to load log_file')
 
