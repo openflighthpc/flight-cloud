@@ -41,6 +41,9 @@ module Cloudware
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
 
+    # Display the help if there is no input arguments
+    ARGV.push '--help' if ARGV.empty?
+
     def self.action(command, klass)
       command.action do |args, options|
         klass.new(args, options).run!
