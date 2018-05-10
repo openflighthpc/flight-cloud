@@ -23,6 +23,9 @@
 #==============================================================================
 require 'yaml'
 require 'ostruct'
+require 'whirly'
+
+Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
 module Cloudware
   class Config
