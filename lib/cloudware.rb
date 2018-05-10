@@ -21,6 +21,9 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
+
+$LOAD_PATH << File.join(File.dirname(__FILE__), 'cloudware')
+
 require 'cli'
 require 'domain'
 require 'machine'

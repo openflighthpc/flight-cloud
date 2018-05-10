@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'rspec/wait'
+require File.join(File.dirname(__FILE__), '../lib/cloudware')
+
 RSpec.configure do |config|
   config.wait_timeout = 120
 
