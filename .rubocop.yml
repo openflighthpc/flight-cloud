@@ -63,3 +63,8 @@ RSpec/NestedGroups:
 RSpec/NamedSubject:
   Enabled: false
 
+# Do not add the magic frozen string comment to the Vagrant file. It breaks
+# it for reasons
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - 'Vagrantfile'
