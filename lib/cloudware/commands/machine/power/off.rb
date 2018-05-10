@@ -13,7 +13,7 @@ module Cloudware
             options.domain = ask('Domain identifier: ') if options.domain.nil?
             machine.domain = options.domain.to_s
 
-            Whirly.start spinner: 'dots2', status: "Powering off machine #{options.name}".bold, stop: '[OK]'.green
+            Whirly.start status: "Powering off machine #{options.name}".bold
             machine.power_off
             Whirly.stop
           end
