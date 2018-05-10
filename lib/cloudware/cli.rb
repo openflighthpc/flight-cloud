@@ -47,6 +47,12 @@ module Cloudware
       end
     end
 
+    command :domain do |c|
+      c.syntax = 'flightconnector domain [options]'
+      c.description = 'Manage a domain'
+      c.sub_command_group = true
+    end
+
     command :'domain create' do |c|
       c.syntax = 'flightconnector domain create [options]'
       c.description = 'Create a new domain'
@@ -56,6 +62,7 @@ module Cloudware
       c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
       c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
       c.option '--region NAME', String, 'Provider region to create domain in'
+      c.hidden = true
       action(c, Commands::Domain::Create)
     end
 
@@ -64,6 +71,7 @@ module Cloudware
       c.description = 'List created domains'
       c.option '--provider NAME', String, 'Cloud provider name to filter by'
       c.option '--region NAME', String, 'Cloud provider region to filter by'
+      c.hidden = true
       action(c, Commands::Domain::List)
     end
 
@@ -71,6 +79,7 @@ module Cloudware
       c.syntax = 'flightconnector domain destroy [options]'
       c.description = 'Destroy a machine'
       c.option '--name NAME', String, 'Domain name'
+      c.hidden = true
       action(c, Commands::Domain::Destroy)
     end
 
