@@ -1,0 +1,9 @@
+
+language: ruby
+dist: trusty
+rvm:
+ - 2.4.1
+sudo: required
+install:
+  - bundle install
+script: rspec
