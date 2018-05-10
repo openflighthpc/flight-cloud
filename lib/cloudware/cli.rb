@@ -236,23 +236,7 @@ module Cloudware
       c.description = 'Rebuild a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          Whirly.start spinner: 'dots2', status: "Recreating machine #{options.name}".bold, stop: '[OK]'.green
-          machine.rebuild
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when rebuilding machine: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Rebuild)
     end
   end
 end
