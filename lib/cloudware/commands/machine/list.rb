@@ -14,7 +14,7 @@ module Cloudware
           end
 
           r = []
-          Whirly.start spinner: 'dots2', status: 'Fetching available machines'.bold, stop: '[OK]'.green
+          Whirly.start status: 'Fetching available machines'
           raise('No available machines') if m.list.nil?
           Whirly.stop
           m.list.each do |_k, v|

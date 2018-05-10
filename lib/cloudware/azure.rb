@@ -43,17 +43,17 @@ module Cloudware
     def options
       @options ||= begin
         provider = MsRestAzure::ApplicationTokenProvider.new(
-          config.azure_tenant_id,
-          config.azure_client_id,
-          config.azure_client_secret
+          config.azure.tenant_id,
+          config.azure.client_id,
+          config.azure.client_secret
         )
         credentials = MsRest::TokenCredentials.new(provider)
         @options = {
           credentials: credentials,
-          subscription_id: config.azure_subscription_id.to_s,
-          tenant_id: config.azure_tenant_id.to_s,
-          client_id: config.azure_client_id.to_s,
-          client_secret: config.azure_client_secret.to_s,
+          subscription_id: config.azure.subscription_id.to_s,
+          tenant_id: config.azure.tenant_id.to_s,
+          client_id: config.azure.client_id.to_s,
+          client_secret: config.azure.client_secret.to_s,
         }
         @options
       end

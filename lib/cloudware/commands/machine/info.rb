@@ -15,7 +15,7 @@ module Cloudware
           case options.output.to_s
           when 'table'
             table = Terminal::Table.new do |t|
-              Whirly.start spinner: 'dots2', status: 'Fetching machine info'.bold, stop: '[OK]'.green
+              Whirly.start status: 'Fetching machine info'
               t.add_row ['Machine name'.bold, m.name]
               t.add_row ['Domain name'.bold, m.get_item('domain')]
               t.add_row ['Machine role'.bold, m.get_item('role')]
