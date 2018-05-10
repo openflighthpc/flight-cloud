@@ -220,23 +220,7 @@ module Cloudware
       c.description = 'Turn a machine on'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          Whirly.start spinner: 'dots2', status: "Powering on machine #{options.name}".bold, stop: '[OK]'.green
-          machine.power_on
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when powering on machine: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Power::On)
     end
 
     command :'machine power off' do |c|
