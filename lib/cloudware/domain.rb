@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #==============================================================================
 # Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
 #
@@ -74,14 +76,14 @@ module Cloudware
         raise "Provider #{provider} doesn't exist"
       end
       log.debug("[#{self.class}] Loaded machines from #{provider}:\n#{cloud.domains}")
-      return cloud.domains
+      cloud.domains
     end
 
     def list
       @list ||= begin
                   @list = {}
                   @provider.each do |a|
-                    @list.merge!(self._load_domains(a))
+                    @list.merge!(_load_domains(a))
                   end
                   log.debug("[#{self.class}] Detected domains:\n#{@list}")
                   @list
@@ -117,7 +119,7 @@ module Cloudware
       machine = Cloudware::Machine.new
       machine.list.each do |k, _v|
         return false
-        return true if /#{@name}/ =~ k
+        return true if /#{@name}/.match?(k)
         break
       end
     end

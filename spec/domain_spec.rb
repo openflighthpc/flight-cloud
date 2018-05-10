@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'cloudware/domain'
 require 'cloudware/azure'
 require 'cloudware/aws'
@@ -15,7 +17,7 @@ describe Cloudware::Domain do
       @networkcidr = '10.0.0.0/16'
       @prvsubnetcidr = '10.0.1.0/24'
       @mgtsubnetcidr = '10.0.2.0/24'
-      @domain = Cloudware::Domain.new
+      @domain = described_class.new
       @domain.name = @name
       @domain.provider = @provider
     end
@@ -66,11 +68,11 @@ describe Cloudware::Domain do
       wait_for(@domain.exists?).to be(true)
     end
 
-    it 'should return a list of domains as a hash' do
+    it 'returns a list of domains as a hash' do
       expect(@domain.list).to be_a(Hash)
     end
 
-    it 'should return the correct domain information from API' do
+    it 'returns the correct domain information from API' do
       domain = @domain.describe
       expect(domain).to have_attributes(name: @name)
       expect(domain).to have_attributes(region: @region)
@@ -80,7 +82,7 @@ describe Cloudware::Domain do
       expect(domain).to have_attributes(mgtsubnetcidr: @mgtsubnetcidr)
     end
 
-    it 'should destroy the domain' do
+    it 'destroys the domain' do
       @domain.destroy
       wait_for(@domain.exists?).to be(false)
     end
@@ -94,7 +96,7 @@ describe Cloudware::Domain do
       @networkcidr = '10.0.0.0/16'
       @prvsubnetcidr = '10.0.1.0/24'
       @mgtsubnetcidr = '10.0.2.0/24'
-      @domain = Cloudware::Domain.new
+      @domain = described_class.new
       @domain.name = @name
       @domain.provider = @provider
     end
@@ -145,11 +147,11 @@ describe Cloudware::Domain do
       wait_for(@domain.exists?).to be(true)
     end
 
-    it 'should return a list of domains as a hash' do
+    it 'returns a list of domains as a hash' do
       expect(@domain.list).to be_a(Hash)
     end
 
-    it 'should return the correct domain information from API' do
+    it 'returns the correct domain information from API' do
       domain = @domain.describe
       expect(domain).to have_attributes(name: @name)
       expect(domain).to have_attributes(region: @region)
@@ -159,7 +161,7 @@ describe Cloudware::Domain do
       expect(domain).to have_attributes(mgtsubnetcidr: @mgtsubnetcidr)
     end
 
-    it 'should destroy the domain' do
+    it 'destroys the domain' do
       @domain.destroy
       wait_for(@domain.exists?).to be(false)
     end

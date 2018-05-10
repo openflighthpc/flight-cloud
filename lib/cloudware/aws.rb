@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #==============================================================================
 # Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
 #
@@ -119,32 +121,31 @@ module Cloudware
                       regions.each do |r|
                         load_config(r)
                         log.info("[#{self.class}] Scanning instances in region #{r}")
-                        
+
                         # Find failed machines in CloudFormation [in state ROLLBACK*]
                         @cfn.describe_stacks.stacks.each do |test|
-                          next if ! test.stack_status.include?('ROLLBACK')
-                          if test.parameters[0]
-                            @state = 'failed'
-                            @extip = 'N/A'
-                            @instance_id = 'N/A'
-                            test.parameters.each_with_index do |val, index|
-                              @type = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmType'
-                              @domain = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'cloudwareDomain'
-                              @id = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'cloudwareId'
-                              @role = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmRole'
-                              @prvip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'prvIp'
-                              @mgtip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'mgtIp'
-                              @flavour = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmFlavour'
-                            end
-                            @name = test.stack_name.gsub("#{@domain}-", '')
-                            log.info("[#{self.class}] Detected machine #{@name} in domain #{@domain}")
-                            @machines.merge!("#{@domain}-#{@name}" => {
-                                               name: @name, domain: @domain, state: @state,
-                                               id: @id, type: @type, role: @role, mgt_ip: @mgtip,
-                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id,
-                                               flavour: @flavour
-                                             })
+                          next unless test.stack_status.include?('ROLLBACK')
+                          next unless test.parameters[0]
+                          @state = 'failed'
+                          @extip = 'N/A'
+                          @instance_id = 'N/A'
+                          test.parameters.each_with_index do |val, _index|
+                            @type = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmType'
+                            @domain = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'cloudwareDomain'
+                            @id = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'cloudwareId'
+                            @role = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmRole'
+                            @prvip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'prvIp'
+                            @mgtip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'mgtIp'
+                            @flavour = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmFlavour'
                           end
+                          @name = test.stack_name.gsub("#{@domain}-", '')
+                          log.info("[#{self.class}] Detected machine #{@name} in domain #{@domain}")
+                          @machines.merge!("#{@domain}-#{@name}" => {
+                                             name: @name, domain: @domain, state: @state,
+                                             id: @id, type: @type, role: @role, mgt_ip: @mgtip,
+                                             prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id,
+                                             flavour: @flavour
+                                           })
                         end
 
                         # Find machines in ec2
@@ -185,7 +186,7 @@ module Cloudware
         load_config(r)
         @ec2.describe_instances(filters: [
                                   { name: 'tag:cloudware_domain', values: [domain.to_s] },
-                                  { name: 'tag:cloudware_machine_name', values: [name.to_s] }
+                                  { name: 'tag:cloudware_machine_name', values: [name.to_s] },
                                 ]).reservations.each do |reservation|
           reservation.instances.each do |instance|
             @instance_id = instance.instance_id
@@ -217,7 +218,7 @@ module Cloudware
         { parameter_key: 'cloudwareId', parameter_value: id },
         { parameter_key: 'networkCidr', parameter_value: networkcidr },
         { parameter_key: 'prvSubnetCidr', parameter_value: prvsubnetcidr },
-        { parameter_key: 'mgtSubnetCidr', parameter_value: mgtsubnetcidr }
+        { parameter_key: 'mgtSubnetCidr', parameter_value: mgtsubnetcidr },
       ]
       deploy("#{name}-domain", template, params)
     end
@@ -240,22 +241,20 @@ module Cloudware
         { parameter_key: 'mgtSubnetId', parameter_value: d.get_item('mgt_subnet_id') },
         { parameter_key: 'prvSubnetCidr', parameter_value: d.get_item('prv_subnet_cidr') },
         { parameter_key: 'mgtSubnetCidr', parameter_value: d.get_item('mgt_subnet_cidr') },
-        { parameter_key: 'vmFlavour', parameter_value: flavour }
+        { parameter_key: 'vmFlavour', parameter_value: flavour },
       ]
       deploy("#{domain}-#{name}", template, params)
     end
 
     def deploy(name, tpl_file, params)
-      begin
-        log.info("[#{self.class}] Deploying new stack\nName: #{name}\nTemplate: #{tpl_file}\nParams: #{params}")
-        @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
-        log.info("[#{self.class}] Deployment for #{name} finished, waiting for deployment to reach complete")
-        @cfn.wait_until :stack_create_complete, stack_name: name
-        log.info("[#{self.class}] Deployment for #{name} reached complete status")
-      # Catch errors and hand it up the stack for `cli.rb` to handle
-      rescue CloudFormation::Errors::ServiceError, Aws::Waiters::Errors::FailureStateError => error
-        raise error.message
-      end
+      log.info("[#{self.class}] Deploying new stack\nName: #{name}\nTemplate: #{tpl_file}\nParams: #{params}")
+      @cfn.create_stack stack_name: name, template_body: render_template(tpl_file), parameters: params
+      log.info("[#{self.class}] Deployment for #{name} finished, waiting for deployment to reach complete")
+      @cfn.wait_until :stack_create_complete, stack_name: name
+      log.info("[#{self.class}] Deployment for #{name} reached complete status")
+    # Catch errors and hand it up the stack for `cli.rb` to handle
+    rescue CloudFormation::Errors::ServiceError, Aws::Waiters::Errors::FailureStateError => error
+      raise error.message
     end
 
     def destroy(name, domain)

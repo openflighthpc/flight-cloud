@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #==============================================================================
 # Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
 #
@@ -51,7 +53,7 @@ module Cloudware
           subscription_id: config.azure_subscription_id.to_s,
           tenant_id: config.azure_tenant_id.to_s,
           client_id: config.azure_client_id.to_s,
-          client_secret: config.azure_client_secret.to_s
+          client_secret: config.azure_client_secret.to_s,
         }
         @options
       end
@@ -73,7 +75,7 @@ module Cloudware
         cloudwareId: id,
         networkCIDR: networkcidr,
         prvSubnetCIDR: prvsubnetcidr,
-        mgtSubnetCIDR: mgtsubnetcidr
+        mgtSubnetCIDR: mgtsubnetcidr,
       }
       deploy(name, 'domain', 'domain', params)
     end
@@ -95,7 +97,7 @@ module Cloudware
                               prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
                               mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
                               provider: 'azure',
-                              region: r.tags['cloudware_domain_region']
+                              region: r.tags['cloudware_domain_region'],
                             })
           end
         end
@@ -114,7 +116,7 @@ module Cloudware
         vmType: size,
         prvSubnetIp: prvip,
         mgtSubnetIp: mgtip,
-        vmFlavour: flavour
+        vmFlavour: flavour,
       }
       deploy(rg, name, "machine-#{type}", params)
     end
@@ -143,7 +145,7 @@ module Cloudware
                                provider: 'azure',
                                type: r.tags['cloudware_machine_type'],
                                flavour: r.tags['cloudware_machine_flavour'],
-                               state: machine_state(r.tags['cloudware_machine_name'], r.tags['cloudware_domain'])
+                               state: machine_state(r.tags['cloudware_machine_name'], r.tags['cloudware_domain']),
                              })
           end
         end
@@ -220,7 +222,7 @@ module Cloudware
         r.tags = {
           cloudware_id: id,
           cloudware_domain: name,
-          region: region
+          region: region,
         }
       end
       log.info("[#{self.class}] Creating new resource group\nRegion: #{region}\nID: #{id}\n#{name}")
