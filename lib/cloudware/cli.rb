@@ -71,25 +71,7 @@ module Cloudware
       c.syntax = 'cloudware domain destroy [options]'
       c.description = 'Destroy a machine'
       c.option '--name NAME', String, 'Domain name'
-      c.action do |_args, options|
-        begin
-          d = Cloudware::Domain.new
-
-          options.name = ask('Domain name: ') if options.name.nil?
-          d.name = options.name.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Checking domain exists'.bold, stop: '[OK]'.green
-          raise("Domain name #{options.name} does not exist") unless d.exists?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: "Destroying domain #{options.name}".bold, stop: '[OK]'.green
-          d.destroy
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed destroying domain: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Domain::Destroy)
     end
 
     command :'machine create' do |c|
