@@ -1,0 +1,16 @@
+---
+# Location to store Cloudware logs
+general:
+  log_file: '/var/log/cloudware.log'
+
+# Provider credentials
+provider:
+  azure:
+    tenant_id: 
+    subscription_id: 
+    client_secret: 
+    client_id: 
+
+  aws:
+    access_key_id: 
+    secret_access_key: 
