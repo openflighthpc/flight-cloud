@@ -26,6 +26,10 @@ require 'terminal-table'
 require 'colorize'
 require 'whirly'
 require 'exceptions'
+require 'command'
+
+require 'require_all'
+require_all 'lib/cloudware/commands/**/*.rb'
 
 module Cloudware
   class CLI
@@ -37,6 +41,12 @@ module Cloudware
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
 
+    def self.action(command, klass)
+      command.action do |args, options|
+        klass.new(args, options).run!
+      end
+    end
+
     command :'domain create' do |c|
       c.syntax = 'cloudware domain create [options]'
       c.description = 'Create a new domain'
@@ -46,54 +56,7 @@ module Cloudware
       c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
       c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
       c.option '--region NAME', String, 'Provider region to create domain in'
-      c.action do |_args, options|
-        begin
-          d = Cloudware::Domain.new
-
-          options.name = ask('Domain identifier: ') if options.name.nil?
-          d.name = options.name.to_s
-
-          options.provider = choose('Provider name?', :aws, :azure, :gcp) if options.provider.nil?
-
-          options.region = ask('Provider region: ') if options.region.nil?
-          d.region = options.region.to_s
-
-          options.networkcidr = ask('Network CIDR: ') if options.networkcidr.nil?
-          d.networkcidr = options.networkcidr.to_s
-
-          options.prvsubnetcidr = ask('Prv subnet CIDR: ') if options.prvsubnetcidr.nil?
-          d.prvsubnetcidr = options.prvsubnetcidr.to_s
-
-          options.mgtsubnetcidr = ask('Mgt subnet CIDR: ') if options.mgtsubnetcidr.nil?
-          d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Verifying network CIDR is valid'.bold, stop: '[OK]'.green
-          raise("Network CIDR #{options.networkcidr} is not a valid IPV4 address") unless d.valid_cidr?(options.networkcidr.to_s)
-          Whirly.status = 'Verifying prv subnet CIDR is valid'.bold
-          raise("Prv subnet CIDR #{options.prvsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.prvsubnetcidr.to_s)
-          Whirly.status = 'Verifying mgt subnet CIDR is valid'.bold
-          raise("Mgt subnet CIDR #{options.mgtsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.mgtsubnetcidr.to_s)
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Checking domain name is valid'.bold, stop: '[OK]'.green
-          raise("Domain name #{options.name} is not valid") unless d.valid_name?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Checking domain does not already exist'.bold, stop: '[OK]'.green
-          raise("Domain name #{options.name} already exists") if d.exists?
-          d.provider = options.provider.to_s
-          Whirly.status = 'Verifying provider is valid'.bold
-          raise("Provider #{options.provider} does not exist") unless d.valid_provider?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Creating new deployment'.bold, stop: '[OK]'.green
-          d.create
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed while creating domain: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Domain::Create)
     end
 
     command :'domain list' do |c|
@@ -101,63 +64,14 @@ module Cloudware
       c.description = 'List created domains'
       c.option '--provider NAME', String, 'Cloud provider name to filter by'
       c.option '--region NAME', String, 'Cloud provider region to filter by'
-      c.action do |_args, options|
-        begin
-          d = Cloudware::Domain.new
-          d.provider = [options.provider] unless options.provider.nil?
-          d.region = options.region.to_s unless options.region.nil?
-          d.name = options.name.to_s unless options.name.nil?
-
-          # Exit if the provider is not in the config list (which verifies details ahead of time)
-          if (Cloudware.config.instance_variable_get(:@providers) & d.provider).empty?
-            raise "The provider #{d.provider.join(',')} is not a valid provider - unknown or missing login details"
-          end
-
-          r = []
-          Whirly.start spinner: 'dots2', status: 'Fetching available domains'.bold, stop: '[OK]'.green
-          raise('No available domains') if d.list.nil?
-          Whirly.stop
-          d.list.each do |k, v|
-            r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider], v[:region]]
-          end
-          table = Terminal::Table.new headings: ['Domain name'.bold,
-                                                 'Network CIDR'.bold,
-                                                 'Prv Subnet CIDR'.bold,
-                                                 'Mgt Subnet CIDR'.bold,
-                                                 'Provider'.bold,
-                                                 'Region'.bold],
-                                      rows: r
-          puts table
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when listing domains: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Domain::List)
     end
 
     command :'domain destroy' do |c|
       c.syntax = 'cloudware domain destroy [options]'
       c.description = 'Destroy a machine'
       c.option '--name NAME', String, 'Domain name'
-      c.action do |_args, options|
-        begin
-          d = Cloudware::Domain.new
-
-          options.name = ask('Domain name: ') if options.name.nil?
-          d.name = options.name.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Checking domain exists'.bold, stop: '[OK]'.green
-          raise("Domain name #{options.name} does not exist") unless d.exists?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: "Destroying domain #{options.name}".bold, stop: '[OK]'.green
-          d.destroy
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed destroying domain: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Domain::Destroy)
     end
 
     command :'machine create' do |c|
@@ -170,89 +84,14 @@ module Cloudware
       c.option '--mgtip ADDR', String, 'Mgt subnet IP address'
       c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
       c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
-      c.action do |_args, options|
-        begin
-          options.default flavour: 'compute', type: 'small'
-
-          m = Cloudware::Machine.new
-          d = Cloudware::Domain.new
-
-          m.type = options.type.to_s
-          m.flavour = options.flavour.to_s
-
-          options.name = ask('Machine name: ') if options.name.nil?
-          m.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          m.domain = options.domain.to_s
-          d.name = options.domain.to_s
-
-          options.role = choose('Machine role?', :master, :slave) if options.role.nil?
-          m.role = options.role.to_s
-
-          options.prvip = ask('Prv subnet IP: ') if options.prvip.nil?
-          m.prvip = options.prvip.to_s
-
-          options.mgtip = ask('Mgt subnet IP: ') if options.mgtip.nil?
-          m.mgtip = options.mgtip.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Verifying domain exists'.bold, stop: '[OK]'.green
-          raise("Domain #{options.domain} does not exist") unless m.valid_domain?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Checking machine name is valid'.bold, stop: '[OK]'.green
-          raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
-          Whirly.status = 'Verifying prv IP address'.bold
-          raise("Invalid prv IP address #{options.prvip} in subnet #{d.get_item('prv_subnet_cidr')}") unless m.valid_ip?(d.get_item('prv_subnet_cidr').to_s, options.prvip.to_s)
-          Whirly.status = 'Verifying mgt IP address'.bold
-          raise("Invalid mgt IP address #{options.mgtip} in subnet #{d.get_item('mgt_subnet_cidr')}") unless m.valid_ip?(d.get_item('mgt_subnet_cidr').to_s, options.mgtip.to_s)
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Creating new deployment'.bold, stop: '[OK]'.green
-          m.create
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when creating machine: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Create)
     end
 
     command :'machine list' do |c|
       c.syntax = 'cloudware machine list'
       c.option '--provider NAME', String, 'Cloud provider to show machines for'
       c.description = 'List available machines'
-      c.action do |_args, options|
-        begin
-          m = Cloudware::Machine.new
-          m.provider = [options.provider] unless options.provider.nil?
-
-          # Exit if the provider is not in the config list (which verifies details ahead of time)
-          if (Cloudware.config.instance_variable_get(:@providers) & m.provider).empty?
-            raise "The provider #{m.provider.join(',')} is not a valid provider - unknown or missing login details"
-          end
-
-          r = []
-          Whirly.start spinner: 'dots2', status: 'Fetching available machines'.bold, stop: '[OK]'.green
-          raise('No available machines') if m.list.nil?
-          Whirly.stop
-          m.list.each do |_k, v|
-            r << [v[:name], v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type], v[:state]]
-          end
-          table = Terminal::Table.new headings: ['Name'.bold,
-                                                 'Domain'.bold,
-                                                 'Role'.bold,
-                                                 'Prv IP address'.bold,
-                                                 'Mgt IP address'.bold,
-                                                 'Type'.bold,
-                                                 'State'.bold],
-                                      rows: r
-          puts table
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed listing machines: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::List)
     end
 
     command :'machine info' do |c|
@@ -261,39 +100,7 @@ module Cloudware
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
       c.option '--output TYPE', String, 'Output type [table]. Default: table'
-      c.action do |_args, options|
-        begin
-          options.default output: 'table'
-          m = Cloudware::Machine.new
-          options.domain = ask('Domain name?') if options.domain.nil?
-          options.name = ask('Machine name?') if options.name.nil?
-          m.name = options.name.to_s
-          m.domain = options.domain.to_s
-
-          case options.output.to_s
-          when 'table'
-            table = Terminal::Table.new do |t|
-              Whirly.start spinner: 'dots2', status: 'Fetching machine info'.bold, stop: '[OK]'.green
-              t.add_row ['Machine name'.bold, m.name]
-              t.add_row ['Domain name'.bold, m.get_item('domain')]
-              t.add_row ['Machine role'.bold, m.get_item('role')]
-              t.add_row ['Prv subnet IP'.bold, m.get_item('prv_ip')]
-              t.add_row ['Mgt subnet IP'.bold, m.get_item('mgt_ip')]
-              t.add_row ['External IP'.bold, m.get_item('ext_ip')]
-              t.add_row ['Machine state'.bold, m.get_item('state')]
-              t.add_row ['Machine type'.bold, m.get_item('type')]
-              t.add_row ['Machine flavour'.bold, m.get_item('flavour')]
-              t.add_row ['Provider'.bold, m.get_item('provider')]
-              Whirly.stop
-              t.style = { all_separators: true }
-            end
-            puts table
-          end
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed fetching info for machine: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Info)
     end
 
     command :'machine destroy' do |c|
@@ -301,28 +108,7 @@ module Cloudware
       c.description = 'Destroy a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          m = Cloudware::Machine.new
-
-          options.name = ask('Machine name: ') if options.name.nil?
-          m.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          m.domain = options.domain.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Checking machine exists'.bold, stop: '[OK]'.green
-          raise('Machine does not exist') unless m.exists?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: "Destroying #{options.name} in domain #{options.domain}".bold, stop: '[OK]'.green
-          m.destroy
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed destroying machine: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Destroy)
     end
 
     command :'machine power status' do |c|
@@ -330,21 +116,7 @@ module Cloudware
       c.description = 'Check the power status of a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          puts "#{options.name}: Power status is #{machine.get_item('state')}"
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when checking machine power status: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Power::Status)
     end
 
     command :'machine power on' do |c|
@@ -352,23 +124,7 @@ module Cloudware
       c.description = 'Turn a machine on'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          Whirly.start spinner: 'dots2', status: "Powering on machine #{options.name}".bold, stop: '[OK]'.green
-          machine.power_on
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when powering on machine: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Power::On)
     end
 
     command :'machine power off' do |c|
@@ -376,23 +132,7 @@ module Cloudware
       c.description = 'Turn a machine off'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          Whirly.start spinner: 'dots2', status: "Powering off machine #{options.name}".bold, stop: '[OK]'.green
-          machine.power_off
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when powering off machine: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Power::Off)
     end
 
     command :'machine rebuild' do |c|
@@ -400,23 +140,7 @@ module Cloudware
       c.description = 'Rebuild a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          Whirly.start spinner: 'dots2', status: "Recreating machine #{options.name}".bold, stop: '[OK]'.green
-          machine.rebuild
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when rebuilding machine: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Rebuild)
     end
   end
 end

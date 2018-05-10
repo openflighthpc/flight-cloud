@@ -36,6 +36,7 @@ Metrics/AbcSize:
     - 'lib/cloudware/azure.rb'
     - 'lib/cloudware/aws.rb'
     - 'lib/cloudware/config.rb'
+    - 'lib/cloudware/commands/**/*.rb'
 
 # Offense count: 5
 # Configuration parameters: CountComments.
@@ -44,14 +45,15 @@ Metrics/ClassLength:
     - 'lib/cloudware/machine.rb'
     - 'lib/cloudware/azure.rb'
     - 'lib/cloudware/domain.rb'
-    - 'lib/cloudware/cli.rb'
     - 'lib/cloudware/aws.rb'
+    - 'lib/cloudware/commands/**/*.rb'
 
 # Offense count: 3
 Metrics/CyclomaticComplexity:
   Exclude:
     - 'lib/cloudware/aws.rb'
     - 'lib/cloudware/config.rb'
+    - 'lib/cloudware/commands/**/*.rb'
 
 # Offense count: 15
 # Configuration parameters: CountComments.
@@ -61,6 +63,7 @@ Metrics/MethodLength:
     - 'lib/cloudware/azure.rb'
     - 'lib/cloudware/aws.rb'
     - 'lib/cloudware/config.rb'
+    - 'lib/cloudware/commands/**/*.rb'
 
 # Offense count: 4
 # Configuration parameters: CountKeywordArgs.
@@ -74,6 +77,7 @@ Metrics/PerceivedComplexity:
   Exclude:
     - 'lib/cloudware/aws.rb'
     - 'lib/cloudware/config.rb'
+    - 'lib/cloudware/commands/**/*.rb'
 
 # Offense count: 2
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist, MethodDefinitionMacros.
@@ -91,9 +95,9 @@ Naming/PredicateName:
 # Configuration parameters: AutoCorrect.
 Performance/HashEachMethods:
   Exclude:
-    - 'lib/cloudware/cli.rb'
     - 'lib/cloudware/domain.rb'
     - 'lib/cloudware/machine.rb'
+    - 'lib/cloudware/commands/**/*.rb'
 
 # Offense count: 4
 # Configuration parameters: Max.
@@ -137,7 +141,7 @@ Style/GuardClause:
 Style/IfUnlessModifier:
   Exclude:
     - 'lib/cloudware/azure.rb'
-    - 'lib/cloudware/cli.rb'
+    - 'lib/cloudware/commands/**/*.rb'
 
 # Offense count: 1
 Style/MultipleComparison:
@@ -157,3 +161,4 @@ Metrics/LineLength:
     - 'lib/cloudware/gcp.rb'
     - 'lib/cloudware/aws.rb'
     - 'lib/cloudware/config.rb'
+    - 'lib/cloudware/commands/**/*.rb'
