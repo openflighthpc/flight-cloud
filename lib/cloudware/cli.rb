@@ -212,21 +212,7 @@ module Cloudware
       c.description = 'Check the power status of a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          puts "#{options.name}: Power status is #{machine.get_item('state')}"
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when checking machine power status: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Power::Status)
     end
 
     command :'machine power on' do |c|
