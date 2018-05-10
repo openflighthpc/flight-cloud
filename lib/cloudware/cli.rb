@@ -204,28 +204,7 @@ module Cloudware
       c.description = 'Destroy a machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          m = Cloudware::Machine.new
-
-          options.name = ask('Machine name: ') if options.name.nil?
-          m.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          m.domain = options.domain.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Checking machine exists'.bold, stop: '[OK]'.green
-          raise('Machine does not exist') unless m.exists?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: "Destroying #{options.name} in domain #{options.domain}".bold, stop: '[OK]'.green
-          m.destroy
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed destroying machine: #{error.message}")
-          raise error.message
-        end
-      end
+      action(c, Commands::Machine::Destroy)
     end
 
     command :'machine power status' do |c|
