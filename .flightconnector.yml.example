@@ -1,4 +1,7 @@
----
+# Please fill this file out with your aws and azure keys
+# The file then needs to be stored in your home directory as:
+# ~/.flightconnector.yml
+
 # Location to store Cloudware logs
 general:
   log_file: '/var/log/cloudware.log'
