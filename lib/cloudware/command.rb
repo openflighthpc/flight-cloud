@@ -2,19 +2,19 @@
 
 module Cloudware
   class Command
-    def initialize(input_args, options)
-      @input_args = input_args.freeze
+    def initialize(args, options)
+      @args = args.freeze
       @options = options
     end
 
     def run!
-      unpack_args(input_args.dup)
+      unpack_args
       run
     rescue Exception => e
       handle_fatal_error(e)
     end
 
-    def unpack_args(args); end
+    def unpack_args; end
 
     def run
       raise NotImplementedError
@@ -22,7 +22,7 @@ module Cloudware
 
     private
 
-    attr_reader :input_args, :options
+    attr_reader :args, :options
 
     def handle_fatal_error(e)
       Cloudware.log.fatal(e.message)
