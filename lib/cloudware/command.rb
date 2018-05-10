@@ -14,8 +14,7 @@ module Cloudware
       handle_fatal_error(e)
     end
 
-    def unpack_args(args)
-    end
+    def unpack_args(args); end
 
     def run
       raise NotImplementedError

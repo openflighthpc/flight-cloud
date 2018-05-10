@@ -68,3 +68,9 @@ RSpec/NamedSubject:
 Style/FrozenStringLiteralComment:
   Exclude:
     - 'Vagrantfile'
+
+# Allow `Exception` to be rescued in `Command` class. This class is designed to
+# log fatal errors including the `Exception`
+Lint/RescueException:
+  Exclude:
+    - 'lib/cloudware/command.rb'
