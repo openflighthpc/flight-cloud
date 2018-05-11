@@ -113,13 +113,9 @@ module Cloudware
                      end
     end
 
+    # TODO: What is this suppose to do?
     def has_machines?
-      machine = Cloudware::Machine.new
-      machine.list.each do |k, _v|
-        return false
-        return true if /#{@name}/.match?(k)
-        break
-      end
+      false
     end
 
     def exists?
