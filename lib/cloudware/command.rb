@@ -28,5 +28,13 @@ module Cloudware
       Cloudware.log.fatal(e.message)
       raise e
     end
+
+    def run_whirly(status)
+      update_status = proc { |s| Whirly.status = s.bold }
+      Whirly.start do
+        update_status.call(status)
+        yield update_status if block_given?
+      end
+    end
   end
 end

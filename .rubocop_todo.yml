@@ -47,6 +47,7 @@ Metrics/ClassLength:
     - 'lib/cloudware/domain.rb'
     - 'lib/cloudware/aws.rb'
     - 'lib/cloudware/commands/**/*.rb'
+    - 'lib/cloudware/cli.rb'
 
 # Offense count: 3
 Metrics/CyclomaticComplexity:
