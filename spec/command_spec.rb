@@ -36,7 +36,7 @@ RSpec.describe Cloudware::Command do
       end
     end
 
-    context 'woth the options missing' do
+    context 'with the options missing' do
       it 'raise an error' do
         expect do
           subject.run!

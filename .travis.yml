@@ -6,5 +6,7 @@ rvm:
 sudo: required
 install:
   - cp ./.flightconnector.yml.example ~/.flightconnector.yml
+  - sed -i 's#/var/log#/tmp#g' ~/.flightconnector.yml
+  - touch /tmp/flightconnector.log
   - bundle install
 script: rspec
