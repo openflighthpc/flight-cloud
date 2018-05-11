@@ -239,9 +239,6 @@ module Cloudware
       log.info("[#{self.class}] Deployment for #{name} finished, waiting for deployment to reach complete")
       @cfn.wait_until :stack_create_complete, stack_name: name
       log.info("[#{self.class}] Deployment for #{name} reached complete status")
-    # Catch errors and hand it up the stack for `cli.rb` to handle
-    rescue CloudFormation::Errors::ServiceError, Aws::Waiters::Errors::FailureStateError => error
-      raise error.message
     end
 
     def destroy(name, domain)
