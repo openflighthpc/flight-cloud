@@ -20,7 +20,7 @@ Resources:
   Network:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: !Join ['', ['10.100.', !Ref clusterIndex, '0/24']]
+      CidrBlock: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
       EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
@@ -35,10 +35,10 @@ Resources:
           Value: !Ref cloudwareDomain
         -
           Key: 'cloudware_network_cidr'
-          Value: !Join ['', ['10.100.', !Ref clusterIndex, '0/24']]
+          Value: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
         -
           Key: 'cloudware_prv_subnet_cidr'
-          Value: !Join ['', ['10.100.', !Ref clusterIndex, '0/24']]
+          Value: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -64,7 +64,7 @@ Resources:
   PrvSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: !Join ['', ['10.100.', !Ref clusterIndex, '0/24']]
+      CidrBlock: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
       VpcId: !Ref Network
       AvailabilityZone: !Select
         - 0
