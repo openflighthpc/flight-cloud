@@ -60,7 +60,6 @@ module Cloudware
                     else
                       raise "Provider #{provider} doesn't exist"
                     end
-      log.debug("[#{self.class}] Loaded machines from #{provider}:\n#{local_cloud.domains}")
       local_cloud.domains
     end
 
