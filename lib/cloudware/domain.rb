@@ -76,13 +76,7 @@ module Cloudware
     end
 
     def domains_by_region(region)
-      @domains_by_region ||= begin
-                               @domains_by_region = cloud.domains
-                               @domains_by_region.each do |k, v|
-                                 k.delete(k) if v[:region] != region
-                               end
-                               @domains_by_region
-                             end
+      cloud.domains.select { |_k, v| true if v[:region] == region }
     end
 
     def destroy
