@@ -17,10 +17,6 @@ Parameters:
     Type: String
     Description: 'Enter the prv subnet ID'
 
-  prvSubnetCidr:
-    Type: String
-    Description: 'Enter the prv subnet CIDR'
-
   keyPairName:
     Default: 'aws_ireland'
     Type: String
@@ -46,7 +42,6 @@ Mappings:
 Resources:
   securityGroupLogin:
     Type: AWS::EC2::SecurityGroup
-    DependsOn: RouteInternetLogin
     Properties:
       GroupName: !Join ['-', [!Ref cloudwareDomain, 'login']]
       GroupDescription: 'Flight Connector Login'
@@ -125,7 +120,7 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: !Join [' ', [!Ref cloudwareDomain, 'login']
+          Value: !Join [' ', [!Ref cloudwareDomain, 'login']]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
