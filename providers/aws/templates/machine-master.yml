@@ -101,7 +101,7 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
 
-  securityGroupPrv:
+  securityGroupPri:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: !Join ['-', [!Ref cloudwareDomain, !Ref vmName, 'prv']]
@@ -151,7 +151,7 @@ Resources:
       Description: !Join [' ', [!Ref cloudwareDomain, !Ref vmName, 'prv network interface']]
       SourceDestCheck: false
       GroupSet:
-        - !Ref securityGroupPrv
+        - !Ref securityGroupPri
         - !Ref securityGroupMaster
       PrivateIpAddress: !Ref prvIp
       SubnetId: !Ref prvSubnetId

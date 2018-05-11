@@ -9,12 +9,12 @@ module Cloudware
           d.name = name
           d.region = options.region
           d.networkcidr = options.networkcidr
-          d.prvsubnetcidr = options.prvsubnetcidr
+          d.prisubnetcidr = options.prisubnetcidr
 
           run_whirly('Verifying network CIDR is valid') do |update_status|
             raise("Network CIDR #{options.networkcidr} is not a valid IPV4 address") unless d.valid_cidr?(options.networkcidr.to_s)
-            update_status.call('Verifying prv subnet CIDR is valid')
-            raise("Prv subnet CIDR #{options.prvsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.prvsubnetcidr.to_s)
+            update_status.call('Verifying pri subnet CIDR is valid')
+            raise("Prv subnet CIDR #{options.prisubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.prisubnetcidr.to_s)
             update_status.call('Verifying mgt subnet CIDR is valid')
           end
 

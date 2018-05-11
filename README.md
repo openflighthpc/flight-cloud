@@ -120,7 +120,7 @@ $ cloudware domain create \
   --provider aws \
   --region eu-west-1 \
   --networkcidr 10.100.0.0/16 \
-  --prvsubnetcidr 10.100.1.0/24 \
+  --prisubnetcidr 10.100.1.0/24 \
   --mgtsubnetcidr 10.100.2.0/24
 Starting deployment. This may take a while..
 Deployment complete
@@ -149,7 +149,7 @@ $ cloudware machine create \
   --name master1 \
   --domain moose \
   --role master \
-  --prvip 10.100.1.11 \
+  --priip 10.100.1.11 \
   --mgtip 10.100.2.11 \
   --flavour compute \
   --type tiny
