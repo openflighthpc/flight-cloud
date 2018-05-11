@@ -32,6 +32,12 @@ module Cloudware
     end
 
     def enforce_required_options
+      required_options&.each do |opt|
+        next if options[opt]
+        raise InvalidInput, <<-ERROR.squish
+          Missing the required --#{opt} input
+        ERROR
+      end
     end
 
     def run_whirly(status)

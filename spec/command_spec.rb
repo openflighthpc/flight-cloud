@@ -35,5 +35,13 @@ RSpec.describe Cloudware::Command do
         expect { subject.run! }.not_to raise_error
       end
     end
+
+    context 'woth the options missing' do
+      it 'raise an error' do
+        expect do
+          subject.run!
+        end.to raise_error(Cloudware::InvalidInput, /#{required.first}/)
+      end
+    end
   end
 end
