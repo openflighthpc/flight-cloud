@@ -33,7 +33,7 @@ module Cloudware
 
     def enforce_required_options
       required_options&.each do |opt|
-        next if options[opt]
+        next if options.method_missing(opt)
         raise InvalidInput, <<-ERROR.squish
           Missing the required --#{opt} input
         ERROR
