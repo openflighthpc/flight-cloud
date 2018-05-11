@@ -39,18 +39,6 @@ module Cloudware
       @items = {}
     end
 
-    def load_cloud
-      case @provider
-      when 'aws'
-        @cloud = Cloudware::Aws2.new
-      when 'azure'
-        @cloud = Cloudware::Azure.new
-      else
-        @aws = Cloudware::Aws2.new
-        @azure = Cloudware::Azure.new
-      end
-    end
-
     def describe
       @describe ||= begin
                     domain = Struct.new :name, :region, :provider, :networkcidr, :prisubnetcidr
@@ -59,8 +47,7 @@ module Cloudware
     end
 
     def create
-      load_cloud
-      @cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,
+      cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,
                            @prisubnetcidr, @region)
     end
 
@@ -90,8 +77,7 @@ module Cloudware
 
     def domains_by_region(region)
       @domains_by_region ||= begin
-                               load_cloud
-                               @domains_by_region = @cloud.domains
+                               @domains_by_region = cloud.domains
                                @domains_by_region.each do |k, v|
                                  k.delete(k) if v[:region] != region
                                end
@@ -102,8 +88,7 @@ module Cloudware
     def destroy
       raise('Unable to destroy domain with active machines') if has_machines?
       @provider = get_item('provider')
-      load_cloud
-      @cloud.destroy('domain', @name)
+      cloud.destroy('domain', @name)
     end
 
     def get_item(item)
@@ -142,6 +127,25 @@ module Cloudware
       network_cidr = IPAddr.new(network)
       subnet_cidr = IPAddr.new(subnet)
       network_cidr.include?(subnet_cidr)
+    end
+
+    private
+
+    def cloud
+      case provider
+      when 'aws'
+        aws
+      when 'azure'
+        azure
+      end
+    end
+
+    def aws
+      @aws ||= Cloudware::Aws2.new
+    end
+
+    def azure
+      @azure ||= Cloudware::Azure.new
     end
   end
 end
