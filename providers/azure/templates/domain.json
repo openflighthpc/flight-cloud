@@ -9,11 +9,11 @@
         "description": "Choose the desired network range"
       }
     },
-    "prvSubnetCIDR": {
+    "priSubnetCIDR": {
       "type": "string",
       "defaultValue": "10.0.1.0/24",
       "metadata": {
-        "description": "Choose the desired prv subnet range"
+        "description": "Choose the desired pri subnet range"
       }
     },
     "mgtSubnetCIDR": {
@@ -46,7 +46,7 @@
         "cloudware_domain": "[parameters('cloudwareDomain')]",
         "cloudware_domain_region": "[resourceGroup().location]",
         "cloudware_network_cidr": "[parameters('networkCIDR')]",
-        "cloudware_prv_subnet_cidr": "[parameters('prvSubnetCIDR')]",
+        "cloudware_pri_subnet_cidr": "[parameters('priSubnetCIDR')]",
         "cloudware_mgt_subnet_cidr": "[parameters('mgtSubnetCIDR')]",
         "cloudware_resource_type": "domain"
       },
@@ -59,9 +59,9 @@
         },
         "subnets": [
           {
-            "name": "prv",
+            "name": "pri",
             "properties": {
-              "addressPrefix": "[parameters('prvSubnetCIDR')]"
+              "addressPrefix": "[parameters('priSubnetCIDR')]"
             }
           },
           {

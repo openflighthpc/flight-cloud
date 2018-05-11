@@ -25,7 +25,7 @@ require 'google/cloud/resource_manager'
 
 module Cloudware
   class Gcp
-    attr_accessor :name, :networkcidr, :prvsubnetcidr, :region, :infrastructure
+    attr_accessor :name, :networkcidr, :prisubnetcidr, :region, :infrastructure
 
     def initialize
       @resource_manager = Google::Cloud::ResourceManager.new

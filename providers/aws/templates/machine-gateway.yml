@@ -13,9 +13,9 @@ Parameters:
     Type: String
     Description: 'Enter the VPC/network ID'
 
-  prvSubnetId:
+  priSubnetId:
     Type: String
-    Description: 'Enter the prv subnet ID'
+    Description: 'Enter the pri subnet ID'
 
   keyPairName:
     Default: 'aws_ireland'
@@ -83,19 +83,19 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
 
-  prvInterface:
+  priInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
-      Description: !Join [' ', [!Ref cloudwareDomain, 'gateway', 'prv network interface']]
+      Description: !Join [' ', [!Ref cloudwareDomain, 'gateway', 'pri network interface']]
       SourceDestCheck: false
       GroupSet:
         - !Ref securityGroupGateway
       PrivateIpAddress: 10.78.100.10
-      SubnetId: !Ref prvSubnetId
+      SubnetId: !Ref priSubnetId
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', [!Ref cloudwareDomain, 'gateway', 'prv']]
+          Value: !Join ['-', [!Ref cloudwareDomain, 'gateway', 'pri']]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -115,7 +115,7 @@ Resources:
       KeyName: !Ref keyPairName
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref prvInterface
+          NetworkInterfaceId: !Ref priInterface
           DeviceIndex: 0
       Tags:
         -
@@ -137,7 +137,7 @@ Resources:
           Key: 'cloudware_machine_flavour'
           Value: !Ref vmFlavour
         -
-          Key: 'cloudware_prv_subnet_ip'
+          Key: 'cloudware_pri_subnet_ip'
           Value: 10.78.100.10
 
   publicIp:
@@ -148,5 +148,5 @@ Resources:
   publicIpAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      NetworkInterfaceId: !Ref prvInterface
+      NetworkInterfaceId: !Ref priInterface
       AllocationId: !GetAtt publicIp.AllocationId

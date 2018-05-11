@@ -126,7 +126,7 @@ Starting deployment. This may take a while..
 Deployment complete
 $ cloudware domain list
 +--------------------+----------------+-----------------+-----------------+----------+-----------+
-| Domain name        | Network CIDR   | Prv Subnet CIDR | Mgt Subnet CIDR | Provider | Region    |
+| Domain name        | Network CIDR   | Pri Subnet CIDR | Mgt Subnet CIDR | Provider | Region    |
 +--------------------+----------------+-----------------+-----------------+----------+-----------+
 | ancient-aardvark   | 10.0.0.0/16    | 10.0.1.0/24     | 10.0.2.0/24     | azure    | uksouth   |
 | broad-buffalo      | 10.0.0.0/16    | 10.0.1.0/24     | 10.0.2.0/24     | azure    | uksouth   |
@@ -157,7 +157,7 @@ $ cloudware machine create \
 ==> Deployment succeeded
 $ cloudware machine list
 +-------------+----------------+--------+----------------+----------------+--------------+---------+
-| Name        | Domain         | Role   | Prv IP address | Mgt IP address | Type         | State   |
+| Name        | Domain         | Role   | Pri IP address | Mgt IP address | Type         | State   |
 +-------------+----------------+--------+----------------+----------------+--------------+---------+
 | master1     | crafty-caribou | master | 10.10.1.11     | 10.10.2.11     | Standard_F4s | running |
 +-------------+----------------+--------+----------------+----------------+--------------+---------+

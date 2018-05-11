@@ -15,7 +15,7 @@ describe Cloudware::Domain do
       @provider = 'azure'
       @region = 'uksouth'
       @networkcidr = '10.0.0.0/16'
-      @prvsubnetcidr = '10.0.1.0/24'
+      @prisubnetcidr = '10.0.1.0/24'
       @domain = described_class.new
       @domain.name = @name
       @domain.provider = @provider
@@ -43,19 +43,19 @@ describe Cloudware::Domain do
       expect(@domain.valid_cidr?(@networkcidr)).to be(true)
     end
 
-    it 'returns the correct prv subnet cidr' do
-      @domain.prvsubnetcidr = @prvsubnetcidr
-      expect(@domain.prvsubnetcidr).to eq(@prvsubnetcidr)
+    it 'returns the correct pri subnet cidr' do
+      @domain.prisubnetcidr = @prisubnetcidr
+      expect(@domain.prisubnetcidr).to eq(@prisubnetcidr)
     end
 
-    it 'validates the prv subnet cidrs' do
-      expect(@domain.is_valid_subnet_cidr?(@networkcidr, @prvsubnetcidr)).to be(true)
+    it 'validates the pri subnet cidrs' do
+      expect(@domain.is_valid_subnet_cidr?(@networkcidr, @prisubnetcidr)).to be(true)
     end
 
     xit 'creates a new domain' do
       @domain.region = 'uksouth'
       @domain.networkcidr = @networkcidr
-      @domain.prvsubnetcidr = @prvsubnetcidr
+      @domain.prisubnetcidr = @prisubnetcidr
       @domain.create
       wait_for(@domain.exists?).to be(true)
     end
@@ -70,7 +70,7 @@ describe Cloudware::Domain do
       expect(domain).to have_attributes(region: @region)
       expect(domain).to have_attributes(provider: @provider)
       expect(domain).to have_attributes(networkcidr: @networkcidr)
-      expect(domain).to have_attributes(prvsubnetcidr: @prvsubnetcidr)
+      expect(domain).to have_attributes(prisubnetcidr: @prisubnetcidr)
     end
 
     xit 'destroys the domain' do
@@ -85,7 +85,7 @@ describe Cloudware::Domain do
       @provider = 'aws'
       @region = 'eu-west-1'
       @networkcidr = '10.0.0.0/16'
-      @prvsubnetcidr = '10.0.1.0/24'
+      @prisubnetcidr = '10.0.1.0/24'
       @domain = described_class.new
       @domain.name = @name
       @domain.provider = @provider
@@ -113,19 +113,19 @@ describe Cloudware::Domain do
       expect(@domain.valid_cidr?(@networkcidr)).to be(true)
     end
 
-    it 'returns the correct prv subnet cidr' do
-      @domain.prvsubnetcidr = @prvsubnetcidr
-      expect(@domain.prvsubnetcidr).to eq(@prvsubnetcidr)
+    it 'returns the correct pri subnet cidr' do
+      @domain.prisubnetcidr = @prisubnetcidr
+      expect(@domain.prisubnetcidr).to eq(@prisubnetcidr)
     end
 
-    it 'validates the prv subnet cidrs' do
-      expect(@domain.is_valid_subnet_cidr?(@networkcidr, @prvsubnetcidr)).to be(true)
+    it 'validates the pri subnet cidrs' do
+      expect(@domain.is_valid_subnet_cidr?(@networkcidr, @prisubnetcidr)).to be(true)
     end
 
     xit 'creates a new domain' do
       @domain.region = @region
       @domain.networkcidr = @networkcidr
-      @domain.prvsubnetcidr = @prvsubnetcidr
+      @domain.prisubnetcidr = @prisubnetcidr
       @domain.create
       wait_for(@domain.exists?).to be(true)
     end
@@ -140,7 +140,7 @@ describe Cloudware::Domain do
       expect(domain).to have_attributes(region: @region)
       expect(domain).to have_attributes(provider: @provider)
       expect(domain).to have_attributes(networkcidr: @networkcidr)
-      expect(domain).to have_attributes(prvsubnetcidr: @prvsubnetcidr)
+      expect(domain).to have_attributes(prisubnetcidr: @prisubnetcidr)
     end
 
     xit 'destroys the domain' do

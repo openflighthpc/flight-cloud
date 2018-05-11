@@ -37,7 +37,7 @@ Resources:
           Key: 'cloudware_network_cidr'
           Value: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
         -
-          Key: 'cloudware_prv_subnet_cidr'
+          Key: 'cloudware_pri_subnet_cidr'
           Value: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
 
   InternetGateway:
@@ -61,7 +61,7 @@ Resources:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref Network
 
-  PrvSubnet:
+  PriSubnet:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
@@ -93,10 +93,10 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
 
-  PrvSubnetRouteTableAssocation:
+  PriSubnetRouteTableAssocation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PrvSubnet
+      SubnetId: !Ref PriSubnet
       RouteTableId: !Ref RouteTable
 
   RouteInternetGateway:

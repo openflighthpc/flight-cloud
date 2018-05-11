@@ -13,25 +13,25 @@ Parameters:
     Type: String
     Description: 'Enter the VPC/network ID'
 
-  prvSubnetId:
+  priSubnetId:
     Type: String
-    Description: 'Enter the prv subnet ID'
+    Description: 'Enter the pri subnet ID'
 
   mgtSubnetId:
     Type: String
     Description: 'Enter the mgt subnet ID'
 
-  prvIp:
+  priIp:
     Type: String
-    Description: 'Enter the prv subnet IP'
+    Description: 'Enter the pri subnet IP'
 
   mgtIp:
     Type: String
     Description: 'Enter the mgt subnet IP'
 
-  prvSubnetCidr:
+  priSubnetCidr:
     Type: String
-    Description: 'Enter the prv subnet CIDR'
+    Description: 'Enter the pri subnet CIDR'
 
   mgtSubnetCidr:
     Type: String
@@ -104,18 +104,18 @@ Resources:
   securityGroupPri:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Join ['-', [!Ref cloudwareDomain, !Ref vmName, 'prv']]
-      GroupDescription: 'Cloudware security group for master machine prv interface'
+      GroupName: !Join ['-', [!Ref cloudwareDomain, !Ref vmName, 'pri']]
+      GroupDescription: 'Cloudware security group for master machine pri interface'
       VpcId: !Ref networkId
       SecurityGroupIngress:
         -
           IpProtocol: '-1'
-          CidrIp: !Ref prvSubnetCidr
-          Description: 'Allow unrestricted access from the prv subnet'
+          CidrIp: !Ref priSubnetCidr
+          Description: 'Allow unrestricted access from the pri subnet'
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', [!Ref cloudwareDomain, !Ref vmName, 'prv']]
+          Value: !Join ['-', [!Ref cloudwareDomain, !Ref vmName, 'pri']]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -145,20 +145,20 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
 
-  prvInterface:
+  priInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
-      Description: !Join [' ', [!Ref cloudwareDomain, !Ref vmName, 'prv network interface']]
+      Description: !Join [' ', [!Ref cloudwareDomain, !Ref vmName, 'pri network interface']]
       SourceDestCheck: false
       GroupSet:
         - !Ref securityGroupPri
         - !Ref securityGroupMaster
-      PrivateIpAddress: !Ref prvIp
-      SubnetId: !Ref prvSubnetId
+      PrivateIpAddress: !Ref priIp
+      SubnetId: !Ref priSubnetId
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', [!Ref cloudwareDomain, !Ref vmName, 'prv']]
+          Value: !Join ['-', [!Ref cloudwareDomain, !Ref vmName, 'pri']]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -197,7 +197,7 @@ Resources:
       KeyName: !Ref keyPairName
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref prvInterface
+          NetworkInterfaceId: !Ref priInterface
           DeviceIndex: 0
         -
           NetworkInterfaceId: !Ref mgtInterface
@@ -222,8 +222,8 @@ Resources:
           Key: 'cloudware_machine_flavour'
           Value: !Ref vmFlavour
         -
-          Key: 'cloudware_prv_subnet_ip'
-          Value: !Ref prvIp
+          Key: 'cloudware_pri_subnet_ip'
+          Value: !Ref priIp
         -
           Key: 'cloudware_mgt_subnet_ip'
           Value: !Ref mgtIp
@@ -236,5 +236,5 @@ Resources:
   publicIpAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      NetworkInterfaceId: !Ref prvInterface
+      NetworkInterfaceId: !Ref priInterface
       AllocationId: !GetAtt publicIp.AllocationId

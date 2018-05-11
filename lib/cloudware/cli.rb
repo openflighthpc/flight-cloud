@@ -73,12 +73,12 @@ module Cloudware
       c.option '--networkcidr CIDR',
                String, { default: '10.0.0.0/16' },
                <<~SUMMARY.squish
-                 Entire network CIDR. The prv and mgt subnet must be
+                 Entire network CIDR. The pri and mgt subnet must be
                  within this range'
                SUMMARY
-      c.option '--prvsubnetcidr NAME',
+      c.option '--prisubnetcidr NAME',
                String, { default: '10.0.1.0/24' },
-               'Prv subnet CIDR'
+               'Pri subnet CIDR'
       c.hidden = true
       action(c, Commands::Domain::Create)
     end
@@ -112,7 +112,7 @@ module Cloudware
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
       c.option '--role NAME', String, 'Machine role to inherit (master or slave)'
-      c.option '--prvip ADDR', String, 'Prv subnet IP address'
+      c.option '--priip ADDR', String, 'Pri subnet IP address'
       c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
       c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
       c.hidden = true
