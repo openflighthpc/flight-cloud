@@ -29,7 +29,7 @@ module Cloudware
           options.mgtip = ask('Mgt subnet IP: ') if options.mgtip.nil?
           m.mgtip = options.mgtip.to_s
 
-          run_whirly('Verifying domain exists') do |update_status|
+          run_whirly('Verifying domain exists') do
             raise("Domain #{options.domain} does not exist") unless m.valid_domain?
           end
 
@@ -41,7 +41,7 @@ module Cloudware
             raise("Invalid mgt IP address #{options.mgtip} in subnet #{d.get_item('mgt_subnet_cidr')}") unless m.valid_ip?(d.get_item('mgt_subnet_cidr').to_s, options.mgtip.to_s)
           end
 
-          run_whirly('Creating new deployment') do |update_status|
+          run_whirly('Creating new deployment') do
             m.create
           end
         end

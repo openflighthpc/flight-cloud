@@ -32,7 +32,7 @@ module Cloudware
             raise("Mgt subnet CIDR #{options.mgtsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.mgtsubnetcidr.to_s)
           end
 
-          run_whirly('Checking domain name is valid') do |update_status|
+          run_whirly('Checking domain name is valid') do
             raise("Domain name #{options.name} is not valid") unless d.valid_name?
           end
 
@@ -43,7 +43,7 @@ module Cloudware
             raise("Provider #{options.provider} does not exist") unless d.valid_provider?
           end
 
-          run_whirly('Creating new deployment') do |update_status|
+          run_whirly('Creating new deployment') do
             d.create
           end
         end
