@@ -22,7 +22,13 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 
-$LOAD_PATH << File.join(File.dirname(__FILE__), 'cloudware')
+lib_dir = File.dirname(__FILE__)
+$LOAD_PATH << File.join(lib_dir, 'cloudware')
+ENV['BUNDLE_GEMFILE'] ||= File.join(lib_dir, '..', 'Gemfile')
+
+require 'rubygems'
+require 'bundler'
+Bundler.setup(:default)
 
 require 'cli'
 require 'domain'
