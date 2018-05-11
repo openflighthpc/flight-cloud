@@ -11,7 +11,7 @@ module Cloudware
           d.name = options.name.to_s unless options.name.nil?
 
           # Exit if the provider is not in the config list (which verifies details ahead of time)
-          if (Cloudware.config.instance_variable_get(:@providers) & d.provider).empty?
+          if (Cloudware.config.providers & d.provider).empty?
             raise "The provider #{d.provider.join(',')} is not a valid provider - unknown or missing login details"
           end
 
