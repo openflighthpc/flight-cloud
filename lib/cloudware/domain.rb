@@ -47,7 +47,7 @@ module Cloudware
     end
 
     def create
-      cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,
+      cloud.create_domain(name, SecureRandom.uuid, @networkcidr,
                            @prisubnetcidr, @region)
     end
 
@@ -88,13 +88,13 @@ module Cloudware
     def destroy
       raise('Unable to destroy domain with active machines') if has_machines?
       @provider = get_item('provider')
-      cloud.destroy('domain', @name)
+      cloud.destroy('domain', name)
     end
 
     def get_item(item)
       @items[item] = begin
                        log.debug("[#{self.class}] Loading #{item} from API")
-                       list[@name][item.to_sym]
+                       list[name][item.to_sym]
                      end
     end
 
@@ -104,11 +104,11 @@ module Cloudware
     end
 
     def exists?
-      list.include? @name || false
+      list.include? name || false
     end
 
     def valid_name?
-      !@name.match(/\A[a-zA-Z0-9-]*\z/).nil?
+      !name.match(/\A[a-zA-Z0-9-]*\z/).nil?
     end
 
     def valid_provider?
