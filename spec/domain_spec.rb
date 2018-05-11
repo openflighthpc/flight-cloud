@@ -16,7 +16,6 @@ describe Cloudware::Domain do
       @region = 'uksouth'
       @networkcidr = '10.0.0.0/16'
       @prvsubnetcidr = '10.0.1.0/24'
-      @mgtsubnetcidr = '10.0.2.0/24'
       @domain = described_class.new
       @domain.name = @name
       @domain.provider = @provider
@@ -49,21 +48,14 @@ describe Cloudware::Domain do
       expect(@domain.prvsubnetcidr).to eq(@prvsubnetcidr)
     end
 
-    it 'validates the prv/mgt subnet cidrs' do
+    it 'validates the prv subnet cidrs' do
       expect(@domain.is_valid_subnet_cidr?(@networkcidr, @prvsubnetcidr)).to be(true)
-      expect(@domain.is_valid_subnet_cidr?(@networkcidr, @mgtsubnetcidr)).to be(true)
-    end
-
-    it 'returns the correct mgt subnet cidr' do
-      @domain.mgtsubnetcidr = @mgtsubnetcidr
-      expect(@domain.mgtsubnetcidr).to eq(@mgtsubnetcidr)
     end
 
     xit 'creates a new domain' do
       @domain.region = 'uksouth'
       @domain.networkcidr = @networkcidr
       @domain.prvsubnetcidr = @prvsubnetcidr
-      @domain.mgtsubnetcidr = @mgtsubnetcidr
       @domain.create
       wait_for(@domain.exists?).to be(true)
     end
@@ -79,7 +71,6 @@ describe Cloudware::Domain do
       expect(domain).to have_attributes(provider: @provider)
       expect(domain).to have_attributes(networkcidr: @networkcidr)
       expect(domain).to have_attributes(prvsubnetcidr: @prvsubnetcidr)
-      expect(domain).to have_attributes(mgtsubnetcidr: @mgtsubnetcidr)
     end
 
     xit 'destroys the domain' do
@@ -95,7 +86,6 @@ describe Cloudware::Domain do
       @region = 'eu-west-1'
       @networkcidr = '10.0.0.0/16'
       @prvsubnetcidr = '10.0.1.0/24'
-      @mgtsubnetcidr = '10.0.2.0/24'
       @domain = described_class.new
       @domain.name = @name
       @domain.provider = @provider
@@ -128,21 +118,14 @@ describe Cloudware::Domain do
       expect(@domain.prvsubnetcidr).to eq(@prvsubnetcidr)
     end
 
-    it 'validates the prv/mgt subnet cidrs' do
+    it 'validates the prv subnet cidrs' do
       expect(@domain.is_valid_subnet_cidr?(@networkcidr, @prvsubnetcidr)).to be(true)
-      expect(@domain.is_valid_subnet_cidr?(@networkcidr, @mgtsubnetcidr)).to be(true)
-    end
-
-    it 'returns the correct mgt subnet cidr' do
-      @domain.mgtsubnetcidr = @mgtsubnetcidr
-      expect(@domain.mgtsubnetcidr).to eq(@mgtsubnetcidr)
     end
 
     xit 'creates a new domain' do
       @domain.region = @region
       @domain.networkcidr = @networkcidr
       @domain.prvsubnetcidr = @prvsubnetcidr
-      @domain.mgtsubnetcidr = @mgtsubnetcidr
       @domain.create
       wait_for(@domain.exists?).to be(true)
     end
@@ -158,7 +141,6 @@ describe Cloudware::Domain do
       expect(domain).to have_attributes(provider: @provider)
       expect(domain).to have_attributes(networkcidr: @networkcidr)
       expect(domain).to have_attributes(prvsubnetcidr: @prvsubnetcidr)
-      expect(domain).to have_attributes(mgtsubnetcidr: @mgtsubnetcidr)
     end
 
     xit 'destroys the domain' do
