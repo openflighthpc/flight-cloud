@@ -4,7 +4,7 @@ require 'ostruct'
 module Cloudware
   module Commands
     class TestCommand < Command
-    def run; end
+      def run; end
     end
   end
 end
