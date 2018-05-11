@@ -150,6 +150,8 @@ CRT=`cat /etc/openvpn/easyrsa/pki/issued/$CLUSTER.crt`
 KEY=`cat /etc/openvpn/easyrsa/pki/private/$CLUSTER.key`
 TA=`cat /etc/openvpn/easyrsa/ta.key`
 cat << EOF > /root/install_$CLUSTER.run
+yum install -y epel-release
+yum install -y openvpn
 cat << EOD > /etc/openvpn/flightconnector.conf
 client
 dev tun
