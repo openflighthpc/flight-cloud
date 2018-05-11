@@ -30,6 +30,9 @@ require 'rubygems'
 require 'bundler'
 Bundler.setup(:default)
 
+# ActiveSupport modules
+require 'active_support/core_ext/string'
+
 require 'cli'
 require 'domain'
 require 'machine'
