@@ -16,6 +16,7 @@ module Cloudware
     end
 
     def unpack_args; end
+
     def required_options; end
 
     def run
