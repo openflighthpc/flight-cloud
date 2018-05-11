@@ -13,7 +13,7 @@ module Cloudware
             options.domain = ask('Domain identifier: ') if options.domain.nil?
             machine.domain = options.domain.to_s
 
-            Whirly.start status: "Powering on machine #{options.name}" do
+            run_whirly("Powering on machine #{options.name}") do
               machine.power_on
             end
           end

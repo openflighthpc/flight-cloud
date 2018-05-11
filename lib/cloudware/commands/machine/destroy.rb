@@ -13,11 +13,11 @@ module Cloudware
           options.domain = ask('Domain identifier: ') if options.domain.nil?
           m.domain = options.domain.to_s
 
-          Whirly.start status: 'Checking machine exists' do
+          run_whirly('Checking machine exists') do
             raise('Machine does not exist') unless m.exists?
           end
 
-          Whirly.start status: "Destroying #{options.name} in domain #{options.domain}" do
+          run_whirly("Destroying #{options.name} in domain #{options.domain}") do
             m.destroy
           end
         end
