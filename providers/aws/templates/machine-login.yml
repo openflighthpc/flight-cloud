@@ -52,6 +52,7 @@ Resources:
       GroupDescription: 'Flight Connector Login'
       VpcId: !Ref networkId
       SecurityGroupIngress:
+        -
           IpProtocol: 'tcp'
           FromPort: 22
           ToPort: 22
