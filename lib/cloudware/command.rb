@@ -16,7 +16,7 @@ module Cloudware
     end
 
     def unpack_args; end
-    def enforce_required_options; end
+    def required_options; end
 
     def run
       raise NotImplementedError
@@ -29,6 +29,9 @@ module Cloudware
     def handle_fatal_error(e)
       Cloudware.log.fatal(e.message)
       raise e
+    end
+
+    def enforce_required_options
     end
 
     def run_whirly(status)
