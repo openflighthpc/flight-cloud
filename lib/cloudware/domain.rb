@@ -37,7 +37,6 @@ module Cloudware
 
     def initialize
       @items = {}
-      @provider = Cloudware.config.instance_variable_get(:@providers)
     end
 
     def load_cloud

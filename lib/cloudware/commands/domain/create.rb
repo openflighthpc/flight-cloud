@@ -8,6 +8,7 @@ module Cloudware
           d = Cloudware::Domain.new
           d.name = name
           d.region = options.region
+          d.provider = options.provider
           d.networkcidr = options.networkcidr
           d.prisubnetcidr = options.prisubnetcidr
 
@@ -24,7 +25,6 @@ module Cloudware
 
           run_whirly('Checking domain does not already exist') do |update_status|
             raise("Domain name #{options.name} already exists") if d.exists?
-            d.provider = options.provider.to_s
             update_status.call('Verifying provider is valid')
             raise("Provider #{options.provider} does not exist") unless d.valid_provider?
           end
