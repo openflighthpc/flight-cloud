@@ -52,6 +52,11 @@ module Cloudware
       end
     end
 
+    def self.cli_syntax(command, args_str = '')
+      s = "flightconnector #{command.name} #{args_str} [options]".squish
+      command.syntax = s
+    end
+
     command :domain do |c|
       c.syntax = 'flightconnector domain [options]'
       c.description = 'Manage a domain'
@@ -59,7 +64,7 @@ module Cloudware
     end
 
     command :'domain create' do |c|
-      c.syntax = 'flightconnector domain create NAME [options]'
+      cli_syntax(c, 'NAME')
       c.description = 'Create a new domain'
       c.option '--networkcidr CIDR', String, { default: '10.0.0.0/16' }, 'Entire network CIDR. The prv and mgt subnet must be within this range'
       c.option '-p', '--provider NAME', String, 'Cloud service provider name'
