@@ -28,7 +28,6 @@ module Cloudware
     attr_accessor :name
     attr_accessor :domain
     attr_accessor :prvip
-    attr_accessor :mgtip
     attr_accessor :role
     attr_accessor :type
     attr_accessor :flavour
@@ -58,7 +57,6 @@ module Cloudware
         domain: @domain,
         id: get_item('id'),
         prvip: get_item('prv_ip'),
-        mgtip: get_item('mgt_ip'),
         role: get_item('role'),
         type: get_item('type'),
         region: get_item('region'),
@@ -69,11 +67,10 @@ module Cloudware
     def create
       raise('Invalid machine name') unless validate_name?
       # raise("IP address #{prvip} is already in use") if ip_in_use? @prvip
-      # raise("IP address #{mgtip} is already in use") if ip_in_use? @mgtip
       load_cloud
-      log.info("[#{self.class}] Creating new machine:\nName: #{name}\nDomain: #{domain}\nID: #{id}\nPrv IP: #{prvip}\nMgt IP: #{mgtip}\nType: #{type}\nFlavour: #{flavour}")
+      log.info("[#{self.class}] Creating new machine:\nName: #{name}\nDomain: #{domain}\nID: #{id}\nPrv IP: #{prvip}\nType: #{type}\nFlavour: #{flavour}")
       @cloud.create_machine(@name, @domain, @d.get_item('id'),
-                            @prvip, @mgtip, @role, render_type, @d.get_item('region'), @flavour)
+                            @prvip, @role, render_type, @d.get_item('region'), @flavour)
     end
 
     def destroy
@@ -89,7 +86,6 @@ module Cloudware
                             machine_info[:domain],
                             machine_info[:id],
                             machine_info[:prvip],
-                            machine_info[:mgtip],
                             machine_info[:role],
                             machine_info[:type],
                             @d.get_item('region'),
@@ -171,7 +167,7 @@ module Cloudware
     def ip_in_use?(ip)
       list.each do |_k, v|
         if v[:domain] == @domain
-          if v[:mgt_ip] == ip || v[:prv_ip] == ip
+          if v[:prv_ip] == ip
             log.warn("IP address #{ip} is in use by #{v[:name]}")
             return true
             break

@@ -26,9 +26,6 @@ module Cloudware
           options.prvip = ask('Prv subnet IP: ') if options.prvip.nil?
           m.prvip = options.prvip.to_s
 
-          options.mgtip = ask('Mgt subnet IP: ') if options.mgtip.nil?
-          m.mgtip = options.mgtip.to_s
-
           Whirly.start status: 'Verifying domain exists'
           raise("Domain #{options.domain} does not exist") unless m.valid_domain?
           Whirly.stop
@@ -37,8 +34,6 @@ module Cloudware
           raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
           Whirly.status = 'Verifying prv IP address'
           raise("Invalid prv IP address #{options.prvip} in subnet #{d.get_item('prv_subnet_cidr')}") unless m.valid_ip?(d.get_item('prv_subnet_cidr').to_s, options.prvip.to_s)
-          Whirly.status = 'Verifying mgt IP address'
-          raise("Invalid mgt IP address #{options.mgtip} in subnet #{d.get_item('mgt_subnet_cidr')}") unless m.valid_ip?(d.get_item('mgt_subnet_cidr').to_s, options.mgtip.to_s)
           Whirly.stop
 
           Whirly.start status: 'Creating new deployment'
