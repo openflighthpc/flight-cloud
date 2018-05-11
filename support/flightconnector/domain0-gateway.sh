@@ -212,7 +212,7 @@ firewall-cmd --add-interface eth0 --zone external --permanent
 firewall-cmd --add-interface eth0 --zone external
 firewall-cmd --add-port 2005/tcp --zone external --permanent
 
-firewall-cmd --add-target=ACCEPT --zone cluster0 --permanent
+firewall-cmd --set-target=ACCEPT --zone cluster0 --permanent
 
 sed '/^ZONE=/{h;s/=.*/=external/};${x;/^$/{s//ZONE=external/;H};x}' /etc/sysconfig/network-scripts/ifcfg-eth0 -i
 
