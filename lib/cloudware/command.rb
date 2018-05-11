@@ -30,8 +30,10 @@ module Cloudware
     end
 
     def run_whirly(status)
-      Whirly.start status: status do
-        yield if block_given?
+      update_status = proc { |s| Whirly.status = s.bold }
+      Whirly.start do
+        update_status.call(status)
+        yield update_status if block_given?
       end
     end
   end
