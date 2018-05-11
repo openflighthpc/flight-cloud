@@ -66,22 +66,22 @@ module Cloudware
     command :'domain create' do |c|
       cli_syntax(c, 'NAME')
       c.description = 'Create a new domain'
+      c.option '-p', '--provider NAME', String,
+               'REQUIRED: Cloud service provider name'
+      c.option '-r', '--region NAME', String,
+               'REQUIRED: Provider region to create domain in'
       c.option '--networkcidr CIDR',
                String, { default: '10.0.0.0/16' },
                <<~SUMMARY.squish
                  Entire network CIDR. The prv and mgt subnet must be
                  within this range'
                SUMMARY
-      c.option '-p', '--provider NAME',
-               String, 'Cloud service provider name'
       c.option '--prvsubnetcidr NAME',
                String, { default: '10.0.1.0/24' },
                'Prv subnet CIDR'
       c.option '--mgtsubnetcidr NAME',
                String, { default: '10.0.2.0/24' },
                'Mgt subnet CIDR'
-      c.option '-r', '--region NAME', String,
-               'Provider region to create domain in'
       c.hidden = true
       action(c, Commands::Domain::Create)
     end
