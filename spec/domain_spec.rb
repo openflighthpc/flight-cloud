@@ -59,7 +59,7 @@ describe Cloudware::Domain do
       expect(@domain.mgtsubnetcidr).to eq(@mgtsubnetcidr)
     end
 
-    it 'creates a new domain' do
+    xit 'creates a new domain' do
       @domain.region = 'uksouth'
       @domain.networkcidr = @networkcidr
       @domain.prvsubnetcidr = @prvsubnetcidr
@@ -68,11 +68,11 @@ describe Cloudware::Domain do
       wait_for(@domain.exists?).to be(true)
     end
 
-    it 'returns a list of domains as a hash' do
+    xit 'returns a list of domains as a hash' do
       expect(@domain.list).to be_a(Hash)
     end
 
-    it 'returns the correct domain information from API' do
+    xit 'returns the correct domain information from API' do
       domain = @domain.describe
       expect(domain).to have_attributes(name: @name)
       expect(domain).to have_attributes(region: @region)
@@ -82,7 +82,7 @@ describe Cloudware::Domain do
       expect(domain).to have_attributes(mgtsubnetcidr: @mgtsubnetcidr)
     end
 
-    it 'destroys the domain' do
+    xit 'destroys the domain' do
       @domain.destroy
       wait_for(@domain.exists?).to be(false)
     end
@@ -138,7 +138,7 @@ describe Cloudware::Domain do
       expect(@domain.mgtsubnetcidr).to eq(@mgtsubnetcidr)
     end
 
-    it 'creates a new domain' do
+    xit 'creates a new domain' do
       @domain.region = @region
       @domain.networkcidr = @networkcidr
       @domain.prvsubnetcidr = @prvsubnetcidr
@@ -147,11 +147,11 @@ describe Cloudware::Domain do
       wait_for(@domain.exists?).to be(true)
     end
 
-    it 'returns a list of domains as a hash' do
+    xit 'returns a list of domains as a hash' do
       expect(@domain.list).to be_a(Hash)
     end
 
-    it 'returns the correct domain information from API' do
+    xit 'returns the correct domain information from API' do
       domain = @domain.describe
       expect(domain).to have_attributes(name: @name)
       expect(domain).to have_attributes(region: @region)
@@ -161,7 +161,7 @@ describe Cloudware::Domain do
       expect(domain).to have_attributes(mgtsubnetcidr: @mgtsubnetcidr)
     end
 
-    it 'destroys the domain' do
+    xit 'destroys the domain' do
       @domain.destroy
       wait_for(@domain.exists?).to be(false)
     end
