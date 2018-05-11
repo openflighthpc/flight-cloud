@@ -32,6 +32,7 @@ Bundler.setup(:default)
 
 # ActiveSupport modules
 require 'active_support/core_ext/string'
+require 'active_support/core_ext/array'
 
 require 'cli'
 require 'domain'

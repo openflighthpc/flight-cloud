@@ -6,7 +6,8 @@ module Cloudware
       class List < Command
         def run
           d = Cloudware::Domain.new
-          d.provider = [options.provider] unless options.provider.nil?
+          # TODO: Why does this need to be wrapped?
+          d.provider = Array.wrap(options.provider)
           d.region = options.region.to_s unless options.region.nil?
           d.name = options.name.to_s unless options.name.nil?
 
@@ -29,6 +30,10 @@ module Cloudware
                                                  'Region'.bold],
                                       rows: r
           puts table
+        end
+
+        def required_options
+          [:provider]
         end
       end
     end
