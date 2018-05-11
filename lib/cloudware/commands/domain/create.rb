@@ -16,7 +16,6 @@ module Cloudware
             raise("Network CIDR #{options.networkcidr} is not a valid IPV4 address") unless d.valid_cidr?(options.networkcidr.to_s)
             update_status.call('Verifying pri subnet CIDR is valid')
             raise("Pri subnet CIDR #{options.prisubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.prisubnetcidr.to_s)
-            update_status.call('Verifying mgt subnet CIDR is valid')
           end
 
           run_whirly('Checking domain name is valid') do
