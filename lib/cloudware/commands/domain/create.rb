@@ -8,15 +8,9 @@ module Cloudware
           d = Cloudware::Domain.new
           d.name = name
           d.region = options.region
-
-          options.networkcidr = ask('Network CIDR: ') if options.networkcidr.nil?
-          d.networkcidr = options.networkcidr.to_s
-
-          options.prvsubnetcidr = ask('Prv subnet CIDR: ') if options.prvsubnetcidr.nil?
-          d.prvsubnetcidr = options.prvsubnetcidr.to_s
-
-          options.mgtsubnetcidr = ask('Mgt subnet CIDR: ') if options.mgtsubnetcidr.nil?
-          d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
+          d.networkcidr = options.networkcidr
+          d.prvsubnetcidr = options.prvsubnetcidr
+          d.mgtsubnetcidr = options.mgtsubnetcidr
 
           run_whirly('Verifying network CIDR is valid') do |update_status|
             # raise("Network CIDR #{options.networkcidr} is not a valid IPV4 address") unless d.valid_cidr?(options.networkcidr.to_s)
