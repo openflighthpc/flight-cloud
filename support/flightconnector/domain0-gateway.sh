@@ -184,6 +184,8 @@ $TA
 </tls-auth>
 topology subnet
 EOD
+systemctl enable openvpn@flightconnector
+systemctl start openvpn@flightconnector
 EOF
 _EOF_
 
