@@ -34,6 +34,13 @@ Parameters:
     Type: String
     Description: 'Enter the VM flavour'
 
+  clusterIndex: 
+    Type: Number
+    Description: 'Enter the cluster index'
+    Default: 1
+    MinValue: 1
+    MaxValue: 99
+
 Mappings:
   RegionMap:
     eu-west-1:
@@ -90,7 +97,7 @@ Resources:
       SourceDestCheck: false
       GroupSet:
         - !Ref securityGroupLogin
-      PrivateIpAddress: 10.100.2.10
+      PrivateIpAddress: !Join ['', ['10.100.', !Ref clusterIndex, '10']]
       SubnetId: !Ref prvSubnetId
       Tags:
         -
@@ -138,7 +145,7 @@ Resources:
           Value: !Ref vmFlavour
         -
           Key: 'cloudware_prv_subnet_ip'
-          Value: 10.100.2.10
+          Value: !Join ['', ['10.100.', !Ref clusterIndex, '10']]
 
   publicIp:
     Type: AWS::EC2::EIP

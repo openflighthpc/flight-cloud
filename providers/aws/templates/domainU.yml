@@ -9,17 +9,24 @@ Parameters:
      Type: String
      Description: 'Enter the desired domain name'
 
+   clusterIndex:
+     Type: Number
+     Description: 'Enter the cluster index'
+     Default: 1
+     MinValue: 1
+     MaxValue: 99
+
 Resources:
   Network:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.100.2.0/24
+      CidrBlock: !Join ['', ['10.100.', !Ref clusterIndex, '0/24']]
       EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', ['flightconnector', 'domainU', !Ref cloudwareDomain]]
+          Value: !Join ['-', ['flightconnector', 'cluster', !Ref clusterIndex, !Ref cloudwareDomain]]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -28,10 +35,10 @@ Resources:
           Value: !Ref cloudwareDomain
         -
           Key: 'cloudware_network_cidr'
-          Value: '10.100.2.0/24'
+          Value: !Join ['', ['10.100.', !Ref clusterIndex, '0/24']]
         -
           Key: 'cloudware_prv_subnet_cidr'
-          Value: '10.100.2.0/24'
+          Value: !Join ['', ['10.100.', !Ref clusterIndex, '0/24']]
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -40,7 +47,7 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', ['flightconnector', 'domainU', !Ref cloudwareDomain]]
+          Value: !Join ['-', ['flightconnector', 'cluster', !Ref clusterIndex, !Ref cloudwareDomain]]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -57,7 +64,7 @@ Resources:
   PrvSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: 10.100.2.0/24
+      CidrBlock: !Join ['', ['10.100.', !Ref clusterIndex, '0/24']]
       VpcId: !Ref Network
       AvailabilityZone: !Select
         - 0
@@ -65,7 +72,7 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', ['flightconnector', 'domainU', !Ref cloudwareDomain]]
+          Value: !Join ['-', ['flightconnector', 'cluster', !Ref clusterIndex, !Ref cloudwareDomain]]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
