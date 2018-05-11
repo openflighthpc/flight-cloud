@@ -52,16 +52,16 @@ module Cloudware
     end
 
     def _load_domains(provider)
-      case provider
-      when 'aws'
-        cloud = Cloudware::Aws2.new
-      when 'azure'
-        cloud = Cloudware::Azure.new
-      else
-        raise "Provider #{provider} doesn't exist"
-      end
-      log.debug("[#{self.class}] Loaded machines from #{provider}:\n#{cloud.domains}")
-      cloud.domains
+      local_cloud = case provider
+                    when 'aws'
+                      aws
+                    when 'azure'
+                      azure
+                    else
+                      raise "Provider #{provider} doesn't exist"
+                    end
+      log.debug("[#{self.class}] Loaded machines from #{provider}:\n#{local_cloud.domains}")
+      local_cloud.domains
     end
 
     def list
