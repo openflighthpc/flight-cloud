@@ -6,9 +6,7 @@ module Cloudware
       class Create < Command
         def run
           d = Cloudware::Domain.new
-
-          options.name = ask('Domain identifier: ') if options.name.nil?
-          d.name = options.name.to_s
+          d.name = name
 
           options.provider = choose('Provider name?', :aws, :azure, :gcp) if options.provider.nil?
 
@@ -47,6 +45,14 @@ module Cloudware
             d.create
           end
         end
+
+        def unpack_args
+          @name = args.first
+        end
+
+        private
+
+        attr_reader :name
       end
     end
   end

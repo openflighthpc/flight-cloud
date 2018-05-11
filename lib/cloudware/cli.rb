@@ -57,9 +57,8 @@ module Cloudware
     end
 
     command :'domain create' do |c|
-      c.syntax = 'flightconnector domain create [options]'
+      c.syntax = 'flightconnector domain create NAME [options]'
       c.description = 'Create a new domain'
-      c.option '--name NAME', String, 'Name of cloud domain'
       c.option '--networkcidr CIDR', String, 'Entire network CIDR, e.g. 10.0.0.0/16. The prv and mgt subnet must be within this range'
       c.option '--provider NAME', String, 'Cloud service provider name'
       c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
