@@ -14,9 +14,9 @@ module Cloudware
           end
 
           r = []
-          Whirly.start status: 'Fetching available machines'
-          raise('No available machines') if m.list.nil?
-          Whirly.stop
+          Whirly.start status: 'Fetching available machines' do
+            raise('No available machines') if m.list.nil?
+          end
           m.list.each do |_k, v|
             r << [v[:name], v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type], v[:state]]
           end
