@@ -26,7 +26,7 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', ['flightconnector', !Ref clusterDomain, !Join ['', ['cluster', !Ref clusterIndex]]]]
+          Value: !Join ['-', ['flightconnector', !Ref cloudwareDomain, !Join ['', ['cluster', !Ref clusterIndex]]]]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -47,7 +47,7 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', ['flightconnector', !Ref clusterDomain, !Join ['', ['cluster', !Ref clusterIndex]]]]
+          Value: !Join ['-', ['flightconnector', !Ref cloudwareDomain, !Join ['', ['cluster', !Ref clusterIndex]]]]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -72,7 +72,7 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', ['flightconnector', !Ref clusterDomain, !Join ['', ['cluster', !Ref clusterIndex]]]]
+          Value: !Join ['-', ['flightconnector', !Ref cloudwareDomain, !Join ['', ['cluster', !Ref clusterIndex]]]]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
