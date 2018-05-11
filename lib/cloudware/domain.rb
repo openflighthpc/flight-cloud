@@ -80,7 +80,7 @@ module Cloudware
     def list
       @list ||= begin
                   @list = {}
-                  @provider.each do |a|
+                  Cloudware.config.providers.each do |a|
                     @list.merge!(_load_domains(a))
                   end
                   log.debug("[#{self.class}] Detected domains:\n#{@list}")
