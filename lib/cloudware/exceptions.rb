@@ -8,5 +8,5 @@ module Cloudware
 
   # Other errors
   class ConfigError < CloudwareError; end
-  class InvalidInput < CloudwareError; end
+  class InvalidInput < UserError; end
 end

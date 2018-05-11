@@ -41,6 +41,8 @@ module Cloudware
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
 
+    suppress_trace_class UserError
+
     # Display the help if there is no input arguments
     ARGV.push '--help' if ARGV.empty?
 
