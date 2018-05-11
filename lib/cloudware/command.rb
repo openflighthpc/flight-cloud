@@ -9,12 +9,14 @@ module Cloudware
 
     def run!
       unpack_args
+      enforce_required_options
       run
     rescue Exception => e
       handle_fatal_error(e)
     end
 
     def unpack_args; end
+    def enforce_required_options; end
 
     def run
       raise NotImplementedError
