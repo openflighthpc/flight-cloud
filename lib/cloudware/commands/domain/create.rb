@@ -7,6 +7,7 @@ module Cloudware
         def run
           d = Cloudware::Domain.new
           d.name = name
+          d.region = options.region
 
           options.networkcidr = ask('Network CIDR: ') if options.networkcidr.nil?
           d.networkcidr = options.networkcidr.to_s
