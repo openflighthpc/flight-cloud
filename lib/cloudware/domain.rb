@@ -55,7 +55,7 @@ module Cloudware
     def describe
       @describe ||= begin
                     domain = Struct.new :name, :region, :provider, :networkcidr, :prvsubnetcidr
-                    @describe = domain.new(get_item('domain'), get_item('region'), get_item('provider'), get_item('network_cidr'), get_item('prv_subnet_cidr')
+                    @describe = domain.new(get_item('domain'), get_item('region'), get_item('provider'), get_item('network_cidr'), get_item('prv_subnet_cidr'))
                   end
     end
 
