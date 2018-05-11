@@ -8,11 +8,6 @@ module Cloudware
           d = Cloudware::Domain.new
           d.name = name
 
-          options.provider = choose('Provider name?', :aws, :azure, :gcp) if options.provider.nil?
-
-          options.region = ask('Provider region: ') if options.region.nil?
-          d.region = options.region.to_s
-
           options.networkcidr = ask('Network CIDR: ') if options.networkcidr.nil?
           d.networkcidr = options.networkcidr.to_s
 
@@ -48,6 +43,10 @@ module Cloudware
 
         def unpack_args
           @name = args.first
+        end
+
+        def required_options
+          [:provider, :region]
         end
 
         private
