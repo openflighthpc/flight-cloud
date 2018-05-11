@@ -1,0 +1,108 @@
+---
+Description: 'Flight Connector DomainU Template'
+Parameters:
+   cloudwareId:
+     Type: String
+     Description: 'Enter the Cloudware UUID'
+
+   cloudwareDomain:
+     Type: String
+     Description: 'Enter the desired domain name'
+
+   clusterIndex:
+     Type: Number
+     Description: 'Enter the cluster index'
+     Default: 1
+     MinValue: 1
+     MaxValue: 99
+
+Resources:
+  Network:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', ['flightconnector', !Ref cloudwareDomain, !Join ['', ['cluster', !Ref clusterIndex]]]]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+        -
+          Key: 'cloudware_network_cidr'
+          Value: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
+        -
+          Key: 'cloudware_prv_subnet_cidr'
+          Value: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: Network
+    Properties:
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', ['flightconnector', !Ref cloudwareDomain, !Join ['', ['cluster', !Ref clusterIndex]]]]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref Network
+
+  PrvSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
+      VpcId: !Ref Network
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', ['flightconnector', !Ref cloudwareDomain, !Join ['', ['cluster', !Ref clusterIndex]]]]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      VpcId: !Ref Network
+      Tags:
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  PrvSubnetRouteTableAssocation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrvSubnet
+      RouteTableId: !Ref RouteTable
+
+  RouteInternetGateway:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway

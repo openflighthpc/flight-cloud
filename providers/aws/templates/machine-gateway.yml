@@ -1,0 +1,152 @@
+---
+Description: 'FlightConnector Gateway Node Template'
+Parameters:
+  cloudwareId:
+    Type: String
+    Description: 'Enter the Cloudware UUID'
+
+  cloudwareDomain:
+    Type: String
+    Description: 'Enter the Cloudware domain name'
+
+  networkId:
+    Type: String
+    Description: 'Enter the VPC/network ID'
+
+  prvSubnetId:
+    Type: String
+    Description: 'Enter the prv subnet ID'
+
+  keyPairName:
+    Default: 'aws_ireland'
+    Type: String
+    Description: 'Select the AWS keypair to assign to the instance'
+
+  vmType:
+    Type: String
+    Description: 'Enter the size of the instance'
+
+  vmRole:
+    Type: String
+    Description: 'Enter the Cloudware instance type'
+
+  vmFlavour:
+    Type: String
+    Description: 'Enter the VM flavour'
+
+Mappings:
+  RegionMap:
+    eu-west-1:
+      "AMI": "ami-d266dfab"
+
+Resources:
+  securityGroupGateway:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Join ['-', [!Ref cloudwareDomain, 'gateway']]
+      GroupDescription: 'Flight Connector Gateway'
+      VpcId: !Ref networkId
+      SecurityGroupIngress:
+        -
+          IpProtocol: 'tcp'
+          FromPort: 22
+          ToPort: 22
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow inbound SSH access'
+        -
+          IpProtocol: 'icmp'
+          FromPort: '8'
+          ToPort: '-1'
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow ping'
+        - 
+          IpProtocol: 'tcp'
+          FromPort: 2005
+          ToPort: 2005
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow inbound cluster VPN access'
+      SecurityGroupEgress:
+        -
+          IpProtocol: '-1'
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow outbound internet access'
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', [!Ref cloudwareDomain, 'gateway']]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  prvInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: !Join [' ', [!Ref cloudwareDomain, 'gateway', 'prv network interface']]
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref securityGroupGateway
+      PrivateIpAddress: 10.78.100.10
+      SubnetId: !Ref prvSubnetId
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', [!Ref cloudwareDomain, 'gateway', 'prv']]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  master:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !FindInMap ["RegionMap", !Ref "AWS::Region", "AMI"]
+      InstanceType: !Ref vmType
+      Monitoring: true
+      KeyName: !Ref keyPairName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref prvInterface
+          DeviceIndex: 0
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join [' ', [!Ref cloudwareDomain, 'gateway']]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+        -
+          Key: 'cloudware_machine_role'
+          Value: !Ref vmRole
+        -
+          Key: 'cloudware_machine_name'
+          Value: 'gateway'
+        -
+          Key: 'cloudware_machine_flavour'
+          Value: !Ref vmFlavour
+        -
+          Key: 'cloudware_prv_subnet_ip'
+          Value: 10.78.100.10
+
+  publicIp:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  publicIpAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      NetworkInterfaceId: !Ref prvInterface
+      AllocationId: !GetAtt publicIp.AllocationId
