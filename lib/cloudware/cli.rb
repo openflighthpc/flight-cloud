@@ -79,9 +79,6 @@ module Cloudware
       c.option '--prvsubnetcidr NAME',
                String, { default: '10.0.1.0/24' },
                'Prv subnet CIDR'
-      c.option '--mgtsubnetcidr NAME',
-               String, { default: '10.0.2.0/24' },
-               'Mgt subnet CIDR'
       c.hidden = true
       action(c, Commands::Domain::Create)
     end
@@ -116,7 +113,6 @@ module Cloudware
       c.option '--domain NAME', String, 'Domain name'
       c.option '--role NAME', String, 'Machine role to inherit (master or slave)'
       c.option '--prvip ADDR', String, 'Prv subnet IP address'
-      c.option '--mgtip ADDR', String, 'Mgt subnet IP address'
       c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
       c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
       c.hidden = true

@@ -26,9 +26,6 @@ module Cloudware
           options.prvip = ask('Prv subnet IP: ') if options.prvip.nil?
           m.prvip = options.prvip.to_s
 
-          options.mgtip = ask('Mgt subnet IP: ') if options.mgtip.nil?
-          m.mgtip = options.mgtip.to_s
-
           run_whirly('Verifying domain exists') do
             raise("Domain #{options.domain} does not exist") unless m.valid_domain?
           end
@@ -38,7 +35,6 @@ module Cloudware
             update_status.call('Verifying prv IP address')
             raise("Invalid prv IP address #{options.prvip} in subnet #{d.get_item('prv_subnet_cidr')}") unless m.valid_ip?(d.get_item('prv_subnet_cidr').to_s, options.prvip.to_s)
             update_status.call('Verifying mgt IP address')
-            raise("Invalid mgt IP address #{options.mgtip} in subnet #{d.get_item('mgt_subnet_cidr')}") unless m.valid_ip?(d.get_item('mgt_subnet_cidr').to_s, options.mgtip.to_s)
           end
 
           run_whirly('Creating new deployment') do

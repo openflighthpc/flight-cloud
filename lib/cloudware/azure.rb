@@ -67,7 +67,7 @@ module Cloudware
       Cloudware.log
     end
 
-    def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
+    def create_domain(name, id, networkcidr, prvsubnetcidr, region)
       raise('Domain already exists') if resource_group_exists?(name)
       create_resource_group(region, id, name)
       params = {
@@ -75,7 +75,6 @@ module Cloudware
         cloudwareId: id,
         networkCIDR: networkcidr,
         prvSubnetCIDR: prvsubnetcidr,
-        mgtSubnetCIDR: mgtsubnetcidr,
       }
       deploy(name, 'domain', 'domain', params)
     end
@@ -95,7 +94,6 @@ module Cloudware
                               id: r.tags['cloudware_id'],
                               network_cidr: r.tags['cloudware_network_cidr'],
                               prv_subnet_cidr: r.tags['cloudware_prv_subnet_cidr'],
-                              mgt_subnet_cidr: r.tags['cloudware_mgt_subnet_cidr'],
                               provider: 'azure',
                               region: r.tags['cloudware_domain_region'],
                             })
@@ -105,7 +103,7 @@ module Cloudware
       end
     end
 
-    def create_machine(name, domain, id, prvip, mgtip, type, size, region, flavour)
+    def create_machine(name, domain, id, prvip, type, size, region, flavour)
       rg = "#{domain}-#{name}"
       abort('Machine already exists') if resource_group_exists?(rg)
       create_resource_group(region, id, rg)
@@ -115,7 +113,6 @@ module Cloudware
         vmName: name,
         vmType: size,
         prvSubnetIp: prvip,
-        mgtSubnetIp: mgtip,
         vmFlavour: flavour,
       }
       deploy(rg, name, "machine-#{type}", params)
@@ -140,7 +137,6 @@ module Cloudware
                                domain: r.tags['cloudware_domain'],
                                role: r.tags['cloudware_machine_role'],
                                prv_ip: r.tags['cloudware_prv_ip'],
-                               mgt_ip: r.tags['cloudware_mgt_ip'],
                                ext_ip: ext_ip,
                                provider: 'azure',
                                type: r.tags['cloudware_machine_type'],

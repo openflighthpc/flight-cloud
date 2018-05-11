@@ -18,13 +18,12 @@ module Cloudware
             raise('No available machines') if m.list.nil?
           end
           m.list.each do |_k, v|
-            r << [v[:name], v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type], v[:state]]
+            r << [v[:name], v[:domain], v[:role], v[:prv_ip], v[:type], v[:state]]
           end
           table = Terminal::Table.new headings: ['Name'.bold,
                                                  'Domain'.bold,
                                                  'Role'.bold,
                                                  'Prv IP address'.bold,
-                                                 'Mgt IP address'.bold,
                                                  'Type'.bold,
                                                  'State'.bold],
                                       rows: r
