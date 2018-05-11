@@ -28,5 +28,11 @@ module Cloudware
       Cloudware.log.fatal(e.message)
       raise e
     end
+
+    def run_whirly(status)
+      Whirly.start status: status do
+        yield if block_given?
+      end
+    end
   end
 end

@@ -24,7 +24,7 @@ module Cloudware
           options.mgtsubnetcidr = ask('Mgt subnet CIDR: ') if options.mgtsubnetcidr.nil?
           d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
 
-          Whirly.start status: 'Verifying network CIDR is valid' do
+          run_whirly('Verifying network CIDR is valid') do
             raise("Network CIDR #{options.networkcidr} is not a valid IPV4 address") unless d.valid_cidr?(options.networkcidr.to_s)
             Whirly.status = 'Verifying prv subnet CIDR is valid'
             raise("Prv subnet CIDR #{options.prvsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.prvsubnetcidr.to_s)
@@ -32,18 +32,18 @@ module Cloudware
             raise("Mgt subnet CIDR #{options.mgtsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.mgtsubnetcidr.to_s)
           end
 
-          Whirly.start status: 'Checking domain name is valid' do
+          run_whirly('Checking domain name is valid') do
             raise("Domain name #{options.name} is not valid") unless d.valid_name?
           end
 
-          Whirly.start status: 'Checking domain does not already exist' do
+          run_whirly('Checking domain does not already exist') do
             raise("Domain name #{options.name} already exists") if d.exists?
             d.provider = options.provider.to_s
             Whirly.status = 'Verifying provider is valid'
             raise("Provider #{options.provider} does not exist") unless d.valid_provider?
           end
 
-          Whirly.start status: 'Creating new deployment' do
+          run_whirly('Creating new deployment') do
             d.create
           end
         end
