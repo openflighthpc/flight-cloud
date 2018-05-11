@@ -18,18 +18,13 @@ module Cloudware
           options.networkcidr = ask('Network CIDR: ') if options.networkcidr.nil?
           d.networkcidr = options.networkcidr.to_s
 
-          options.prvsubnetcidr = ask('Prv subnet CIDR: ') if options.prvsubnetcidr.nil?
-          d.prvsubnetcidr = options.prvsubnetcidr.to_s
-
-          options.mgtsubnetcidr = ask('Mgt subnet CIDR: ') if options.mgtsubnetcidr.nil?
-          d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
+          options.prisubnetcidr = ask('Pri subnet CIDR: ') if options.prisubnetcidr.nil?
+          d.prisubnetcidr = options.prisubnetcidr.to_s
 
           Whirly.start status: 'Verifying network CIDR is valid'
           raise("Network CIDR #{options.networkcidr} is not a valid IPV4 address") unless d.valid_cidr?(options.networkcidr.to_s)
-          Whirly.status = 'Verifying prv subnet CIDR is valid'
-          raise("Prv subnet CIDR #{options.prvsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.prvsubnetcidr.to_s)
-          Whirly.status = 'Verifying mgt subnet CIDR is valid'
-          raise("Mgt subnet CIDR #{options.mgtsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.mgtsubnetcidr.to_s)
+          Whirly.status = 'Verifying pri subnet CIDR is valid'
+          raise("Pri subnet CIDR #{options.prisubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.prisubnetcidr.to_s)
           Whirly.stop
 
           Whirly.start status: 'Checking domain name is valid'

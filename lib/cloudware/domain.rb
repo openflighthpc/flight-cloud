@@ -29,12 +29,11 @@ module Cloudware
     attr_accessor :name
     attr_accessor :id
     attr_accessor :networkcidr
-    attr_accessor :prvsubnetcidr
-    attr_accessor :mgtsubnetcidr
+    attr_accessor :prisubnetcidr
     attr_accessor :region
     attr_accessor :provider
     # aws provider specific
-    attr_accessor :prvsubnetid, :mgtsubnetid, :networkid
+    attr_accessor :prisubnetid, :networkid
 
     def initialize
       @items = {}
@@ -55,15 +54,15 @@ module Cloudware
 
     def describe
       @describe ||= begin
-                    domain = Struct.new :name, :region, :provider, :networkcidr, :prvsubnetcidr, :mgtsubnetcidr
-                    @describe = domain.new(get_item('domain'), get_item('region'), get_item('provider'), get_item('network_cidr'), get_item('prv_subnet_cidr'), get_item('mgt_subnet_cidr'))
+                    domain = Struct.new :name, :region, :provider, :networkcidr, :prisubnetcidr
+                    @describe = domain.new(get_item('domain'), get_item('region'), get_item('provider'), get_item('network_cidr'), get_item('pri_subnet_cidr')
                   end
     end
 
     def create
       load_cloud
       @cloud.create_domain(@name, SecureRandom.uuid, @networkcidr,
-                           @prvsubnetcidr, @mgtsubnetcidr, @region)
+                           @prisubnetcidr, @region)
     end
 
     def _load_domains(provider)
