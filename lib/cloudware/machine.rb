@@ -27,7 +27,7 @@ module Cloudware
   class Machine < Domain
     attr_accessor :name
     attr_accessor :domain
-    attr_accessor :prvip
+    attr_accessor :priip
     attr_accessor :role
     attr_accessor :type
     attr_accessor :flavour
@@ -56,7 +56,7 @@ module Cloudware
         name: @name,
         domain: @domain,
         id: get_item('id'),
-        prvip: get_item('prv_ip'),
+        priip: get_item('pri_ip'),
         role: get_item('role'),
         type: get_item('type'),
         region: get_item('region'),
@@ -66,11 +66,11 @@ module Cloudware
 
     def create
       raise('Invalid machine name') unless validate_name?
-      # raise("IP address #{prvip} is already in use") if ip_in_use? @prvip
+      # raise("IP address #{priip} is already in use") if ip_in_use? @priip
       load_cloud
-      log.info("[#{self.class}] Creating new machine:\nName: #{name}\nDomain: #{domain}\nID: #{id}\nPrv IP: #{prvip}\nType: #{type}\nFlavour: #{flavour}")
+      log.info("[#{self.class}] Creating new machine:\nName: #{name}\nDomain: #{domain}\nID: #{id}\nPri IP: #{priip}\nType: #{type}\nFlavour: #{flavour}")
       @cloud.create_machine(@name, @domain, @d.get_item('id'),
-                            @prvip, @role, render_type, @d.get_item('region'), @flavour)
+                            @priip, @role, render_type, @d.get_item('region'), @flavour)
     end
 
     def destroy
@@ -85,7 +85,7 @@ module Cloudware
       @cloud.create_machine(machine_info[:name],
                             machine_info[:domain],
                             machine_info[:id],
-                            machine_info[:prvip],
+                            machine_info[:priip],
                             machine_info[:role],
                             machine_info[:type],
                             @d.get_item('region'),
@@ -167,7 +167,7 @@ module Cloudware
     def ip_in_use?(ip)
       list.each do |_k, v|
         if v[:domain] == @domain
-          if v[:prv_ip] == ip
+          if v[:pri_ip] == ip
             log.warn("IP address #{ip} is in use by #{v[:name]}")
             return true
             break

@@ -60,9 +60,9 @@ module Cloudware
       c.syntax = 'flightconnector domain create [options]'
       c.description = 'Create a new domain'
       c.option '--name NAME', String, 'Name of cloud domain'
-      c.option '--networkcidr CIDR', String, 'Entire network CIDR, e.g. 10.0.0.0/16. The prv subnet must be within this range'
+      c.option '--networkcidr CIDR', String, 'Entire network CIDR, e.g. 10.0.0.0/16. The pri subnet must be within this range'
       c.option '--provider NAME', String, 'Cloud service provider name'
-      c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
+      c.option '--prisubnetcidr NAME', String, 'Pri subnet CIDR'
       c.option '--region NAME', String, 'Provider region to create domain in'
       c.hidden = true
       action(c, Commands::Domain::Create)
@@ -97,7 +97,7 @@ module Cloudware
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
       c.option '--role NAME', String, 'Machine role to inherit (master or slave)'
-      c.option '--prvip ADDR', String, 'Prv subnet IP address'
+      c.option '--priip ADDR', String, 'Pri subnet IP address'
       c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
       c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
       c.hidden = true

@@ -18,12 +18,12 @@ module Cloudware
           raise('No available machines') if m.list.nil?
           Whirly.stop
           m.list.each do |_k, v|
-            r << [v[:name], v[:domain], v[:role], v[:prv_ip], v[:type], v[:state]]
+            r << [v[:name], v[:domain], v[:role], v[:pri_ip], v[:type], v[:state]]
           end
           table = Terminal::Table.new headings: ['Name'.bold,
                                                  'Domain'.bold,
                                                  'Role'.bold,
-                                                 'Prv IP address'.bold,
+                                                 'Pri IP address'.bold,
                                                  'Type'.bold,
                                                  'State'.bold],
                                       rows: r

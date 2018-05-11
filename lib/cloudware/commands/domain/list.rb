@@ -20,11 +20,11 @@ module Cloudware
           raise('No available domains') if d.list.nil?
           Whirly.stop
           d.list.each do |k, v|
-            r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:provider], v[:region]]
+            r << [k, v[:network_cidr], v[:pri_subnet_cidr], v[:provider], v[:region]]
           end
           table = Terminal::Table.new headings: ['Domain name'.bold,
                                                  'Network CIDR'.bold,
-                                                 'Prv Subnet CIDR'.bold,
+                                                 'Pri Subnet CIDR'.bold,
                                                  'Provider'.bold,
                                                  'Region'.bold],
                                       rows: r
