@@ -32,7 +32,6 @@ module Cloudware
 
     # Fields above this line have been ported to the new model
 
-    attr_accessor :id
     attr_accessor :networkcidr
     attr_accessor :prisubnetcidr
     attr_accessor :region
