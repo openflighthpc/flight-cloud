@@ -18,9 +18,9 @@ module Cloudware
 
           r = []
           run_whirly('Fetching available domains') do
-            raise('No available domains') if d.list.nil?
+            raise('No available domains') if Domains.list.nil?
           end
-          d.list.each do |k, v|
+          Domains.list.each do |k, v|
             r << [k, v[:network_cidr], v[:pri_subnet_cidr], v[:provider], v[:region]]
           end
           table = Terminal::Table.new headings: ['Domain name'.bold,
