@@ -104,6 +104,7 @@ module Cloudware
       network_cidr.include?(subnet_cidr)
     end
 
+    # Ported
     def cloud
       case provider
       when 'aws'
