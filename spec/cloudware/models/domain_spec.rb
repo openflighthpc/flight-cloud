@@ -39,5 +39,13 @@ RSpec.describe Cloudware::Models::Domain do
 
   describe '#prisubnetcidr' do
     include_examples 'valid IPv4', :prisubnetcidr
+
+    it 'must be contained within the networkcidr' do
+      ip_ranges = {
+        networkcidr: '10.0.0.0/16',
+        prisubnetcidr: '11.0.1.0/24'
+      }
+      expect(build(:domain, **ip_ranges)).not_to be_valid
+    end
   end
 end

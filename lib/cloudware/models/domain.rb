@@ -11,6 +11,7 @@ module Cloudware
       validates :provider, inclusion: { in: Cloudware.config.providers }
       validate :validate_networkcidr_is_ipv4
       validate :validate_prisubnetcidr_is_ipv4
+      validate :validate_networkcidr_contains_prisubnetcidr
 
       private
 
@@ -32,12 +33,24 @@ module Cloudware
       end
 
       def validate_ipv4(address_name)
-        valid = begin
-                  IPAddr.new(send(address_name)).ipv4?
-                rescue IPAddr::InvalidAddressError
-                  false
-                end
-        errors.add(address_name, 'Is not a IPv4 address') unless valid
+        return true if begin
+                         IPAddr.new(send(address_name)).ipv4?
+                       rescue IPAddr::InvalidAddressError
+                         false
+                       end
+        errors.add(address_name, 'Is not a IPv4 address')
+        false
+      end
+
+      def validate_networkcidr_contains_prisubnetcidr
+        return unless validate_networkcidr_is_ipv4
+        return unless validate_prisubnetcidr_is_ipv4
+        network = IPAddr.new(networkcidr)
+        pri = IPAddr.new(prisubnetcidr)
+        return true if network.include?(pri)
+        errors.add(:prisubnetcidr,
+                   'Prisubnetcidr is not within the network')
+        false
       end
     end
   end
