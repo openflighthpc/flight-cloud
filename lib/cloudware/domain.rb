@@ -23,6 +23,7 @@
 #==============================================================================
 require 'securerandom'
 require 'ipaddr'
+require 'domains'
 
 module Cloudware
   class Domain
@@ -51,29 +52,6 @@ module Cloudware
                            @prisubnetcidr, @region)
     end
 
-    def _load_domains(provider)
-      local_cloud = case provider
-                    when 'aws'
-                      aws
-                    when 'azure'
-                      azure
-                    else
-                      raise "Provider #{provider} doesn't exist"
-                    end
-      local_cloud.domains
-    end
-
-    def list
-      @list ||= begin
-                  @list = {}
-                  Cloudware.config.providers.each do |a|
-                    @list.merge!(_load_domains(a))
-                  end
-                  log.debug("[#{self.class}] Detected domains:\n#{@list}")
-                  @list
-                end
-    end
-
     def domains_by_region(region)
       cloud.domains.select { |_k, v| true if v[:region] == region }
     end
@@ -87,7 +65,7 @@ module Cloudware
     def get_item(item)
       @items[item] = begin
                        log.debug("[#{self.class}] Loading #{item} from API")
-                       list[name][item.to_sym]
+                       Cloudware::Domains.list[name][item.to_sym]
                      end
     end
 
@@ -97,7 +75,7 @@ module Cloudware
     end
 
     def exists?
-      list.include? name || false
+      Cloudware::Domains.list.include? name || false
     end
 
     def valid_name?
@@ -122,8 +100,6 @@ module Cloudware
       network_cidr.include?(subnet_cidr)
     end
 
-    private
-
     def cloud
       case provider
       when 'aws'
@@ -132,6 +108,8 @@ module Cloudware
         azure
       end
     end
+
+    private
 
     def aws
       @aws ||= Cloudware::Aws2.new
