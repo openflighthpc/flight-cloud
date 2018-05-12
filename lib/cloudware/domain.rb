@@ -29,12 +29,12 @@ module Cloudware
   class Domain
     attr_accessor :name
     attr_accessor :provider
+    attr_accessor :region
 
     # Fields above this line have been ported to the new model
 
     attr_accessor :networkcidr
     attr_accessor :prisubnetcidr
-    attr_accessor :region
     # aws provider specific
     attr_accessor :prisubnetid, :networkid
 
@@ -85,6 +85,7 @@ module Cloudware
       !name.match(/\A[a-zA-Z0-9-]*\z/).nil?
     end
 
+    # Ported
     def valid_provider?
       %w[aws azure gcp].include? @provider
     end

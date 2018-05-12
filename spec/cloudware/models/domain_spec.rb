@@ -19,4 +19,10 @@ RSpec.describe Cloudware::Models::Domain do
       expect(build(:domain, provider: 'missing')).not_to be_valid
     end
   end
+
+  describe '#region' do
+    it 'can not be nil' do
+      expect(build(:domain, region: nil)).not_to be_valid
+    end
+  end
 end
