@@ -23,12 +23,16 @@ module Cloudware
       end
 
       def networkcidr_is_ipv4?
+        validate_ipv4?(:networkcidr)
+      end
+
+      def validate_ipv4?(address_name)
         valid = begin
-                  IPAddr.new(networkcidr).ipv4?
+                  IPAddr.new(send(address_name)).ipv4?
                 rescue IPAddr::InvalidAddressError
                   false
                 end
-        errors.add(:networkcidr, 'Is not a IPv4 address') unless valid
+        errors.add(address_name, 'Is not a IPv4 address') unless valid
       end
     end
   end

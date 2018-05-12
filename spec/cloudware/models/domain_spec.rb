@@ -26,9 +26,14 @@ RSpec.describe Cloudware::Models::Domain do
     end
   end
 
-  describe '#networkcidr' do
+  shared_examples 'valid IPv4' do |address_name|
     it 'must be an IPv4 address' do
-      expect(build(:domain, networkcidr: '10.0.0.257')).not_to be_valid
+      domain = build(:domain, address_name => '10.0.0.257/16')
+      expect(domain).not_to be_valid
     end
+  end
+
+  describe '#networkcidr' do
+    include_examples 'valid IPv4', :networkcidr
   end
 end
