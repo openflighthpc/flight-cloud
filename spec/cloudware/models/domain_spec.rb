@@ -25,4 +25,10 @@ RSpec.describe Cloudware::Models::Domain do
       expect(build(:domain, region: nil)).not_to be_valid
     end
   end
+
+  describe '#networkcidr' do
+    it 'must be an IPv4 address' do
+      expect(build(:domain, networkcidr: '10.0.0.257')).not_to be_valid
+    end
+  end
 end

@@ -30,10 +30,10 @@ module Cloudware
     attr_accessor :name
     attr_accessor :provider
     attr_accessor :region
+    attr_accessor :networkcidr
 
     # Fields above this line have been ported to the new model
 
-    attr_accessor :networkcidr
     attr_accessor :prisubnetcidr
     # aws provider specific
     attr_accessor :prisubnetid, :networkid
