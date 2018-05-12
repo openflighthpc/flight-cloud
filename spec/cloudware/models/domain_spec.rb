@@ -36,4 +36,8 @@ RSpec.describe Cloudware::Models::Domain do
   describe '#networkcidr' do
     include_examples 'valid IPv4', :networkcidr
   end
+
+  describe '#prisubnetcidr' do
+    include_examples 'valid IPv4', :prisubnetcidr
+  end
 end
