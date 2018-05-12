@@ -27,9 +27,11 @@ require 'colorize'
 require 'whirly'
 require 'exceptions'
 require 'command'
+require 'models/application'
 
 require 'require_all'
 require_all 'lib/cloudware/commands/**/*.rb'
+require_all 'lib/cloudware/models/**/*.rb'
 
 module Cloudware
   class CLI
