@@ -22,4 +22,6 @@ gem 'whirly'
 group :development do
   gem 'rubocop', '~> 0.52.1', require: false
   gem 'rubocop-rspec'
+  gem 'rspec'
+  gem 'factory_bot'
 end

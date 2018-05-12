@@ -6,7 +6,6 @@ require 'cloudware/aws'
 require 'cloudware/config'
 require 'cloudware/log'
 require 'cloudware'
-require 'rspec/wait'
 
 describe Cloudware::Domain do
   context 'with provider azure' do

@@ -2,8 +2,15 @@
 
 require 'rspec/wait'
 require File.join(File.dirname(__FILE__), '../lib/cloudware')
+Bundler.setup(:development)
+require 'factory_bot'
 
 RSpec.configure do |config|
+  config.include FactoryBot::Syntax::Methods
+  config.before(:suite) do
+    FactoryBot.find_definitions
+  end
+
   config.wait_timeout = 120
 
   config.expect_with :rspec do |expectations|
