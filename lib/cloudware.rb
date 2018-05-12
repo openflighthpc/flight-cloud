@@ -36,7 +36,7 @@ require 'active_support/core_ext/array'
 require 'active_model'
 require 'active_model/errors'
 
-require 'cli'
+require 'colorize'
 require 'domain'
 require 'machine'
 require 'azure'
@@ -60,3 +60,5 @@ module Cloudware
     end
   end
 end
+
+require 'cli'

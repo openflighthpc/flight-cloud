@@ -4,5 +4,6 @@ FactoryBot.define do
 
   factory :domain, class: models::Domain do
     name 'test-domain-name'
+    provider 'aws'
   end
 end

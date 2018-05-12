@@ -23,7 +23,6 @@
 #==============================================================================
 require 'commander'
 require 'terminal-table'
-require 'colorize'
 require 'whirly'
 require 'exceptions'
 require 'command'

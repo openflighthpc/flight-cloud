@@ -28,11 +28,14 @@ require 'domains'
 module Cloudware
   class Domain
     attr_accessor :name
+    attr_accessor :provider
+
+    # Fields above this line have been ported to the new model
+
     attr_accessor :id
     attr_accessor :networkcidr
     attr_accessor :prisubnetcidr
     attr_accessor :region
-    attr_accessor :provider
     # aws provider specific
     attr_accessor :prisubnetid, :networkid
 
