@@ -9,8 +9,8 @@ module Cloudware
       validates_presence_of :name, :region
       validates :name, format: { with: /\A[a-zA-Z0-9-]*\z/ }
       validates :provider, inclusion: { in: Cloudware.config.providers }
-      validate :networkcidr_is_ipv4?
-      validate :prisubnetcidr_is_ipv4?
+      validate :validate_networkcidr_is_ipv4
+      validate :validate_prisubnetcidr_is_ipv4
 
       private
 
@@ -23,15 +23,15 @@ module Cloudware
         end
       end
 
-      def networkcidr_is_ipv4?
-        validate_ipv4?(:networkcidr)
+      def validate_networkcidr_is_ipv4
+        validate_ipv4(:networkcidr)
       end
 
-      def prisubnetcidr_is_ipv4?
-        validate_ipv4?(:prisubnetcidr)
+      def validate_prisubnetcidr_is_ipv4
+        validate_ipv4(:prisubnetcidr)
       end
 
-      def validate_ipv4?(address_name)
+      def validate_ipv4(address_name)
         valid = begin
                   IPAddr.new(send(address_name)).ipv4?
                 rescue IPAddr::InvalidAddressError
