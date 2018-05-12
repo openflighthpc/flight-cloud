@@ -2,6 +2,7 @@
 
 source 'https://rubygems.org'
 
+gem 'activemodel'
 gem 'activesupport'
 gem 'aws-sdk-cloudformation'
 gem 'aws-sdk-ec2'

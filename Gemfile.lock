@@ -8,6 +8,8 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    activemodel (5.2.0)
+      activesupport (= 5.2.0)
     activesupport (5.2.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
@@ -159,6 +161,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activemodel
   activesupport
   aws-sdk-cloudformation
   aws-sdk-ec2
