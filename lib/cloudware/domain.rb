@@ -80,6 +80,7 @@ module Cloudware
       Cloudware::Domains.list.include? name || false
     end
 
+    # Ported
     def valid_name?
       !name.match(/\A[a-zA-Z0-9-]*\z/).nil?
     end

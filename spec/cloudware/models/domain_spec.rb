@@ -8,6 +8,10 @@ RSpec.describe Cloudware::Models::Domain do
     it 'can not be nil' do
       expect(build(:domain, name: nil)).not_to be_valid
     end
+
+    it 'errors if it contains special characters' do
+      expect(build(:domain, name: '!!')).not_to be_valid
+    end
   end
 
   describe '#provider' do

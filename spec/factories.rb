@@ -3,7 +3,7 @@ FactoryBot.define do
   models = Cloudware::Models
 
   factory :domain, class: models::Domain do
-    name 'test-domain-name'
+    name 'Test-Domain-Name-1'
     provider 'aws'
   end
 end
