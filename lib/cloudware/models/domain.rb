@@ -13,6 +13,11 @@ module Cloudware
       validate :validate_prisubnetcidr_is_ipv4
       validate :validate_networkcidr_contains_prisubnetcidr
 
+      # TODO: Integrate this into a before_create hook
+      def exists?
+        Cloudware::Domains.list.include? name || false
+      end
+
       private
 
       def cloud
@@ -22,6 +27,11 @@ module Cloudware
         when 'azure'
           Azure.new
         end
+      end
+
+      def run_create(*_a)
+        cloud.create_domain(name, SecureRandom.uuid, networkcidr,
+                            prisubnetcidr, region)
       end
 
       def validate_networkcidr_is_ipv4

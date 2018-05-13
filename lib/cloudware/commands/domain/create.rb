@@ -5,31 +5,20 @@ module Cloudware
     module Domain
       class Create < Command
         def run
-          d = Cloudware::Domain.new
-          d.name = name
-          d.region = options.region
-          d.provider = options.provider
-          d.networkcidr = options.networkcidr
-          d.prisubnetcidr = options.prisubnetcidr
-
-          run_whirly('Verifying network CIDR is valid') do |update_status|
-            raise("Network CIDR #{options.networkcidr} is not a valid IPV4 address") unless d.valid_cidr?(options.networkcidr.to_s)
-            update_status.call('Verifying pri subnet CIDR is valid')
-            raise("Pri subnet CIDR #{options.prisubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.prisubnetcidr.to_s)
-          end
-
-          run_whirly('Checking domain name is valid') do
-            raise("Domain name #{options.name} is not valid") unless d.valid_name?
-          end
+          d = Cloudware::Models::Domain.build(
+            name: name,
+            region: options.region,
+            provider: options.provider,
+            networkcidr: options.networkcidr,
+            prisubnetcidr: options.prisubnetcidr
+          )
 
           run_whirly('Checking domain does not already exist') do |update_status|
             raise("Domain name #{options.name} already exists") if d.exists?
-            update_status.call('Verifying provider is valid')
-            raise("Provider #{options.provider} does not exist") unless d.valid_provider?
           end
 
           run_whirly('Creating new deployment') do
-            d.create
+            d.create!
           end
         end
 
