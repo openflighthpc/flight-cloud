@@ -2,6 +2,10 @@
 module Cloudware
   module Models
     class Application
+      class << self
+        alias_method 'build', 'new'
+      end
+
       include ActiveModel::Model
 
       def initialize(*_a, **parameters)
