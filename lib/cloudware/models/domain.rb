@@ -35,7 +35,7 @@ module Cloudware
       def validate_ipv4(address_name)
         return true if begin
                          IPAddr.new(send(address_name)).ipv4?
-                       rescue IPAddr::InvalidAddressError
+                       rescue IPAddr::Error
                          false
                        end
         errors.add(address_name, 'Is not a IPv4 address')
