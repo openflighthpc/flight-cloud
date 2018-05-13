@@ -13,10 +13,7 @@ module Cloudware
       validate :validate_prisubnetcidr_is_ipv4
       validate :validate_networkcidr_contains_prisubnetcidr
 
-      # TODO: Integrate this into a before_create hook
-      def exists?
-        Cloudware::Domains.list.include? name || false
-      end
+      before_create :validate_domain_name_is_unique
 
       private
 
@@ -61,6 +58,11 @@ module Cloudware
         errors.add(:prisubnetcidr,
                    'Prisubnetcidr is not within the network')
         false
+      end
+
+      def validate_domain_name_is_unique
+        return unless Cloudware::Domains.list.include?(name)
+        errors.add(:name, "the '#{name}' domain already exists")
       end
     end
   end

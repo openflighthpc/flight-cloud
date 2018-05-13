@@ -13,11 +13,7 @@ module Cloudware
             prisubnetcidr: options.prisubnetcidr
           )
 
-          run_whirly('Checking domain does not already exist') do |update_status|
-            raise("Domain name #{options.name} already exists") if d.exists?
-          end
-
-          run_whirly('Creating new deployment') do
+          run_whirly('Creating new domain') do
             d.create!
           end
         end
