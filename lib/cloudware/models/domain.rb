@@ -31,27 +31,27 @@ module Cloudware
                             prisubnetcidr, region)
       end
 
-      def validate_networkcidr_is_ipv4
-        validate_ipv4(:networkcidr)
+      def validate_networkcidr_is_ipv4(**h)
+        validate_ipv4(:networkcidr, **h)
       end
 
-      def validate_prisubnetcidr_is_ipv4
-        validate_ipv4(:prisubnetcidr)
+      def validate_prisubnetcidr_is_ipv4(**h)
+        validate_ipv4(:prisubnetcidr, **h)
       end
 
-      def validate_ipv4(address_name)
+      def validate_ipv4(address_name, add_error: true)
         return true if begin
                          IPAddr.new(send(address_name)).ipv4?
                        rescue IPAddr::Error
                          false
                        end
-        errors.add(address_name, 'Is not a IPv4 address')
+        errors.add(address_name, 'Is not a IPv4 address') if add_error
         false
       end
 
       def validate_networkcidr_contains_prisubnetcidr
-        return unless validate_networkcidr_is_ipv4
-        return unless validate_prisubnetcidr_is_ipv4
+        return unless validate_networkcidr_is_ipv4(add_error: false)
+        return unless validate_prisubnetcidr_is_ipv4(add_error: false)
         network = IPAddr.new(networkcidr)
         pri = IPAddr.new(prisubnetcidr)
         return true if network.include?(pri)
