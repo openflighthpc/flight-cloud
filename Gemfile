@@ -24,4 +24,5 @@ group :development do
   gem 'rubocop-rspec'
   gem 'rspec'
   gem 'factory_bot'
+  gem 'pry'
 end
