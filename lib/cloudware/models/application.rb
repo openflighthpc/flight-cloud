@@ -22,6 +22,12 @@ module Cloudware
         self
       end
 
+      def create!(*a)
+        create(*a)
+        return if valid?
+        raise ModelValidationError, errors.full_messages.join("\n")
+      end
+
       private
 
       define_model_callbacks :create
