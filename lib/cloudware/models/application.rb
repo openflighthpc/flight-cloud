@@ -14,6 +14,21 @@ module Cloudware
           public_send("#{key}=", value)
         end
       end
+
+      def create(*a)
+        run_callbacks(:create) do
+          run_create(*a) if valid?
+        end
+        self
+      end
+
+      private
+
+      define_model_callbacks :create
+
+      def run_create(*_a)
+        raise NotImplementedError
+      end
     end
   end
 end
