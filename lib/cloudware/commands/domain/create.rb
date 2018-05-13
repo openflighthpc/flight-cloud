@@ -5,16 +5,14 @@ module Cloudware
     module Domain
       class Create < Command
         def run
-          d = Cloudware::Models::Domain.build(
-            name: name,
-            region: options.region,
-            provider: options.provider,
-            networkcidr: options.networkcidr,
-            prisubnetcidr: options.prisubnetcidr
-          )
-
           run_whirly('Creating new domain') do
-            d.create!
+            Cloudware::Models::Domain.build(
+              name: name,
+              region: options.region,
+              provider: options.provider,
+              networkcidr: options.networkcidr,
+              prisubnetcidr: options.prisubnetcidr
+            ).create!
           end
         end
 
