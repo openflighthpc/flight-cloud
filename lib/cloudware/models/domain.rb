@@ -23,15 +23,14 @@ module Cloudware
       def cloud
         case provider
         when 'aws'
-          Aws2.new
+          Providers::AWSProvider.new(self)
         when 'azure'
-          Azure.new
+          raise NotImplementedError
         end
       end
 
       def run_create(*_a)
-        cloud.create_domain(name, SecureRandom.uuid, networkcidr,
-                            prisubnetcidr, region, template: template)
+        cloud.create_domain
       end
 
       def validate_networkcidr_is_ipv4(**h)
@@ -70,3 +69,9 @@ module Cloudware
     end
   end
 end
+
+# The providers require the Domain object to be define before they can be
+# required
+require 'providers/provider'
+require_all 'lib/cloudware/providers/**/*.rb'
+
