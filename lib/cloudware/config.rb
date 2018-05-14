@@ -24,6 +24,8 @@
 require 'yaml'
 require 'ostruct'
 require 'whirly'
+require 'aws-sdk-cloudformation'
+require 'aws-sdk-ec2'
 
 Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
@@ -49,6 +51,12 @@ module Cloudware
 
     def log
       Cloudware.log
+    end
+
+    def credentials
+      @credentials = OpenStruct.new(
+        aws: Aws::Credentials.new(aws.access_key_id, aws.secret_access_key),
+      )
     end
 
     private
