@@ -1,13 +1,20 @@
 GIT
   remote: https://github.com/alces-software/commander
-  revision: cd637ecd5c590b18daa9f044fd5c771c34699245
+  revision: 4090e181cf280f228543e35ad21af219a6d2f626
   specs:
-    commander (4.4.4.pre.alces0)
+    commander (4.4.4.pre.alces2)
       highline (~> 1.7.2)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    activemodel (5.2.0)
+      activesupport (= 5.2.0)
+    activesupport (5.2.0)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 0.7, < 2)
+      minitest (~> 5.1)
+      tzinfo (~> 1.1)
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
     ast (2.4.0)
@@ -29,6 +36,7 @@ GEM
       ms_rest_azure (~> 0.9.0)
     azure_mgmt_resources (0.15.1)
       ms_rest_azure (~> 0.9.0)
+    coderay (1.1.2)
     colorize (0.8.1)
     concurrent-ruby (1.0.5)
     declarative (0.0.10)
@@ -36,6 +44,8 @@ GEM
     diff-lcs (1.3)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
+    factory_bot (4.8.2)
+      activesupport (>= 3.0.0)
     faraday (0.13.1)
       multipart-post (>= 1.2, < 3)
     faraday-cookie_jar (0.0.6)
@@ -68,6 +78,8 @@ GEM
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     httpclient (2.8.3)
+    i18n (1.0.1)
+      concurrent-ruby (~> 1.0)
     ipaddr (1.2.0)
     jmespath (1.3.1)
     jwt (1.5.6)
@@ -76,9 +88,11 @@ GEM
       little-plugger (~> 1.1)
       multi_json (~> 1.10)
     memoist (0.16.0)
+    method_source (0.9.0)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
+    minitest (5.11.3)
     ms_rest (0.7.2)
       concurrent-ruby (~> 1.0)
       faraday (~> 0.9)
@@ -95,6 +109,9 @@ GEM
     parser (2.5.1.0)
       ast (~> 2.4.0)
     powerpack (0.1.1)
+    pry (0.11.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     public_suffix (3.0.1)
     rainbow (3.0.0)
     representable (3.0.4)
@@ -135,7 +152,10 @@ GEM
       multi_json (~> 1.10)
     terminal-table (1.8.0)
       unicode-display_width (~> 1.1, >= 1.1.1)
+    thread_safe (0.3.6)
     timeliness (0.3.8)
+    tzinfo (1.2.5)
+      thread_safe (~> 0.1)
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
@@ -148,6 +168,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activemodel
+  activesupport
   aws-sdk-cloudformation
   aws-sdk-ec2
   azure_mgmt_compute
@@ -155,8 +177,10 @@ DEPENDENCIES
   azure_mgmt_resources
   colorize
   commander!
+  factory_bot
   google-cloud-resource_manager
   ipaddr
+  pry
   require_all
   rspec
   rspec-wait

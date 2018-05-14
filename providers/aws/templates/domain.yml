@@ -13,13 +13,9 @@ Parameters:
     Type: String
     Description: 'Enter the desired network CIDR'
 
-  prvSubnetCidr:
+  priSubnetCidr:
     Type: String
-    Description: 'Enter the desired prv subnet CIDR'
-
-  mgtSubnetCidr:
-    Type: String
-    Description: 'Enter the desired mgt subnet CIDR'
+    Description: 'Enter the desired pri subnet CIDR'
 
 Resources:
   Network:
@@ -42,11 +38,8 @@ Resources:
           Key: 'cloudware_network_cidr'
           Value: !Ref networkCidr
         -
-          Key: 'cloudware_prv_subnet_cidr'
-          Value: !Ref prvSubnetCidr
-        -
-          Key: 'cloudware_mgt_subnet_cidr'
-          Value: !Ref mgtSubnetCidr
+          Key: 'cloudware_pri_subnet_cidr'
+          Value: !Ref priSubnetCidr
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -69,10 +62,10 @@ Resources:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref Network
 
-  PrvSubnet:
+  PriSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: !Ref prvSubnetCidr
+      CidrBlock: !Ref priSubnetCidr
       VpcId: !Ref Network
       AvailabilityZone: !Select
         - 0
@@ -85,26 +78,7 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
         -
-          Key: !Join ['_', ['cloudware', !Ref cloudwareDomain, 'prv_subnet_id']]
-          Value: 'null'
-
-  MgtSubnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      CidrBlock: !Ref mgtSubnetCidr
-      VpcId: !Ref Network
-      AvailabilityZone: !Select
-        - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
-      Tags:
-        -
-          Key: 'cloudware_id'
-          Value: !Ref cloudwareId
-        -
-          Key: 'cloudware_domain'
-          Value: !Ref cloudwareDomain
-        -
-          Key: !Join ['_', ['cloudware', !Ref cloudwareDomain, 'mgt_subnet_id']]
+          Key: !Join ['_', ['cloudware', !Ref cloudwareDomain, 'pri_subnet_id']]
           Value: 'null'
 
   RouteTable:
@@ -119,16 +93,10 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
 
-  PrvSubnetRouteTableAssocation:
+  PriSubnetRouteTableAssocation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PrvSubnet
-      RouteTableId: !Ref RouteTable
-
-  MgtSubnetRouteTableAssocation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref MgtSubnet
+      SubnetId: !Ref PriSubnet
       RouteTableId: !Ref RouteTable
 
   RouteInternetGateway:

@@ -2,9 +2,8 @@
 # The file then needs to be stored in your home directory as:
 # ~/.flightconnector.yml
 
-# Location to store Cloudware logs
 general:
-  log_file: '/var/log/cloudware.log'
+  log_file: '/var/log/flightconnector.log'
 
 # Provider credentials
 provider:

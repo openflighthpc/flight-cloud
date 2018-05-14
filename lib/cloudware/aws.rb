@@ -33,10 +33,8 @@ module Cloudware
     attr_accessor :cloudware_domain
     attr_accessor :cloudware_id
     attr_accessor :network_cidr
-    attr_accessor :prv_subnet_cidr
-    attr_accessor :mgt_subnet_cidr
-    attr_accessor :prv_subnet_id
-    attr_accessor :mgt_subnet_id
+    attr_accessor :pri_subnet_cidr
+    attr_accessor :pri_subnet_id
     attr_accessor :region
 
     def initialize
@@ -89,8 +87,7 @@ module Cloudware
                            @domain = t.value if t.key == 'cloudware_domain'
                            @id = t.value if t.key == 'cloudware_id'
                            @network_cidr = t.value if t.key == 'cloudware_network_cidr'
-                           @prv_subnet_cidr = t.value if t.key == 'cloudware_prv_subnet_cidr'
-                           @mgt_subnet_cidr = t.value if t.key == 'cloudware_mgt_subnet_cidr'
+                           @pri_subnet_cidr = t.value if t.key == 'cloudware_pri_subnet_cidr'
                            @networkid = v.vpc_id
                            @region = r
                          end
@@ -98,15 +95,13 @@ module Cloudware
                          subnet_list = @ec2.describe_subnets(filters: [{ name: 'vpc-id', values: [v.vpc_id] }])
                          subnet_list.subnets.each do |s|
                            s.tags.each do |t|
-                             @prv_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_prv_subnet_id"
-                             @mgt_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_mgt_subnet_id"
+                             @pri_subnet_id = s.subnet_id if t.key == "cloudware_#{@domain}_pri_subnet_id"
                            end
                          end
                          log.info("[#{self.class}] Detected domain #{@domain} in region #{@region}")
                          @domains.merge!(@domain => {
                                            domain: @domain, id: @id, network_cidr: @network_cidr,
-                                           prv_subnet_cidr: @prv_subnet_cidr, mgt_subnet_cidr: @mgt_subnet_cidr,
-                                           prv_subnet_id: @prv_subnet_id, mgt_subnet_id: @mgt_subnet_id,
+                                           pri_subnet_cidr: @pri_subnet_cidr, pri_subnet_id: @pri_subnet_id,
                                            region: @region, provider: 'aws', network_id: @networkid
                                          })
                        end
@@ -134,17 +129,15 @@ module Cloudware
                             @domain = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'cloudwareDomain'
                             @id = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'cloudwareId'
                             @role = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmRole'
-                            @prvip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'prvIp'
-                            @mgtip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'mgtIp'
+                            @priip = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'priIp'
                             @flavour = val.to_h[:parameter_value] if val.to_h[:parameter_key] == 'vmFlavour'
                           end
                           @name = test.stack_name.gsub("#{@domain}-", '')
                           log.info("[#{self.class}] Detected machine #{@name} in domain #{@domain}")
                           @machines.merge!("#{@domain}-#{@name}" => {
                                              name: @name, domain: @domain, state: @state,
-                                             id: @id, type: @type, role: @role, mgt_ip: @mgtip,
-                                             prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id,
-                                             flavour: @flavour
+                                             id: @id, type: @type, role: @role, pri_ip: @priip, ext_ip: @extip,
+                                             provider: 'aws', instance_id: @instance_id, flavour: @flavour
                                            })
                         end
 
@@ -160,17 +153,15 @@ module Cloudware
                               @domain = tag.value if tag.key == 'cloudware_domain'
                               @id = tag.value if tag.key == 'cloudware_id'
                               @role = tag.value if tag.key == 'cloudware_machine_role'
-                              @prvip = tag.value if tag.key == 'cloudware_prv_subnet_ip'
-                              @mgtip = tag.value if tag.key == 'cloudware_mgt_subnet_ip'
+                              @priip = tag.value if tag.key == 'cloudware_pri_subnet_ip'
                               @name = tag.value if tag.key == 'cloudware_machine_name'
                               @flavour = tag.value if tag.key == 'cloudware_machine_flavour'
                             end
                             log.info("[#{self.class}] Detected machine #{@name} in domain #{@domain}")
                             @machines.merge!("#{@domain}-#{@name}" => {
                                                name: @name, domain: @domain, state: @state,
-                                               id: @id, type: @type, role: @role, mgt_ip: @mgtip,
-                                               prv_ip: @prvip, ext_ip: @extip, provider: 'aws', instance_id: @instance_id,
-                                               flavour: @flavour
+                                               id: @id, type: @type, role: @role, pri_ip: @priip, ext_ip: @extip,
+                                               provider: 'aws', instance_id: @instance_id, flavour: @flavour
                                              })
                           end
                         end
@@ -210,20 +201,19 @@ module Cloudware
       @ec2.stop_instances(instance_ids: [machine_info(name, domain)[:instance_id]])
     end
 
-    def create_domain(name, id, networkcidr, prvsubnetcidr, mgtsubnetcidr, region)
+    def create_domain(name, id, networkcidr, prisubnetcidr, region)
       load_config(region)
       template = 'domain.yml'
       params = [
         { parameter_key: 'cloudwareDomain', parameter_value: name },
         { parameter_key: 'cloudwareId', parameter_value: id },
         { parameter_key: 'networkCidr', parameter_value: networkcidr },
-        { parameter_key: 'prvSubnetCidr', parameter_value: prvsubnetcidr },
-        { parameter_key: 'mgtSubnetCidr', parameter_value: mgtsubnetcidr },
+        { parameter_key: 'priSubnetCidr', parameter_value: prisubnetcidr },
       ]
       deploy("#{name}-domain", template, params)
     end
 
-    def create_machine(name, domain, id, prvip, mgtip, role, type, region, flavour)
+    def create_machine(name, domain, id, priip, role, type, region, flavour)
       d = Cloudware::Domain.new
       d.name = domain
       load_config(region)
@@ -231,16 +221,13 @@ module Cloudware
       params = [
         { parameter_key: 'cloudwareDomain', parameter_value: domain },
         { parameter_key: 'cloudwareId', parameter_value: id },
-        { parameter_key: 'prvIp', parameter_value: prvip },
-        { parameter_key: 'mgtIp', parameter_value: mgtip },
+        { parameter_key: 'priIp', parameter_value: priip },
         { parameter_key: 'vmRole', parameter_value: role },
         { parameter_key: 'vmType', parameter_value: type },
         { parameter_key: 'vmName', parameter_value: name },
         { parameter_key: 'networkId', parameter_value: d.get_item('network_id') },
-        { parameter_key: 'prvSubnetId', parameter_value: d.get_item('prv_subnet_id') },
-        { parameter_key: 'mgtSubnetId', parameter_value: d.get_item('mgt_subnet_id') },
-        { parameter_key: 'prvSubnetCidr', parameter_value: d.get_item('prv_subnet_cidr') },
-        { parameter_key: 'mgtSubnetCidr', parameter_value: d.get_item('mgt_subnet_cidr') },
+        { parameter_key: 'priSubnetId', parameter_value: d.get_item('pri_subnet_id') },
+        { parameter_key: 'priSubnetCidr', parameter_value: d.get_item('pri_subnet_cidr') },
         { parameter_key: 'vmFlavour', parameter_value: flavour },
       ]
       deploy("#{domain}-#{name}", template, params)
@@ -252,9 +239,6 @@ module Cloudware
       log.info("[#{self.class}] Deployment for #{name} finished, waiting for deployment to reach complete")
       @cfn.wait_until :stack_create_complete, stack_name: name
       log.info("[#{self.class}] Deployment for #{name} reached complete status")
-    # Catch errors and hand it up the stack for `cli.rb` to handle
-    rescue CloudFormation::Errors::ServiceError, Aws::Waiters::Errors::FailureStateError => error
-      raise error.message
     end
 
     def destroy(name, domain)

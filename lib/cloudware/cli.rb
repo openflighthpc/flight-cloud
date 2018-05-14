@@ -23,13 +23,14 @@
 #==============================================================================
 require 'commander'
 require 'terminal-table'
-require 'colorize'
 require 'whirly'
 require 'exceptions'
 require 'command'
+require 'models/application'
 
 require 'require_all'
 require_all 'lib/cloudware/commands/**/*.rb'
+require_all 'lib/cloudware/models/**/*.rb'
 
 module Cloudware
   class CLI
@@ -41,6 +42,8 @@ module Cloudware
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
 
+    suppress_trace_class UserError
+
     # Display the help if there is no input arguments
     ARGV.push '--help' if ARGV.empty?
 
@@ -50,6 +53,11 @@ module Cloudware
       end
     end
 
+    def self.cli_syntax(command, args_str = '')
+      s = "flightconnector #{command.name} #{args_str} [options]".squish
+      command.syntax = s
+    end
+
     command :domain do |c|
       c.syntax = 'flightconnector domain [options]'
       c.description = 'Manage a domain'
@@ -57,14 +65,21 @@ module Cloudware
     end
 
     command :'domain create' do |c|
-      c.syntax = 'flightconnector domain create [options]'
+      cli_syntax(c, 'NAME')
       c.description = 'Create a new domain'
-      c.option '--name NAME', String, 'Name of cloud domain'
-      c.option '--networkcidr CIDR', String, 'Entire network CIDR, e.g. 10.0.0.0/16. The prv and mgt subnet must be within this range'
-      c.option '--provider NAME', String, 'Cloud service provider name'
-      c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
-      c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
-      c.option '--region NAME', String, 'Provider region to create domain in'
+      c.option '-p', '--provider NAME', String,
+               'REQUIRED: Cloud service provider name'
+      c.option '-r', '--region NAME', String,
+               'REQUIRED: Provider region to create domain in'
+      c.option '--networkcidr CIDR',
+               String, { default: '10.0.0.0/16' },
+               <<~SUMMARY.squish
+                 Entire network CIDR. The pri subnet must be
+                 within this range'
+               SUMMARY
+      c.option '--prisubnetcidr NAME',
+               String, { default: '10.0.1.0/24' },
+               'Pri subnet CIDR'
       c.hidden = true
       action(c, Commands::Domain::Create)
     end
@@ -98,8 +113,7 @@ module Cloudware
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'
       c.option '--role NAME', String, 'Machine role to inherit (master or slave)'
-      c.option '--prvip ADDR', String, 'Prv subnet IP address'
-      c.option '--mgtip ADDR', String, 'Mgt subnet IP address'
+      c.option '--priip ADDR', String, 'Pri subnet IP address'
       c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
       c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
       c.hidden = true
