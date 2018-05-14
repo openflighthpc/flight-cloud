@@ -4,8 +4,10 @@ require 'ipaddr'
 module Cloudware
   module Models
     class Domain < Application
-      attr_accessor :name, :provider, :region, :networkcidr, :prisubnetcidr,
-                    :template
+      ATTRIBUTES = [
+        :name, :provider, :region, :networkcidr, :prisubnetcidr, :template
+      ]
+      attr_accessor(*ATTRIBUTES)
 
       validates_presence_of :name, :region
       validates :name, format: { with: /\A[a-zA-Z0-9-]*\z/ }
