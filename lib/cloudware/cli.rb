@@ -32,6 +32,9 @@ require 'require_all'
 require_all 'lib/cloudware/commands/**/*.rb'
 require_all 'lib/cloudware/models/**/*.rb'
 
+require 'providers/domains/domain'
+require_all 'lib/cloudware/providers/domains/**/*.rb'
+
 module Cloudware
   class CLI
     extend Commander::UI

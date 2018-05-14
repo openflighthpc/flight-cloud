@@ -23,7 +23,7 @@ module Cloudware
       def cloud
         case provider
         when 'aws'
-          Providers::AWSProvider.new(self)
+          Providers::Domains::AWS.new(self)
         when 'azure'
           raise NotImplementedError
         end
@@ -69,9 +69,4 @@ module Cloudware
     end
   end
 end
-
-# The providers require the Domain object to be define before they can be
-# required
-require 'providers/provider'
-require_all 'lib/cloudware/providers/**/*.rb'
 
