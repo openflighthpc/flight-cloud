@@ -16,6 +16,14 @@ Parameters:
      MinValue: 1
      MaxValue: 99
 
+   networkCidr:
+     Type: String
+     Description: 'Enter the desired network CIDR'
+
+   priSubnetCidr:
+     Type: String
+     Description: 'Enter the desired pri subnet CIDR'
+
 Resources:
   Network:
     Type: AWS::EC2::VPC

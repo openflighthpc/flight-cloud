@@ -9,6 +9,14 @@ Parameters:
      Type: String
      Description: 'Enter the desired domain name'
 
+   networkCidr:
+     Type: String
+     Description: 'Enter the desired network CIDR'
+
+   priSubnetCidr:
+     Type: String
+     Description: 'Enter the desired pri subnet CIDR'
+
 Resources:
   Network:
     Type: AWS::EC2::VPC
