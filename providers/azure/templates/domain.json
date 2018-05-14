@@ -16,13 +16,6 @@
         "description": "Choose the desired pri subnet range"
       }
     },
-    "mgtSubnetCIDR": {
-      "type": "string",
-      "defaultValue": "10.0.2.0/24",
-      "metadata": {
-        "description": "Choose the desired mgt subnet range"
-      }
-    },
     "cloudwareId": {
       "type": "string",
       "metadata": {
@@ -47,7 +40,6 @@
         "cloudware_domain_region": "[resourceGroup().location]",
         "cloudware_network_cidr": "[parameters('networkCIDR')]",
         "cloudware_pri_subnet_cidr": "[parameters('priSubnetCIDR')]",
-        "cloudware_mgt_subnet_cidr": "[parameters('mgtSubnetCIDR')]",
         "cloudware_resource_type": "domain"
       },
       "location": "[resourceGroup().location]",
@@ -64,12 +56,6 @@
               "addressPrefix": "[parameters('priSubnetCIDR')]"
             }
           },
-          {
-            "name": "mgt",
-            "properties": {
-              "addressPrefix": "[parameters('mgtSubnetCIDR')]"
-            }
-          }
         ]
       }
     }

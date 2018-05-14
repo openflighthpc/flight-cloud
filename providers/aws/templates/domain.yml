@@ -17,10 +17,6 @@ Parameters:
     Type: String
     Description: 'Enter the desired pri subnet CIDR'
 
-  mgtSubnetCidr:
-    Type: String
-    Description: 'Enter the desired mgt subnet CIDR'
-
 Resources:
   Network:
     Type: AWS::EC2::VPC
@@ -44,9 +40,6 @@ Resources:
         -
           Key: 'cloudware_pri_subnet_cidr'
           Value: !Ref priSubnetCidr
-        -
-          Key: 'cloudware_mgt_subnet_cidr'
-          Value: !Ref mgtSubnetCidr
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -88,25 +81,6 @@ Resources:
           Key: !Join ['_', ['cloudware', !Ref cloudwareDomain, 'pri_subnet_id']]
           Value: 'null'
 
-  MgtSubnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      CidrBlock: !Ref mgtSubnetCidr
-      VpcId: !Ref Network
-      AvailabilityZone: !Select
-        - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
-      Tags:
-        -
-          Key: 'cloudware_id'
-          Value: !Ref cloudwareId
-        -
-          Key: 'cloudware_domain'
-          Value: !Ref cloudwareDomain
-        -
-          Key: !Join ['_', ['cloudware', !Ref cloudwareDomain, 'mgt_subnet_id']]
-          Value: 'null'
-
   RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -123,12 +97,6 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PriSubnet
-      RouteTableId: !Ref RouteTable
-
-  MgtSubnetRouteTableAssocation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref MgtSubnet
       RouteTableId: !Ref RouteTable
 
   RouteInternetGateway:

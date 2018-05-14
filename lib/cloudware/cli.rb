@@ -74,7 +74,7 @@ module Cloudware
       c.option '--networkcidr CIDR',
                String, { default: '10.0.0.0/16' },
                <<~SUMMARY.squish
-                 Entire network CIDR. The pri and mgt subnet must be
+                 Entire network CIDR. The pri subnet must be
                  within this range'
                SUMMARY
       c.option '--prisubnetcidr NAME',

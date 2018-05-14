@@ -34,7 +34,6 @@ module Cloudware
             raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
             update_status.call('Verifying pri IP address')
             raise("Invalid pri IP address #{options.priip} in subnet #{d.get_item('pri_subnet_cidr')}") unless m.valid_ip?(d.get_item('pri_subnet_cidr').to_s, options.priip.to_s)
-            update_status.call('Verifying mgt IP address')
           end
 
           run_whirly('Creating new deployment') do

@@ -37,19 +37,12 @@
 			"metadata": {
 				"description": "Enter the desired pri subnet IP address"
 			}
-		},
-		"mgtSubnetIp": {
-			"type": "string",
-			"metadata": {
-				"description": "Enter the desired mgt subnet IP address"
-			}
 		}
 	},
 	"variables": {
 		"adminUsername": "alces",
 		"adminPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/0R5EvmSrySy2I+8Cx6eOX7cVuYFXx5D0O1x0+OmAZ0Qaj9d7E0Nj4ZcWxdCT03uFl1Ka4tInDlQmMyy0V1/AftpHxBEnB17Pk/lJnDW1YstmAqD0GlFa1CrxUdtHd+jB3LJmdoHsV6fRGpMOgFd+u/4Wces7KAqYFmL5uPG1UTCMgokQ2qboQgEVspXotMvni1iil3kEjyH/eW64Laxmn2Vxls9feZ1o95mPQhJPJcN7MMo1h+jkxyat3bawtpqyV7fXYU0+BO2JHpu/VIEDHtxhlk7RhI0U06XbJu6ZCCUrEX8idIhw4hueQpKwVYplTXssa9JqNlcjouqLj5kd cloudware@alces-software.com",
 		"priInterfaceName": "[concat(parameters('cloudwareDomain'), parameters('vmName'), 'pri')]",
-		"mgtInterfaceName": "[concat(parameters('cloudwareDomain'), parameters('vmName'), 'mgt')]",
 		"azureConfig": {
 			"imageSubscription": "[concat('/subscriptions/', 'd1e964ef-15c7-4b27-8113-e725167cee83', '/resourceGroups/alcesflight/providers/Microsoft.Compute/images/alces-flight-compute-1.0.0-beta')]"
 		}
@@ -128,28 +121,6 @@
 			]
 		},
 		{
-			"type": "Microsoft.Network/networkInterfaces",
-			"name": "[variables('mgtInterfaceName')]",
-			"apiVersion": "2017-03-01",
-			"tags": {
-				"cloudware_domain": "[parameters('cloudwareDomain')]",
-				"cloudware_machine_name": "[parameters('vmName')]"
-			},
-			"location": "[resourceGroup().location]",
-			"properties": {
-				"ipConfigurations": [{
-					"name": "[concat(parameters('cloudwareDomain'), parameters('vmName'), '-mgt')]",
-					"properties": {
-						"privateIPAllocationMethod": "Static",
-						"privateIPAddress": "[parameters('mgtSubnetIp')]",
-						"subnet": {
-							"id": "[resourceId(parameters('cloudwareDomain'), 'Microsoft.Network/virtualNetworks/subnets', 'network', 'mgt')]"
-						}
-					}
-				}]
-			}
-		},
-		{
 			"type": "Microsoft.Compute/virtualMachines",
 			"name": "[parameters('vmName')]",
 			"apiVersion": "2016-04-30-preview",
@@ -161,8 +132,7 @@
 				"cloudware_machine_type": "[parameters('vmType')]",
 				"cloudware_machine_flavour": "[parameters('vmFlavour')]",
 				"cloudware_resource_type": "machine",
-				"cloudware_pri_ip": "[parameters('priSubnetIp')]",
-				"cloudware_mgt_ip": "[parameters('mgtSubnetIp')]"
+				"cloudware_pri_ip": "[parameters('priSubnetIp')]"
 			},
 			"location": "[resourceGroup().location]",
 			"properties": {
@@ -203,18 +173,11 @@
 								"primary": true
 							}
 						},
-						{
-							"id": "[resourceId('Microsoft.Network/networkInterfaces', variables('mgtInterfaceName'))]",
-							"properties": {
-								"primary": false
-							}
-						}
 					]
 				}
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.Network/networkInterfaces', variables('priInterfaceName'))]",
-				"[resourceId('Microsoft.Network/networkInterfaces', variables('mgtInterfaceName'))]"
+				"[resourceId('Microsoft.Network/networkInterfaces', variables('priInterfaceName'))]"
 			]
 		}
 	]
