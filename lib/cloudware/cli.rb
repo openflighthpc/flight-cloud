@@ -80,6 +80,9 @@ module Cloudware
       c.option '--prisubnetcidr NAME',
                String, { default: '10.0.1.0/24' },
                'Pri subnet CIDR'
+      c.option '-t', '--template TEMPLATE',
+               String, { default: 'domain' },
+               'Provider template to build the domain from'
       c.hidden = true
       action(c, Commands::Domain::Create)
     end

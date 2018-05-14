@@ -11,7 +11,8 @@ module Cloudware
               region: options.region,
               provider: options.provider,
               networkcidr: options.networkcidr,
-              prisubnetcidr: options.prisubnetcidr
+              prisubnetcidr: options.prisubnetcidr,
+              template: options.template
             ).create!
           end
         end

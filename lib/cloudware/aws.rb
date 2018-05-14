@@ -201,16 +201,16 @@ module Cloudware
       @ec2.stop_instances(instance_ids: [machine_info(name, domain)[:instance_id]])
     end
 
-    def create_domain(name, id, networkcidr, prisubnetcidr, region)
+    def create_domain(name, id, networkcidr, prisubnetcidr, region, template:)
       load_config(region)
-      template = 'domain.yml'
+      template_file = "#{template}.yml"
       params = [
         { parameter_key: 'cloudwareDomain', parameter_value: name },
         { parameter_key: 'cloudwareId', parameter_value: id },
         { parameter_key: 'networkCidr', parameter_value: networkcidr },
         { parameter_key: 'priSubnetCidr', parameter_value: prisubnetcidr },
       ]
-      deploy("#{name}-domain", template, params)
+      deploy("#{name}-domain", template_file, params)
     end
 
     def create_machine(name, domain, id, priip, role, type, region, flavour)

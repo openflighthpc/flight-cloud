@@ -4,7 +4,8 @@ require 'ipaddr'
 module Cloudware
   module Models
     class Domain < Application
-      attr_accessor :name, :provider, :region, :networkcidr, :prisubnetcidr
+      attr_accessor :name, :provider, :region, :networkcidr, :prisubnetcidr,
+                    :template
 
       validates_presence_of :name, :region
       validates :name, format: { with: /\A[a-zA-Z0-9-]*\z/ }
@@ -28,7 +29,7 @@ module Cloudware
 
       def run_create(*_a)
         cloud.create_domain(name, SecureRandom.uuid, networkcidr,
-                            prisubnetcidr, region)
+                            prisubnetcidr, region, template: template)
       end
 
       def validate_networkcidr_is_ipv4(**h)

@@ -67,7 +67,7 @@ module Cloudware
       Cloudware.log
     end
 
-    def create_domain(name, id, networkcidr, prisubnetcidr, region)
+    def create_domain(name, id, networkcidr, prisubnetcidr, region, template:)
       raise('Domain already exists') if resource_group_exists?(name)
       create_resource_group(region, id, name)
       params = {
@@ -76,7 +76,7 @@ module Cloudware
         networkCIDR: networkcidr,
         priSubnetCIDR: prisubnetcidr,
       }
-      deploy(name, 'domain', 'domain', params)
+      deploy(name, 'domain', template, params)
     end
 
     def domains
