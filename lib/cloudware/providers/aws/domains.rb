@@ -2,7 +2,7 @@
 module Cloudware
   module Providers
     module AWS
-      class Domains < Providers::Domains
+      class Domains < Base::Domains
         class << self
           private
 

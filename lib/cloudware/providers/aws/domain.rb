@@ -3,7 +3,7 @@
 module Cloudware
   module Providers
     module AWS
-      class Domain < Providers::Domain
+      class Domain < Base::Domain
         include DeployAWS
 
         def create

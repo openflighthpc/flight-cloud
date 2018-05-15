@@ -1,5 +1,5 @@
 
-require_all 'lib/cloudware/providers/*.rb'
+require_all 'lib/cloudware/providers/base/*.rb'
 require_all 'lib/cloudware/providers/**/*.rb'
 
 module Cloudware
