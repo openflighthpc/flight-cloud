@@ -16,14 +16,11 @@ module Cloudware
         private
 
         def domain
-          model = domains_in_region.find { |d| d.name == name }
+          model = Providers.select(options.provider)::Domains
+                           .by_region(options.region)
+                           .find_by_name(name)
           return model unless model.nil?
           raise InvalidInput, "Domain name '#{name}' does not exist"
-        end
-
-        def domains_in_region
-          Providers.select(options.provider)::Domains
-                   .by_region(options.region)
         end
       end
     end
