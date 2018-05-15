@@ -34,6 +34,18 @@ Parameters:
     Type: String
     Description: 'Enter the VM flavour'
 
+  vmName:
+    Type: String
+    Description: 'Enter the desired instance name'
+
+  priIp:
+    Type: String
+    Description: 'Enter the pri subnet IP'
+
+  priSubnetCidr:
+    Type: String
+    Description: 'Enter the pri subnet CIDR'
+
 Mappings:
   RegionMap:
     eu-west-1:
