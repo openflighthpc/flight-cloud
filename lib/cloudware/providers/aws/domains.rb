@@ -28,7 +28,7 @@ module Cloudware
                   domain.name = tag.value
                 when 'cloudware_network_cidr'
                   domain.networkcidr = tag.value
-                when 'cloudware_pri_subnet_ip'
+                when 'cloudware_pri_subnet_cidr'
                   domain.prisubnetcidr = tag.value
                 end
               end

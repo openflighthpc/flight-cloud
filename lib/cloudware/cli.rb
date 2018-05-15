@@ -97,8 +97,7 @@ module Cloudware
     command :'domain list' do |c|
       c.syntax = 'flightconnector domain list [options]'
       c.description = 'List created domains'
-      c.option '--provider NAME', String, 'Cloud provider name to filter by'
-      c.option '--region NAME', String, 'Cloud provider region to filter by'
+      provider_and_region_options(c)
       c.hidden = true
       action(c, Commands::Domain::List)
     end

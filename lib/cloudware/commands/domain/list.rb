@@ -5,35 +5,28 @@ module Cloudware
     module Domain
       class List < Command
         def run
-          d = Cloudware::Domain.new
-          # TODO: Why does this need to be wrapped?
-          d.provider = Array.wrap(options.provider)
-          d.region = options.region.to_s unless options.region.nil?
-          d.name = options.name.to_s unless options.name.nil?
-
-          # Exit if the provider is not in the config list (which verifies details ahead of time)
-          if (Cloudware.config.providers & d.provider).empty?
-            raise "The provider #{d.provider.join(',')} is not a valid provider - unknown or missing login details"
-          end
-
-          r = []
-          run_whirly('Fetching available domains') do
-            raise('No available domains') if Domains.list.nil?
-          end
-          Domains.list.each do |k, v|
-            r << [k, v[:network_cidr], v[:pri_subnet_cidr], v[:provider], v[:region]]
-          end
+          rows = Providers.select(options.provider)::Domains
+                          .by_region(options.region)
+                          .reduce([]) do |memo, domain|
+                            memo << [
+                              domain.name,
+                              domain.networkcidr,
+                              domain.prisubnetcidr,
+                              domain.provider,
+                              domain.region
+                            ]
+                          end
           table = Terminal::Table.new headings: ['Domain name'.bold,
                                                  'Network CIDR'.bold,
                                                  'Pri Subnet CIDR'.bold,
                                                  'Provider'.bold,
                                                  'Region'.bold],
-                                      rows: r
+                                      rows: rows
           puts table
         end
 
         def required_options
-          [:provider]
+          [:provider, :region]
         end
       end
     end
