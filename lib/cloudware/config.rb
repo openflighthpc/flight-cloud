@@ -55,7 +55,7 @@ module Cloudware
 
     def credentials
       @credentials = OpenStruct.new(
-        aws: Aws::Credentials.new(aws.access_key_id, aws.secret_access_key),
+        aws: Aws::Credentials.new(aws.access_key_id, aws.secret_access_key)
       )
     end
 

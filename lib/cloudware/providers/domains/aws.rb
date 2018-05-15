@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 module Cloudware
   module Providers
     module Domains
@@ -58,7 +60,7 @@ module Cloudware
             { parameter_key: 'networkCidr', parameter_value: networkcidr },
             {
               parameter_key: 'priSubnetCidr',
-              parameter_value: prisubnetcidr
+              parameter_value: prisubnetcidr,
             },
           ]
         end

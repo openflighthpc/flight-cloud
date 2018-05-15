@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 module Cloudware
   module Providers
     module DeployAWS
@@ -21,7 +23,7 @@ module Cloudware
       def cloud_formation
         @cloud_formation ||= Aws::CloudFormation::Client.new(
           region: region,
-          credentials: Cloudware.config.credentials.aws,
+          credentials: Cloudware.config.credentials.aws
         )
       end
     end

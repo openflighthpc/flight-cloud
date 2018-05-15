@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 module Cloudware
   module Commands
     module Concerns

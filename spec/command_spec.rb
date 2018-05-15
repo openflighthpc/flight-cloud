@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 require 'ostruct'
 
 module Cloudware
@@ -11,8 +13,9 @@ end
 
 RSpec.describe Cloudware::Command do
   subject { Cloudware::Commands::TestCommand.new(args, options) }
+
   let(:args) { [] }
-  let(:options) { OpenStruct.new() }
+  let(:options) { OpenStruct.new }
 
   it 'does nothing with blank arguments' do
     expect { subject.run! }.not_to raise_error
@@ -20,6 +23,7 @@ RSpec.describe Cloudware::Command do
 
   describe '#required_options' do
     let(:required) { [:required_option1, :required_option2] }
+
     before do
       allow(subject).to receive(:required_options).and_return(required)
     end

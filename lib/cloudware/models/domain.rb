@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 require 'ipaddr'
 
 module Cloudware
@@ -7,7 +9,7 @@ module Cloudware
       ATTRIBUTES = [
         :name, :provider, :region, :networkcidr, :prisubnetcidr, :template,
         :create_domain_already_exists_flag
-      ]
+      ].freeze
       attr_accessor(*ATTRIBUTES)
 
       validates_presence_of :name, :region
@@ -73,4 +75,3 @@ module Cloudware
     end
   end
 end
-
