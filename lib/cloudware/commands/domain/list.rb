@@ -28,6 +28,16 @@ module Cloudware
         def required_options
           [:provider, :region]
         end
+
+        private
+
+        def search_regions
+          if options.all_regions
+            Providers.select(options.provider).regions
+          else
+            Array.wrap(options.region)
+          end
+        end
       end
     end
   end

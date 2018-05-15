@@ -100,6 +100,10 @@ module Cloudware
       c.syntax = 'flightconnector domain list [options]'
       c.description = 'List created domains'
       provider_and_region_options(c)
+      c.option '-a', '--all-regions', <<-OPTION.squish
+        List domains in all the regions. This option overrides the region
+        input
+      OPTION
       c.hidden = true
       action(c, Commands::Domain::List)
     end
