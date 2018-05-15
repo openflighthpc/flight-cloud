@@ -13,6 +13,14 @@ Parameters:
     Type: String
     Description: 'Enter the VPC/network ID'
 
+  priIp:
+    Type: String
+    Description: 'Enter the pri subnet IP'
+
+  priSubnetCidr:
+    Type: String
+    Description: 'Enter the pri subnet CIDR'
+
   priSubnetId:
     Type: String
     Description: 'Enter the pri subnet ID'
@@ -33,6 +41,10 @@ Parameters:
   vmFlavour:
     Type: String
     Description: 'Enter the VM flavour'
+
+  vmName:
+    Type: String
+    Description: 'Enter the desired instance name'
 
   clusterIndex: 
     Type: Number
