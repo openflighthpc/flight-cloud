@@ -7,15 +7,15 @@ module Cloudware
         include Concerns::DomainInput
 
         def run
-          d = Cloudware::Domain.new
-          d.name = name
+          d_remove_me = Cloudware::Domain.new
+          d_remove_me.name = name
 
           run_whirly('Checking domain exists') do
-            raise("Domain name #{options.name} does not exist") unless d.exists?
+            raise("Domain name #{options.name} does not exist") unless d_remove_me.exists?
           end
 
           run_whirly("Destroying domain #{options.name}") do
-            d.destroy
+            d_remove_me.destroy
           end
         end
       end
