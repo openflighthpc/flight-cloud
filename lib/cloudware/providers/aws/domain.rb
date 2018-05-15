@@ -1,10 +1,9 @@
-
 # frozen_string_literal: true
 
 module Cloudware
   module Providers
-    module Domains
-      class AWS < Domain
+    module AWS
+      class Domain < Providers::Domain
         class << self
           def by_region(region)
             ec2_by_region(region).describe_vpcs(
