@@ -28,11 +28,20 @@ module Cloudware
         raise ModelValidationError, errors.full_messages.join("\n")
       end
 
+      def destroy
+        run_callbacks(:destroy) { run_destroy }
+      end
+
       private
 
       define_model_callbacks :create
+      define_model_callbacks :destroy
 
-      def run_create(*_a)
+      def run_create
+        raise NotImplementedError
+      end
+
+      def run_destroy
         raise NotImplementedError
       end
     end
