@@ -32,6 +32,7 @@ require 'require_all'
 require_all 'lib/cloudware/commands/**/*.rb'
 require_all 'lib/cloudware/models/**/*.rb'
 
+require_all 'lib/cloudware/providers/*.rb'
 require 'providers/domains/domain'
 require_all 'lib/cloudware/providers/domains/**/*.rb'
 

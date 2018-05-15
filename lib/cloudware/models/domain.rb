@@ -29,8 +29,8 @@ module Cloudware
         end
       end
 
-      def run_create(*_a)
-        cloud.create_domain
+      def run_create
+        cloud.create
       end
 
       def validate_networkcidr_is_ipv4(**h)
