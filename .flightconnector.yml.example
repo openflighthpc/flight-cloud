@@ -16,3 +16,8 @@ provider:
   aws:
     access_key_id: 
     secret_access_key: 
+
+# Default region and provider for the cluster
+default:
+  provider:
+  region:

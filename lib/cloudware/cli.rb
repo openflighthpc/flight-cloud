@@ -63,9 +63,11 @@ module Cloudware
 
     def self.provider_and_region_options(command)
       command.option '-p', '--provider NAME', String,
-                     'REQUIRED: Cloud service provider name'
+                     { default: Cloudware.config.default.provider },
+                     'Cloud service provider name'
       command.option '-r', '--region NAME', String,
-                     'REQUIRED: Provider region to create domain in'
+                     { default: Cloudware.config.default.region },
+                     'Provider region to create domain in'
     end
 
     command :domain do |c|
