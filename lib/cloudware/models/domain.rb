@@ -30,7 +30,7 @@ module Cloudware
       end
 
       def run_create
-        cloud.create!
+        cloud.create
       end
 
       def run_destroy
