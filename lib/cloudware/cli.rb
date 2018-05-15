@@ -33,9 +33,7 @@ require_all 'lib/cloudware/commands/concerns/**/*.rb'
 require_all 'lib/cloudware/commands/**/*.rb'
 require_all 'lib/cloudware/models/**/*.rb'
 
-require_all 'lib/cloudware/providers/*.rb'
-require 'providers/domains/domain'
-require_all 'lib/cloudware/providers/domains/**/*.rb'
+require 'providers'
 
 module Cloudware
   class CLI

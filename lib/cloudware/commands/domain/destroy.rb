@@ -22,8 +22,8 @@ module Cloudware
         end
 
         def domains_in_region
-          Providers::Domains.by_provider(options.provider)
-                            .by_region(options.region)
+          Providers.select(options.provider)::Domain
+                   .by_region(options.region)
         end
       end
     end

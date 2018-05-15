@@ -23,12 +23,7 @@ module Cloudware
       private
 
       def cloud
-        case provider
-        when 'aws'
-          Providers::Domains::AWS.new(self)
-        when 'azure'
-          raise NotImplementedError
-        end
+        Providers.select(provider)::Domain.new(self)
       end
 
       def run_create
