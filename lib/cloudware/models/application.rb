@@ -15,15 +15,15 @@ module Cloudware
         end
       end
 
-      def create(*a)
+      def create
         run_callbacks(:create) do
-          run_create(*a) if valid?
+          run_create if valid?
         end
         self
       end
 
-      def create!(*a)
-        create(*a)
+      def create!
+        create
         return self if valid?
         raise ModelValidationError, errors.full_messages.join("\n")
       end
