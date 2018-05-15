@@ -20,17 +20,13 @@ module Cloudware
 
       private
 
-      def cloud
+      def run_create
         case provider
         when 'aws'
           Providers::Domains::AWS.new(self)
         when 'azure'
           raise NotImplementedError
-        end
-      end
-
-      def run_create
-        cloud.create
+        end.create
       end
 
       def validate_networkcidr_is_ipv4(**h)
