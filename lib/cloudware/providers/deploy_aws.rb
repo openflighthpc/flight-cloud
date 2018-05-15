@@ -2,6 +2,11 @@
 module Cloudware
   module Providers
     module DeployAWS
+      def destroy
+        cloud_formation.delete_stack(stack_name: name)
+        cloud_formation.wait_until(:stack_delete_complete, stack_name: name)
+      end
+
       private
 
       def deploy_aws
@@ -11,11 +16,6 @@ module Cloudware
           parameters: deploy_parameters
         )
         cloud_formation.wait_until(:stack_create_complete, stack_name: name)
-      end
-
-      def destroy
-        cloud_formation(stack_name: name)
-        cloud_formation(:stack_delete_complete, stack_name: name)
       end
 
       def cloud_formation
