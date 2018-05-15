@@ -13,6 +13,11 @@ module Cloudware
         cloud_formation.wait_until(:stack_create_complete, stack_name: name)
       end
 
+      def destroy
+        cloud_formation(stack_name: name)
+        cloud_formation(:stack_delete_complete, stack_name: name)
+      end
+
       def cloud_formation
         @cloud_formation ||= Aws::CloudFormation::Client.new(
           region: region,
