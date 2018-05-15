@@ -3,12 +3,6 @@
 module Cloudware
   module Providers
     class Domain
-      class << self
-        def by_region(_r)
-          raise NotImplementedError
-        end
-      end
-
       def initialize(domain_model)
         @domain_model = domain_model
       end
