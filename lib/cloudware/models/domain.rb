@@ -5,7 +5,8 @@ module Cloudware
   module Models
     class Domain < Application
       ATTRIBUTES = [
-        :name, :provider, :region, :networkcidr, :prisubnetcidr, :template
+        :name, :provider, :region, :networkcidr, :prisubnetcidr, :template,
+        :create_domain_already_exists_flag
       ]
       attr_accessor(*ATTRIBUTES)
 
@@ -15,8 +16,7 @@ module Cloudware
       validate :validate_networkcidr_is_ipv4
       validate :validate_prisubnetcidr_is_ipv4
       validate :validate_networkcidr_contains_prisubnetcidr
-
-      before_create :validate_domain_name_is_unique
+      validate :validate_domain_does_not_exist_on_create
 
       private
 
@@ -58,9 +58,9 @@ module Cloudware
         false
       end
 
-      def validate_domain_name_is_unique
-        return unless Cloudware::Domains.list.include?(name)
-        errors.add(:name, "the '#{name}' domain already exists")
+      def validate_domain_does_not_exist_on_create
+        return unless create_domain_already_exists_flag
+        errors.add(:domain, "error, '#{name}' already exists")
       end
     end
   end

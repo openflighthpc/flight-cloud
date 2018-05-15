@@ -24,7 +24,7 @@ module Cloudware
 
       def create!(*a)
         create(*a)
-        return if valid?
+        return self if valid?
         raise ModelValidationError, errors.full_messages.join("\n")
       end
 
