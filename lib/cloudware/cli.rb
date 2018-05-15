@@ -29,6 +29,7 @@ require 'command'
 require 'models/application'
 
 require 'require_all'
+require_all 'lib/cloudware/commands/concerns/**/*.rb'
 require_all 'lib/cloudware/commands/**/*.rb'
 require_all 'lib/cloudware/models/**/*.rb'
 
@@ -62,6 +63,13 @@ module Cloudware
       command.syntax = s
     end
 
+    def self.provider_and_region_options(command)
+      command.option '-p', '--provider NAME', String,
+                     'REQUIRED: Cloud service provider name'
+      command.option '-r', '--region NAME', String,
+                     'REQUIRED: Provider region to create domain in'
+    end
+
     command :domain do |c|
       c.syntax = 'flightconnector domain [options]'
       c.description = 'Manage a domain'
@@ -71,10 +79,7 @@ module Cloudware
     command :'domain create' do |c|
       cli_syntax(c, 'NAME')
       c.description = 'Create a new domain'
-      c.option '-p', '--provider NAME', String,
-               'REQUIRED: Cloud service provider name'
-      c.option '-r', '--region NAME', String,
-               'REQUIRED: Provider region to create domain in'
+      provider_and_region_options(c)
       c.option '--networkcidr CIDR',
                String, { default: '10.0.0.0/16' },
                <<~SUMMARY.squish
@@ -101,9 +106,9 @@ module Cloudware
     end
 
     command :'domain destroy' do |c|
-      c.syntax = 'flightconnector domain destroy [options]'
+      c.syntax = 'flightconnector domain destroy NAME [options]'
       c.description = 'Destroy a machine'
-      c.option '--name NAME', String, 'Domain name'
+      provider_and_region_options(c)
       c.hidden = true
       action(c, Commands::Domain::Destroy)
     end
