@@ -12,7 +12,7 @@ module Cloudware
         when 'azure'
           raise NotImplementedError
         else
-          raise InternalError, "Unrecognised provider: #{provider}"
+          raise InvalidInput, "Unrecognised provider: #{provider}"
         end
       end
     end
