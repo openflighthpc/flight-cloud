@@ -31,7 +31,16 @@ module Cloudware
       end
 
       def destroy
-        run_callbacks(:destroy) { run_destroy }
+        run_callbacks(:destroy) do |result|
+          return false if errors.any?
+          run_destroy
+        end
+      end
+
+      def destroy!
+        destroy
+        return true if errors.empty?
+        raise ModelValidationError, errors.full_messages.join("\n")
       end
 
       private

@@ -7,20 +7,13 @@ module Cloudware
         include Concerns::DomainInput
 
         def run
-          run_whirly('Checking domain exists') { domain }
           run_whirly("Destroying domain #{options.name}") do
-            domain.destroy
+            Models::Domain.new(
+              name: name,
+              provider: options.provider,
+              region: options.region
+            ).destroy!
           end
-        end
-
-        private
-
-        def domain
-          model = Providers.select(options.provider)::Domains
-                           .by_region(options.region)
-                           .find_by_name(name)
-          return model unless model.nil?
-          raise InvalidInput, "Domain name '#{name}' does not exist"
         end
       end
     end

@@ -19,6 +19,7 @@ module Cloudware
       validate :validate_prisubnetcidr_is_ipv4
       validate :validate_networkcidr_contains_prisubnetcidr
       validate :validate_domain_does_not_exist_on_create
+      before_destroy :validate_cloudware_domain_exists
 
       private
 
@@ -32,6 +33,12 @@ module Cloudware
 
       def run_destroy
         cloud.destroy
+      end
+
+      def validate_cloudware_domain_exists
+        domains = Providers.select(provider)::Domains.by_region(region)
+        return true if domains.find_by_name(name)
+        errors.add(:domain, 'does not exist')
       end
 
       def validate_networkcidr_is_ipv4(**h)
