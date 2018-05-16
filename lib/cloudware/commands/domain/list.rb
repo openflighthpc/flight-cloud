@@ -12,10 +12,6 @@ module Cloudware
           puts table
         end
 
-        def required_options
-          [:provider, :region]
-        end
-
         private
 
         def search_regions

@@ -9,10 +9,6 @@ module Cloudware
           @name = args.first
         end
 
-        def required_options
-          [:provider, :region]
-        end
-
         private
 
         attr_reader :name
