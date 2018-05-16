@@ -13,6 +13,7 @@ module Cloudware
       delegate(*DOMAIN_ATTRIBUTES, to: :domain)
 
       def run_create
+        provider_machine.create
       end
 
       private
