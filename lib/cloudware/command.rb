@@ -4,12 +4,12 @@ module Cloudware
   class Command
     def initialize(args, options)
       @args = args.freeze
-      @options = options
+      @options = OpenStruct.new(options.__hash__)
     end
 
     def run!
       unpack_args
-      enforce_required_options
+      define_required_options
       run
     rescue Exception => e
       handle_fatal_error(e)
@@ -32,12 +32,14 @@ module Cloudware
       raise e
     end
 
-    def enforce_required_options
+    def define_required_options
       required_options&.each do |opt|
         next if options.method_missing(opt)
-        raise InvalidInput, <<-ERROR.squish
-          Missing the required --#{opt} input
-        ERROR
+        options.define_singleton_method(opt) do
+          raise InvalidInput, <<-ERROR.squish
+            Missing the required --#{opt} input
+          ERROR
+        end
       end
     end
 
