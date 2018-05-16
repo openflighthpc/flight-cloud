@@ -5,26 +5,15 @@ module Cloudware
     module Machine
       class Create < Command
         def run
-          machine = Cloudware::Models::Machine.build(
-            domain: domain,
-            name: name,
-            type: options.type,
-            flavour: options.flavour,
-            role: options.role,
-            priip: options.role
-          )
-
-          m = Cloudware::Machine.new
-
-          m.type = options.type.to_s
-          m.flavour = options.flavour.to_s
-          m.name = name
-          m.domain = options.domain
-          m.role = options.role
-          m.priip = options.priip.to_s
-
           run_whirly('Creating new deployment') do
-            m.create
+            Cloudware::Models::Machine.build(
+              domain: domain,
+              name: name,
+              type: options.type,
+              flavour: options.flavour,
+              role: options.role,
+              priip: options.role
+            ).create!
           end
         end
 
