@@ -10,12 +10,10 @@ module Cloudware
 
           m.type = options.type.to_s
           m.flavour = options.flavour.to_s
-
           m.name = name
 
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          m.domain = options.domain.to_s
-          d.name = options.domain.to_s
+          m.domain = options.domain
+          d.name = options.domain
 
           options.role = choose('Machine role?', :master, :slave) if options.role.nil?
           m.role = options.role.to_s
@@ -45,6 +43,10 @@ module Cloudware
         private
 
         attr_reader :name
+
+        def required_options
+          [:domain]
+        end
       end
     end
   end
