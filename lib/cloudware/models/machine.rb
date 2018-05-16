@@ -17,8 +17,8 @@ module Cloudware
 
       private
 
-      def provider_module
-        Providers.select(provider)
+      def provider_machine
+        Providers.select(provider)::Machine.new(self)
       end
     end
   end
