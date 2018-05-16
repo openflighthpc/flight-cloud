@@ -14,7 +14,8 @@ module Cloudware
               provider: options.provider,
               networkcidr: options.networkcidr,
               prisubnetcidr: options.prisubnetcidr,
-              template: options.template
+              template: options.template,
+              cluster_index: options.cluster_index
             ).create!
           end
         end

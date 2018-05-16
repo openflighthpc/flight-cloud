@@ -89,6 +89,8 @@ module Cloudware
       c.option '--prisubnetcidr NAME',
                String, { default: '10.0.1.0/24' },
                'Pri subnet CIDR'
+      c.option '--cluster-index INDEX', String,
+               'Cluster index to be passed into the template'
       c.option '-t', '--template TEMPLATE',
                String, { default: 'domain' },
                'Provider template to build the domain from'

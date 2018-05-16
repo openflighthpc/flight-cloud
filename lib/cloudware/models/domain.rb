@@ -8,7 +8,7 @@ module Cloudware
     class Domain < Application
       ATTRIBUTES = [
         :name, :provider, :region, :networkcidr, :prisubnetcidr, :template,
-        :create_domain_already_exists_flag
+        :cluster_index, :create_domain_already_exists_flag
       ].freeze
       attr_accessor(*ATTRIBUTES)
 
