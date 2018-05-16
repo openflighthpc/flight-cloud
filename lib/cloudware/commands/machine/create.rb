@@ -5,8 +5,6 @@ module Cloudware
     module Machine
       class Create < Command
         def run
-          options.default flavour: 'compute', type: 'small'
-
           m = Cloudware::Machine.new
           d = Cloudware::Domain.new
 

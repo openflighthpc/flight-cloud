@@ -131,8 +131,13 @@ module Cloudware
       c.option '--domain NAME', String, 'Domain name'
       c.option '--role NAME', String, 'Machine role to inherit (master or slave)'
       c.option '--priip ADDR', String, 'Pri subnet IP address'
-      c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
-      c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
+      c.option '--type NAME', String,
+               { default: 'small' },
+               'Flavour of machine type to deploy, e.g. medium'
+      c.option '--flavour NAME', String,
+               { default: 'compute' },
+               'Type of machine to deploy, e.g. gpu'
+
       c.hidden = true
       action(c, Commands::Machine::Create)
     end
