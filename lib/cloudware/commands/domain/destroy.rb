@@ -4,18 +4,15 @@ module Cloudware
   module Commands
     module Domain
       class Destroy < Command
+        include Concerns::DomainInput
+
         def run
-          d = Cloudware::Domain.new
-
-          options.name = ask('Domain name: ') if options.name.nil?
-          d.name = options.name.to_s
-
-          run_whirly('Checking domain exists') do
-            raise("Domain name #{options.name} does not exist") unless d.exists?
-          end
-
           run_whirly("Destroying domain #{options.name}") do
-            d.destroy
+            Models::Domain.new(
+              name: name,
+              provider: options.provider,
+              region: options.region
+            ).destroy!
           end
         end
       end

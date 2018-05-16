@@ -108,7 +108,7 @@ push "route 10.10.0.0 255.255.0.0 10.78.110.2"
 push "route 10.100.2.0 255.255.255.0 10.78.110.12"
 push "route 10.100.3.0 255.255.255.0 10.78.110.13"
 push "route 10.100.4.0 255.255.255.0 10.78.110.14"
-iroute 10.100.1.0 255.255.0.0
+iroute 10.100.1.0 255.255.255.0
 EOF
 
 cat << EOF > /etc/openvpn/ccd-clusters/cluster2
@@ -118,7 +118,7 @@ push "route 10.10.0.0 255.255.0.0 10.78.110.2"
 push "route 10.100.1.0 255.255.255.0 10.78.110.11"
 push "route 10.100.3.0 255.255.255.0 10.78.110.13"
 push "route 10.100.4.0 255.255.255.0 10.78.110.14"
-iroute 10.100.2.0 255.255.0.0
+iroute 10.100.2.0 255.255.255.0
 EOF
 
 cat << EOF > /etc/openvpn/ccd-clusters/cluster3
@@ -128,7 +128,7 @@ push "route 10.10.0.0 255.255.0.0 10.78.110.2"
 push "route 10.100.1.0 255.255.255.0 10.78.110.11"
 push "route 10.100.2.0 255.255.255.0 10.78.110.12"
 push "route 10.100.4.0 255.255.255.0 10.78.110.13"
-iroute 10.100.3.0 255.255.0.0
+iroute 10.100.3.0 255.255.255.0
 EOF
 
 cat << EOF > /etc/openvpn/ccd-clusters/cluster4
@@ -138,7 +138,7 @@ push "route 10.10.0.0 255.255.0.0 10.78.110.2"
 push "route 10.100.1.0 255.255.255.0 10.78.110.11"
 push "route 10.100.2.0 255.255.255.0 10.78.110.12"
 push "route 10.100.3.0 255.255.255.0 10.78.110.13"
-iroute 10.100.4.0 255.255.0.0
+iroute 10.100.4.0 255.255.255.0
 EOF
 
 
@@ -186,6 +186,28 @@ topology subnet
 EOD
 systemctl enable openvpn@flightconnector
 systemctl start openvpn@flightconnector
+systemctl disable iptables
+systemctl enable firewalld
+systemctl stop iptables
+systemctl start firewalld
+systemctl disable cloud-init
+systemctl disable cloud-init-local
+systemctl disable cloud-config
+systemctl disable cloud-final
+
+firewall-cmd --new-zone $CLUSTER --permanent
+firewall-cmd --add-interface tun0 --zone $CLUSTER --permanent
+firewall-cmd --remove-interface eth0 --zone public
+firewall-cmd --remove-interface eth0 --zone public --permanent
+firewall-cmd --add-interface eth0 --zone external --permanent
+firewall-cmd --add-interface eth0 --zone external
+firewall-cmd --add-port 2005/tcp --zone external --permanent
+
+firewall-cmd --set-target=ACCEPT --zone $CLUSTER --permanent
+
+sed '/^ZONE=/{h;s/=.*/=external/};${x;/^$/{s//ZONE=external/;H};x}' /etc/sysconfig/network-scripts/ifcfg-eth0 -i
+
+echo "Please reboot"
 EOF
 _EOF_
 

@@ -21,12 +21,9 @@
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-require 'aws-sdk-cloudformation'
-require 'aws-sdk-ec2'
 
 CloudFormation = Aws::CloudFormation
 EC2 = Aws::EC2
-Credentials = Aws::Credentials
 
 module Cloudware
   class Aws2
@@ -50,7 +47,7 @@ module Cloudware
     def load_config(region)
       if valid_credentials?
         log.debug("[#{self.class}] Loading credentials from config file")
-        credentials = Credentials.new(config.aws.access_key_id, config.aws.secret_access_key)
+        credentials = config.credentials.aws
         @cfn = CloudFormation::Client.new(region: region, credentials: credentials)
         @ec2 = EC2::Client.new(region: region, credentials: credentials)
       else
@@ -201,16 +198,16 @@ module Cloudware
       @ec2.stop_instances(instance_ids: [machine_info(name, domain)[:instance_id]])
     end
 
-    def create_domain(name, id, networkcidr, prisubnetcidr, region)
+    def create_domain(name, id, networkcidr, prisubnetcidr, region, template:)
       load_config(region)
-      template = 'domain.yml'
+      template_file = "#{template}.yml"
       params = [
         { parameter_key: 'cloudwareDomain', parameter_value: name },
         { parameter_key: 'cloudwareId', parameter_value: id },
         { parameter_key: 'networkCidr', parameter_value: networkcidr },
         { parameter_key: 'priSubnetCidr', parameter_value: prisubnetcidr },
       ]
-      deploy("#{name}-domain", template, params)
+      deploy("#{name}-domain", template_file, params)
     end
 
     def create_machine(name, domain, id, priip, role, type, region, flavour)

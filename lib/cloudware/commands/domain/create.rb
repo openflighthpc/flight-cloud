@@ -4,6 +4,8 @@ module Cloudware
   module Commands
     module Domain
       class Create < Command
+        include Concerns::DomainInput
+
         def run
           run_whirly('Creating new domain') do
             Cloudware::Models::Domain.build(
@@ -11,22 +13,12 @@ module Cloudware
               region: options.region,
               provider: options.provider,
               networkcidr: options.networkcidr,
-              prisubnetcidr: options.prisubnetcidr
+              prisubnetcidr: options.prisubnetcidr,
+              template: options.template,
+              cluster_index: options.cluster_index
             ).create!
           end
         end
-
-        def unpack_args
-          @name = args.first
-        end
-
-        def required_options
-          [:provider, :region]
-        end
-
-        private
-
-        attr_reader :name
       end
     end
   end

@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 RSpec.describe Cloudware::Models::Domain do
   it 'can build a valid domain object' do
     expect(build(:domain)).to be_valid
@@ -43,7 +45,7 @@ RSpec.describe Cloudware::Models::Domain do
     it 'must be contained within the networkcidr' do
       ip_ranges = {
         networkcidr: '10.0.0.0/16',
-        prisubnetcidr: '11.0.1.0/24'
+        prisubnetcidr: '11.0.1.0/24',
       }
       expect(build(:domain, **ip_ranges)).not_to be_valid
     end

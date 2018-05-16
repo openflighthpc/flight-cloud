@@ -5,35 +5,51 @@ module Cloudware
     module Domain
       class List < Command
         def run
-          d = Cloudware::Domain.new
-          # TODO: Why does this need to be wrapped?
-          d.provider = Array.wrap(options.provider)
-          d.region = options.region.to_s unless options.region.nil?
-          d.name = options.name.to_s unless options.name.nil?
-
-          # Exit if the provider is not in the config list (which verifies details ahead of time)
-          if (Cloudware.config.providers & d.provider).empty?
-            raise "The provider #{d.provider.join(',')} is not a valid provider - unknown or missing login details"
+          rows = search_regions.reduce([]) do |memo, region|
+            add_domain_rows_in_region(memo, options.provider, region)
           end
-
-          r = []
-          run_whirly('Fetching available domains') do
-            raise('No available domains') if Domains.list.nil?
-          end
-          Domains.list.each do |k, v|
-            r << [k, v[:network_cidr], v[:pri_subnet_cidr], v[:provider], v[:region]]
-          end
-          table = Terminal::Table.new headings: ['Domain name'.bold,
-                                                 'Network CIDR'.bold,
-                                                 'Pri Subnet CIDR'.bold,
-                                                 'Provider'.bold,
-                                                 'Region'.bold],
-                                      rows: r
+          table = Terminal::Table.new headings: headers, rows: rows
           puts table
         end
 
-        def required_options
-          [:provider]
+        private
+
+        def search_regions
+          if options.all_regions
+            Providers.select(options.provider).regions
+          else
+            Array.wrap(options.region)
+          end
+        end
+
+        def headers
+          [
+            'Domain name'.bold,
+            'Network CIDR'.bold,
+            'Pri Subnet CIDR'.bold,
+          ].tap do |x|
+            if options.all_regions
+              x << 'Provider'.bold
+              x << 'Region'.bold
+            end
+          end
+        end
+
+        def add_domain_rows_in_region(current_rows, provider, region)
+          Providers.select(provider)::Domains
+            .by_region(region)
+            .reduce(current_rows) do |memo, domain|
+            memo << [
+              domain.name,
+              domain.networkcidr,
+              domain.prisubnetcidr,
+            ].tap do |x|
+              if options.all_regions
+                x << domain.provider
+                x << domain.region
+              end
+            end
+          end
         end
       end
     end

@@ -29,8 +29,11 @@ require 'command'
 require 'models/application'
 
 require 'require_all'
+require_all 'lib/cloudware/commands/concerns/**/*.rb'
 require_all 'lib/cloudware/commands/**/*.rb'
 require_all 'lib/cloudware/models/**/*.rb'
+
+require 'providers'
 
 module Cloudware
   class CLI
@@ -58,6 +61,15 @@ module Cloudware
       command.syntax = s
     end
 
+    def self.provider_and_region_options(command)
+      command.option '-p', '--provider NAME', String,
+                     { default: Cloudware.config.default.provider },
+                     'Cloud service provider name'
+      command.option '-r', '--region NAME', String,
+                     { default: Cloudware.config.default.region },
+                     'Provider region to create domain in'
+    end
+
     command :domain do |c|
       c.syntax = 'flightconnector domain [options]'
       c.description = 'Manage a domain'
@@ -67,10 +79,7 @@ module Cloudware
     command :'domain create' do |c|
       cli_syntax(c, 'NAME')
       c.description = 'Create a new domain'
-      c.option '-p', '--provider NAME', String,
-               'REQUIRED: Cloud service provider name'
-      c.option '-r', '--region NAME', String,
-               'REQUIRED: Provider region to create domain in'
+      provider_and_region_options(c)
       c.option '--networkcidr CIDR',
                String, { default: '10.0.0.0/16' },
                <<~SUMMARY.squish
@@ -80,6 +89,11 @@ module Cloudware
       c.option '--prisubnetcidr NAME',
                String, { default: '10.0.1.0/24' },
                'Pri subnet CIDR'
+      c.option '--cluster-index INDEX', String,
+               'Cluster index to be passed into the template'
+      c.option '-t', '--template TEMPLATE',
+               String, { default: 'domain' },
+               'Provider template to build the domain from'
       c.hidden = true
       action(c, Commands::Domain::Create)
     end
@@ -87,16 +101,19 @@ module Cloudware
     command :'domain list' do |c|
       c.syntax = 'flightconnector domain list [options]'
       c.description = 'List created domains'
-      c.option '--provider NAME', String, 'Cloud provider name to filter by'
-      c.option '--region NAME', String, 'Cloud provider region to filter by'
+      provider_and_region_options(c)
+      c.option '-a', '--all-regions', <<-OPTION.squish
+        List domains in all the regions. This option overrides the region
+        input
+      OPTION
       c.hidden = true
       action(c, Commands::Domain::List)
     end
 
     command :'domain destroy' do |c|
-      c.syntax = 'flightconnector domain destroy [options]'
+      c.syntax = 'flightconnector domain destroy NAME [options]'
       c.description = 'Destroy a machine'
-      c.option '--name NAME', String, 'Domain name'
+      provider_and_region_options(c)
       c.hidden = true
       action(c, Commands::Domain::Destroy)
     end

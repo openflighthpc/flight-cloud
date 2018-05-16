@@ -41,8 +41,8 @@ require 'domain'
 require 'machine'
 require 'azure'
 require 'gcp'
-require 'aws'
 require 'config'
+require 'aws'
 require 'logger'
 
 module Cloudware

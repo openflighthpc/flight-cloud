@@ -1,10 +1,16 @@
 
+# frozen_string_literal: true
+
 require 'ipaddr'
 
 module Cloudware
   module Models
     class Domain < Application
-      attr_accessor :name, :provider, :region, :networkcidr, :prisubnetcidr
+      ATTRIBUTES = [
+        :name, :provider, :region, :networkcidr, :prisubnetcidr, :template,
+        :cluster_index, :create_domain_already_exists_flag
+      ].freeze
+      attr_accessor(*ATTRIBUTES)
 
       validates_presence_of :name, :region
       validates :name, format: { with: /\A[a-zA-Z0-9-]*\z/ }
@@ -12,23 +18,27 @@ module Cloudware
       validate :validate_networkcidr_is_ipv4
       validate :validate_prisubnetcidr_is_ipv4
       validate :validate_networkcidr_contains_prisubnetcidr
-
-      before_create :validate_domain_name_is_unique
+      validate :validate_domain_does_not_exist_on_create
+      before_destroy :validate_cloudware_domain_exists
 
       private
 
       def cloud
-        case provider
-        when 'aws'
-          Aws2.new
-        when 'azure'
-          Azure.new
-        end
+        Providers.select(provider)::Domain.new(self)
       end
 
-      def run_create(*_a)
-        cloud.create_domain(name, SecureRandom.uuid, networkcidr,
-                            prisubnetcidr, region)
+      def run_create
+        cloud.create
+      end
+
+      def run_destroy
+        cloud.destroy
+      end
+
+      def validate_cloudware_domain_exists
+        domains = Providers.select(provider)::Domains.by_region(region)
+        return true if domains.find_by_name(name)
+        errors.add(:domain, 'does not exist')
       end
 
       def validate_networkcidr_is_ipv4(**h)
@@ -60,9 +70,9 @@ module Cloudware
         false
       end
 
-      def validate_domain_name_is_unique
-        return unless Cloudware::Domains.list.include?(name)
-        errors.add(:name, "the '#{name}' domain already exists")
+      def validate_domain_does_not_exist_on_create
+        return unless create_domain_already_exists_flag
+        errors.add(:domain, "error, '#{name}' already exists")
       end
     end
   end

@@ -51,7 +51,7 @@ module Cloudware
 
     def create
       cloud.create_domain(name, SecureRandom.uuid, @networkcidr,
-                           @prisubnetcidr, @region)
+                          @prisubnetcidr, @region)
     end
 
     def domains_by_region(region)

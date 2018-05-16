@@ -24,12 +24,14 @@
 require 'yaml'
 require 'ostruct'
 require 'whirly'
+require 'aws-sdk-cloudformation'
+require 'aws-sdk-ec2'
 
 Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
 module Cloudware
   class Config
-    attr_accessor :log_file, :azure, :aws, :providers
+    attr_accessor :log_file, :azure, :aws, :providers, :default
 
     def initialize
       config = YAML.load_file(config_path)
@@ -45,10 +47,22 @@ module Cloudware
       config['provider'].each do |a, b|
         providers << a if b.first[1].nil? || !b.first[1].empty?
       end
+
+      @default = OpenStruct.new(config['default'])
     end
 
     def log
       Cloudware.log
+    end
+
+    def credentials
+      @credentials = OpenStruct.new(
+        aws: Aws::Credentials.new(aws.access_key_id, aws.secret_access_key)
+      )
+    end
+
+    def base_dir
+      File.expand_path(File.join(__dir__, '../..'))
     end
 
     private
