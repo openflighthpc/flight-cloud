@@ -7,24 +7,16 @@ module Cloudware
         def run
           domain
           m = Cloudware::Machine.new
-          d = Cloudware::Domain.new
 
           m.type = options.type.to_s
           m.flavour = options.flavour.to_s
           m.name = name
 
           m.domain = options.domain
-          d.name = options.domain
 
           m.role = options.role
 
           m.priip = options.priip.to_s
-
-          run_whirly('Checking machine name is valid') do |update_status|
-            raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
-            update_status.call('Verifying pri IP address')
-            raise("Invalid pri IP address #{options.priip} in subnet #{d.get_item('pri_subnet_cidr')}") unless m.valid_ip?(d.get_item('pri_subnet_cidr').to_s, options.priip.to_s)
-          end
 
           run_whirly('Creating new deployment') do
             m.create
