@@ -17,7 +17,6 @@ module Cloudware
 
           m.role = options.role
 
-          options.priip = ask('Pri subnet IP: ') if options.priip.nil?
           m.priip = options.priip.to_s
 
           run_whirly('Verifying domain exists') do
@@ -44,7 +43,7 @@ module Cloudware
         attr_reader :name
 
         def required_options
-          [:domain, :role]
+          [:domain, :role, :priip]
         end
       end
     end
