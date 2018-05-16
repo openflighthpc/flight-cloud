@@ -68,7 +68,6 @@ module Cloudware
       raise('Invalid machine name') unless validate_name?
       # raise("IP address #{priip} is already in use") if ip_in_use? @priip
       load_cloud
-      log.info("[#{self.class}] Creating new machine:\nName: #{name}\nDomain: #{domain}\nID: #{id}\nPri IP: #{priip}\nType: #{type}\nFlavour: #{flavour}")
       @cloud.create_machine(@name, @domain, @d.get_item('id'),
                             @priip, @role, render_type, @d.get_item('region'), @flavour)
     end
