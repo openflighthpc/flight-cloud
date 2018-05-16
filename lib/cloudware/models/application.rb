@@ -31,7 +31,7 @@ module Cloudware
       end
 
       def destroy
-        run_callbacks(:destroy) do |result|
+        run_callbacks(:destroy) do
           return false if errors.any?
           run_destroy
         end

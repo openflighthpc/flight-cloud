@@ -27,12 +27,12 @@ module Cloudware
             {
               parameter_key: 'priSubnetCidr',
               parameter_value: prisubnetcidr,
-            }
+            },
           ].tap do |p|
             if cluster_index
               p << {
                 parameter_key: 'clusterIndex',
-                parameter_value: cluster_index
+                parameter_value: cluster_index,
               }
             end
           end

@@ -37,19 +37,19 @@ module Cloudware
 
         def add_domain_rows_in_region(current_rows, provider, region)
           Providers.select(provider)::Domains
-                   .by_region(region)
-                   .reduce(current_rows) do |memo, domain|
-                     memo << [
-                       domain.name,
-                       domain.networkcidr,
-                       domain.prisubnetcidr
-                     ].tap do |x|
-                       if options.all_regions
-                         x << domain.provider
-                         x << domain.region
-                       end
-                     end
-                   end
+            .by_region(region)
+            .reduce(current_rows) do |memo, domain|
+            memo << [
+              domain.name,
+              domain.networkcidr,
+              domain.prisubnetcidr,
+            ].tap do |x|
+              if options.all_regions
+                x << domain.provider
+                x << domain.region
+              end
+            end
+          end
         end
       end
     end

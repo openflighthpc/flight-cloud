@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 require_all 'lib/cloudware/providers/base/*.rb'
 require_all 'lib/cloudware/providers/**/*.rb'
 

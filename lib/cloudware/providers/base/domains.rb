@@ -1,16 +1,18 @@
 
+# frozen_string_literal: true
+
 module Cloudware
   module Providers
     module Base
       class Domains < Array
         class << self
           def by_region(region)
-            self.new(domain_models_by_region(region))
+            new(domain_models_by_region(region))
           end
 
           private
 
-          def domain_models_by_region(region)
+          def domain_models_by_region(_region)
             raise NotImplementedError
           end
         end
