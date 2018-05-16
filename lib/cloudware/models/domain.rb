@@ -36,8 +36,7 @@ module Cloudware
       end
 
       def validate_cloudware_domain_exists
-        domains = Providers.select(provider)::Domains.by_region(region)
-        return true if domains.find_by_name(name)
+        return true if Providers.find_domain(provider, region, name)
         errors.add(:domain, 'does not exist')
       end
 

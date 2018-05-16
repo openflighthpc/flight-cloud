@@ -17,6 +17,10 @@ module Cloudware
           raise InvalidInput, "Unrecognised provider: #{provider}"
         end
       end
+
+      def find_domain(provider, region, name)
+        select(provider)::Domains.by_region(region).find_by_name(name)
+      end
     end
   end
 end
