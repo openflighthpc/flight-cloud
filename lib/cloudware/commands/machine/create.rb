@@ -5,12 +5,11 @@ module Cloudware
     module Machine
       class Create < Command
         def run
-          domain
           machine = Cloudware::Models::Machine.build(
+            domain: domain,
             name: name,
             type: options.type,
             flavour: options.flavour,
-            domain: domain,
             role: options.role,
             priip: options.role
           )
@@ -43,11 +42,9 @@ module Cloudware
 
         def domain
           @domain ||= begin
-            run_whirly('Searching for domain') do
-              Providers.find_domain(
-                options.provider, options.region, options.domain
-              )
-            end
+            Providers.find_domain(
+              options.provider, options.region, options.domain
+            )
           end
           return @domain if @domain
           raise InvalidInput, "Can not find '#{options.domain}' domain"
