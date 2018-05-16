@@ -125,7 +125,7 @@ module Cloudware
     end
 
     command :'machine create' do |c|
-      c.syntax = 'flightconnector machine create [options]'
+      c.syntax = 'flightconnector machine create NAME [options]'
       c.description = 'Create a new machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '--domain NAME', String, 'Domain name'

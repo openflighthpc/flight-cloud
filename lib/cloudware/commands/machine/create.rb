@@ -11,8 +11,7 @@ module Cloudware
           m.type = options.type.to_s
           m.flavour = options.flavour.to_s
 
-          options.name = ask('Machine name: ') if options.name.nil?
-          m.name = options.name.to_s
+          m.name = name
 
           options.domain = ask('Domain identifier: ') if options.domain.nil?
           m.domain = options.domain.to_s
@@ -38,6 +37,14 @@ module Cloudware
             m.create
           end
         end
+
+        def unpack_args
+          @name = args.first
+        end
+
+        private
+
+        attr_reader :name
       end
     end
   end
