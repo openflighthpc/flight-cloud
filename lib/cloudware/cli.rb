@@ -127,7 +127,6 @@ module Cloudware
     command :'machine create' do |c|
       c.syntax = 'flightconnector machine create NAME [options]'
       c.description = 'Create a new machine'
-      c.option '--name NAME', String, 'Machine name'
       c.option '-d', '--domain NAME', String, 'Domain name'
       c.option '-r', '--role NAME', String,
                'Machine role to inherit (master or slave)'
