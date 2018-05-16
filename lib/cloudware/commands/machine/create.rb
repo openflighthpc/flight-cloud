@@ -44,10 +44,14 @@ module Cloudware
         end
 
         def domain
-          d = Providers.find_domain(
-            options.provider, options.region, options.domain
-          )
-          return d if d
+          @domain ||= begin
+            run_whirly('Searching for domain') do
+              Providers.find_domain(
+                options.provider, options.region, options.domain
+              )
+            end
+          end
+          return @domain if @domain
           raise InvalidInput, "Can not find '#{options.domain}' domain"
         end
       end
