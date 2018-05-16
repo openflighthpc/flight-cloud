@@ -5,6 +5,7 @@ module Cloudware
     module Machine
       class Create < Command
         def run
+          domain
           m = Cloudware::Machine.new
           d = Cloudware::Domain.new
 
@@ -18,10 +19,6 @@ module Cloudware
           m.role = options.role
 
           m.priip = options.priip.to_s
-
-          run_whirly('Verifying domain exists') do
-            raise("Domain #{options.domain} does not exist") unless m.valid_domain?
-          end
 
           run_whirly('Checking machine name is valid') do |update_status|
             raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
@@ -44,6 +41,14 @@ module Cloudware
 
         def required_options
           [:domain, :role, :priip, :flavour, :type]
+        end
+
+        def domain
+          d = Providers.find_domain(
+            options.provider, options.region, options.domain
+          )
+          return d if d
+          raise InvalidInput, "Can not find '#{options.domain}' domain"
         end
       end
     end

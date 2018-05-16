@@ -127,8 +127,9 @@ module Cloudware
     command :'machine create' do |c|
       c.syntax = 'flightconnector machine create NAME [options]'
       c.description = 'Create a new machine'
+      provider_and_region_options(c)
       c.option '-d', '--domain NAME', String, 'Domain name'
-      c.option '-r', '--role NAME', String,
+      c.option '--role NAME', String,
                'Machine role to inherit (master or slave)'
       c.option '--priip ADDR', String,
                { default: '10.0.1.1' },
