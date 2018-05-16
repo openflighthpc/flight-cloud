@@ -15,8 +15,7 @@ module Cloudware
           m.domain = options.domain
           d.name = options.domain
 
-          options.role = choose('Machine role?', :master, :slave) if options.role.nil?
-          m.role = options.role.to_s
+          m.role = options.role
 
           options.priip = ask('Pri subnet IP: ') if options.priip.nil?
           m.priip = options.priip.to_s
@@ -45,7 +44,7 @@ module Cloudware
         attr_reader :name
 
         def required_options
-          [:domain]
+          [:domain, :role]
         end
       end
     end

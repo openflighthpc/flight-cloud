@@ -129,7 +129,8 @@ module Cloudware
       c.description = 'Create a new machine'
       c.option '--name NAME', String, 'Machine name'
       c.option '-d', '--domain NAME', String, 'Domain name'
-      c.option '--role NAME', String, 'Machine role to inherit (master or slave)'
+      c.option '-r', '--role NAME', String,
+               'Machine role to inherit (master or slave)'
       c.option '--priip ADDR', String, 'Pri subnet IP address'
       c.option '--type NAME', String,
                { default: 'small' },
