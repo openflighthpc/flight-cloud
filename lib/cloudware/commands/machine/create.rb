@@ -43,7 +43,7 @@ module Cloudware
         attr_reader :name
 
         def required_options
-          [:domain, :role, :priip]
+          [:domain, :role, :priip, :flavour, :type]
         end
       end
     end
