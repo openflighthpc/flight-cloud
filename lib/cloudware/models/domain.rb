@@ -8,7 +8,8 @@ module Cloudware
     class Domain < Application
       ATTRIBUTES = [
         :name, :provider, :region, :networkcidr, :prisubnetcidr, :template,
-        :cluster_index, :create_domain_already_exists_flag
+        :cluster_index, :create_domain_already_exists_flag,
+        :network_id, :prisubnet_id, # TODO: Remove the aws specific id's
       ].freeze
       attr_accessor(*ATTRIBUTES)
 

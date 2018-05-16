@@ -32,11 +32,11 @@ module Cloudware
             },
             {
               parameter_key: 'priSubnetId',
-              parameter_value: domain.pri_subnet_id
+              parameter_value: domain.prisubnet_id
             },
             {
               parameter_key: 'priSubnetCidr',
-              parameter_value: domain.pri_subnet_cidr
+              parameter_value: domain.prisubnetcidr
             },
             { parameter_key: 'vmFlavour', parameter_value: flavour },
           ]
