@@ -31,13 +31,14 @@ module Cloudware
           def subnets
             @subnets ||= ec2.describe_subnets(
               filters: [{ name: 'tag-key', values: ['cloudware_id'] }]
-            ).subnets
+            ).subnets.map do |net|
+              tags_structs(net.tags).tap { |t| t.original_ec2 = net }
+            end
           end
 
           def find_subnet(domain_name)
             subnets.find do |net|
-              tags = tags_structs(net.tags)
-              tags.cloudware_domain == domain_name
+              net.cloudware_domain == domain_name
             end
           end
 
@@ -48,7 +49,7 @@ module Cloudware
               domain.name = vpc_tags.cloudware_domain
               domain.networkcidr = vpc_tags.cloudware_network_cidr
               domain.prisubnetcidr = vpc_tags.cloudware_pri_subnet_cidr
-              subnet = find_subnet(domain.name)
+              pp subnet = find_subnet(domain.name).original_ec2
             end
           end
 
