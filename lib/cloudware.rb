@@ -37,12 +37,9 @@ require 'active_model'
 require 'active_model/errors'
 
 require 'colorize'
-require 'domain'
-require 'machine'
 require 'azure'
 require 'gcp'
 require 'config'
-require 'aws'
 require 'logger'
 
 module Cloudware
