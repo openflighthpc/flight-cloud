@@ -9,7 +9,26 @@ module Cloudware
           deploy_aws
         end
 
+        def power_on
+          ec2.start_instances(
+            instance_ids: [instance_id]
+          )
+        end
+
+        def power_off
+          ec2.stop_instances(
+            instance_ids: [instance_id]
+          )
+        end
+
         private
+
+        def ec2
+          @ec2 ||= Aws::EC2::Client.new(
+            credentials: Cloudware.config.credentials.aws,
+            region: region
+          )
+        end
 
         def aws_type
           provider_type || machine_mappings[flavour][type]
