@@ -6,17 +6,9 @@ module Cloudware
       class List < Command
         def run
           m = Cloudware::Machine.new
-          m.provider = [options.provider] unless options.provider.nil?
-
-          # Exit if the provider is not in the config list (which verifies details ahead of time)
-          if (Cloudware.config.instance_variable_get(:@providers) & m.provider).empty?
-            raise "The provider #{m.provider.join(',')} is not a valid provider - unknown or missing login details"
-          end
+          m.provider = [options.provider]
 
           r = []
-          run_whirly('Fetching available machines') do
-            raise('No available machines') if m.list.nil?
-          end
           m.list.each do |_k, v|
             r << [v[:name], v[:domain], v[:role], v[:pri_ip], v[:type], v[:state]]
           end
