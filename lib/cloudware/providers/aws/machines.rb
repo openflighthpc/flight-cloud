@@ -32,7 +32,7 @@ module Cloudware
               domain: domains.find_by_name(tags.cloudware_domain),
               id: tags.cloudware_id,
               role: tags.cloudware_machine_role,
-              priip: tags.cloudware_pri_subnet_id,
+              priip: tags.cloudware_pri_subnet_ip,
               name: tags.cloudware_machine_name,
               flavour: tags.cloudware_machine_flavour
             )
