@@ -14,6 +14,7 @@ module Cloudware
 
       attr_accessor(*ATTRIBUTES)
       delegate(*DOMAIN_ATTRIBUTES, to: :domain)
+      delegate :power_on, :power_off, to: :provider_machine
 
       private
 

@@ -16,6 +16,14 @@ module Cloudware
           raise NotImplementedError
         end
 
+        def power_on
+          raise NotImplementedError
+        end
+
+        def power_off
+          raise NotImplementedError
+        end
+
         private
 
         attr_reader :machine_model
