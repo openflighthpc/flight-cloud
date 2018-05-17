@@ -15,12 +15,28 @@ module Cloudware
           end
 
           def models
-            pp instances
+            pp instances.map { |i| build_machine(i) }
           end
 
           private
 
           attr_reader :region, :ec2
+
+          def build_machine(instance)
+            tags = tags_structs(instance.tags)
+            Models::Machine.build(
+              state: instance.state.name,
+              extip: instance.public_ip_address,
+              type: instance.instance_type,
+              instance_id: instance.instance_id,
+              domain: domains.find_by_name(tags.cloudware_domain),
+              id: tags.cloudware_id,
+              role: tags.cloudware_machine_role,
+              priip: tags.cloudware_pri_subnet_id,
+              name: tags.cloudware_machine_name,
+              flavour: tags.cloudware_machine_flavour
+            )
+          end
 
           def instances
             @instances ||= begin
@@ -31,6 +47,10 @@ module Cloudware
                .flatten
                .reject { |i| i.state.name == 'terminated' }
             end
+          end
+
+          def domains
+            @domains ||= AWS::Domains.by_region(region)
           end
 
           def tags_structs(tags_struct)

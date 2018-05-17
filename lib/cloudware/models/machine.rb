@@ -2,7 +2,10 @@
 module Cloudware
   module Models
     class Machine < Application
-      ATTRIBUTES = [:name, :type, :flavour, :domain, :role, :priip]
+      ATTRIBUTES = [
+        :name, :type, :flavour, :domain, :role, :priip, :state, :extip,
+        :instance_id, :id
+      ]
       DOMAIN_ATTRIBUTES = [:region, :provider]
 
       def self.delegate_attributes
