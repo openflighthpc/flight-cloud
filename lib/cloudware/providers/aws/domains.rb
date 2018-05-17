@@ -47,6 +47,7 @@ module Cloudware
               domain.name = vpc_tags.cloudware_domain
               domain.networkcidr = vpc_tags.cloudware_network_cidr
               domain.prisubnetcidr = vpc_tags.cloudware_pri_subnet_cidr
+              domain.network_id = vpc.vpc_id
 
               subnet = find_subnet(domain.name)
               domain.prisubnet_id = subnet.original_ec2.subnet_id
