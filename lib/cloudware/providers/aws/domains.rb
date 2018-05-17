@@ -28,12 +28,18 @@ module Cloudware
             ).vpcs
           end
 
-          # Ported code
-          # def subnets
-          #   @subnets ||= ec2.describe_subnets(
-          #     filters: [{ name: 'tag-key', values: ['cloudware_id'] }]
-          #   ).subnets
-          # end
+          def subnets
+            @subnets ||= ec2.describe_subnets(
+              filters: [{ name: 'tag-key', values: ['cloudware_id'] }]
+            ).subnets
+          end
+
+          def find_subnet(domain_name)
+            subnets.find do |net|
+              tags = net.tags.map { |t| [t.key, t.value] }.to_h
+              tags['cloudware_domain'] == domain_name
+            end
+          end
 
           def build_domain(vpc)
             args = { provider: 'aws', region: region }
@@ -48,6 +54,7 @@ module Cloudware
                   domain.prisubnetcidr = tag.value
                 end
               end
+              subnet = find_subnet(domain.name)
             end
           end
         end
