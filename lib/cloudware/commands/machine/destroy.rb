@@ -9,6 +9,7 @@ module Cloudware
             Providers.find_machine(
               options.provider,
               options.region,
+              options.domain,
               name,
               missing_error: true
             ).destroy!
@@ -18,6 +19,10 @@ module Cloudware
         private
 
         attr_reader :name
+
+        def required_options
+          [:domain]
+        end
 
         def unpack_args
           @name = args.first

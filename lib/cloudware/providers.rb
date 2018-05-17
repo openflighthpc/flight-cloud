@@ -22,8 +22,9 @@ module Cloudware
         select(provider)::Domains.by_region(region).find_by_name(name)
       end
 
-      def find_machine(provider, region, name, missing_error: false)
-        select(provider)::Machines.by_region(region).find_by_name(name)
+      def find_machine(provider, region, domain, name, missing_error: false)
+        select(provider)::Machines.by_region(region)
+          .find_machine(domain, name)
           .tap { |m| raise_if_missing(m, 'machine', name) if missing_error }
       end
 

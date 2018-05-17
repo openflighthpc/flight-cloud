@@ -17,8 +17,10 @@ module Cloudware
           end
         end
 
-        def find_by_name(name)
-          find { |model| model.name == name }
+        def find_machine(domain, machine)
+          find do |model|
+            (model.name == machine) && (model.domain.name == domain)
+          end
         end
       end
     end

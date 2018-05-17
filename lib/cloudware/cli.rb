@@ -157,6 +157,8 @@ module Cloudware
       c.syntax = 'flightconnector machine info NAME [options]'
       c.description = 'List detailed information about a given machine'
       provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String,
+               'Domain the machine belongs to'
       c.hidden = true
       action(c, Commands::Machine::Info)
     end
@@ -165,6 +167,8 @@ module Cloudware
       c.syntax = 'flightconnector machine destroy NAME [options]'
       c.description = 'Destroy a machine'
       provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String,
+               'Domain the machine belongs to'
       c.hidden = true
       action(c, Commands::Machine::Destroy)
     end
@@ -200,6 +204,8 @@ module Cloudware
       c.syntax = 'flightconnector machine rebuild NAME [options]'
       c.description = 'Rebuild a machine'
       provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String,
+               'Domain the machine belongs to'
       c.hidden = true
       action(c, Commands::Machine::Rebuild)
     end
