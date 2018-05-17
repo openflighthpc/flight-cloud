@@ -132,7 +132,6 @@ module Cloudware
       c.option '--role NAME', String,
                'Machine role to inherit (master or slave)'
       c.option '--priip ADDR', String,
-               { default: '10.0.1.1' },
                'Pri subnet IP address'
       c.option '--type NAME', String,
                { default: 'small' },
