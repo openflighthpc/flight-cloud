@@ -6,11 +6,12 @@ module Cloudware
       class Destroy < Command
         def run
           run_whirly("Destroying: '#{name}'") do
-            pp Providers.find_machine(
+            Providers.find_machine(
               options.provider,
               options.region,
               name
-            )
+            ).tap { |m| raise_if_machine_is_missing(m) }
+
           end
         end
 
@@ -20,6 +21,11 @@ module Cloudware
 
         def unpack_args
           @name = args.first
+        end
+
+        def raise_if_machine_is_missing(machine)
+          return if machine
+          raise InvalidInput, "Could not find machine: '#{name}'"
         end
       end
     end
