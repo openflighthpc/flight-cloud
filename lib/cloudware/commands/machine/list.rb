@@ -14,7 +14,7 @@ module Cloudware
                          machine.domain.name,
                          machine.role,
                          machine.priip,
-                         machine.type,
+                         machine.provider_type,
                          machine.state
                        ]
                      end

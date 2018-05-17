@@ -12,7 +12,7 @@ module Cloudware
         private
 
         def aws_type
-          machine_mappings[flavour][type]
+          provider_type || machine_mappings[flavour][type]
         end
 
         def id

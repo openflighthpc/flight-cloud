@@ -27,7 +27,7 @@ module Cloudware
             Models::Machine.build(
               state: instance.state.name,
               extip: instance.public_ip_address,
-              type: instance.instance_type,
+              provider_type: instance.instance_type,
               instance_id: instance.instance_id,
               domain: domains.find_by_name(tags.cloudware_domain),
               id: tags.cloudware_id,

@@ -19,7 +19,7 @@ module Cloudware
               t.add_row ['Pri subnet IP'.bold, m.priip]
               t.add_row ['External IP'.bold, m.extip]
               t.add_row ['Machine state'.bold, m.state]
-              t.add_row ['Machine type'.bold, m.type]
+              t.add_row ['Machine type'.bold, m.provider_type]
               t.add_row ['Machine flavour'.bold, m.flavour]
               t.add_row ['Provider'.bold, m.provider]
               t.style = { all_separators: true }
