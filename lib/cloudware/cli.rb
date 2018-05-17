@@ -197,10 +197,9 @@ module Cloudware
     end
 
     command :'machine rebuild' do |c|
-      c.syntax = 'flightconnector machine rebuild [options]'
+      c.syntax = 'flightconnector machine rebuild NAME [options]'
       c.description = 'Rebuild a machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
+      provider_and_region_options(c)
       c.hidden = true
       action(c, Commands::Machine::Rebuild)
     end

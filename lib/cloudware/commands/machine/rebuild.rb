@@ -5,16 +5,24 @@ module Cloudware
     module Machine
       class Rebuild < Command
         def run
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          run_whirly("Recreating machine #{options.name}") do
-            machine.rebuild
+          machine = run_whirly('Finding the machine') do
+            Providers.find_machine(
+              options.provider,
+              options.region,
+              name,
+              missing_error: true
+            )
           end
+          run_whirly('Destroying the old machine') { machine.destroy! }
+          run_whirly('Building the new machine') { machine.create! }
+        end
+
+        private
+
+        attr_reader :name
+
+        def unpack_args
+          @name = args.first
         end
       end
     end
