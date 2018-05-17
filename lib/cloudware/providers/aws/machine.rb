@@ -62,7 +62,14 @@ module Cloudware
               parameter_value: domain.prisubnetcidr
             },
             { parameter_key: 'vmFlavour', parameter_value: flavour },
-          ]
+          ].tap do |p|
+            if cluster_index
+              p << {
+                parameter_key: 'clusterIndex',
+                parameter_value: cluster_index,
+              }
+            end
+          end
         end
 
         def deploy_template_content

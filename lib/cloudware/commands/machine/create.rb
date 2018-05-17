@@ -12,7 +12,8 @@ module Cloudware
               type: options.type,
               flavour: options.flavour,
               role: options.role,
-              priip: options.priip
+              priip: options.priip,
+              cluster_index: options.cluster_index
             ).create!
           end
         end

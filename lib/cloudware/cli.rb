@@ -139,7 +139,8 @@ module Cloudware
       c.option '--flavour NAME', String,
                { default: 'compute' },
                'Type of machine to deploy, e.g. gpu'
-
+      c.option '--cluster-index INDEX', String,
+               'Cluster index to be passed into the template'
       c.hidden = true
       action(c, Commands::Machine::Create)
     end

@@ -4,7 +4,7 @@ module Cloudware
     class Machine < Application
       ATTRIBUTES = [
         :name, :type, :flavour, :domain, :role, :priip, :state, :extip,
-        :instance_id, :id, :provider_type
+        :instance_id, :id, :provider_type, :cluster_index
       ]
       DOMAIN_ATTRIBUTES = [:region, :provider]
 
