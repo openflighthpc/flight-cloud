@@ -5,23 +5,37 @@ module Cloudware
   module Providers
     module AWS
       class Domains < Base::Domains
-        class << self
-          private
-
-          def domain_models_by_region(region)
-            ec2_by_region(region).describe_vpcs(
-              filters: [{ name: 'tag-key', values: ['cloudware_id'] }]
-            ).vpcs.map { |vpc| build_domain(region, vpc) }
-          end
-
-          def ec2_by_region(region)
-            Aws::EC2::Client.new(
+        class Builder
+          def initialize(region)
+            @region ||= region
+            @ec2 = Aws::EC2::Client.new(
               region: region,
               credentials: Cloudware.config.credentials.aws
             )
           end
 
-          def build_domain(region, vpc)
+          def domains
+            vpcs.map { |vpc| build_domain(vpc) }
+          end
+
+          private
+
+          attr_reader :region, :ec2
+
+          def vpcs
+            @vpcs ||= ec2.describe_vpcs(
+              filters: [{ name: 'tag-key', values: ['cloudware_id'] }]
+            ).vpcs
+          end
+
+          # Ported code
+          # def subnets
+          #   @subnets ||= ec2.describe_subnets(
+          #     filters: [{ name: 'tag-key', values: ['cloudware_id'] }]
+          #   ).subnets
+          # end
+
+          def build_domain(vpc)
             args = { provider: 'aws', region: region }
             Models::Domain.build(**args).tap do |domain|
               vpc.tags.each do |tag|
@@ -35,6 +49,14 @@ module Cloudware
                 end
               end
             end
+          end
+        end
+
+        class << self
+          private
+
+          def domain_models_by_region(region)
+            Builder.new(region).domains
           end
         end
       end
