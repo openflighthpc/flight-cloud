@@ -9,9 +9,9 @@ module Cloudware
             Providers.find_machine(
               options.provider,
               options.region,
-              name
-            ).tap { |m| raise_if_machine_is_missing(m) }
-             .destroy!
+              name,
+              missing_error: true
+            ).destroy!
           end
         end
 
@@ -21,11 +21,6 @@ module Cloudware
 
         def unpack_args
           @name = args.first
-        end
-
-        def raise_if_machine_is_missing(machine)
-          return if machine
-          raise InvalidInput, "Could not find machine: '#{name}'"
         end
       end
     end
