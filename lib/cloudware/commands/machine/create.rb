@@ -12,7 +12,7 @@ module Cloudware
               type: options.type,
               flavour: options.flavour,
               role: options.role,
-              priip: options.role
+              priip: options.priip
             ).create!
           end
         end
