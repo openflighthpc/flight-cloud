@@ -164,10 +164,9 @@ module Cloudware
     end
 
     command :'machine destroy' do |c|
-      c.syntax = 'flightconnector machine destroy [options]'
+      c.syntax = 'flightconnector machine destroy NAME [options]'
       c.description = 'Destroy a machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
+      provider_and_region_options(c)
       c.hidden = true
       action(c, Commands::Machine::Destroy)
     end

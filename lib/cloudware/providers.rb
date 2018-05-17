@@ -21,6 +21,10 @@ module Cloudware
       def find_domain(provider, region, name)
         select(provider)::Domains.by_region(region).find_by_name(name)
       end
+
+      def find_machine(provider, region, name)
+        select(provider)::Machines.by_region(region).find_by_name(name)
+      end
     end
   end
 end
