@@ -7,7 +7,7 @@ module Cloudware
       class Machines < Array
         class << self
           def by_region(region)
-            new(models_by_region(region))
+            new(self::Builder.new(region).models)
           end
 
           private

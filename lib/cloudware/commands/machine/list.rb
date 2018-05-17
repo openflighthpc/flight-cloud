@@ -8,6 +8,9 @@ module Cloudware
           m = Cloudware::Machine.new
           m.provider = [options.provider]
 
+          machines = Providers.select(options.provider)::Machines
+                       .by_region(options.region)
+
           r = []
           m.list.each do |_k, v|
             r << [v[:name], v[:domain], v[:role], v[:pri_ip], v[:type], v[:state]]

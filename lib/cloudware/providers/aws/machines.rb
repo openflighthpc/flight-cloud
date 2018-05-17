@@ -4,7 +4,7 @@
 module Cloudware
   module Providers
     module AWS
-      class Machines < Base::Domains
+      class Machines < Base::Machines
         class Builder
           def initialize(region)
             @region ||= region
