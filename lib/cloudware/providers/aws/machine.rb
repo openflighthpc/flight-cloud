@@ -11,6 +11,10 @@ module Cloudware
 
         private
 
+        def aws_type
+          machine_mappings[flavour][type]
+        end
+
         def id
           @id ||= SecureRandom.uuid
         end
@@ -24,7 +28,7 @@ module Cloudware
             { parameter_key: 'cloudwareId', parameter_value: id },
             { parameter_key: 'priIp', parameter_value: priip },
             { parameter_key: 'vmRole', parameter_value: role },
-            { parameter_key: 'vmType', parameter_value: type },
+            { parameter_key: 'vmType', parameter_value: aws_type },
             { parameter_key: 'vmName', parameter_value: name },
             {
               parameter_key: 'networkId',
@@ -48,6 +52,13 @@ module Cloudware
             "providers/aws/templates/machine-#{role}.yml"
           )
           File.read(path)
+        end
+
+        def machine_mappings
+          @machine_mappings ||= YAML.load_file(File.join(
+            Cloudware.config.base_dir,
+              "providers/aws/mappings/machine_types.yml"
+          ))
         end
       end
     end
