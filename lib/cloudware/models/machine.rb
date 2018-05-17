@@ -15,11 +15,15 @@ module Cloudware
       attr_accessor(*ATTRIBUTES)
       delegate(*DOMAIN_ATTRIBUTES, to: :domain)
 
+      private
+
       def run_create
         provider_machine.create
       end
 
-      private
+      def run_destroy
+        provider_machine.destroy
+      end
 
       def provider_machine
         Providers.select(provider)::Machine.new(self)

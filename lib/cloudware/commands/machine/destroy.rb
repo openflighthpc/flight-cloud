@@ -11,7 +11,7 @@ module Cloudware
               options.region,
               name
             ).tap { |m| raise_if_machine_is_missing(m) }
-
+             .destroy!
           end
         end
 
