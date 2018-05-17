@@ -37,9 +37,7 @@ module Cloudware
           end
 
           def find_subnet(domain_name)
-            subnets.find do |net|
-              net.cloudware_domain == domain_name
-            end
+            subnets.find { |net| net.cloudware_domain == domain_name }
           end
 
           def build_domain(vpc)
