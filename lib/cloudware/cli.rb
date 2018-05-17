@@ -154,11 +154,9 @@ module Cloudware
     end
 
     command :'machine info' do |c|
-      c.syntax = 'flightconnector machine info [options]'
+      c.syntax = 'flightconnector machine info NAME [options]'
       c.description = 'List detailed information about a given machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain name'
-      c.option '--output TYPE', String, 'Output type [table]. Default: table'
+      provider_and_region_options(c)
       c.hidden = true
       action(c, Commands::Machine::Info)
     end
