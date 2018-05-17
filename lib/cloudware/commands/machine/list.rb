@@ -5,18 +5,21 @@ module Cloudware
     module Machine
       class List < Command
         def run
-          rows = Providers.select(options.provider)::Machines
-                          .by_region(options.region)
-                          .reduce([]) do |memo, machine|
-                            memo << [
-                              machine.name,
-                              machine.domain.name,
-                              machine.role,
-                              machine.priip,
-                              machine.type,
-                              machine.state
-                            ]
-                          end
+          rows = run_whirly('Fetching machines') do
+            Providers.select(options.provider)::Machines
+                     .by_region(options.region)
+                     .reduce([]) do |memo, machine|
+                       memo << [
+                         machine.name,
+                         machine.domain.name,
+                         machine.role,
+                         machine.priip,
+                         machine.type,
+                         machine.state
+                       ]
+                     end
+          end
+
           table = Terminal::Table.new headings: ['Name'.bold,
                                                  'Domain'.bold,
                                                  'Role'.bold,
