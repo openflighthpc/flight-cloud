@@ -148,6 +148,7 @@ module Cloudware
       c.syntax = 'flightconnector machine list'
       c.option '--provider NAME', String, 'Cloud provider to show machines for'
       c.description = 'List available machines'
+      provider_and_region_options(c)
       c.hidden = true
       action(c, Commands::Machine::List)
     end
