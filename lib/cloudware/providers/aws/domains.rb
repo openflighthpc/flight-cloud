@@ -36,26 +36,26 @@ module Cloudware
 
           def find_subnet(domain_name)
             subnets.find do |net|
-              tags = net.tags.map { |t| [t.key, t.value] }.to_h
-              tags['cloudware_domain'] == domain_name
+              tags = tags_structs(net.tags)
+              tags.cloudware_domain == domain_name
             end
           end
 
           def build_domain(vpc)
             args = { provider: 'aws', region: region }
             Models::Domain.build(**args).tap do |domain|
-              vpc.tags.each do |tag|
-                case tag.key
-                when 'cloudware_domain'
-                  domain.name = tag.value
-                when 'cloudware_network_cidr'
-                  domain.networkcidr = tag.value
-                when 'cloudware_pri_subnet_cidr'
-                  domain.prisubnetcidr = tag.value
-                end
-              end
+              vpc_tags = tags_structs(vpc.tags)
+              domain.name = vpc_tags.cloudware_domain
+              domain.networkcidr = vpc_tags.cloudware_network_cidr
+              domain.prisubnetcidr = vpc_tags.cloudware_pri_subnet_cidr
               subnet = find_subnet(domain.name)
             end
+          end
+
+          def tags_structs(tags_struct)
+            OpenStruct.new(
+              tags_struct.map { |t| [t.key, t.value] }.to_h
+            )
           end
         end
 
