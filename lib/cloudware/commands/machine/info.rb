@@ -14,14 +14,14 @@ module Cloudware
             )
             Terminal::Table.new do |t|
               t.add_row ['Machine name'.bold, m.name]
-              t.add_row ['Domain name'.bold, m.get_item('domain')]
-              t.add_row ['Machine role'.bold, m.get_item('role')]
-              t.add_row ['Pri subnet IP'.bold, m.get_item('pri_ip')]
-              t.add_row ['External IP'.bold, m.get_item('ext_ip')]
-              t.add_row ['Machine state'.bold, m.get_item('state')]
-              t.add_row ['Machine type'.bold, m.get_item('type')]
-              t.add_row ['Machine flavour'.bold, m.get_item('flavour')]
-              t.add_row ['Provider'.bold, m.get_item('provider')]
+              t.add_row ['Domain name'.bold, m.domain.name]
+              t.add_row ['Machine role'.bold, m.role]
+              t.add_row ['Pri subnet IP'.bold, m.priip]
+              t.add_row ['External IP'.bold, m.extip]
+              t.add_row ['Machine state'.bold, m.state]
+              t.add_row ['Machine type'.bold, m.type]
+              t.add_row ['Machine flavour'.bold, m.flavour]
+              t.add_row ['Provider'.bold, m.provider]
               t.style = { all_separators: true }
             end
           end
