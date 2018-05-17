@@ -6,16 +6,28 @@ module Cloudware
       module Power
         class On < Command
           def run
-            machine = Cloudware::Machine.new
-            options.name = ask('Machine name: ') if options.name.nil?
-            machine.name = options.name.to_s
-
-            options.domain = ask('Domain identifier: ') if options.domain.nil?
-            machine.domain = options.domain.to_s
-
-            run_whirly("Powering on machine #{options.name}") do
-              machine.power_on
+            machine = run_whirly('Fetching machine') do
+              Providers.find_machine(
+                options.provider,
+                options.region,
+                options.domain,
+                name,
+                missing_error: true
+              )
             end
+            run_whirly('Powering machine on') { machine.power_on }
+          end
+
+          private
+
+          attr_reader :name
+
+          def required_options
+            [:domain]
+          end
+
+          def unpack_args
+            @name = args.first
           end
         end
       end
