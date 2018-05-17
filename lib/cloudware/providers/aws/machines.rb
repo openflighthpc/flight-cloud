@@ -15,11 +15,23 @@ module Cloudware
           end
 
           def models
+            pp instances
           end
 
           private
 
           attr_reader :region, :ec2
+
+          def instances
+            @instances ||= begin
+              ec2.describe_instances(
+                filters: [{ name: 'tag-key', values: ['cloudware_id'] }]
+              ).reservations
+               .map(&:instances)
+               .flatten
+               .reject { |i| i.state.name == 'terminated' }
+            end
+          end
 
           def tags_structs(tags_struct)
             OpenStruct.new(
