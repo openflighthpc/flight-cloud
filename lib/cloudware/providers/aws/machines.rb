@@ -15,7 +15,7 @@ module Cloudware
           end
 
           def models
-            pp instances.map { |i| build_machine(i) }
+            instances.map { |i| build_machine(i) }
           end
 
           private
