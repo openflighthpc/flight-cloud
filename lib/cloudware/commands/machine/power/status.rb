@@ -6,14 +6,28 @@ module Cloudware
       module Power
         class Status < Command
           def run
-            machine = Cloudware::Machine.new
-            options.name = ask('Machine name: ') if options.name.nil?
-            machine.name = options.name.to_s
+            machine = run_whirly('Fetching machine') do
+              Providers.find_machine(
+                options.provider,
+                options.region,
+                options.domain,
+                name,
+                missing_error: true
+              )
+            end
+            puts "#{name}: Power status is #{machine.state}"
+          end
 
-            options.domain = ask('Domain identifier: ') if options.domain.nil?
-            machine.domain = options.domain.to_s
+          private
 
-            puts "#{options.name}: Power status is #{machine.get_item('state')}"
+          attr_reader :name
+
+          def required_options
+            [:domain]
+          end
+
+          def unpack_args
+            @name = args.first
           end
         end
       end
