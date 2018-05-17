@@ -194,10 +194,11 @@ module Cloudware
     end
 
     command :'machine power off' do |c|
-      c.syntax = 'flightconnector machine power off [options]'
+      c.syntax = 'flightconnector machine power off NAME [options]'
       c.description = 'Turn a machine off'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
+      provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String,
+               'Domain the machine belongs to'
       c.hidden = true
       action(c, Commands::Machine::Power::Off)
     end
