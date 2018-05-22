@@ -125,14 +125,22 @@ module Cloudware
     end
 
     command :'machine create' do |c|
-      c.syntax = 'flightconnector machine create [options]'
+      c.syntax = 'flightconnector machine create NAME [options]'
       c.description = 'Create a new machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain name'
-      c.option '--role NAME', String, 'Machine role to inherit (master or slave)'
-      c.option '--priip ADDR', String, 'Pri subnet IP address'
-      c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
-      c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
+      provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String, 'Domain name'
+      c.option '--role NAME', String,
+               'Machine role to inherit (master or slave)'
+      c.option '--priip ADDR', String,
+               'Pri subnet IP address'
+      c.option '--type NAME', String,
+               { default: 'small' },
+               'Flavour of machine type to deploy, e.g. medium'
+      c.option '--flavour NAME', String,
+               { default: 'compute' },
+               'Type of machine to deploy, e.g. gpu'
+      c.option '--cluster-index INDEX', String,
+               'Cluster index to be passed into the template'
       c.hidden = true
       action(c, Commands::Machine::Create)
     end
@@ -141,61 +149,67 @@ module Cloudware
       c.syntax = 'flightconnector machine list'
       c.option '--provider NAME', String, 'Cloud provider to show machines for'
       c.description = 'List available machines'
+      provider_and_region_options(c)
       c.hidden = true
       action(c, Commands::Machine::List)
     end
 
     command :'machine info' do |c|
-      c.syntax = 'flightconnector machine info [options]'
+      c.syntax = 'flightconnector machine info NAME [options]'
       c.description = 'List detailed information about a given machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain name'
-      c.option '--output TYPE', String, 'Output type [table]. Default: table'
+      provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String,
+               'Domain the machine belongs to'
       c.hidden = true
       action(c, Commands::Machine::Info)
     end
 
     command :'machine destroy' do |c|
-      c.syntax = 'flightconnector machine destroy [options]'
+      c.syntax = 'flightconnector machine destroy NAME [options]'
       c.description = 'Destroy a machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
+      provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String,
+               'Domain the machine belongs to'
       c.hidden = true
       action(c, Commands::Machine::Destroy)
     end
 
     command :'machine power status' do |c|
-      c.syntax = 'flightconnector machine power status [options]'
+      c.syntax = 'flightconnector machine power status NAME [options]'
       c.description = 'Check the power status of a machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
+      provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String,
+               'Domain the machine belongs to'
       c.hidden = true
       action(c, Commands::Machine::Power::Status)
     end
 
     command :'machine power on' do |c|
-      c.syntax = 'flightconnector machine power on [options]'
+      c.syntax = 'flightconnector machine power on NAME [options]'
       c.description = 'Turn a machine on'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
+      provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String,
+               'Domain the machine belongs to'
       c.hidden = true
       action(c, Commands::Machine::Power::On)
     end
 
     command :'machine power off' do |c|
-      c.syntax = 'flightconnector machine power off [options]'
+      c.syntax = 'flightconnector machine power off NAME [options]'
       c.description = 'Turn a machine off'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
+      provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String,
+               'Domain the machine belongs to'
       c.hidden = true
       action(c, Commands::Machine::Power::Off)
     end
 
     command :'machine rebuild' do |c|
-      c.syntax = 'flightconnector machine rebuild [options]'
+      c.syntax = 'flightconnector machine rebuild NAME [options]'
       c.description = 'Rebuild a machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
+      provider_and_region_options(c)
+      c.option '-d', '--domain NAME', String,
+               'Domain the machine belongs to'
       c.hidden = true
       action(c, Commands::Machine::Rebuild)
     end

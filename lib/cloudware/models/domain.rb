@@ -8,7 +8,8 @@ module Cloudware
     class Domain < Application
       ATTRIBUTES = [
         :name, :provider, :region, :networkcidr, :prisubnetcidr, :template,
-        :cluster_index, :create_domain_already_exists_flag
+        :cluster_index, :create_domain_already_exists_flag,
+        :network_id, :prisubnet_id, # TODO: Remove the aws specific id's
       ].freeze
       attr_accessor(*ATTRIBUTES)
 
@@ -36,8 +37,7 @@ module Cloudware
       end
 
       def validate_cloudware_domain_exists
-        domains = Providers.select(provider)::Domains.by_region(region)
-        return true if domains.find_by_name(name)
+        return true if Providers.find_domain(provider, region, name)
         errors.add(:domain, 'does not exist')
       end
 

@@ -139,7 +139,7 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: !Join [' ', [!Ref cloudwareDomain, 'login']]
+          Value: !Join ['-', [!Ref cloudwareDomain, !Ref vmName]]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -151,7 +151,7 @@ Resources:
           Value: !Ref vmRole
         -
           Key: 'cloudware_machine_name'
-          Value: 'login'
+          Value: !Ref vmName
         -
           Key: 'cloudware_machine_flavour'
           Value: !Ref vmFlavour
