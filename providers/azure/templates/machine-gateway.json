@@ -16,6 +16,7 @@
 		},
 		"vmName": {
 			"type": "string",
+            "defaultValue": "gateway",
 			"metadata": {
 				"description": "Choose the VM name"
 			}
@@ -34,6 +35,7 @@
 		},
 		"priSubnetIp": {
 			"type": "string",
+            "defaultValue": "10.78.100.10",
 			"metadata": {
 				"description": "Enter the desired pri subnet IP address"
 			}
@@ -41,7 +43,7 @@
 	},
 	"variables": {
 		"adminUsername": "alces",
-		"adminPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/0R5EvmSrySy2I+8Cx6eOX7cVuYFXx5D0O1x0+OmAZ0Qaj9d7E0Nj4ZcWxdCT03uFl1Ka4tInDlQmMyy0V1/AftpHxBEnB17Pk/lJnDW1YstmAqD0GlFa1CrxUdtHd+jB3LJmdoHsV6fRGpMOgFd+u/4Wces7KAqYFmL5uPG1UTCMgokQ2qboQgEVspXotMvni1iil3kEjyH/eW64Laxmn2Vxls9feZ1o95mPQhJPJcN7MMo1h+jkxyat3bawtpqyV7fXYU0+BO2JHpu/VIEDHtxhlk7RhI0U06XbJu6ZCCUrEX8idIhw4hueQpKwVYplTXssa9JqNlcjouqLj5kd cloudware@alces-software.com",
+		"adminPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCK8fxlYAcZHfZ9Rhcl0IIcFAleztyMkBF6CxfcaqI6XO9WYhy/sawZXnOHlACjLfx1RuDu+kDvPT/lhxay7yrQt0g1HsTs3xwW6luZuLxPvCS7Zqi0AGqr/LC6OWUKodpNe8ZUPxCWx+JiyaRb9SD+PWqV0WPiZXTmgd9lRYfWuvMl24sNvK8VWWzWSr8q2+1yGNbyzoFC/NUfoMuFEPyb+XV3BIKNyacAM8gep+mrFxadV1ehZConzeoJSFavlJUiU76JMKkbJcfUeXFqTBk/W1mXpmYPw+JUZzsDM2RZD/Ef4LrhyxjtLVLelrIU5j4DN/7lMCsMf3tdfXbJ2+fp aws_ireland",
 		"priInterfaceName": "[concat(parameters('cloudwareDomain'), parameters('vmName'), 'pri')]",
 		"azureConfig": {
 			"imageSubscription": "[concat('/subscriptions/', 'd1e964ef-15c7-4b27-8113-e725167cee83', '/resourceGroups/alcesflight/providers/Microsoft.Compute/images/alces-flight-compute-1.0.0-beta')]"
@@ -69,7 +71,20 @@
 						"priority": 1000,
 						"direction": "Inbound"
 					}
-				}]
+				},
+                {
+                    "name": "inbound-vpn",
+                    "properties": {
+                       "protocol": "TCP",
+                       "sourcePortRange": "*",
+                       "destinationPortRange": "2005",
+                       "sourceAddressPrefix": "*",
+                       "destinationAddressPrefix": "*",
+                       "access": "Allow",
+                       "priority": 1010,
+                       "direction": "Inbound"
+                    }
+                }]
 			}
 		},
 		{
@@ -128,7 +143,7 @@
 				"cloudware_domain": "[parameters('cloudwareDomain')]",
 				"cloudware_id": "[parameters('cloudwareId')]",
 				"cloudware_machine_name": "[parameters('vmName')]",
-				"cloudware_machine_role": "master",
+				"cloudware_machine_role": "gateway",
 				"cloudware_machine_type": "[parameters('vmType')]",
 				"cloudware_machine_flavour": "[parameters('vmFlavour')]",
 				"cloudware_resource_type": "machine",

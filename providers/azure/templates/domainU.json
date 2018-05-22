@@ -4,14 +4,14 @@
   "parameters": {
     "networkCIDR": {
       "type": "string",
-      "defaultValue": "10.0.0.0/16",
+      "defaultValue": "10.100.1.0/24",
       "metadata": {
         "description": "Choose the desired network range"
       }
     },
     "priSubnetCIDR": {
       "type": "string",
-      "defaultValue": "10.0.1.0/24",
+      "defaultValue": "10.100.1.0/24",
       "metadata": {
         "description": "Choose the desired pri subnet range"
       }
@@ -27,6 +27,13 @@
       "metadata": {
         "description": "Cloudware domain"
       }
+    },
+    "clusterIndex": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Cluster index"
+      }
     }
   },
   "resources": [
@@ -38,22 +45,22 @@
         "cloudware_id": "[parameters('cloudwareId')]",
         "cloudware_domain": "[parameters('cloudwareDomain')]",
         "cloudware_domain_region": "[resourceGroup().location]",
-        "cloudware_network_cidr": "[parameters('networkCIDR')]",
-        "cloudware_pri_subnet_cidr": "[parameters('priSubnetCIDR')]",
-        "cloudware_resource_type": "domain"
+        "cloudware_network_cidr": "[concat('10.100.', parameters('clusterIndex'), '.0/24')]",
+        "cloudware_pri_subnet_cidr": "[concat('10.100.', parameters('clusterIndex'), '.0/24')]",
+        "cloudware_resource_type": "domainiU"
       },
       "location": "[resourceGroup().location]",
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[parameters('networkCIDR')]"
+            "[concat('10.100.', parameters('clusterIndex'), '.0/24')]"
           ]
         },
         "subnets": [
           {
             "name": "pri",
             "properties": {
-              "addressPrefix": "[parameters('priSubnetCIDR')]"
+              "addressPrefix": "[concat('10.100.', parameters('clusterIndex'), '.0/24')]"
             }
           }
         ]
