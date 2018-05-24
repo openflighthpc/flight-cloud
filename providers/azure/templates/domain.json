@@ -2,14 +2,14 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "networkCIDR": {
+    "networkCidr": {
       "type": "string",
       "defaultValue": "10.0.0.0/16",
       "metadata": {
         "description": "Choose the desired network range"
       }
     },
-    "priSubnetCIDR": {
+    "priSubnetCidr": {
       "type": "string",
       "defaultValue": "10.0.1.0/24",
       "metadata": {
@@ -38,22 +38,22 @@
         "cloudware_id": "[parameters('cloudwareId')]",
         "cloudware_domain": "[parameters('cloudwareDomain')]",
         "cloudware_domain_region": "[resourceGroup().location]",
-        "cloudware_network_cidr": "[parameters('networkCIDR')]",
-        "cloudware_pri_subnet_cidr": "[parameters('priSubnetCIDR')]",
+        "cloudware_network_cidr": "[parameters('networkCidr')]",
+        "cloudware_pri_subnet_cidr": "[parameters('priSubnetCidr')]",
         "cloudware_resource_type": "domain"
       },
       "location": "[resourceGroup().location]",
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[parameters('networkCIDR')]"
+            "[parameters('networkCidr')]"
           ]
         },
         "subnets": [
           {
             "name": "pri",
             "properties": {
-              "addressPrefix": "[parameters('priSubnetCIDR')]"
+              "addressPrefix": "[parameters('priSubnetCidr')]"
             }
           }
         ]
