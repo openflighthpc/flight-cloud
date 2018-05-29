@@ -11,8 +11,8 @@ module Cloudware
         def run_create
           deploy_aws
         rescue Aws::CloudFormation::Errors::AlreadyExistsException
-          domain_model.create_domain_already_exists_flag = true
-          domain_model.valid?
+          self.create_domain_already_exists_flag = true
+          valid?
         end
 
         def provider
