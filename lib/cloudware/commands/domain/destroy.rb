@@ -8,9 +8,8 @@ module Cloudware
 
         def run
           run_whirly("Destroying domain #{options.name}") do
-            Models::Domain.new(
+            Providers.select(options.provider)::Domain.new(
               name: name,
-              provider: options.provider,
               region: options.region
             ).destroy!
           end

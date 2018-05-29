@@ -6,11 +6,15 @@ module Cloudware
       class Domain < Base::Domain
         include DeployAWS
 
-        def create
+        def run_create
           deploy_aws
         rescue Aws::CloudFormation::Errors::AlreadyExistsException
           domain_model.create_domain_already_exists_flag = true
           domain_model.valid?
+        end
+
+        def provider
+          'aws'
         end
 
         private

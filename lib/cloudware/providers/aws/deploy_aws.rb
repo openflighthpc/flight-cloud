@@ -4,7 +4,7 @@ module Cloudware
   module Providers
     module AWS
       module DeployAWS
-        def destroy
+        def run_destroy
           cloud_formation.delete_stack(stack_name: name)
           cloud_formation.wait_until(:stack_delete_complete, stack_name: name)
         end

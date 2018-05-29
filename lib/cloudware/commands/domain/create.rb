@@ -8,10 +8,9 @@ module Cloudware
 
         def run
           run_whirly('Creating new domain') do
-            Cloudware::Models::Domain.build(
+            Providers.select(options.provider)::Domain.build(
               name: name,
               region: options.region,
-              provider: options.provider,
               networkcidr: options.networkcidr,
               prisubnetcidr: options.prisubnetcidr,
               template: options.template,

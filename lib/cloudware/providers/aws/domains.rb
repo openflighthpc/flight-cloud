@@ -41,8 +41,7 @@ module Cloudware
           end
 
           def build_domain(vpc)
-            args = { provider: 'aws', region: region }
-            Models::Domain.build(**args).tap do |domain|
+            Domain.build(region: region).tap do |domain|
               vpc_tags = tags_structs(vpc.tags)
               domain.name = vpc_tags.cloudware_domain
               domain.networkcidr = vpc_tags.cloudware_network_cidr
