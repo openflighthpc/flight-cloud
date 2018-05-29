@@ -7,6 +7,7 @@ require 'azure_mgmt_network'
 
 require 'providers/base/application'
 require_all 'lib/cloudware/providers/base/*.rb'
+require_all 'lib/cloudware/providers/**/helpers/*.rb'
 require_all 'lib/cloudware/providers/**/*.rb'
 
 module Cloudware

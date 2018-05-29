@@ -14,19 +14,14 @@ module Cloudware
 
         private
 
+        include Helpers::Client
+
         def run_create
+          client.resources
         end
 
         def id
           @id ||= SecureRandom.uuid
-        end
-
-        def resources_client
-          @resources_client ||= begin
-            Azure::Resources::Profiles::Latest::Mgmt::Client.new(
-              Cloudware.config.credentials.azure
-            )
-          end
         end
       end
     end
