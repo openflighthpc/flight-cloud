@@ -4,12 +4,9 @@ module Cloudware
   module Providers
     module Base
       class Domain < Application
-        ATTRIBUTES = [
-          :name, :region, :networkcidr, :prisubnetcidr, :template,
-          :cluster_index, :create_domain_already_exists_flag,
-          :network_id, :prisubnet_id, # TODO: Remove the aws specific id's
-        ].freeze
-        attr_accessor(*ATTRIBUTES)
+        attr_accessor :name, :region, :networkcidr, :prisubnetcidr,
+                      :template, :cluster_index,
+                      :create_domain_already_exists_flag
 
         validates_presence_of :name, :region
         validates :name, format: { with: /\A[a-zA-Z0-9-]*\z/ }

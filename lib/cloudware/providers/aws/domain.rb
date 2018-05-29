@@ -6,6 +6,8 @@ module Cloudware
       class Domain < Base::Domain
         include DeployAWS
 
+        attr_accessor :network_id, :prisubnet_id
+
         def run_create
           deploy_aws
         rescue Aws::CloudFormation::Errors::AlreadyExistsException
