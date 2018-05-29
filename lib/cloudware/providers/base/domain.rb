@@ -22,14 +22,6 @@ module Cloudware
 
         private
 
-        def run_create
-          raise NotImplementedError
-        end
-
-        def run_destroy
-          raise NotImplementedError
-        end
-
         def validate_cloudware_domain_exists
           return true if Providers.find_domain(provider, region, name)
           errors.add(:domain, 'does not exist')

@@ -17,16 +17,6 @@ module Cloudware
         def power_off
           raise NotImplementedError
         end
-
-        private
-
-        def run_create
-          raise NotImplementedError
-        end
-
-        def run_destroy
-          raise NotImplementedError
-        end
       end
     end
   end
