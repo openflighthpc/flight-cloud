@@ -1,7 +1,7 @@
 
 module Cloudware
   module Models
-    class Machine < Application
+    class Machine < Providers::Base::Application
       ATTRIBUTES = [
         :name, :type, :flavour, :domain, :role, :priip, :state, :extip,
         :instance_id, :id, :provider_type, :cluster_index

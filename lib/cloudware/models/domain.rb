@@ -5,7 +5,7 @@ require 'ipaddr'
 
 module Cloudware
   module Models
-    class Domain < Application
+    class Domain < Providers::Base::Application
       ATTRIBUTES = [
         :name, :provider, :region, :networkcidr, :prisubnetcidr, :template,
         :cluster_index, :create_domain_already_exists_flag,

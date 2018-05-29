@@ -26,11 +26,11 @@ require 'terminal-table'
 require 'whirly'
 require 'exceptions'
 require 'command'
-require 'models/application'
 
 require 'require_all'
 require_all 'lib/cloudware/commands/concerns/**/*.rb'
 require_all 'lib/cloudware/commands/**/*.rb'
+require 'providers/base/application'
 require_all 'lib/cloudware/models/**/*.rb'
 
 require 'providers'
