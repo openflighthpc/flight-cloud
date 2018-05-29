@@ -28,12 +28,9 @@ require 'exceptions'
 require 'command'
 
 require 'require_all'
+require 'providers'
 require_all 'lib/cloudware/commands/concerns/**/*.rb'
 require_all 'lib/cloudware/commands/**/*.rb'
-require 'providers/base/application'
-require_all 'lib/cloudware/models/**/*.rb'
-
-require 'providers'
 
 module Cloudware
   class CLI

@@ -3,18 +3,15 @@
 module Cloudware
   module Providers
     module Base
-      class Machine
-        def initialize(machine_model)
-          @machine_model = machine_model
-        end
+      class Machine < Application
+        ATTRIBUTES = [
+          :name, :type, :flavour, :domain, :role, :priip, :state, :extip,
+          :instance_id, :id, :provider_type, :cluster_index
+        ]
+        DOMAIN_ATTRIBUTES = [:region, :provider]
 
-        def create
-          raise NotImplementedError
-        end
-
-        def destroy
-          raise NotImplementedError
-        end
+        attr_accessor(*ATTRIBUTES)
+        delegate(*DOMAIN_ATTRIBUTES, to: :domain)
 
         def power_on
           raise NotImplementedError
@@ -26,9 +23,13 @@ module Cloudware
 
         private
 
-        attr_reader :machine_model
+        def run_create
+          raise NotImplementedError
+        end
 
-        delegate(*Models::Machine.delegate_attributes, to: :machine_model)
+        def run_destroy
+          raise NotImplementedError
+        end
       end
     end
   end

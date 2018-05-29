@@ -5,10 +5,6 @@ module Cloudware
       class Machine < Base::Machine
         include DeployAWS
 
-        def create
-          deploy_aws
-        end
-
         def power_on
           ec2.start_instances(
             instance_ids: [instance_id]
@@ -22,6 +18,10 @@ module Cloudware
         end
 
         private
+
+        def run_create
+          deploy_aws
+        end
 
         def ec2
           @ec2 ||= Aws::EC2::Client.new(
