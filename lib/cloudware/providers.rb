@@ -1,6 +1,10 @@
 
 # frozen_string_literal: true
 
+require 'azure_mgmt_resources'
+require 'azure_mgmt_compute'
+require 'azure_mgmt_network'
+
 require 'providers/base/application'
 require_all 'lib/cloudware/providers/base/*.rb'
 require_all 'lib/cloudware/providers/**/*.rb'
@@ -13,7 +17,7 @@ module Cloudware
         when 'aws'
           AWS
         when 'azure'
-          raise NotImplementedError
+          AZURE
         else
           raise InvalidInput, "Unrecognised provider: #{provider}"
         end
