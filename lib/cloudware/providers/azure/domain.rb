@@ -17,11 +17,23 @@ module Cloudware
         include Helpers::Client
 
         def run_create
-          client.resources
+          create_resource_group
         end
 
         def id
           @id ||= SecureRandom.uuid
+        end
+
+        def create_resource_group
+          client.resources.model_classes.resource_group.new.tap do |params|
+            params.location = region
+            params.tags = {
+              cloudware_id: id,
+              cloudware_domain: name,
+              region: region
+            }
+            client.resources.resource_groups.create_or_update(name, params)
+          end
         end
       end
     end
