@@ -4,14 +4,11 @@ module Cloudware
   module Providers
     module Base
       class Machine < Application
-        ATTRIBUTES = [
-          :name, :type, :flavour, :domain, :role, :priip, :state, :extip,
-          :instance_id, :id, :provider_type, :cluster_index
-        ]
-        DOMAIN_ATTRIBUTES = [:region, :provider]
+        attr_accessor :name, :type, :flavour, :domain, :role, :priip,
+                      :state, :extip, :instance_id, :id, :provider_type,
+                      :cluster_index
 
-        attr_accessor(*ATTRIBUTES)
-        delegate(*DOMAIN_ATTRIBUTES, to: :domain)
+        delegate :region, :provider, to: :domain
 
         def power_on
           raise NotImplementedError
