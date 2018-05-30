@@ -25,14 +25,14 @@ module Cloudware
         end
 
         def create_resource_group
-          client.resources.model_classes.resource_group.new.tap do |params|
+          client.resource.model_classes.resource_group.new.tap do |params|
             params.location = region
             params.tags = {
               cloudware_id: id,
               cloudware_domain: name,
               region: region
             }
-            client.resources.resource_groups.create_or_update(name, params)
+            client.resource.resource_groups.create_or_update(name, params)
           end
         end
       end

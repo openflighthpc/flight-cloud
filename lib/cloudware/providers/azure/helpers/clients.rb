@@ -4,8 +4,8 @@ module Cloudware
     module AZURE
       module Helpers
         class AzureClient
-          def resources
-            @resources ||= begin
+          def resource
+            @resource ||= begin
               Azure::Resources::Profiles::Latest::Mgmt::Client.new(
                 Cloudware.config.credentials.azure
               )
