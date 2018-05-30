@@ -54,14 +54,15 @@ module Cloudware
         memoize :deployment_model
 
         def deployment_properties
-          client.resource.model_classes.deployment_properties.new do |props|
-            props.template = template
-            props.parameters = {
+          client.resource.model_classes.deployment_properties.new.tap do |p|
+            p.template = template
+            p.parameters = {
               cloudwareDomain: name,
               cloudwareId: id,
               networkCIDR: networkcidr,
               priSubnetCIDR: prisubnetcidr
             }
+            p.mode = Azure::Resources::Profiles::Latest::Mgmt::Models::DeploymentMode::Incremental
           end
         end 
       end
