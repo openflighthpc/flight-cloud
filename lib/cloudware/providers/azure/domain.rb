@@ -32,14 +32,32 @@ module Cloudware
         end
 
         def create_resource_group
-          client.resource.model_classes.resource_group.new.tap do |params|
-            params.location = region
-            params.tags = {
+          client.resource.model_classes.resource_group.new.tap do |group|
+            group.location = region
+            group.tags = {
               cloudware_id: id,
               cloudware_domain: name,
               region: region
             }
-            client.resource.resource_groups.create_or_update(name, params)
+            client.resource.resource_groups.create_or_update(name, group)
+          end
+        end
+
+        def deployment_model
+          client.resource.model_classes.deployment.new.tap do |deployment|
+            deployment.properties = deployment_properties
+          end
+        end
+
+        def deployment_properties
+          client.resource.model_classes.deployment_properties do |props|
+            props.template = template
+            props.parameters = {
+              cloudwareDomain: name,
+              cloudwareId: id,
+              networkCIDR: networkcidr,
+              priSubnetCIDR: prisubnetcidr
+            }
           end
         end
       end
