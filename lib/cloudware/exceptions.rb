@@ -10,4 +10,5 @@ module Cloudware
   class ConfigError < CloudwareError; end
   class InvalidInput < UserError; end
   class ModelValidationError < UserError; end
+  class InvalidAzureRequest < UserError; end
 end

@@ -18,6 +18,13 @@ module Cloudware
 
         def run_create
           create_resource_group
+        rescue MsRestAzure::AzureOperationError => e
+          # Azure returns a `JSON` string which contains an embedded `JSON`
+          # string. This embedded `JSON` contains the error message
+          message = JSON.parse(
+            JSON.parse(e.message)['response']['body']
+          )['error']['message']
+          raise InvalidAzureRequest, message
         end
 
         def id
