@@ -5,6 +5,10 @@ module Cloudware
     def initialize(args, options)
       @args = args.freeze
       @options = OpenStruct.new(options.__hash__)
+      if options.debug
+        Bundler.setup(:default, :development)
+        require 'pry'
+      end
     end
 
     def run!
@@ -52,6 +56,7 @@ module Cloudware
       result = nil
       Whirly.start do
         update_status.call(status)
+        Whirly.stop if options.debug
         result = yield update_status if block_given?
       end
       result

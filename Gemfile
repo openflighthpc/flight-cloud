@@ -20,6 +20,7 @@ gem 'whirly'
 group :development do
   gem 'factory_bot'
   gem 'pry'
+  gem 'pry-byebug'
   gem 'rspec'
   gem 'rspec-wait'
   gem 'rubocop', '~> 0.52.1', require: false
