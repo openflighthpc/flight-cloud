@@ -11,6 +11,10 @@ module Cloudware
 
         include ActiveModel::Model
 
+        # Allow methods to be memorized in all the models
+        # https://rails-bestpractices.com/posts/2010/11/22/use-memoization/
+        extend Memoist
+
         def initialize(*_a, **parameters)
           @errors = ActiveModel::Errors.new(self)
           parameters.each do |key, value|

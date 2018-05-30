@@ -17,7 +17,7 @@ module Cloudware
         include Helpers::Client
 
         def run_create
-          create_resource_group
+          resource_group
         rescue MsRestAzure::AzureOperationError => e
           # Azure returns a `JSON` string which contains an embedded `JSON`
           # string. This embedded `JSON` contains the error message
@@ -31,23 +31,24 @@ module Cloudware
           @id ||= SecureRandom.uuid
         end
 
-        def create_resource_group
-          client.resource.model_classes.resource_group.new.tap do |group|
-            group.location = region
-            group.tags = {
-              cloudware_id: id,
-              cloudware_domain: name,
-              region: region
-            }
-            client.resource.resource_groups.create_or_update(name, group)
-          end
+        def resource_group
+          group = client.resource.model_classes.resource_group.new
+          group.location = region
+          group.tags = {
+            cloudware_id: id,
+            cloudware_domain: name,
+            region: region
+          }
+          client.resource.resource_groups.create_or_update(name, group)
         end
+        memoize :resource_group
 
         def deployment_model
           client.resource.model_classes.deployment.new.tap do |deployment|
             deployment.properties = deployment_properties
           end
         end
+        memoize :deployment_model
 
         def deployment_properties
           client.resource.model_classes.deployment_properties do |props|
@@ -59,7 +60,7 @@ module Cloudware
               priSubnetCIDR: prisubnetcidr
             }
           end
-        end
+        end 
       end
     end
   end

@@ -184,6 +184,7 @@ DEPENDENCIES
   factory_bot
   google-cloud-resource_manager
   ipaddr
+  memoist
   pry
   pry-byebug
   require_all

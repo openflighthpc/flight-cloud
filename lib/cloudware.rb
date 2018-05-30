@@ -40,6 +40,7 @@ require 'colorize'
 require 'gcp'
 require 'config'
 require 'logger'
+require 'memoist'
 
 module Cloudware
   class << self
