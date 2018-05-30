@@ -55,16 +55,30 @@ module Cloudware
 
         def deployment_properties
           client.resource.model_classes.deployment_properties.new.tap do |p|
-            p.template = template
-            p.parameters = {
+            p.template = template_content
+            p.parameters = convert_params_to_azure_syntax(
               cloudwareDomain: name,
               cloudwareId: id,
               networkCIDR: networkcidr,
               priSubnetCIDR: prisubnetcidr
-            }
+            )
             p.mode = Azure::Resources::Profiles::Latest::Mgmt::Models::DeploymentMode::Incremental
           end
         end 
+
+        # Azure requires the parameter hash to have syntax:
+        # { :your_key => { value: 'your_value' } }
+        def convert_params_to_azure_syntax(**params)
+          params.map { |k, v| [k, { value: v }] }.to_h
+        end
+
+        def template_content
+          JSON.parse(File.read(File.join(
+            Cloudware.config.base_dir,
+            "providers/azure/templates/#{template}.json"
+          )))
+        end
+        :memoize
       end
     end
   end
