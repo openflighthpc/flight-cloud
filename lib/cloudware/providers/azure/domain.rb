@@ -17,7 +17,9 @@ module Cloudware
         include Helpers::Client
 
         def run_create
-          resource_group
+          client.resource.deployments.create_or_update(
+            resource_group.name, name, deployment_model
+          )
         rescue MsRestAzure::AzureOperationError => e
           # Azure returns a `JSON` string which contains an embedded `JSON`
           # string. This embedded `JSON` contains the error message
@@ -32,14 +34,15 @@ module Cloudware
         end
 
         def resource_group
+          rg_name = "domain-#{name}"
           group = client.resource.model_classes.resource_group.new
           group.location = region
           group.tags = {
             cloudware_id: id,
-            cloudware_domain: name,
+            cloudware_domain: rg_name,
             region: region
           }
-          client.resource.resource_groups.create_or_update(name, group)
+          client.resource.resource_groups.create_or_update(rg_name, group)
         end
         memoize :resource_group
 
@@ -51,7 +54,7 @@ module Cloudware
         memoize :deployment_model
 
         def deployment_properties
-          client.resource.model_classes.deployment_properties do |props|
+          client.resource.model_classes.deployment_properties.new do |props|
             props.template = template
             props.parameters = {
               cloudwareDomain: name,
