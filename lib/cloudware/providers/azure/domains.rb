@@ -6,6 +6,8 @@ module Cloudware
     module AZURE
       class Domains < Base::Domains
         class Builder
+          NETWORK_TYPE = 'Microsoft.Network/virtualNetworks'
+
           extend Memoist
           include Helpers::Client
 
@@ -29,10 +31,13 @@ module Cloudware
           end
 
           def domain_resources
-            resource_groups.map do |group|
+            groups = resource_groups.map do |group|
               client.resource.resources.list_by_resource_group(group.name)
             end.flatten
-               .select { |r| r.tags&.[]('cloudware_domain') }
+            groups.select do |resource|
+              next false unless resource.type == NETWORK_TYPE
+              resource.tags&.[]('cloudware_domain')
+            end
           end
 
           def build_domain(resource)
