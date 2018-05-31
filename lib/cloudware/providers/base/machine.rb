@@ -10,6 +10,8 @@ module Cloudware
 
         delegate :region, :provider, to: :domain
 
+        before_create :assign_machine_id
+
         def power_on
           raise NotImplementedError
         end
@@ -19,6 +21,11 @@ module Cloudware
         end
 
         private
+
+        def assign_machine_id
+          raise InternalError if id
+          self.id = SecureRandom.uuid
+        end
 
         def machine_mappings
           YAML.load_file(File.join(

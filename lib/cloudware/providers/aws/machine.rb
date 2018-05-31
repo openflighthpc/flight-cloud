@@ -30,10 +30,6 @@ module Cloudware
           )
         end
 
-        def id
-          @id ||= SecureRandom.uuid
-        end
-
         def deploy_parameters
           [
             {
