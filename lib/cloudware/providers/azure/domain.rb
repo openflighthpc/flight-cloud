@@ -30,8 +30,9 @@ module Cloudware
         end
 
         def id
-          @id ||= SecureRandom.uuid
+          SecureRandom.uuid
         end
+        memoize :id
 
         def resource_group
           rg_name = "domain-#{name}"
