@@ -8,9 +8,18 @@ module Cloudware
           'azure'
         end
 
-        def resource_group_name
-          "alces-flightconnector-#{name}"
+        def resource_group
+          group = client.resource.model_classes.resource_group.new
+          group.location = region
+          group.tags = {
+            cloudware_id: id,
+            cloudware_domain: name,
+            region: region
+          }
+          client.resource.resource_groups
+                .create_or_update(resource_group_name, group)
         end
+        memoize :resource_group
 
         private
 
@@ -30,18 +39,9 @@ module Cloudware
           client.resource.resource_groups.delete(resource_group_name)
         end
 
-        def resource_group
-          group = client.resource.model_classes.resource_group.new
-          group.location = region
-          group.tags = {
-            cloudware_id: id,
-            cloudware_domain: name,
-            region: region
-          }
-          client.resource.resource_groups
-                .create_or_update(resource_group_name, group)
+        def resource_group_name
+          "alces-flightconnector-#{name}"
         end
-        memoize :resource_group
 
         def template_path
           File.join(
