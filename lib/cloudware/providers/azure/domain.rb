@@ -13,7 +13,7 @@ module Cloudware
         end
 
         def resource_group_name
-          "domain-#{name}"
+          "alces-flightconnector-#{name}"
         end
 
         private
