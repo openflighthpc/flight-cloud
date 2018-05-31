@@ -32,7 +32,7 @@ module Cloudware
             resource_groups.map do |group|
               client.resource.resources.list_by_resource_group(group.name)
             end.flatten
-               .select { |r| r.type == 'Microsoft.Network/virtualNetworks' }
+               .select { |r| r.tags&.[]('cloudware_domain') }
           end
 
           def build_domain(resource)
