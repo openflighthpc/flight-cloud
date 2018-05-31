@@ -12,6 +12,10 @@ module Cloudware
           'azure'
         end
 
+        def resource_group_name
+          "domain-#{name}"
+        end
+
         private
 
         include Helpers::Client
@@ -30,15 +34,15 @@ module Cloudware
         end
 
         def resource_group
-          rg_name = "domain-#{name}"
           group = client.resource.model_classes.resource_group.new
           group.location = region
           group.tags = {
             cloudware_id: id,
-            cloudware_domain: rg_name,
+            cloudware_domain: name,
             region: region
           }
-          client.resource.resource_groups.create_or_update(rg_name, group)
+          client.resource.resource_groups
+                .create_or_update(resource_group_name, group)
         end
         memoize :resource_group
 
