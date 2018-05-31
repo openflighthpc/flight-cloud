@@ -29,11 +29,6 @@ module Cloudware
           raise InvalidAzureRequest, message
         end
 
-        def id
-          SecureRandom.uuid
-        end
-        memoize :id
-
         def resource_group
           rg_name = "domain-#{name}"
           group = client.resource.model_classes.resource_group.new

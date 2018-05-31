@@ -7,6 +7,7 @@ module Cloudware
         attr_accessor :name, :region, :networkcidr, :prisubnetcidr,
                       :template, :cluster_index,
                       :create_domain_already_exists_flag
+        attr_writer :id
 
         validates_presence_of :name, :region
         validates :name, format: { with: /\A[a-zA-Z0-9-]*\z/ }
@@ -18,6 +19,10 @@ module Cloudware
 
         def provider
           raise NotImplementedError
+        end
+
+        def id
+          @id ||= SecureRandom.uuid
         end
 
         private
