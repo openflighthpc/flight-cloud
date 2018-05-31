@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'azure_mgmt_resources'
-require 'azure_mgmt_compute'
-require 'azure_mgmt_network'
-
 module Cloudware
   module Providers
     module AZURE
