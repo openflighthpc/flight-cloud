@@ -7,6 +7,21 @@ module Cloudware
           extend Memoist
           include Client
 
+          def resource_group
+            group = client.resource.model_classes.resource_group.new
+            group.location = region
+            group.tags = {
+              cloudware_id: id,
+              cloudware_domain: name,
+              region: region
+            }
+            client.resource.resource_groups
+              .create_or_update(resource_group_name, group)
+          end
+          memoize :resource_group
+
+          private
+
           def run_create
             client.resource.deployments.create_or_update(
               resource_group.name, name, deployment_model

@@ -2,11 +2,13 @@ module Cloudware
   module Providers
     module AZURE
       class Machine < Base::Machine
-        delegate :resource_group, to: :domain
+        include Helpers::Deploy
 
         private
 
-        include Helpers::Deploy
+        def resource_group_name
+          domain.resource_group.name + '-machine-' + name
+        end
 
         def deployment_parameters
           {
