@@ -163,7 +163,7 @@
 					}
 				},
 				"osProfile": {
-					"computerName": "[concat(parameters('vmName'), '.pri.', parameters('cloudwareDomain'), '.alces.network')]",
+					"computerName": "[concat(parameters('vmName'), '.pri.', '.alces.network')]",
 					"adminUsername": "[variables('adminUsername')]",
 					"linuxConfiguration": {
 						"disablePasswordAuthentication": true,
