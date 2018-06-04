@@ -27,8 +27,7 @@ module Cloudware
         private
 
         def assign_machine_id
-          raise InternalError if id
-          self.id = SecureRandom.uuid
+          self.id = SecureRandom.uuid unless id
         end
 
         def machine_mappings
