@@ -4,13 +4,28 @@ module Cloudware
     module AZURE
       module Helpers
         class AzureClient
+          extend Memoist
+
           def resource
-            @resource ||= begin
-              Azure::Resources::Profiles::Latest::Mgmt::Client.new(
-                Cloudware.config.credentials.azure
-              )
-            end
+            Azure::Resources::Profiles::Latest::Mgmt::Client.new(
+              Cloudware.config.credentials.azure
+            )
           end
+          memoize :resource
+
+          def network
+            Azure::Network::Profiles::Latest::Mgmt::Client.new(
+              Cloudware.config.credentials.azure
+            )
+          end
+          memoize :network
+
+          def compute
+            Azure::Compute::Profiles::Latest::Mgmt::Client.new(
+              Cloudware.config.credentials.azure
+            )
+          end
+          memoize :compute
         end
 
         module Client

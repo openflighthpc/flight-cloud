@@ -35,6 +35,10 @@ module Cloudware
             raise InvalidAzureRequest, message
           end
 
+          def run_destroy
+            client.resource.resource_groups.delete(resource_group_name)
+          end
+
           def deployment_model
             client.resource.model_classes.deployment.new.tap do |deployment|
               deployment.properties = deployment_properties

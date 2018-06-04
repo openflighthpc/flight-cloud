@@ -5,6 +5,8 @@ module Cloudware
       class Machine < Base::Machine
         include DeployAWS
 
+        attr_accessor :state
+
         def power_on
           ec2.start_instances(
             instance_ids: [instance_id]

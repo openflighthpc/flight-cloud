@@ -5,7 +5,7 @@ module Cloudware
     module Base
       class Machine < Application
         attr_accessor :name, :type, :flavour, :domain, :role, :priip,
-                      :state, :extip, :instance_id, :id, :cluster_index
+                      :extip, :instance_id, :id, :cluster_index
         attr_writer :provider_type
 
         delegate :region, :provider, to: :domain
@@ -20,11 +20,14 @@ module Cloudware
           raise NotImplementedError
         end
 
+        def provider_type
+          @provider_type ||= machine_mappings[flavour][type]
+        end
+
         private
 
         def assign_machine_id
-          raise InternalError if id
-          self.id = SecureRandom.uuid
+          self.id = SecureRandom.uuid unless id
         end
 
         def machine_mappings
@@ -34,10 +37,6 @@ module Cloudware
           ))
         end
         memoize :machine_mappings
-
-        def provider_type
-          @provider_type ||= machine_mappings[flavour][type]
-        end
       end
     end
   end
