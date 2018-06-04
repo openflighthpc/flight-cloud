@@ -65,6 +65,17 @@ module Cloudware
           return unless create_domain_already_exists_flag
           errors.add(:domain, "error, '#{name}' already exists")
         end
+
+        def deploy_parameters
+          {
+            cloudwareDomain: name,
+            cloudwareId: id,
+            networkCidr: networkcidr,
+            priSubnetCidr: prisubnetcidr,
+          }.tap do |p|
+            p.merge(clusterIndex: cluster_index) if cluster_index
+          end
+        end
       end
     end
   end

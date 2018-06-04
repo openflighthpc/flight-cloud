@@ -25,17 +25,6 @@ module Cloudware
           @id ||= SecureRandom.uuid
         end
 
-        def deploy_parameters
-          {
-            cloudwareDomain: name,
-            cloudwareId: id,
-            networkCidr: networkcidr,
-            priSubnetCidr: prisubnetcidr,
-          }.tap do |p|
-            p.merge(clusterIndex: cluster_index) if cluster_index
-          end
-        end
-
         def deploy_template_content
           path = File.join(
             Cloudware.config.base_dir,
