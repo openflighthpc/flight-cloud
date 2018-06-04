@@ -39,7 +39,7 @@
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "name": "network",
+      "name": "[parameters('cloudwareDomain')]",
       "apiVersion": "2017-03-01",
       "tags": {
         "cloudware_id": "[parameters('cloudwareId')]",
