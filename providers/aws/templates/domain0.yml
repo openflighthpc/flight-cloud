@@ -105,7 +105,7 @@ Resources:
 
   RouteInternetGateway:
     Type: AWS::EC2::Route
-    DependsOn: InternetGateway
+    DependsOn: InternetGatewayAttachment
     Properties:
       RouteTableId: !Ref RouteTable
       DestinationCidrBlock: '0.0.0.0/0'
