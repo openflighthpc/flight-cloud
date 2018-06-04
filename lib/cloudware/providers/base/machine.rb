@@ -5,7 +5,7 @@ module Cloudware
     module Base
       class Machine < Application
         attr_accessor :name, :type, :flavour, :domain, :role, :priip,
-                      :state, :extip, :instance_id, :id, :cluster_index
+                      :extip, :instance_id, :id, :cluster_index
         attr_writer :provider_type
 
         delegate :region, :provider, to: :domain
