@@ -41,11 +41,12 @@ module Cloudware
 
           def build_machine(resource)
             tags = OpenStruct.new(resource.tags)
+            domain = domains.find do |d|
+              d.resource_group.name == tags.cloudware_domain
+            end
             Machine.build(
+              domain: domain,
               name: tags.cloudware_machine_name,
-              domain: domains.find do |d|
-                d.resource_group.name == tags.cloudware_domain
-              end,
               id: tags.cloudware_id,
               role: tags.cloudware_machine_role,
               priip: tags.cloudware_pri_ip,
