@@ -16,6 +16,16 @@ module Cloudware
            .sub(STATE_REGEX, '')
         end
 
+        def power_on
+          client.compute.virtual_machines.start(resource_group_name, name)
+        end
+
+        def power_off
+          client.compute.virtual_machines.power_off(
+            resource_group_name, name
+          )
+        end
+
         private
 
         include Helpers::Client
