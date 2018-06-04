@@ -46,6 +46,13 @@ Parameters:
     Type: String
     Description: 'Enter the VM flavour'
 
+  clusterIndex:
+    Type: Number
+    Description: 'Enter the cluster index'
+    Default: 1
+    MinValue: 1
+    MaxValue: 99
+
 Mappings:
   RegionMap:
     eu-west-1:
