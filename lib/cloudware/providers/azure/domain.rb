@@ -23,10 +23,6 @@ module Cloudware
           }
         end
 
-        def run_destroy
-          client.resource.resource_groups.delete(resource_group_name)
-        end
-
         def resource_group_name
           "alces-flightconnector-#{name}"
         end
