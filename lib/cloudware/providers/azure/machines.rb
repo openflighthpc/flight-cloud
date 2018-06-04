@@ -19,14 +19,14 @@ module Cloudware
 
           private
 
+          include Helpers::Client
+
+          attr_reader :region
+
           def domains
             Domains.by_region(region)
           end
           memoize :domains
-
-          include Helpers::Client
-
-          attr_reader :region
 
           def resources
             client.resource.resources.list.select do |r|
@@ -38,6 +38,11 @@ module Cloudware
             end
           end
           memoize :resources
+
+          def public_ipaddresses
+            client.network.public_ipaddresses.list_all
+          end
+          memoize :public_ipaddresses
 
           def build_machine(resource)
             tags = OpenStruct.new(resource.tags)
