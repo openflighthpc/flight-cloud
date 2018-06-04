@@ -20,6 +20,10 @@ module Cloudware
           raise NotImplementedError
         end
 
+        def provider_type
+          @provider_type ||= machine_mappings[flavour][type]
+        end
+
         private
 
         def assign_machine_id
@@ -34,10 +38,6 @@ module Cloudware
           ))
         end
         memoize :machine_mappings
-
-        def provider_type
-          @provider_type ||= machine_mappings[flavour][type]
-        end
       end
     end
   end
