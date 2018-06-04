@@ -19,6 +19,13 @@ module Cloudware
             )
           end
           memoize :network
+
+          def compute
+            Azure::Compute::Profiles::Latest::Mgmt::Client.new(
+              Cloudware.config.credentials.azure
+            )
+          end
+          memoize :compute
         end
 
         module Client
