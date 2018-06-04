@@ -26,14 +26,11 @@ require 'terminal-table'
 require 'whirly'
 require 'exceptions'
 require 'command'
-require 'models/application'
 
 require 'require_all'
+require 'providers'
 require_all 'lib/cloudware/commands/concerns/**/*.rb'
 require_all 'lib/cloudware/commands/**/*.rb'
-require_all 'lib/cloudware/models/**/*.rb'
-
-require 'providers'
 
 module Cloudware
   class CLI
@@ -44,6 +41,8 @@ module Cloudware
     program :name, 'flightconnector'
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
+
+    global_option('--debug', 'Enables the development mode')
 
     suppress_trace_class UserError
 

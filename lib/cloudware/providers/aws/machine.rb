@@ -5,10 +5,6 @@ module Cloudware
       class Machine < Base::Machine
         include DeployAWS
 
-        def create
-          deploy_aws
-        end
-
         def power_on
           ec2.start_instances(
             instance_ids: [instance_id]
@@ -23,19 +19,15 @@ module Cloudware
 
         private
 
+        def run_create
+          deploy_aws
+        end
+
         def ec2
           @ec2 ||= Aws::EC2::Client.new(
             credentials: Cloudware.config.credentials.aws,
             region: region
           )
-        end
-
-        def aws_type
-          provider_type || machine_mappings[flavour][type]
-        end
-
-        def id
-          @id ||= SecureRandom.uuid
         end
 
         def deploy_parameters
@@ -47,7 +39,7 @@ module Cloudware
             { parameter_key: 'cloudwareId', parameter_value: id },
             { parameter_key: 'priIp', parameter_value: priip },
             { parameter_key: 'vmRole', parameter_value: role },
-            { parameter_key: 'vmType', parameter_value: aws_type },
+            { parameter_key: 'vmType', parameter_value: provider_type },
             { parameter_key: 'vmName', parameter_value: name },
             {
               parameter_key: 'networkId',
@@ -78,13 +70,6 @@ module Cloudware
             "providers/aws/templates/machine-#{role}.yml"
           )
           File.read(path)
-        end
-
-        def machine_mappings
-          @machine_mappings ||= YAML.load_file(File.join(
-            Cloudware.config.base_dir,
-              "providers/aws/mappings/machine_types.yml"
-          ))
         end
       end
     end

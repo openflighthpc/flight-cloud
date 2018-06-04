@@ -36,6 +36,7 @@ GEM
       ms_rest_azure (~> 0.9.0)
     azure_mgmt_resources (0.15.1)
       ms_rest_azure (~> 0.9.0)
+    byebug (10.0.2)
     coderay (1.1.2)
     colorize (0.8.1)
     concurrent-ruby (1.0.5)
@@ -112,6 +113,9 @@ GEM
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
+    pry-byebug (3.6.0)
+      byebug (~> 10.0)
+      pry (~> 0.10)
     public_suffix (3.0.1)
     rainbow (3.0.0)
     representable (3.0.4)
@@ -180,7 +184,9 @@ DEPENDENCIES
   factory_bot
   google-cloud-resource_manager
   ipaddr
+  memoist
   pry
+  pry-byebug
   require_all
   rspec
   rspec-wait
@@ -190,4 +196,4 @@ DEPENDENCIES
   whirly
 
 BUNDLED WITH
-   1.16.1
+   1.16.2

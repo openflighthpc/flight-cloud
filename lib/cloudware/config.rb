@@ -57,7 +57,8 @@ module Cloudware
 
     def credentials
       @credentials = OpenStruct.new(
-        aws: Aws::Credentials.new(aws.access_key_id, aws.secret_access_key)
+        aws: Aws::Credentials.new(aws.access_key_id, aws.secret_access_key),
+        azure: build_azure_credentials
       )
     end
 
@@ -69,6 +70,20 @@ module Cloudware
 
     def config_path
       File.expand_path('~/.flightconnector.yml')
+    end
+
+    def build_azure_credentials
+      provider = MsRestAzure::ApplicationTokenProvider.new(
+        azure.tenant_id, azure.client_id, azure.client_secret
+      )
+      token = MsRest::TokenCredentials.new(provider)
+      {
+        credentials: token,
+        subscription_id: azure.subscription_id,
+        tenant_id: azure.tenant_id,
+        client_id: azure.client_id,
+        client_secret: azure.client_secret
+      }
     end
   end
 end

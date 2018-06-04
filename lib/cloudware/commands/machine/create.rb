@@ -6,7 +6,7 @@ module Cloudware
       class Create < Command
         def run
           run_whirly('Creating new deployment') do
-            Cloudware::Models::Machine.build(
+            Providers.select(domain.provider)::Machine.build(
               domain: domain,
               name: name,
               type: options.type,

@@ -3,18 +3,14 @@
 module Cloudware
   module Providers
     module Base
-      class Machine
-        def initialize(machine_model)
-          @machine_model = machine_model
-        end
+      class Machine < Application
+        attr_accessor :name, :type, :flavour, :domain, :role, :priip,
+                      :state, :extip, :instance_id, :id, :cluster_index
+        attr_writer :provider_type
 
-        def create
-          raise NotImplementedError
-        end
+        delegate :region, :provider, to: :domain
 
-        def destroy
-          raise NotImplementedError
-        end
+        before_create :assign_machine_id
 
         def power_on
           raise NotImplementedError
@@ -26,9 +22,22 @@ module Cloudware
 
         private
 
-        attr_reader :machine_model
+        def assign_machine_id
+          raise InternalError if id
+          self.id = SecureRandom.uuid
+        end
 
-        delegate(*Models::Machine.delegate_attributes, to: :machine_model)
+        def machine_mappings
+          YAML.load_file(File.join(
+            Cloudware.config.base_dir,
+            "providers/#{provider}/mappings/machine_types.yml"
+          ))
+        end
+        memoize :machine_mappings
+
+        def provider_type
+          @provider_type ||= machine_mappings[flavour][type]
+        end
       end
     end
   end

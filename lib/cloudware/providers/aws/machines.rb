@@ -24,7 +24,7 @@ module Cloudware
 
           def build_machine(instance)
             tags = tags_structs(instance.tags)
-            Models::Machine.build(
+            Machine.build(
               state: instance.state.name,
               extip: instance.public_ip_address,
               provider_type: instance.instance_type,
