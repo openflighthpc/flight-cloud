@@ -26,21 +26,13 @@ module Cloudware
         end
 
         def deploy_parameters
-          [
-            { parameter_key: 'cloudwareDomain', parameter_value: name },
-            { parameter_key: 'cloudwareId', parameter_value: id },
-            { parameter_key: 'networkCidr', parameter_value: networkcidr },
-            {
-              parameter_key: 'priSubnetCidr',
-              parameter_value: prisubnetcidr,
-            },
-          ].tap do |p|
-            if cluster_index
-              p << {
-                parameter_key: 'clusterIndex',
-                parameter_value: cluster_index,
-              }
-            end
+          {
+            cloudwareDomain: name,
+            cloudwareId: id,
+            networkCidr: networkcidr,
+            priSubnetCidr: prisubnetcidr,
+          }.tap do |p|
+            p.merge(clusterIndex: cluster_index) if cluster_index
           end
         end
 
