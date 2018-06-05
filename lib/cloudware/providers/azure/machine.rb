@@ -37,6 +37,7 @@ module Cloudware
         def deployment_parameters
           {
             # TODO: Dafaq? Fix this
+            cloudwareDomainGroup: domain.resource_group.name,
             cloudwareDomain: domain.resource_group.name,
             cloudwareId: id,
             vmName: name,
