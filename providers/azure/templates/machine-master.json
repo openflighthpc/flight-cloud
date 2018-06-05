@@ -5,6 +5,12 @@
     "cloudwareDomainGroup": {
       "type": "string",
       "metadata": {
+        "description": "Enter the Cloudware domain resource group name"
+      }
+    },
+    "cloudwareDomain": {
+      "type": "string",
+      "metadata": {
         "description": "Enter the Cloudware domain name"
       }
     },
