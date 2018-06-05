@@ -2,7 +2,7 @@
 	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
-		"cloudwareDomain": {
+		"cloudwareDomainGroup": {
 			"type": "string",
 			"metadata": {
 				"description": "Enter the Cloudware domain name"
@@ -51,7 +51,7 @@
 	"variables": {
 		"adminUsername": "alces",
 		"adminPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCK8fxlYAcZHfZ9Rhcl0IIcFAleztyMkBF6CxfcaqI6XO9WYhy/sawZXnOHlACjLfx1RuDu+kDvPT/lhxay7yrQt0g1HsTs3xwW6luZuLxPvCS7Zqi0AGqr/LC6OWUKodpNe8ZUPxCWx+JiyaRb9SD+PWqV0WPiZXTmgd9lRYfWuvMl24sNvK8VWWzWSr8q2+1yGNbyzoFC/NUfoMuFEPyb+XV3BIKNyacAM8gep+mrFxadV1ehZConzeoJSFavlJUiU76JMKkbJcfUeXFqTBk/W1mXpmYPw+JUZzsDM2RZD/Ef4LrhyxjtLVLelrIU5j4DN/7lMCsMf3tdfXbJ2+fp aws_ireland",
-		"priInterfaceName": "[concat(parameters('cloudwareDomain'), parameters('vmName'), 'pri')]",
+		"priInterfaceName": "[concat(parameters('cloudwareDomainGroup'), parameters('vmName'), 'pri')]",
 		"azureConfig": {
 			"imageSubscription": "[concat('/subscriptions/', 'd1e964ef-15c7-4b27-8113-e725167cee83', '/resourceGroups/alcesflight/providers/Microsoft.Compute/images/alces-flight-compute-1.0.0-beta')]"
 		}
@@ -61,7 +61,7 @@
 			"name": "[parameters('vmName')]",
 			"apiVersion": "2017-03-01",
 			"tags": {
-				"cloudware_domain": "[parameters('cloudwareDomain')]",
+				"cloudware_domain": "[parameters('cloudwareDomainGroup')]",
 				"cloudware_machine_name": "[parameters('vmName')]"
 			},
 			"location": "[resourceGroup().location]",
@@ -86,13 +86,13 @@
 			"name": "[variables('priInterfaceName')]",
 			"apiVersion": "2017-03-01",
 			"tags": {
-				"cloudware_domain": "[parameters('cloudwareDomain')]",
+				"cloudware_domain": "[parameters('cloudwareDomainGroup')]",
 				"cloudware_machine_name": "[parameters('vmName')]"
 			},
 			"location": "[resourceGroup().location]",
 			"properties": {
 				"ipConfigurations": [{
-					"name": "[concat(parameters('cloudwareDomain'), parameters('vmName'), '-pri')]",
+					"name": "[concat(parameters('cloudwareDomainGroup'), parameters('vmName'), '-pri')]",
 					"properties": {
 						"privateIPAllocationMethod": "Static",
 						"privateIPAddress": "[parameters('priSubnetIp')]",
@@ -100,7 +100,7 @@
 							"id": "[resourceId('Microsoft.Network/publicIpAddresses', parameters('vmName'))]"
 						},
 						"subnet": {
-							"id": "[resourceId(parameters('cloudwareDomain'), 'Microsoft.Network/virtualNetworks/subnets', 'network', 'pri')]"
+							"id": "[resourceId(parameters('cloudwareDomainGroup'), 'Microsoft.Network/virtualNetworks/subnets', 'network', 'pri')]"
 						}
 					}
 				}],
@@ -117,7 +117,7 @@
 			"name": "[parameters('vmName')]",
 			"apiVersion": "2016-04-30-preview",
 			"tags": {
-				"cloudware_domain": "[parameters('cloudwareDomain')]",
+				"cloudware_domain": "[parameters('cloudwareDomainGroup')]",
 				"cloudware_id": "[parameters('cloudwareId')]",
 				"cloudware_machine_name": "[parameters('vmName')]",
 				"cloudware_machine_role": "loogin",
