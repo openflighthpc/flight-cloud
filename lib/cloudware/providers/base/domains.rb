@@ -10,6 +10,10 @@ module Cloudware
             new(domain_models_by_region(region))
           end
 
+          def all_regions
+            raise NotImplementedError
+          end
+
           private
 
           def domain_models_by_region(_region)

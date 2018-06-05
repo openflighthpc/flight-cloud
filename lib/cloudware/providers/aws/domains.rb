@@ -61,6 +61,13 @@ module Cloudware
         end
 
         class << self
+          def all_regions
+            all_domains = AWS.regions.map do |region|
+              Domains.by_region(region)
+            end
+            Domains.new(all_domains.flatten)
+          end
+
           private
 
           def domain_models_by_region(region)
