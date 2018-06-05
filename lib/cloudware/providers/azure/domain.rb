@@ -14,10 +14,6 @@ module Cloudware
 
         include Helpers::Client
 
-        def resource_group_name
-          "alces-flightconnector-#{name}"
-        end
-
         def template_path
           File.join(
             Cloudware.config.base_dir,

@@ -26,6 +26,10 @@ module Cloudware
 
         private
 
+        def resource_group_name
+          domain.resource_group.name + '-machine-' + name
+        end
+
         def assign_machine_id
           self.id = SecureRandom.uuid unless id
         end

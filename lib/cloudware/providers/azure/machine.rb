@@ -30,10 +30,6 @@ module Cloudware
 
         include Helpers::Client
 
-        def resource_group_name
-          domain.resource_group.name + '-machine-' + name
-        end
-
         def deployment_parameters
           super.merge(cloudwareDomainGroup: domain.resource_group.name)
         end

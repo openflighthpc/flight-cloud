@@ -27,6 +27,10 @@ module Cloudware
 
         private
 
+        def resource_group_name
+          "alces-flightconnector-#{name}"
+        end
+
         def validate_cloudware_domain_exists
           return true if Providers.find_domain(provider, region, name)
           errors.add(:domain, 'does not exist')
