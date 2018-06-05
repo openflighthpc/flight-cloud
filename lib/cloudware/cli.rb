@@ -69,6 +69,11 @@ module Cloudware
                      'Provider region to create domain in'
     end
 
+    def self.cluster_index_option(command)
+      command.option '--cluster-index INDEX', Integer,
+                     'Cluster index to be passed into the template'
+    end
+
     command :domain do |c|
       c.syntax = 'flightconnector domain [options]'
       c.description = 'Manage a domain'
@@ -88,8 +93,7 @@ module Cloudware
       c.option '--prisubnetcidr NAME',
                String, { default: '10.0.1.0/24' },
                'Pri subnet CIDR'
-      c.option '--cluster-index INDEX', String,
-               'Cluster index to be passed into the template'
+      cluster_index_option(c)
       c.option '-t', '--template TEMPLATE',
                String, { default: 'domain' },
                'Provider template to build the domain from'
@@ -138,8 +142,7 @@ module Cloudware
       c.option '--flavour NAME', String,
                { default: 'compute' },
                'Type of machine to deploy, e.g. gpu'
-      c.option '--cluster-index INDEX', String,
-               'Cluster index to be passed into the template'
+      cluster_index_option(c)
       c.hidden = true
       action(c, Commands::Machine::Create)
     end
