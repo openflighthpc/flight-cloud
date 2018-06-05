@@ -62,9 +62,9 @@ module Cloudware
 
         class << self
           def all_regions
-            all_domains = AWS.regions.map do |region|
-              Domains.by_region(region)
-            end
+            all_domains = Parallel.map(
+              AWS.regions, in_threads: AWS.regions.length
+            ) { |region| Domains.by_region(region) }
             Domains.new(all_domains.flatten)
           end
 
