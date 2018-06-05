@@ -37,6 +37,18 @@ module Cloudware
           ))
         end
         memoize :machine_mappings
+
+        # Base deploy parameters that all inherited classes should use
+        def deploy_parameters
+          {
+            cloudwareDomain: name,
+            cloudwareId: id,
+            vmName: name,
+            vmType: provider_type,
+            priIp: priip,
+            vmFlavour: flavour,
+          }
+        end
       end
     end
   end

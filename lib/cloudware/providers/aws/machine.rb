@@ -33,18 +33,12 @@ module Cloudware
         end
 
         def deploy_parameters
-          {
-            cloudwareDomain: domain.name,
-            cloudwareId: id,
-            priIp: priip,
+          super.merge(
             vmRole: role,
-            vmType: provider_type,
-            vmName: name,
             networkId: domain.network_id,
             priSubnetId: domain.prisubnet_id,
-            priSubnetCidr: domain.prisubnetcidr,
-            vmFlavour: flavour,
-          }.tap do |p|
+            priSubnetCidr: domain.prisubnetcidr
+          ).tap do |p|
             p.merge(clusterIndex: cluster_index) if cluster_index
           end
         end

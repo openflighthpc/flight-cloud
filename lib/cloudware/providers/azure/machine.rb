@@ -35,15 +35,7 @@ module Cloudware
         end
 
         def deployment_parameters
-          {
-            cloudwareDomainGroup: domain.resource_group.name,
-            cloudwareDomain: name,
-            cloudwareId: id,
-            vmName: name,
-            vmType: provider_type,
-            priIp: priip,
-            vmFlavour: flavour,
-          }
+          super.merge(cloudwareDomainGroup: domain.resource_group.name)
         end
 
         def template_path
