@@ -41,7 +41,7 @@ module Cloudware
         # Base deploy parameters that all inherited classes should use
         def deployment_parameters
           {
-            cloudwareDomain: name,
+            cloudwareDomain: domain.name,
             cloudwareId: id,
             vmName: name,
             vmType: provider_type,
