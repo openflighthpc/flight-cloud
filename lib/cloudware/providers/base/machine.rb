@@ -39,7 +39,7 @@ module Cloudware
         memoize :machine_mappings
 
         # Base deploy parameters that all inherited classes should use
-        def deploy_parameters
+        def deployment_parameters
           {
             cloudwareDomain: name,
             cloudwareId: id,

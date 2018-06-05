@@ -32,7 +32,7 @@ module Cloudware
           )
         end
 
-        def deploy_parameters
+        def deployment_parameters
           super.merge(
             vmRole: role,
             networkId: domain.network_id,

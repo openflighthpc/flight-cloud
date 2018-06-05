@@ -66,7 +66,7 @@ module Cloudware
           errors.add(:domain, "error, '#{name}' already exists")
         end
 
-        def deploy_parameters
+        def deployment_parameters
           {
             cloudwareDomain: name,
             cloudwareId: id,
