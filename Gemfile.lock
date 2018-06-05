@@ -185,6 +185,7 @@ DEPENDENCIES
   google-cloud-resource_manager
   ipaddr
   memoist
+  parallel
   pry
   pry-byebug
   require_all
