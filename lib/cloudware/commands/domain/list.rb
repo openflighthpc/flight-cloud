@@ -5,7 +5,6 @@ module Cloudware
     module Domain
       class List < Command
         def run
-          rows = create_domain_rows
           table = Terminal::Table.new headings: headers, rows: rows
           puts table
         end
@@ -42,7 +41,7 @@ module Cloudware
           end
         end
 
-        def create_domain_rows
+        def rows
           domains.reduce([]) do |memo, domain|
             memo << [
               domain.name,
