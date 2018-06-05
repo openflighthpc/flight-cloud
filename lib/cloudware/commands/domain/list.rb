@@ -5,9 +5,7 @@ module Cloudware
     module Domain
       class List < Command
         def run
-          rows = search_regions.reduce([]) do |memo, region|
-            add_domain_rows_in_region(memo, options.provider, region)
-          end
+          rows = create_domain_rows
           table = Terminal::Table.new headings: headers, rows: rows
           puts table
         end
@@ -35,10 +33,17 @@ module Cloudware
           end
         end
 
-        def add_domain_rows_in_region(current_rows, provider, region)
-          Providers.select(provider)::Domains
-            .by_region(region)
-            .reduce(current_rows) do |memo, domain|
+        def domains
+          domains_class = Providers.select(options.provider)::Domains
+          if options.all_regions
+            domains_class.all_regions
+          else
+            domains_class.by_region(options.region)
+          end
+        end
+
+        def create_domain_rows
+          domains.reduce([]) do |memo, domain|
             memo << [
               domain.name,
               domain.networkcidr,
