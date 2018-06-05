@@ -48,7 +48,7 @@ module Cloudware
             priIp: priip,
             vmFlavour: flavour,
           }.tap do |p|
-            p.merge(clusterIndex: cluster_index) if cluster_index
+            p.merge!(clusterIndex: cluster_index) if cluster_index
           end
         end
       end
