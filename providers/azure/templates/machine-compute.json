@@ -102,9 +102,6 @@
           "properties": {
             "privateIPAllocationMethod": "Static",
             "privateIPAddress": "[parameters('priIp')]",
-            "publicIPAddress": {
-              "id": "[resourceId('Microsoft.Network/publicIpAddresses', parameters('vmName'))]"
-            },
             "subnet": {
               "id": "[resourceId(parameters('cloudwareDomainGroup'), 'Microsoft.Network/virtualNetworks/subnets', 'network', 'pri')]"
             }
