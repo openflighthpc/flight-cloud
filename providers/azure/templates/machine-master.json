@@ -38,7 +38,7 @@
         "description": "Choose the VM flavour"
       }
     },
-    "priSubnetIp": {
+    "priIp": {
       "type": "string",
       "metadata": {
         "description": "Enter the desired pri subnet IP address"
@@ -109,7 +109,7 @@
         "name": "[concat(parameters('cloudwareDomainGroup'), parameters('vmName'), '-pri')]",
         "properties": {
           "privateIPAllocationMethod": "Static",
-          "privateIPAddress": "[parameters('priSubnetIp')]",
+          "privateIPAddress": "[parameters('priIp')]",
           "publicIPAddress": {
             "id": "[resourceId('Microsoft.Network/publicIpAddresses', parameters('vmName'))]"
           },
@@ -138,7 +138,7 @@
       "cloudware_machine_type": "[parameters('vmType')]",
       "cloudware_machine_flavour": "[parameters('vmFlavour')]",
       "cloudware_resource_type": "machine",
-      "cloudware_pri_ip": "[parameters('priSubnetIp')]"
+      "cloudware_pri_ip": "[parameters('priIp')]"
     },
     "location": "[resourceGroup().location]",
     "properties": {

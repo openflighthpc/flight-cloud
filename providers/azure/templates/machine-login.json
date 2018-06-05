@@ -39,7 +39,7 @@
         "description": "Choose the VM flavour"
       }
     },
-    "priSubnetIp": {
+    "priIp": {
       "type": "string",
       "defaultValue": "10.100.1.10",
       "metadata": {

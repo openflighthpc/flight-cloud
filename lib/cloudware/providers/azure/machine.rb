@@ -41,7 +41,7 @@ module Cloudware
             cloudwareId: id,
             vmName: name,
             vmType: provider_type,
-            priSubnetIp: priip,
+            priIp: priip,
             vmFlavour: flavour,
           }
         end
