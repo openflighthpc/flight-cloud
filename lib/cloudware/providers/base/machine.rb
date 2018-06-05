@@ -24,11 +24,11 @@ module Cloudware
           @provider_type ||= machine_mappings[flavour][type]
         end
 
-        private
-
         def resource_group_name
-          domain.resource_group.name + '-machine-' + name
+          domain.resource_group_name + '-machine-' + name
         end
+
+        private
 
         def assign_machine_id
           self.id = SecureRandom.uuid unless id

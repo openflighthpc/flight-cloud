@@ -25,11 +25,11 @@ module Cloudware
           @id ||= SecureRandom.uuid
         end
 
-        private
-
         def resource_group_name
           "alces-flightconnector-#{name}"
         end
+
+        private
 
         def validate_cloudware_domain_exists
           return true if Providers.find_domain(provider, region, name)
