@@ -29,9 +29,11 @@ module Cloudware
 
         # This methods allows the parameters to be defined as a hash then
         # converted to the syntax required by aws
+        # AWS does not play well with non-string inputs. Instead all values
+        # are passed as strings which can then be converted in the template
         def convert_deployment_parameters_to_aws_syntax
           deployment_parameters.map do |k, v|
-            { parameter_key: k.to_s , parameter_value: v }
+            { parameter_key: k.to_s , parameter_value: v.to_s }
           end
         end
       end
