@@ -5,19 +5,23 @@ module Cloudware
     module AWS
       module DeployAWS
         def run_destroy
-          cloud_formation.delete_stack(stack_name: name)
-          cloud_formation.wait_until(:stack_delete_complete, stack_name: name)
+          cloud_formation.delete_stack(stack_name: resource_group_name)
+          cloud_formation.wait_until(
+            :stack_delete_complete, stack_name: resource_group_name
+          )
         end
 
         private
 
         def deploy_aws
           cloud_formation.create_stack(
-            stack_name: name,
+            stack_name: resource_group_name,
             template_body: deploy_template_content,
             parameters: convert_deployment_parameters_to_aws_syntax
           )
-          cloud_formation.wait_until(:stack_create_complete, stack_name: name)
+          cloud_formation.wait_until(
+            :stack_create_complete, stack_name: resource_group_name
+          )
         end
 
         def cloud_formation
