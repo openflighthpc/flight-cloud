@@ -54,7 +54,7 @@ module Cloudware
 
         class << self
           def all_regions
-            Builder.new.domains
+            Domains.new(Builder.new.domains)
           end
 
           private
