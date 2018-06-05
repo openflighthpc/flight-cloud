@@ -11,14 +11,6 @@ module Cloudware
 
         private
 
-        def search_regions
-          if options.all_regions
-            Providers.select(options.provider).regions
-          else
-            Array.wrap(options.region)
-          end
-        end
-
         def headers
           [
             'Domain name'.bold,
