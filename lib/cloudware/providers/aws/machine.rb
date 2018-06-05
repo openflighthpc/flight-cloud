@@ -38,9 +38,7 @@ module Cloudware
             networkId: domain.network_id,
             priSubnetId: domain.prisubnet_id,
             priSubnetCidr: domain.prisubnetcidr
-          ).tap do |p|
-            p.merge(clusterIndex: cluster_index) if cluster_index
-          end
+          )
         end
 
         def deploy_template_content
