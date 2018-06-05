@@ -11,7 +11,7 @@ module Cloudware
           extend Memoist
           include Helpers::Client
 
-          def initialize(region)
+          def initialize(region = nil)
             @region ||= region
           end
 
@@ -25,9 +25,9 @@ module Cloudware
           attr_reader :region
 
           def resource_groups
-            client.resource.resource_groups.list.select do |rg|
-              rg.location == region
-            end
+            rgs = client.resource.resource_groups.list
+            return rgs unless region
+            rgs.select { |g| g.location == region }
           end
 
           def domain_resources
@@ -47,12 +47,16 @@ module Cloudware
               id: tags.id,
               networkcidr: tags.cloudware_network_cidr,
               prisubnetcidr: tags.cloudware_pri_subnet_cidr,
-              region: region
+              region: resource.location
             )
           end
         end
 
         class << self
+          def all_regions
+            Builder.new.domains
+          end
+
           private
 
           def domain_models_by_region(region)
