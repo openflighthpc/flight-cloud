@@ -26,7 +26,7 @@ module Cloudware
         end
 
         def resource_group_name
-          "alces-flightconnector-#{name}"
+          "alces-fc-#{name}"
         end
 
         private
