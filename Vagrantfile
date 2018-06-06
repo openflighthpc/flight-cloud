@@ -36,8 +36,15 @@ Vagrant.configure('2') do |config|
   config.vm.hostname = 'controller'
   config.vm.synced_folder '.', '/vagrant', disabled: true
   config.vm.synced_folder '.', $src_dir
+
+  # Copies your local flightconnector config into the 'vagrant' user's
+  # $HOME directory. This will be picked up by the provisioning script
+  # and moved into the 'root' user's $HOME directory. It is not possible
+  # to do this in a single step
   config.vm.provision 'file',
                       source: '~/.flightconnector.yml',
                       destination: '~/.flightconnector.yml'
+
+  # Provisions the VM with the above script
   config.vm.provision 'shell', inline: $script
 end
