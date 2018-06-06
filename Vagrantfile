@@ -5,8 +5,8 @@
 # INSTALLATION NOTES w/ VirtualBox
 #
 # The official "centos/7" box does not come with the drivers for Oracle
-# "Virtual Box Guest Additions". They will means needs to be installed
-# when the machine is being provisioned:
+# "Virtual Box Guest Additions". They need to be installed from a virtual
+# disk
 # https://wiki.centos.org/HowTos/Virtualization/VirtualBox/CentOSguest
 #
 # The above method in-short:
