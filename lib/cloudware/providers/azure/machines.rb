@@ -57,7 +57,7 @@ module Cloudware
               id: tags.cloudware_id,
               role: tags.cloudware_machine_role,
               priip: tags.cloudware_pri_ip,
-              extip: public_ip.ip_address,
+              extip: public_ip&.ip_address,
               provider_type: tags.cloudware_machine_type,
               flavour: tags.cloudware_machine_flavour
             )

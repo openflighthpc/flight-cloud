@@ -24,6 +24,10 @@ module Cloudware
           @provider_type ||= machine_mappings[flavour][type]
         end
 
+        def resource_group_name
+          domain.resource_group_name + '-machine-' + name
+        end
+
         private
 
         def assign_machine_id
@@ -37,6 +41,20 @@ module Cloudware
           ))
         end
         memoize :machine_mappings
+
+        # Base deploy parameters that all inherited classes should use
+        def deployment_parameters
+          {
+            cloudwareDomain: domain.name,
+            cloudwareId: id,
+            vmName: name,
+            vmType: provider_type,
+            priIp: priip,
+            vmFlavour: flavour,
+          }.tap do |p|
+            p.merge!(clusterIndex: cluster_index) if cluster_index
+          end
+        end
       end
     end
   end

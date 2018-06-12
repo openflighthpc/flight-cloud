@@ -41,6 +41,7 @@ require 'gcp'
 require 'config'
 require 'logger'
 require 'memoist'
+require 'parallel'
 
 module Cloudware
   class << self

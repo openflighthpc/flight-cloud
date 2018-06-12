@@ -33,9 +33,7 @@ module Cloudware
               id: tags.cloudware_id,
               role: tags.cloudware_machine_role,
               priip: tags.cloudware_pri_subnet_ip,
-              name: tags.public_send(
-                'aws:cloudformation:stack-name'
-              ),
+              name: tags.cloudware_machine_name,
               flavour: tags.cloudware_machine_flavour
             )
           end

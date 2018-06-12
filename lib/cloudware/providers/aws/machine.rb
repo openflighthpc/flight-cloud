@@ -32,38 +32,13 @@ module Cloudware
           )
         end
 
-        def deploy_parameters
-          [
-            {
-              parameter_key: 'cloudwareDomain',
-              parameter_value: domain.name
-            },
-            { parameter_key: 'cloudwareId', parameter_value: id },
-            { parameter_key: 'priIp', parameter_value: priip },
-            { parameter_key: 'vmRole', parameter_value: role },
-            { parameter_key: 'vmType', parameter_value: provider_type },
-            { parameter_key: 'vmName', parameter_value: name },
-            {
-              parameter_key: 'networkId',
-              parameter_value: domain.network_id
-            },
-            {
-              parameter_key: 'priSubnetId',
-              parameter_value: domain.prisubnet_id
-            },
-            {
-              parameter_key: 'priSubnetCidr',
-              parameter_value: domain.prisubnetcidr
-            },
-            { parameter_key: 'vmFlavour', parameter_value: flavour },
-          ].tap do |p|
-            if cluster_index
-              p << {
-                parameter_key: 'clusterIndex',
-                parameter_value: cluster_index,
-              }
-            end
-          end
+        def deployment_parameters
+          super.merge(
+            vmRole: role,
+            networkId: domain.network_id,
+            priSubnetId: domain.prisubnet_id,
+            priSubnetCidr: domain.prisubnetcidr
+          )
         end
 
         def deploy_template_content

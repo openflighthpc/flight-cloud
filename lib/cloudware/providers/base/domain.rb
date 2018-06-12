@@ -25,6 +25,10 @@ module Cloudware
           @id ||= SecureRandom.uuid
         end
 
+        def resource_group_name
+          "alces-fc-#{name}"
+        end
+
         private
 
         def validate_cloudware_domain_exists
@@ -64,6 +68,17 @@ module Cloudware
         def validate_domain_does_not_exist_on_create
           return unless create_domain_already_exists_flag
           errors.add(:domain, "error, '#{name}' already exists")
+        end
+
+        def deployment_parameters
+          {
+            cloudwareDomain: name,
+            cloudwareId: id,
+            networkCidr: networkcidr,
+            priSubnetCidr: prisubnetcidr,
+          }.tap do |p|
+            p.merge!(clusterIndex: cluster_index) if cluster_index
+          end
         end
       end
     end

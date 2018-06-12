@@ -18,7 +18,7 @@ module Cloudware
               t.add_row ['Domain name'.bold, m.domain.name]
               t.add_row ['Machine role'.bold, m.role]
               t.add_row ['Pri subnet IP'.bold, m.priip]
-              t.add_row ['External IP'.bold, m.extip]
+              t.add_row ['External IP'.bold, m.extip || 'n/a']
               t.add_row ['Machine state'.bold, m.state]
               t.add_row ['Machine type'.bold, m.provider_type]
               t.add_row ['Machine flavour'.bold, m.flavour]

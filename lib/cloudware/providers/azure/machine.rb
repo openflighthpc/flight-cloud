@@ -30,20 +30,8 @@ module Cloudware
 
         include Helpers::Client
 
-        def resource_group_name
-          domain.resource_group.name + '-machine-' + name
-        end
-
         def deployment_parameters
-          {
-            # TODO: Dafaq? Fix this
-            cloudwareDomain: domain.resource_group.name,
-            cloudwareId: id,
-            vmName: name,
-            vmType: provider_type,
-            priSubnetIp: priip,
-            vmFlavour: flavour,
-          }
+          super.merge(cloudwareDomainGroup: domain.resource_group.name)
         end
 
         def template_path
