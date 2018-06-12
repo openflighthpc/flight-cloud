@@ -103,7 +103,7 @@
             "privateIPAllocationMethod": "Static",
             "privateIPAddress": "[parameters('priIp')]",
             "subnet": {
-              "id": "[resourceId(parameters('cloudwareDomainGroup'), 'Microsoft.Network/virtualNetworks/subnets', 'network', 'pri')]"
+              "id": "[resourceId(parameters('cloudwareDomainGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('cloudwareDomain'), 'pri')]"
             }
           }
         }],

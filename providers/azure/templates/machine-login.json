@@ -123,7 +123,7 @@
             "id": "[resourceId('Microsoft.Network/publicIpAddresses', parameters('vmName'))]"
           },
           "subnet": {
-            "id": "[resourceId(parameters('cloudwareDomainGroup'), 'Microsoft.Network/virtualNetworks/subnets', 'network', 'pri')]"
+            "id": "[resourceId(parameters('cloudwareDomainGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('cloudwareDomain'), 'pri')]"
           }
         }
       }],
