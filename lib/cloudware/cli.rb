@@ -95,7 +95,7 @@ module Cloudware
                'Pri subnet CIDR'
       cluster_index_option(c)
       c.option '-t', '--template TEMPLATE',
-               String, { default: 'domain' },
+               String, { default: 'domain0' },
                'Provider template to build the domain from'
       c.hidden = true
       action(c, Commands::Domain::Create)
