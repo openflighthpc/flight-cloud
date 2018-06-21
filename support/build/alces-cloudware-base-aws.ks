@@ -3,9 +3,9 @@ reboot
 firewall --enabled --service=ssh
 firstboot --disable
 ignoredisk --only-use=vda
-keyboard --vckeymap=us --xlayouts='us'
-# System language
-lang en_US.UTF-8
+keyboard uk
+lang en_GB
+selinux --disabled
 repo --name "os" --baseurl="http://mirror.centos.org/centos/7/os/x86_64/" --cost=100
 repo --name "updates" --baseurl="http://mirror.centos.org/centos/7/updates/x86_64/" --cost=100
 repo --name "extras" --baseurl="http://mirror.centos.org/centos/7/extras/x86_64/" --cost=100
@@ -14,9 +14,8 @@ network  --bootproto=dhcp
 network  --hostname=localhost.localdomain
 # Root password
 rootpw --iscrypted thereisnopasswordanditslocked
-selinux --enforcing
 services --disabled="kdump" --enabled="network,sshd,rsyslog,chronyd"
-timezone UTC --isUtc
+timezone --utc Europe/London
 # Disk
 bootloader --append="console=tty0" --location=mbr --timeout=1 --boot-drive=vda
 zerombr
@@ -24,6 +23,11 @@ clearpart --all --initlabel
 part / --fstype="xfs" --ondisk=vda --size=4096 --grow
 
 %post --erroronfail
+set -x -v
+exec 1>/tmp/ks-post.log 2>&1
+#Do a yum update here as kernel updates don't work very well from a chroot
+yum -y update
+
 passwd -d root
 passwd -l root
 
@@ -129,6 +133,86 @@ mkdir -p /var/cache/yum
 
 # reorder console entries
 sed -i 's/console=tty0/console=tty0 console=ttyS0,115200n8/' /boot/grub2/grub.cfg
+
+# SFN - alces presets
+mkdir -p /etc/systemd/system-preset
+cat <<EOF > /etc/systemd/system-preset/00-alces-base.preset
+disable libvirtd.service
+disable NetworkManager.service
+disable firewalld.service
+EOF
+systemctl disable firewalld
+
+# SFN - cloudinit
+yum -y install cloud-init cloud-utils cloud-utils-growpart
+
+#Configure Cloudinit
+cat << EOF > /etc/cloud/cloud.cfg
+users:
+ - default
+disable_root: 1
+ssh_pwauth:   0
+locale_configfile: /etc/sysconfig/i18n
+mount_default_fields: [~, ~, 'auto', 'defaults,nofail', '0', '2']
+mounts:
+ - [ ephemeral0 ]
+ - [ swap ]
+resize_rootfs_tmp: /dev
+ssh_deletekeys:   0
+ssh_genkeytypes:  ~
+syslog_fix_perms: ~
+cloud_init_modules:
+ - migrator
+ - bootcmd
+ - growpart
+ - resizefs
+ - set_hostname
+ - update_hostname
+ - update_etc_hosts
+ - write-files
+ - rsyslog
+ - users-groups
+ - ssh
+cloud_config_modules:
+ - mounts
+ - locale
+ - set-passwords
+ - yum-add-repo
+ - package-update-upgrade-install
+ - timezone
+ - puppet
+ - chef
+ - salt-minion
+ - mcollective
+ - disable-ec2-metadata
+ - runcmd
+cloud_final_modules:
+ - rightscale_userdata
+ - scripts-per-once
+ - scripts-per-boot
+ - scripts-per-instance
+ - scripts-user
+ - ssh-authkey-fingerprints
+ - keys-to-console
+ - phone-home
+ - final-message
+system_info:
+  default_user:
+    name: alces
+    lock_passwd: true
+    gecos: Alces Administrator
+    groups: [wheel, adm, systemd-journal]
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    shell: /bin/bash
+  distro: rhel
+  paths:
+    cloud_dir: /var/lib/cloud
+    templates_dir: /etc/cloud/templates
+  ssh_svcname: sshd
+manage_etc_hosts: true
+preserve_hostname: false
+# vim:syntax=yaml
+EOF
 
 %end
 
