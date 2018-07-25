@@ -62,6 +62,12 @@ Resources:
       VpcId: !Ref networkId
       SecurityGroupIngress:
         -
+          IpProtocol: 'all'
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: '10.78.100.0/24'
+          Description: 'Allow all traffic for internal network'
+        -
           IpProtocol: 'tcp'
           FromPort: 22
           ToPort: 22
