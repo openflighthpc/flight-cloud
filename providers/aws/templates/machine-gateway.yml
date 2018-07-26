@@ -62,7 +62,7 @@ Resources:
       VpcId: !Ref networkId
       SecurityGroupIngress:
         -
-          IpProtocol: 'all'
+          IpProtocol: '-1'
           FromPort: 0
           ToPort: 65535
           CidrIp: '10.78.100.0/24'
