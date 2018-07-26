@@ -166,6 +166,9 @@ Resources:
                   - "-"
                   - Ref: cloudwareDomain
               - "\n"
+              - "runcmd:\n"
+              - "- [ sh, -c, 'curl https://raw.githubusercontent.com/alces-software/cloudware/develop/support/flightconnector/domain0-gateway.sh | /bin/bash' ]"
+
 
   publicIp:
     Type: AWS::EC2::EIP
