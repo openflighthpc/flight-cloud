@@ -160,6 +160,19 @@ Resources:
         -
           Key: 'cloudware_pri_subnet_ip'
           Value: !Join ['', ['10.100.', !Ref clusterIndex, '.10']]
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - ''
+            - - "#cloud-config\n"
+              - "hostname: login\n"
+              - "fqdn: login."
+              - Fn::Join:
+                - "."
+                - Fn::Split:
+                  - "-"
+                  - Ref: cloudwareDomain
+              - "\n"
 
   publicIp:
     Type: AWS::EC2::EIP

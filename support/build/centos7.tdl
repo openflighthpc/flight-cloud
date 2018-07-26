@@ -8,7 +8,7 @@
     <version>0</version>
     <arch>x86_64</arch>
     <install type='iso'>
-      <iso>http://mirror.ox.ac.uk/sites/mirror.centos.org/7/isos/x86_64/CentOS-7-x86_64-DVD-1708.iso</iso>
+      <iso>http://mirror.ox.ac.uk/sites/mirror.centos.org/7/isos/x86_64/CentOS-7-x86_64-DVD-1804.iso</iso>
     </install>
   </os>
   <description>CentOS 7 Base Install</description>
