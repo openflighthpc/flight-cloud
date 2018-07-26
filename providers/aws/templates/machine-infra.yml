@@ -1,0 +1,196 @@
+---
+Description: 'FlightConnector Infra Node Template'
+Parameters:
+  cloudwareId:
+    Type: String
+    Description: 'Enter the Cloudware UUID'
+
+  cloudwareDomain:
+    Type: String
+    Description: 'Enter the Cloudware domain name'
+
+  networkId:
+    Type: String
+    Description: 'Enter the VPC/network ID'
+
+  priSubnetId:
+    Type: String
+    Description: 'Enter the pri subnet ID'
+
+  priIp:
+    Type: String
+    Description: 'Enter the pri subnet IP'
+
+  priSubnetCidr:
+    Type: String
+    Description: 'Enter the pri subnet CIDR'
+
+  keyPairName:
+    Default: 'aws_ireland'
+    Type: String
+    Description: 'Select the AWS keypair to assign to the instance'
+
+  vmType:
+    Type: String
+    Description: 'Enter the size of the instance'
+
+  vmRole:
+    Type: String
+    Description: 'Enter the Cloudware instance type'
+
+  vmName:
+    Type: String
+    Description: 'Enter the desired instance name'
+
+  vmFlavour:
+    Type: String
+    Description: 'Enter the VM flavour'
+
+  clusterIndex:
+    Type: Number
+    Description: 'Enter the cluster index'
+    Default: 1
+    MinValue: 1
+    MaxValue: 99
+
+Mappings:
+  RegionMap:
+    eu-west-1:
+      "AMI": "ami-d266dfab"
+    eu-west-2:
+      "AMI": "ami-c5f11ea2"
+
+Resources:
+  securityGroupInfra:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Join ['-', [!Ref cloudwareDomain, 'infra01']]
+      GroupDescription: 'FlightConnector security group for infra node'
+      VpcId: !Ref networkId
+      SecurityGroupIngress:
+        -
+          IpProtocol: 'icmp'
+          FromPort: '8'
+          ToPort: '-1'
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow ping'
+      SecurityGroupEgress:
+        -
+          IpProtocol: '-1'
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow outbound internet access'
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', [!Ref cloudwareDomain, 'infra01']]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  securityGroupPri:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Join ['-', [!Ref cloudwareDomain, 'infra01', 'pri']]
+      GroupDescription: 'Cloudware security group for slave machine pri interface'
+      VpcId: !Ref networkId
+      SecurityGroupIngress:
+        -
+          IpProtocol: '-1'
+          CidrIp: !Ref priSubnetCidr
+          Description: 'Allow unrestricted access from the pri subnet'
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', [!Ref cloudwareDomain, 'infra01', 'pri']]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  priInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: !Join [' ', [!Ref cloudwareDomain, 'infra01', 'pri network interface']]
+      GroupSet:
+        - !Ref securityGroupPri
+        - !Ref securityGroupInfra
+      PrivateIpAddress: !Ref priIp
+      SubnetId: !Ref priSubnetId
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', [!Ref cloudwareDomain, 'infra01', 'pri']]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  Infra:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !FindInMap ["RegionMap", !Ref "AWS::Region", "AMI"]
+      InstanceType: !Ref vmType
+      Monitoring: true
+      KeyName: !Ref keyPairName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref priInterface
+          DeviceIndex: 0
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', [!Ref cloudwareDomain, 'infra01']]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+        -
+          Key: 'cloudware_machine_role'
+          Value: !Ref vmRole
+        -
+          Key: 'cloudware_machine_name'
+          Value: 'infra01'
+        -
+          Key: 'cloudware_machine_flavour'
+          Value: !Ref vmFlavour
+        -
+          Key: 'cloudware_pri_subnet_ip'
+          Value: !Ref priIp
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - ''
+            - - "#cloud-config\n"
+              - "hostname: infra01\n"
+              - Fn::Join:
+                - ''
+                - - "fqdn: infra01."
+                  - Fn::Join:
+                    - "."
+                    - Fn::Split:
+                      - "-"
+                      - Ref: cloudwareDomain
+              - "\n"
+              - "users:\n"
+              - "  - default\n"
+              - "  - name: ipaadmin\n"
+              - "    groups: [ wheel ]\n"
+              - "    sudo: ['ALL=(ALL) NOPASSWD:ALL']\n"
+              - "    shell: /bin/bash\n"
+              - "runcmd:\n"
+              - "- [ sh, -c, 'ip route replace default via 10.78.100.10 dev eth0' ]\n"
+              - "- [ sh, -c, 'curl https://s3-eu-west-1.amazonaws.com/flightconnector/directory/resources/infra01-setup.sh |/bin/bash' ]"
