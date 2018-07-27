@@ -193,4 +193,5 @@ Resources:
               - "    shell: /bin/bash\n"
               - "runcmd:\n"
               - "- [ sh, -c, 'ip route replace default via 10.78.100.10 dev eth0' ]\n"
-              - "- [ sh, -c, 'curl https://s3-eu-west-1.amazonaws.com/flightconnector/directory/resources/infra01-setup.sh |/bin/bash' ]"
+              - "- [ sh, -c, 'echo default via 10.78.100.10 dev eth0 > /etc/sysconfig/network-scripts/route-eth0' ]\n"
+              - "- [ sh, -c, 'curl https://s3-eu-west-1.amazonaws.com/flightconnector/directory/resources/infra01-setup.sh |/bin/bash' ]\n"
