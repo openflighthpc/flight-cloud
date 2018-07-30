@@ -240,6 +240,11 @@ firewall-cmd --add-port 2005/tcp --zone external --permanent
 
 firewall-cmd --set-target=ACCEPT --zone cluster0 --permanent
 
+# Rules for forwarding infra01 userware SSH for Flight Center console
+firewall-cmd --zone=external --add-forward-port=port=2222:proto=tcp:toport=22:toaddr=10.78.100.51 --permanent
+firewall-cmd --zone=external --add-port=2222/tcp --permanent
+firewall-cmd --reload
+
 sed '/^ZONE=/{h;s/=.*/=external/};${x;/^$/{s//ZONE=external/;H};x}' /etc/sysconfig/network-scripts/ifcfg-eth0 -i
 
 echo "Please reboot"

@@ -1,5 +1,5 @@
 ---
-Description: 'FlightConnector Gateway Node Template'
+Description: 'FlightConnector Infra Node Template'
 Parameters:
   cloudwareId:
     Type: String
@@ -17,6 +17,14 @@ Parameters:
     Type: String
     Description: 'Enter the pri subnet ID'
 
+  priIp:
+    Type: String
+    Description: 'Enter the pri subnet IP'
+
+  priSubnetCidr:
+    Type: String
+    Description: 'Enter the pri subnet CIDR'
+
   keyPairName:
     Default: 'aws_ireland'
     Type: String
@@ -30,21 +38,20 @@ Parameters:
     Type: String
     Description: 'Enter the Cloudware instance type'
 
-  vmFlavour:
-    Type: String
-    Description: 'Enter the VM flavour'
-
   vmName:
     Type: String
     Description: 'Enter the desired instance name'
 
-  priIp:
+  vmFlavour:
     Type: String
-    Description: 'Enter the pri subnet IP'
+    Description: 'Enter the VM flavour'
 
-  priSubnetCidr:
-    Type: String
-    Description: 'Enter the pri subnet CIDR'
+  clusterIndex:
+    Type: Number
+    Description: 'Enter the cluster index'
+    Default: 1
+    MinValue: 1
+    MaxValue: 99
 
 Mappings:
   RegionMap:
@@ -54,43 +61,19 @@ Mappings:
       "AMI": "ami-c5f11ea2"
 
 Resources:
-  securityGroupGateway:
+  securityGroupInfra:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Join ['-', [!Ref cloudwareDomain, 'gateway']]
-      GroupDescription: 'Flight Connector Gateway'
+      GroupName: !Join ['-', [!Ref cloudwareDomain, 'infra01']]
+      GroupDescription: 'FlightConnector security group for infra node'
       VpcId: !Ref networkId
       SecurityGroupIngress:
-        -
-          IpProtocol: '-1'
-          FromPort: 0
-          ToPort: 65535
-          CidrIp: '10.78.100.0/24'
-          Description: 'Allow all traffic for internal network'
-        -
-          IpProtocol: 'tcp'
-          FromPort: 22
-          ToPort: 22
-          CidrIp: '0.0.0.0/0'
-          Description: 'Allow inbound SSH access'
         -
           IpProtocol: 'icmp'
           FromPort: '8'
           ToPort: '-1'
           CidrIp: '0.0.0.0/0'
           Description: 'Allow ping'
-        - 
-          IpProtocol: 'tcp'
-          FromPort: 2005
-          ToPort: 2005
-          CidrIp: '0.0.0.0/0'
-          Description: 'Allow inbound cluster VPN access'
-        -
-          IpProtocol: 'tcp'
-          FromPort: 2222
-          ToPort: 2222
-          CidrIp: '0.0.0.0/0'
-          Description: 'Allow port forward for FlightCenter Console support'
       SecurityGroupEgress:
         -
           IpProtocol: '-1'
@@ -101,7 +84,29 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', [!Ref cloudwareDomain, 'gateway']]
+          Value: !Join ['-', [!Ref cloudwareDomain, 'infra01']]
+        -
+          Key: 'cloudware_id'
+          Value: !Ref cloudwareId
+        -
+          Key: 'cloudware_domain'
+          Value: !Ref cloudwareDomain
+
+  securityGroupPri:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Join ['-', [!Ref cloudwareDomain, 'infra01', 'pri']]
+      GroupDescription: 'Cloudware security group for slave machine pri interface'
+      VpcId: !Ref networkId
+      SecurityGroupIngress:
+        -
+          IpProtocol: '-1'
+          CidrIp: !Ref priSubnetCidr
+          Description: 'Allow unrestricted access from the pri subnet'
+      Tags:
+        -
+          Key: 'Name'
+          Value: !Join ['-', [!Ref cloudwareDomain, 'infra01', 'pri']]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -112,16 +117,16 @@ Resources:
   priInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
-      Description: !Join [' ', [!Ref cloudwareDomain, 'gateway', 'pri network interface']]
-      SourceDestCheck: false
+      Description: !Join [' ', [!Ref cloudwareDomain, 'infra01', 'pri network interface']]
       GroupSet:
-        - !Ref securityGroupGateway
-      PrivateIpAddress: 10.78.100.10
+        - !Ref securityGroupPri
+        - !Ref securityGroupInfra
+      PrivateIpAddress: !Ref priIp
       SubnetId: !Ref priSubnetId
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', [!Ref cloudwareDomain, 'gateway', 'pri']]
+          Value: !Join ['-', [!Ref cloudwareDomain, 'infra01', 'pri']]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -129,7 +134,7 @@ Resources:
           Key: 'cloudware_domain'
           Value: !Ref cloudwareDomain
 
-  master:
+  Infra:
     Type: AWS::EC2::Instance
     Properties:
       AvailabilityZone: !Select
@@ -146,7 +151,7 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: !Join ['-', [!Ref cloudwareDomain, !Ref vmName]]
+          Value: !Join ['-', [!Ref cloudwareDomain, 'infra01']]
         -
           Key: 'cloudware_id'
           Value: !Ref cloudwareId
@@ -158,37 +163,35 @@ Resources:
           Value: !Ref vmRole
         -
           Key: 'cloudware_machine_name'
-          Value: !Ref vmName
+          Value: 'infra01'
         -
           Key: 'cloudware_machine_flavour'
           Value: !Ref vmFlavour
         -
           Key: 'cloudware_pri_subnet_ip'
-          Value: 10.78.100.10
+          Value: !Ref priIp
       UserData:
         Fn::Base64:
           Fn::Join:
             - ''
             - - "#cloud-config\n"
-              - "hostname: gateway\n"
-              - "fqdn: gateway."
+              - "hostname: infra01\n"
               - Fn::Join:
-                - "."
-                - Fn::Split:
-                  - "-"
-                  - Ref: cloudwareDomain
+                - ''
+                - - "fqdn: infra01."
+                  - Fn::Join:
+                    - "."
+                    - Fn::Split:
+                      - "-"
+                      - Ref: cloudwareDomain
               - "\n"
+              - "users:\n"
+              - "  - default\n"
+              - "  - name: ipaadmin\n"
+              - "    groups: [ wheel ]\n"
+              - "    sudo: ['ALL=(ALL) NOPASSWD:ALL']\n"
+              - "    shell: /bin/bash\n"
               - "runcmd:\n"
-              - "- [ sh, -c, 'curl https://raw.githubusercontent.com/alces-software/cloudware/develop/support/flightconnector/domain0-gateway.sh | /bin/bash' ]"
-
-
-  publicIp:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-
-  publicIpAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      NetworkInterfaceId: !Ref priInterface
-      AllocationId: !GetAtt publicIp.AllocationId
+              - "- [ sh, -c, 'ip route replace default via 10.78.100.10 dev eth0' ]\n"
+              - "- [ sh, -c, 'echo default via 10.78.100.10 dev eth0 > /etc/sysconfig/network-scripts/route-eth0' ]\n"
+              - "- [ sh, -c, 'curl https://s3-eu-west-1.amazonaws.com/flightconnector/directory/resources/infra01-setup.sh |/bin/bash' ]\n"
