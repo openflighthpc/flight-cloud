@@ -85,6 +85,12 @@ Resources:
           ToPort: 2005
           CidrIp: '0.0.0.0/0'
           Description: 'Allow inbound cluster VPN access'
+        -
+          IpProtocol: 'tcp'
+          FromPort: 2222
+          ToPort: 2222
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow port forward for FlightCenter Console support'
       SecurityGroupEgress:
         -
           IpProtocol: '-1'
