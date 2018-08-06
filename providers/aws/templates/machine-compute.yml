@@ -192,3 +192,5 @@ Resources:
                       - Ref: cloudwareDomain
                   - "\n"
               - "\n"
+            - "runcmd:\n"
+            - "- [ sh, -c, 'systemctl disable cloud-init' ]\n"

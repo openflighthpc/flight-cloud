@@ -191,6 +191,8 @@ Resources:
                   - "-"
                   - Ref: cloudwareDomain
               - "\n"
+            - "runcmd:\n"
+            - "- [ sh, -c, 'systemctl disable cloud-init' ]\n"
 
   publicIp:
     Type: AWS::EC2::EIP
