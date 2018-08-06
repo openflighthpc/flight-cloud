@@ -179,7 +179,6 @@ Resources:
                   - Ref: cloudwareDomain
               - "\n"
               - "runcmd:\n"
-              - "- [ sh, -c, 'curl https://raw.githubusercontent.com/alces-software/cloudware/dev/everyware/support/flightconnector/domain0-gateway.sh | /bin/bash' ]\n"
               - "- [ sh, -c, 'systemctl disable cloud-init' ]\n"
               - "users:\n"
               - "  - default\n"
