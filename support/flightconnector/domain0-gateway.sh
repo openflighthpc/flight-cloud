@@ -1,3 +1,48 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+exec 1>/tmp/cloudware-gateway-setup-output 2>&1
+
+#################
+# PREREQUISITES #
+#################
+yum install -y syslinux git
+
+########
+# VARS #
+########
+
+# Software
+everyware_CLOUDWARE_VERSION="${everyware_CLOUDWARE_VERSION:-dev/everyware}"
+everyware_METALWARE_VERSION="${everyware_METALWARE_VERSION:-2018.3.0-rc2}"
+
+
+# VPN Specific
+# everyware_VPN_CLUSTERS="${everyware_VPN_CLUSTERS:-cluster1 cluster2 cluster3 cluster4 clusterX}" # Space separated list of clusters
+
+
+# Metalware Specific
+everyware_METALWARE_REPO="${everyware_METALWARE_REPO:-dev/everyware}"
+
+# IPA Specific
+everyware_IPA_PASSWORD="${everyware_IPA_PASSWORD:-MySecurePassword}"
+everyware_IPA_HOST="${everyware_IPA_HOST:-$(hostname -f)}"
+everyware_IPA_HOSTIP="${everyware_IPA_HOSTIP:-$(gethostip -d $(hostname))}"
+everyware_IPA_REALM="${everyware_IPA_REALM:-$(hostname -d |sed 's/^[^.]*.//g' |tr '[a-z]' '[A-Z]')}"
+everyware_IPA_DOMAIN="${everyware_IPA_DOMAIN:-$(hostname -d)}"
+everyware_IPA_DNS="${everyware_IPA_DNS:-$(grep nameserver -m 1 /etc/resolv.conf  |sed 's/nameserver //g')}"
+everyware_IPA_REVERSE="${everyware_IPA_REVERSE:-$(gethostip -d $(hostname) |awk -F. '{print $2"."$1}')}"
+
+
+echo "
+
+#####################
+# VPN Configuration #
+#####################
+
+"
 yum -y install epel-release
 yum -y install openvpn easy-rsa
 cp -pav /usr/share/easy-rsa/3.0.3 /etc/openvpn/easyrsa
@@ -241,5 +286,106 @@ firewall-cmd --add-port 2005/tcp --zone external --permanent
 firewall-cmd --set-target=ACCEPT --zone cluster0 --permanent
 
 sed '/^ZONE=/{h;s/=.*/=external/};${x;/^$/{s//ZONE=external/;H};x}' /etc/sysconfig/network-scripts/ifcfg-eth0 -i
+
+
+echo "
+
+###################
+# VPN HTTP SERVER #
+###################
+
+"
+firewall-cmd --add-port 80/tcp --zone external --permanent
+firewall-cmd --reload
+mkdir /var/www/html/vpn
+mv /root/install_cluster* /var/www/html/vpn
+
+cat << EOF > /etc/httpd/conf.d/vpn.conf
+<Directory /var/www/html/vpn/>
+    Options Indexes MultiViews FollowSymlinks
+    AllowOverride None
+    Require all granted
+    Order Allow,Deny
+    Allow from all
+    Allow from 127.0.0.1/8
+</Directory>
+Alias /vpn /var/www/html/vpn
+EOF
+
+
+
+
+echo "
+
+#############
+# CLOUDWARE #
+#############
+
+"
+curl -sL https://git.io/vbsTg | alces_OS=el7 alces_SOURCE_BRANCH=$everyware_CLOUDWARE_VERSION /bin/bash
+
+
+echo "
+
+#############
+# METALWARE #
+#############
+
+"
+curl -sL http://git.io/metalware-installer |alces_OS=el7 alces_SOURCE_BRANCH=$everyware_METALWARE_VERSION /bin/bash
+metal repo use https://github.com/alces-software/metalware-repo-base.git
+cd /var/lib/metalware/repo/
+git checkout $everyware_METALWARE_REPO
+mv plugins/* ../plugins/
+
+# Workaround for build errors
+mkdir -p /var/lib/tftpboot/pxelinux.cfg
+
+
+
+echo "
+
+##############
+# IPA SERVER #
+##############
+
+"
+
+# Install Userware
+git clone https://github.com/alces-software/userware /tmp/userware
+rsync -auv /tmp/userware/{directory,share} /opt/
+
+cd /opt/directory/cli
+make setup
+
+mkdir /opt/directory/etc
+echo "cw_ACCESS_fqdn=$(hostname -f)" > /opt/directory/etc/access.rc
+echo "IPAPASSWORD=$everyware_IPA_PASSWORD" > /opt/directory/etc/config
+
+mkdir -p /var/www/html/secure
+
+# Branding
+mkdir -p /opt/flight/bin
+cd /opt/flight/bin
+curl https://s3-eu-west-1.amazonaws.com/flightconnector/directory/resources/banner > banner
+chmod 755 banner
+
+cd /opt/directory/cli/bin
+curl https://s3-eu-west-1.amazonaws.com/flightconnector/directory/resources/sandbox-starter > sandbox-starter
+
+# IPA Admin User Config
+su - ipaadmin -c "ssh-keygen -f /home/ipaadmin/.ssh/id_rsa -N ''"
+cat << EOF > /home/ipaadmin/.ssh/authorized_keys
+command="/opt/directory/cli/bin/sandbox-starter",no-port-forwarding,no-x11-forwarding,no-agent-forwarding $(cat /home/ipaadmin/.ssh/id_rsa.pub)
+EOF
+chown ipaadmin:ipaadmin /home/ipaadmin/.ssh/authorized_keys
+chmod 600 /home/ipaadmin/.ssh/authorized_keys
+passwd -l ipaadmin
+
+echo 'AcceptEnv FC_*' >> /etc/ssh/sshd_config
+
+# IPA Server Install
+ipa-server-install -a $everyware_IPA_PASSWORD --hostname $everyware_IPA_HOST --ip-address=$everyware_IPA_HOSTIP -r "$everyware_IPA_REALM" -p $everyware_IPA_PASSWORD -n "$everyware_IPA_DOMAIN" --no-ntp --setup-dns --forwarder="$everyware_IPA_DNS" --reverse-zone="$everyware_IPA_REVERSE.in-addr.arpa." --ssh-trust-dns --unattended
+
 
 echo "Please reboot"
