@@ -69,6 +69,24 @@ Resources:
       VpcId: !Ref networkId
       SecurityGroupIngress:
         -
+          IpProtocol: '-1'
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: '10.78.100.0/24'
+          Description: 'Allow domain0 traffic'
+        -
+          IpProtocol: '-1'
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: '10.78.110.0/24'
+          Description: 'Allow flightconnector VPN traffic'
+        -
+          IpProtocol: '-1'
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: !Join ['', ['10.100.', !Ref clusterIndex, '.0/24']]
+          Description: 'Allow incoming traffic to cluster subnet'
+        -
           IpProtocol: 'tcp'
           FromPort: 22
           ToPort: 22
