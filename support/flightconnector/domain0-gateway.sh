@@ -384,6 +384,7 @@ passwd -l ipaadmin
 echo 'AcceptEnv FC_*' >> /etc/ssh/sshd_config
 
 # IPA Server Install
+yum -y install ipa-server bind bind-dyndb-ldap ipa-server-dns
 ipa-server-install -a $everyware_IPA_PASSWORD --hostname $everyware_IPA_HOST --ip-address=$everyware_IPA_HOSTIP -r "$everyware_IPA_REALM" -p $everyware_IPA_PASSWORD -n "$everyware_IPA_DOMAIN" --no-ntp --setup-dns --forwarder="$everyware_IPA_DNS" --reverse-zone="$everyware_IPA_REVERSE.in-addr.arpa." --ssh-trust-dns --unattended
 
 
