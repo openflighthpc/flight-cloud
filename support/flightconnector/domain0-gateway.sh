@@ -7,7 +7,7 @@ exec 1>/tmp/cloudware-gateway-setup-output 2>&1
 #################
 # PREREQUISITES #
 #################
-yum install -y syslinux git
+yum install -y syslinux git httpd
 
 ########
 # VARS #
