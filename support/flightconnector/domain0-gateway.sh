@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
 IFS=$'\n\t'
 
 exec 1>/tmp/cloudware-gateway-setup-output 2>&1
