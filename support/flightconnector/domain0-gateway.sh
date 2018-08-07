@@ -9,6 +9,12 @@ exec 1>/tmp/cloudware-gateway-setup-output 2>&1
 #################
 yum install -y syslinux git httpd
 
+firewall-cmd --add-service ldap --add-service ldaps --add-service kerberos\
+    --add-service kpasswd --add-service http --add-service https\
+    --add-service dns --add-service mountd --add-service nfs\
+    --add-service ntp --add-service syslog\
+    --zone external --permanent
+
 ########
 # VARS #
 ########
