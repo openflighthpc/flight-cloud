@@ -7,7 +7,9 @@ exec 1>/tmp/cloudware-gateway-setup-output 2>&1
 #################
 # PREREQUISITES #
 #################
-yum install -y syslinux git httpd
+yum install -y syslinux git httpd epel-release ipa-server bind bind-dyndb-ldap ipa-server-dns firefox
+yum install -y openvpn easy-rsa
+yum update -y
 
 firewall-cmd --add-service ldap --add-service ldaps --add-service kerberos\
     --add-service kpasswd --add-service http --add-service https\
@@ -54,8 +56,6 @@ echo "
 #####################
 
 "
-yum -y install epel-release
-yum -y install openvpn easy-rsa
 cp -pav /usr/share/easy-rsa/3.0.3 /etc/openvpn/easyrsa
 cd /etc/openvpn/easyrsa
 
@@ -344,6 +344,7 @@ echo "
 
 "
 curl -sL http://git.io/metalware-installer |alces_OS=el7 alces_SOURCE_BRANCH=$everyware_METALWARE_VERSION /bin/bash
+source /etc/profile.d/alces-metalware.sh
 metal repo use https://github.com/alces-software/metalware-repo-base.git
 cd /var/lib/metalware/repo/
 git checkout $everyware_METALWARE_REPO
@@ -396,8 +397,6 @@ passwd -l ipaadmin
 echo 'AcceptEnv FC_*' >> /etc/ssh/sshd_config
 
 # IPA Server Install
-yum -y install ipa-server bind bind-dyndb-ldap ipa-server-dns
-
 systemctl restart dbus # fix for certmonger error https://bugzilla.redhat.com/show_bug.cgi?id=1504688
 
 ipa-server-install -a $everyware_IPA_PASSWORD --hostname $everyware_IPA_HOST --ip-address=$everyware_IPA_HOSTIP -r "$everyware_IPA_REALM" -p $everyware_IPA_PASSWORD -n "$everyware_IPA_DOMAIN" --no-ntp --setup-dns --forwarder="$everyware_IPA_DNS" --reverse-zone="$everyware_IPA_REVERSE.in-addr.arpa." --ssh-trust-dns --unattended
