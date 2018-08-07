@@ -26,7 +26,7 @@ everyware_METALWARE_VERSION="${everyware_METALWARE_VERSION:-2018.3.0-rc2}"
 everyware_METALWARE_REPO="${everyware_METALWARE_REPO:-dev/everyware}"
 
 # IPA Specific
-everyware_IPA_PASSWORD="${everyware_IPA_PASSWORD:-MySecurePassword}"
+everyware_IPA_PASSWORD="${everyware_IPA_PASSWORD:-REPLACE_ME}"
 everyware_IPA_HOST="${everyware_IPA_HOST:-$(hostname -f)}"
 everyware_IPA_HOSTIP="${everyware_IPA_HOSTIP:-$(gethostip -d $(hostname))}"
 everyware_IPA_REALM="${everyware_IPA_REALM:-$(hostname -d |sed 's/^[^.]*.//g' |tr '[a-z]' '[A-Z]')}"
@@ -34,6 +34,12 @@ everyware_IPA_DOMAIN="${everyware_IPA_DOMAIN:-$(hostname -d)}"
 everyware_IPA_DNS="${everyware_IPA_DNS:-$(grep nameserver -m 1 /etc/resolv.conf  |sed 's/nameserver //g')}"
 everyware_IPA_REVERSE="${everyware_IPA_REVERSE:-$(gethostip -d $(hostname) |awk -F. '{print $2"."$1}')}"
 
+if [ $everyware_IPA_PASSWORD == "REPLACE_ME" ] ; then
+    echo "The IPA password needs to be provided as a CLI argument"
+    echo "To do this when curling the script:"
+    echo "  curl http://path/to/domain0-gateway.sh |everyware_IPA_PASSWORD=MySecurePassword /bin/bash"
+    exit 1
+fi
 
 echo "
 
@@ -385,6 +391,9 @@ echo 'AcceptEnv FC_*' >> /etc/ssh/sshd_config
 
 # IPA Server Install
 yum -y install ipa-server bind bind-dyndb-ldap ipa-server-dns
+
+systemctl restart dbus # fix for certmonger error https://bugzilla.redhat.com/show_bug.cgi?id=1504688
+
 ipa-server-install -a $everyware_IPA_PASSWORD --hostname $everyware_IPA_HOST --ip-address=$everyware_IPA_HOSTIP -r "$everyware_IPA_REALM" -p $everyware_IPA_PASSWORD -n "$everyware_IPA_DOMAIN" --no-ntp --setup-dns --forwarder="$everyware_IPA_DNS" --reverse-zone="$everyware_IPA_REVERSE.in-addr.arpa." --ssh-trust-dns --unattended
 
 
