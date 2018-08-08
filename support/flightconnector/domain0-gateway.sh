@@ -21,6 +21,9 @@ firewall-cmd --add-service ldap --add-service ldaps --add-service kerberos\
 # VARS #
 ########
 
+# General
+everyware_PRIMARY_INTERFACE="${everyware_PRIMARY_INTERFACE:-eth0}"
+
 # Software
 everyware_CLOUDWARE_VERSION="${everyware_CLOUDWARE_VERSION:-dev/everyware}"
 everyware_METALWARE_VERSION="${everyware_METALWARE_VERSION:-2018.3.0-rc2}"
@@ -289,15 +292,15 @@ systemctl disable cloud-final
 
 firewall-cmd --new-zone cluster0 --permanent
 firewall-cmd --add-interface tun0 --zone cluster0 --permanent
-firewall-cmd --remove-interface eth0 --zone public
-firewall-cmd --remove-interface eth0 --zone public --permanent
-firewall-cmd --add-interface eth0 --zone external --permanent
-firewall-cmd --add-interface eth0 --zone external
+firewall-cmd --remove-interface $everyware_PRIMARY_INTERFACE --zone public
+firewall-cmd --remove-interface $everyware_PRIMARY_INTERFACE --zone public --permanent
+firewall-cmd --add-interface $everyware_PRIMARY_INTERFACE --zone external --permanent
+firewall-cmd --add-interface $everyware_PRIMARY_INTERFACE --zone external
 firewall-cmd --add-port 2005/tcp --zone external --permanent
 
 firewall-cmd --set-target=ACCEPT --zone cluster0 --permanent
 
-sed '/^ZONE=/{h;s/=.*/=external/};${x;/^$/{s//ZONE=external/;H};x}' /etc/sysconfig/network-scripts/ifcfg-eth0 -i
+sed '/^ZONE=/{h;s/=.*/=external/};${x;/^$/{s//ZONE=external/;H};x}' /etc/sysconfig/network-scripts/ifcfg-$everyware_PRIMARY_INTERFACE -i
 
 
 echo "
@@ -408,8 +411,8 @@ search $everyware_IPA_DOMAIN
 nameserver 127.0.0.1
 EOF
 
-# Ensure PEERDNS=no in ifcfg-eth0
-sed '/^PEERDNS=/{h;s/=.*/=no/};${x;/^$/{s//PEERDNS=no/;H};x}' /etc/sysconfig/network-scripts/ifcfg-eth0 -i
+# Ensure PEERDNS=no in ifcfg-$everyware_PRIMARY_INTERFACE
+sed '/^PEERDNS=/{h;s/=.*/=no/};${x;/^$/{s//PEERDNS=no/;H};x}' /etc/sysconfig/network-scripts/ifcfg-$everyware_PRIMARY_INTERFACE -i
 
 echo $everyware_IPA_PASSWORD |kinit admin
 
