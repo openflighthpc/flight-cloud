@@ -402,10 +402,19 @@ systemctl restart dbus # fix for certmonger error https://bugzilla.redhat.com/sh
 
 ipa-server-install -a $everyware_IPA_PASSWORD --hostname $everyware_IPA_HOST --ip-address=$everyware_IPA_HOSTIP -r "$everyware_IPA_REALM" -p $everyware_IPA_PASSWORD -n "$everyware_IPA_DOMAIN" --no-ntp --setup-dns --forwarder="$everyware_IPA_DNS" --reverse-zone="$everyware_IPA_REVERSE.in-addr.arpa." --ssh-trust-dns --unattended
 
+# Set resolv.conf
+cat << EOF > /etc/resolv.conf
+search $everyware_IPA_DOMAIN
+nameserver 127.0.0.1
+EOF
+
+# Ensure PEERDNS=no in ifcfg-eth0
+sed '/^PEERDNS=/{h;s/=.*/=no/};${x;/^$/{s//PEERDNS=no/;H};x}' /etc/sysconfig/network-scripts/ifcfg-eth0 -i
+
 echo $everyware_IPA_PASSWORD |kinit admin
 
-ipa dnszone-add cluster1.$everyware_IPA_REALM_DOWNCASE --dynamic-update=true
-ipa dnszone-add cluster2.$everyware_IPA_REALM_DOWNCASE --dynamic-update=true
-ipa dnszone-add cluster3.$everyware_IPA_REALM_DOWNCASE --dynamic-update=true
-ipa dnszone-add cluster4.$everyware_IPA_REALM_DOWNCASE --dynamic-update=true
-ipa dnszone-add 100.10.in-addr.arpa. --dynamic-update=true
+ipa dnszone-add cluster1.$everyware_IPA_REALM_DOWNCASE
+ipa dnszone-add cluster2.$everyware_IPA_REALM_DOWNCASE
+ipa dnszone-add cluster3.$everyware_IPA_REALM_DOWNCASE
+ipa dnszone-add cluster4.$everyware_IPA_REALM_DOWNCASE
+ipa dnszone-add 100.10.in-addr.arpa.
