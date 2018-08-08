@@ -23,14 +23,18 @@ firewall-cmd --add-service ldap --add-service ldaps --add-service kerberos\
 
 # General
 everyware_PRIMARY_INTERFACE="${everyware_PRIMARY_INTERFACE:-eth0}"
+everyware_CLUSTER1_NAME="${everyware_CLUSTER1_NAME:-cluster1}"
+everyware_CLUSTER1_NETWORK="${everyware_CLUSTER1_NETWORK:-10.100.1.0}"
+everyware_CLUSTER2_NAME="${everyware_CLUSTER2_NAME:-cluster2}"
+everyware_CLUSTER2_NETWORK="${everyware_CLUSTER2_NETWORK:-10.100.2.0}"
+everyware_CLUSTER3_NAME="${everyware_CLUSTER3_NAME:-cluster3}"
+everyware_CLUSTER3_NETWORK="${everyware_CLUSTER3_NETWORK:-10.100.3.0}"
+everyware_CLUSTER4_NAME="${everyware_CLUSTER4_NAME:-cluster4}"
+everyware_CLUSTER4_NETWORK="${everyware_CLUSTER4_NETWORK:-10.100.4.0}"
 
 # Software
 everyware_CLOUDWARE_VERSION="${everyware_CLOUDWARE_VERSION:-dev/everyware}"
 everyware_METALWARE_VERSION="${everyware_METALWARE_VERSION:-2018.3.0-rc2}"
-
-
-# VPN Specific
-# everyware_VPN_CLUSTERS="${everyware_VPN_CLUSTERS:-cluster1 cluster2 cluster3 cluster4 clusterX}" # Space separated list of clusters
 
 
 # Metalware Specific
@@ -98,17 +102,17 @@ EOF
 ./easyrsa --req-cn=clusterX gen-req clusterX nopass
 ./easyrsa sign-req client clusterX
 
-./easyrsa --req-cn=cluster1 gen-req cluster1 nopass
-./easyrsa sign-req client cluster1
+./easyrsa --req-cn=$everyware_CLUSTER1_NAME gen-req $everyware_CLUSTER1_NAME nopass
+./easyrsa sign-req client $everyware_CLUSTER1_NAME
 
-./easyrsa --req-cn=cluster2 gen-req cluster2 nopass
-./easyrsa sign-req client cluster2
+./easyrsa --req-cn=$everyware_CLUSTER2_NAME gen-req $everyware_CLUSTER2_NAME nopass
+./easyrsa sign-req client $everyware_CLUSTER2_NAME
 
-./easyrsa --req-cn=cluster3 gen-req cluster3 nopass
-./easyrsa sign-req client cluster3
+./easyrsa --req-cn=$everyware_CLUSTER3_NAME gen-req $everyware_CLUSTER3_NAME nopass
+./easyrsa sign-req client $everyware_CLUSTER3_NAME
 
-./easyrsa --req-cn=cluster4 gen-req cluster4 nopass
-./easyrsa sign-req client cluster4
+./easyrsa --req-cn=$everyware_CLUSTER4_NAME gen-req $everyware_CLUSTER4_NAME nopass
+./easyrsa sign-req client $everyware_CLUSTER4_NAME
 
 ./easyrsa gen-dh
 ./easyrsa gen-crl
@@ -131,10 +135,10 @@ client-to-client
 ifconfig 10.78.110.1 255.255.255.0
 topology subnet
 route 10.10.0.0 255.255.0.0 10.78.110.2
-route 10.100.1.0 255.255.255.0 10.78.110.11
-route 10.100.2.0 255.255.255.0 10.78.110.12
-route 10.100.3.0 255.255.255.0 10.78.110.13
-route 10.100.4.0 255.255.255.0 10.78.110.14
+route $everyware_CLUSTER1_NETWORK 255.255.255.0 10.78.110.11
+route $everyware_CLUSTER2_NETWORK 255.255.255.0 10.78.110.12
+route $everyware_CLUSTER3_NETWORK 255.255.255.0 10.78.110.13
+route $everyware_CLUSTER4_NETWORK 255.255.255.0 10.78.110.14
 keepalive 10 120
 comp-lzo adaptive
 tls-auth /etc/openvpn/easyrsa/ta.key 0
@@ -154,51 +158,51 @@ mkdir /etc/openvpn/ccd-clusters
 cat << EOF > /etc/openvpn/ccd-clusters/clusterX
 ifconfig-push 10.78.110.2 255.255.255.0
 push "route 10.78.100.0 255.255.255.0 10.78.110.1"
-push "route 10.100.1.0 255.255.255.0 10.78.110.11"
-push "route 10.100.2.0 255.255.255.0 10.78.110.12"
-push "route 10.100.3.0 255.255.255.0 10.78.110.13"
-push "route 10.100.4.0 255.255.255.0 10.78.110.14"
+push "route $everyware_CLUSTER1_NETWORK 255.255.255.0 10.78.110.11"
+push "route $everyware_CLUSTER2_NETWORK 255.255.255.0 10.78.110.12"
+push "route $everyware_CLUSTER3_NETWORK 255.255.255.0 10.78.110.13"
+push "route $everyware_CLUSTER4_NETWORK 255.255.255.0 10.78.110.14"
 iroute 10.10.0.0 255.255.0.0
 EOF
 
-cat << EOF > /etc/openvpn/ccd-clusters/cluster1
+cat << EOF > /etc/openvpn/ccd-clusters/$everyware_CLUSTER1_NAME
 ifconfig-push 10.78.110.11 255.255.255.0
 push "route 10.78.100.0 255.255.255.0 10.78.110.1"
 push "route 10.10.0.0 255.255.0.0 10.78.110.2"
-push "route 10.100.2.0 255.255.255.0 10.78.110.12"
-push "route 10.100.3.0 255.255.255.0 10.78.110.13"
-push "route 10.100.4.0 255.255.255.0 10.78.110.14"
-iroute 10.100.1.0 255.255.255.0
+push "route $everyware_CLUSTER2_NETWORK 255.255.255.0 10.78.110.12"
+push "route $everyware_CLUSTER3_NETWORK 255.255.255.0 10.78.110.13"
+push "route $everyware_CLUSTER4_NETWORK 255.255.255.0 10.78.110.14"
+iroute $everyware_CLUSTER1_NETWORK 255.255.255.0
 EOF
 
-cat << EOF > /etc/openvpn/ccd-clusters/cluster2
+cat << EOF > /etc/openvpn/ccd-clusters/$everyware_CLUSTER2_NAME
 ifconfig-push 10.78.110.12 255.255.255.0
 push "route 10.78.100.0 255.255.255.0 10.78.110.1"
 push "route 10.10.0.0 255.255.0.0 10.78.110.2"
-push "route 10.100.1.0 255.255.255.0 10.78.110.11"
-push "route 10.100.3.0 255.255.255.0 10.78.110.13"
-push "route 10.100.4.0 255.255.255.0 10.78.110.14"
-iroute 10.100.2.0 255.255.255.0
+push "route $everyware_CLUSTER1_NETWORK 255.255.255.0 10.78.110.11"
+push "route $everyware_CLUSTER3_NETWORK 255.255.255.0 10.78.110.13"
+push "route $everyware_CLUSTER4_NETWORK 255.255.255.0 10.78.110.14"
+iroute $everyware_CLUSTER2_NETWORK 255.255.255.0
 EOF
 
-cat << EOF > /etc/openvpn/ccd-clusters/cluster3
+cat << EOF > /etc/openvpn/ccd-clusters/$everyware_CLUSTER3_NAME
 ifconfig-push 10.78.110.13 255.255.255.0
 push "route 10.78.100.0 255.255.255.0 10.78.110.1"
 push "route 10.10.0.0 255.255.0.0 10.78.110.2"
-push "route 10.100.1.0 255.255.255.0 10.78.110.11"
-push "route 10.100.2.0 255.255.255.0 10.78.110.12"
-push "route 10.100.4.0 255.255.255.0 10.78.110.13"
-iroute 10.100.3.0 255.255.255.0
+push "route $everyware_CLUSTER1_NETWORK 255.255.255.0 10.78.110.11"
+push "route $everyware_CLUSTER2_NETWORK 255.255.255.0 10.78.110.12"
+push "route $everyware_CLUSTER4_NETWORK 255.255.255.0 10.78.110.13"
+iroute $everyware_CLUSTER3_NETWORK 255.255.255.0
 EOF
 
-cat << EOF > /etc/openvpn/ccd-clusters/cluster4
+cat << EOF > /etc/openvpn/ccd-clusters/$everyware_CLUSTER4_NAME
 ifconfig-push 10.78.110.14 255.255.255.0
 push "route 10.78.100.0 255.255.255.0 10.78.110.1"
 push "route 10.10.0.0 255.255.0.0 10.78.110.2"
-push "route 10.100.1.0 255.255.255.0 10.78.110.11"
-push "route 10.100.2.0 255.255.255.0 10.78.110.12"
-push "route 10.100.3.0 255.255.255.0 10.78.110.13"
-iroute 10.100.4.0 255.255.255.0
+push "route $everyware_CLUSTER1_NETWORK 255.255.255.0 10.78.110.11"
+push "route $everyware_CLUSTER2_NETWORK 255.255.255.0 10.78.110.12"
+push "route $everyware_CLUSTER3_NETWORK 255.255.255.0 10.78.110.13"
+iroute $everyware_CLUSTER4_NETWORK 255.255.255.0
 EOF
 
 
@@ -272,10 +276,10 @@ EOF
 _EOF_
 
 bash /etc/openvpn/buildinstaller.sh clusterX
-bash /etc/openvpn/buildinstaller.sh cluster1
-bash /etc/openvpn/buildinstaller.sh cluster2
-bash /etc/openvpn/buildinstaller.sh cluster3
-bash /etc/openvpn/buildinstaller.sh cluster4
+bash /etc/openvpn/buildinstaller.sh $everyware_CLUSTER1_NAME
+bash /etc/openvpn/buildinstaller.sh $everyware_CLUSTER2_NAME
+bash /etc/openvpn/buildinstaller.sh $everyware_CLUSTER3_NAME
+bash /etc/openvpn/buildinstaller.sh $everyware_CLUSTER4_NAME
 
 
 systemctl enable openvpn@flightconnector
@@ -313,7 +317,7 @@ echo "
 firewall-cmd --add-port 80/tcp --zone external --permanent
 firewall-cmd --reload
 mkdir /var/www/html/vpn
-mv /root/install_cluster* /var/www/html/vpn
+mv /root/install_* /var/www/html/vpn
 
 cat << EOF > /etc/httpd/conf.d/vpn.conf
 <Directory /var/www/html/vpn/>
@@ -416,8 +420,8 @@ sed '/^PEERDNS=/{h;s/=.*/=no/};${x;/^$/{s//PEERDNS=no/;H};x}' /etc/sysconfig/net
 
 echo $everyware_IPA_PASSWORD |kinit admin
 
-ipa dnszone-add cluster1.$everyware_IPA_REALM_DOWNCASE
-ipa dnszone-add cluster2.$everyware_IPA_REALM_DOWNCASE
-ipa dnszone-add cluster3.$everyware_IPA_REALM_DOWNCASE
-ipa dnszone-add cluster4.$everyware_IPA_REALM_DOWNCASE
+ipa dnszone-add $everyware_CLUSTER1_NAME.$everyware_IPA_REALM_DOWNCASE
+ipa dnszone-add $everyware_CLUSTER2_NAME.$everyware_IPA_REALM_DOWNCASE
+ipa dnszone-add $everyware_CLUSTER3_NAME.$everyware_IPA_REALM_DOWNCASE
+ipa dnszone-add $everyware_CLUSTER4_NAME.$everyware_IPA_REALM_DOWNCASE
 ipa dnszone-add 100.10.in-addr.arpa.
