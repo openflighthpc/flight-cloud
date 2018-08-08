@@ -180,6 +180,7 @@ Resources:
               - "\n"
               - "runcmd:\n"
               - "- [ sh, -c, 'systemctl disable cloud-init' ]\n"
+              - "- [ sh, -c, 'touch /etc/cloud/cloud-init.disabled' ]\n"
               - "users:\n"
               - "  - default\n"
               - "  - name: ipaadmin\n"
