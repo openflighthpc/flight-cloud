@@ -183,13 +183,22 @@ Resources:
           Fn::Join:
             - ''
             - - "#cloud-config\n"
-              - "hostname: login\n"
-              - "fqdn: login."
               - Fn::Join:
-                - "."
-                - Fn::Split:
-                  - "-"
-                  - Ref: cloudwareDomain
+                - ''
+                - - "hostname: "
+                  - Ref: vmName
+                  - "\n"
+              - Fn::Join:
+                - ''
+                - - "fqdn: "
+                  - Ref: vmName
+                  - '.'
+                  - Fn::Join:
+                    - "."
+                    - Fn::Split:
+                      - "-"
+                      - Ref: cloudwareDomain
+                  - "\n"
               - "\n"
               - "runcmd:\n"
               - "- [ sh, -c, 'systemctl disable cloud-init' ]\n"
