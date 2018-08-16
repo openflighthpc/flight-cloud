@@ -374,7 +374,24 @@ mv plugins/* ../plugins/
 #  of the questions are already answered
 
 ## Domain config
-metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstrun\": \"true\", \"metalware_internal--plugin_enabled--firstrun\": \"true\", \"metalware_internal--plugin_enabled--flightdirect\": \"false\", \"metalware_internal--plugin_enabled--ganglia\": \"true\", \"ganglia_serverip\": \"$everyware_IPA_HOSTIP\", \"metalware_internal--plugin_enabled--infiniband\": \"false\", \"metalware_internal--plugin_enabled--ipa\": \"true\", \"ipa_serverip\": \"$everyware_IPA_HOSTIP\", \"ipa_servername\": \"$everyware_IPA_HOST\", \"ipa_insecurepassword\": \"$everyware_IPA_INSECUREPASSWORD\", \"ipa_userdir\": \"/home/\", \"metalware_internal--plugin_enabled--lustre\": \"false\", \"metalware_internal--plugin_enabled--nfs\": \"true\", \"nfs_isclient\": \"true\", \"metalware_internal--plugin_enabled--nvidia\": \"false\", \"metalware_internal--plugin_enabled--rootrun\": \"false\", \"metalware_internal--plugin_enabled--slurm\": \"false\", \"metalware_internal--plugin_enabled--yumrepo\": \"false\" }"
+metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstrun\": \"true\", \
+    \"metalware_internal--plugin_enabled--firstrun\": \"true\", \
+    \"metalware_internal--plugin_enabled--flightdirect\": \"false\", \
+    \"metalware_internal--plugin_enabled--ganglia\": \"true\", \
+    \"ganglia_serverip\": \"$everyware_IPA_HOSTIP\", \
+    \"metalware_internal--plugin_enabled--infiniband\": \"false\", \
+    \"metalware_internal--plugin_enabled--ipa\": \"true\", \
+    \"ipa_serverip\": \"$everyware_IPA_HOSTIP\", \
+    \"ipa_servername\": \"$everyware_IPA_HOST\", \
+    \"ipa_insecurepassword\": \"$everyware_IPA_INSECUREPASSWORD\", \
+    \"ipa_userdir\": \"/users/\", \
+    \"metalware_internal--plugin_enabled--lustre\": \"false\", \
+    \"metalware_internal--plugin_enabled--nfs\": \"true\", \
+    \"nfs_isclient\": \"true\", \
+    \"metalware_internal--plugin_enabled--nvidia\": \"false\", \
+    \"metalware_internal--plugin_enabled--rootrun\": \"false\", \
+    \"metalware_internal--plugin_enabled--slurm\": \"false\", \
+    \"metalware_internal--plugin_enabled--yumrepo\": \"false\" }"
 
 cat << EOF > /var/lib/metalware/repo/config/domain.yaml
 cluster: $everyware_CLOUDWARE_DOMAIN_NAME
