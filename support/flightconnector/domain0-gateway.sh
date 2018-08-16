@@ -8,6 +8,9 @@ exec 1>/tmp/cloudware-gateway-setup-output 2>&1
 # VARS #
 ########
 
+# Install syslinux for setting up variables
+yum install -y syslinux
+
 # General
 everyware_CLOUDWARE_DOMAIN_NAME="${everyware_CLUSTER_NAME:-$(hostname -d |sed 's/^[^.]*.//;s/\..*//g')}" # e.g. 'dom0.mycluster.alces.network' becomes 'mycluster'
 everyware_CLOUDWARE_DOMAIN_NETWORK="${everyware_CLOUDWARE_DOMAIN_NETWORK:-10.78.0.0}"
@@ -53,7 +56,7 @@ echo "
 #################
 
 "
-yum install -y syslinux git httpd epel-release ipa-server bind bind-dyndb-ldap ipa-server-dns firefox
+yum install -y git httpd epel-release ipa-server bind bind-dyndb-ldap ipa-server-dns firefox
 yum install -y openvpn easy-rsa
 yum update -y
 
@@ -377,24 +380,24 @@ mv plugins/* ../plugins/
 #  of the questions are already answered
 
 ## Domain config
-metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstrun\": \"true\", \
-    \"metalware_internal--plugin_enabled--firstrun\": \"true\", \
-    \"metalware_internal--plugin_enabled--flightdirect\": \"false\", \
-    \"metalware_internal--plugin_enabled--ganglia\": \"true\", \
+metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstrun\": true, \
+    \"metalware_internal--plugin_enabled--firstrun\": true, \
+    \"metalware_internal--plugin_enabled--flightdirect\": false, \
+    \"metalware_internal--plugin_enabled--ganglia\": true, \
     \"ganglia_serverip\": \"$everyware_IPA_HOSTIP\", \
-    \"metalware_internal--plugin_enabled--infiniband\": \"false\", \
-    \"metalware_internal--plugin_enabled--ipa\": \"true\", \
+    \"metalware_internal--plugin_enabled--infiniband\": false, \
+    \"metalware_internal--plugin_enabled--ipa\": true, \
     \"ipa_serverip\": \"$everyware_IPA_HOSTIP\", \
     \"ipa_servername\": \"$everyware_IPA_HOST\", \
     \"ipa_insecurepassword\": \"$everyware_IPA_INSECUREPASSWORD\", \
     \"ipa_userdir\": \"/users/\", \
-    \"metalware_internal--plugin_enabled--lustre\": \"false\", \
-    \"metalware_internal--plugin_enabled--nfs\": \"true\", \
-    \"nfs_isclient\": \"true\", \
-    \"metalware_internal--plugin_enabled--nvidia\": \"false\", \
-    \"metalware_internal--plugin_enabled--rootrun\": \"false\", \
-    \"metalware_internal--plugin_enabled--slurm\": \"false\", \
-    \"metalware_internal--plugin_enabled--yumrepo\": \"false\" }"
+    \"metalware_internal--plugin_enabled--lustre\": false, \
+    \"metalware_internal--plugin_enabled--nfs\": true, \
+    \"nfs_isclient\": true, \
+    \"metalware_internal--plugin_enabled--nvidia\": false, \
+    \"metalware_internal--plugin_enabled--rootrun\": false, \
+    \"metalware_internal--plugin_enabled--slurm\": false, \
+    \"metalware_internal--plugin_enabled--yumrepo\": false }"
 
 cat << EOF > /var/lib/metalware/repo/config/domain.yaml
 cluster: $everyware_CLOUDWARE_DOMAIN_NAME
@@ -479,7 +482,15 @@ EOF
 metal sync
 
 ## Local config
-metal configure local --answers "{ \"ganglia_isserver\": \"true\", \"nfs_isserver\": \"true\"}"
+#metal configure local --answers "{ \"ganglia_isserver\": true, \"nfs_isserver\": true }"
+
+## Workaround until local --answers is merged into official release
+mkdir -p /var/lib/metalware/staging/var/lib/metalware/rendered/system
+echo 'local    orphan' > /var/lib/metalware/staging/var/lib/metalware/rendered/system/genders
+cat << EOF > /var/lib/metalware/answers/nodes/local.yaml
+ganglia_isserver: true
+nfs_isserver: true
+EOF
 
 cat << EOF > /var/lib/metalware/repo/config/local.yaml
 networks:
@@ -531,10 +542,10 @@ EOF
 metal sync
 
 ## Cluster configs
-metal configure group $everyware_CLUSTER1_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER1_NAME-node[01-10],$everyware_CLUSTER1_NAME-login1\", \"genders_all_group\": \"true\" }"
-metal configure group $everyware_CLUSTER2_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER2_NAME-node[01-10],$everyware_CLUSTER2_NAME-login1\", \"genders_all_group\": \"true\" }"
-metal configure group $everyware_CLUSTER3_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER3_NAME-node[01-10],$everyware_CLUSTER3_NAME-login1\", \"genders_all_group\": \"true\" }"
-metal configure group $everyware_CLUSTER4_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER4_NAME-node[01-10],$everyware_CLUSTER4_NAME-login1\", \"genders_all_group\": \"true\" }"
+metal configure group $everyware_CLUSTER1_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER1_NAME-node[01-10],$everyware_CLUSTER1_NAME-login1\", \"genders_all_group\": true }"
+metal configure group $everyware_CLUSTER2_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER2_NAME-node[01-10],$everyware_CLUSTER2_NAME-login1\", \"genders_all_group\": true }"
+metal configure group $everyware_CLUSTER3_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER3_NAME-node[01-10],$everyware_CLUSTER3_NAME-login1\", \"genders_all_group\": true }"
+metal configure group $everyware_CLUSTER4_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER4_NAME-node[01-10],$everyware_CLUSTER4_NAME-login1\", \"genders_all_group\": true }"
 
 metal sync
 
