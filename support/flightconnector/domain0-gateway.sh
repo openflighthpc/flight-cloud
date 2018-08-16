@@ -53,7 +53,7 @@ everyware_IPA_DOMAIN="${everyware_IPA_DOMAIN:-$(hostname -d)}"
 everyware_IPA_DNS="${everyware_IPA_DNS:-$(grep nameserver -m 1 /etc/resolv.conf  |sed 's/nameserver //g')}"
 everyware_IPA_REVERSE="${everyware_IPA_REVERSE:-$(gethostip -d $(hostname) |awk -F. '{print $2"."$1}')}"
 
-if [ $everyware_IPA_SECUREPASSWORD == "REPLACE_ME" || $everyware_IPA_INSECUREPASSWORD == "REPLACE_ME" ] ; then
+if [[ $everyware_IPA_SECUREPASSWORD == "REPLACE_ME" || $everyware_IPA_INSECUREPASSWORD == "REPLACE_ME" ]] ; then
     echo "The IPA passwords needs to be provided as a CLI argument"
     echo "To do this when curling the script:"
     echo "  curl http://path/to/domain0-gateway.sh |everyware_IPA_SECUREPASSWORD=MySecurePassword everyware_IPA_INSECUREPASSWORD=MyInsecurePassword /bin/bash"
