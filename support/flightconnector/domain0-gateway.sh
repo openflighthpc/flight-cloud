@@ -4,19 +4,6 @@ IFS=$'\n\t'
 
 exec 1>/tmp/cloudware-gateway-setup-output 2>&1
 
-#################
-# PREREQUISITES #
-#################
-yum install -y syslinux git httpd epel-release ipa-server bind bind-dyndb-ldap ipa-server-dns firefox
-yum install -y openvpn easy-rsa
-yum update -y
-
-firewall-cmd --add-service ldap --add-service ldaps --add-service kerberos\
-    --add-service kpasswd --add-service http --add-service https\
-    --add-service dns --add-service mountd --add-service nfs\
-    --add-service ntp --add-service syslog\
-    --zone external --permanent
-
 ########
 # VARS #
 ########
@@ -38,7 +25,6 @@ everyware_CLUSTER4_NETWORK="${everyware_CLUSTER4_NETWORK:-10.100.4.0}"
 everyware_CLOUDWARE_VERSION="${everyware_CLOUDWARE_VERSION:-dev/everyware}"
 everyware_METALWARE_VERSION="${everyware_METALWARE_VERSION:-2018.3.0}"
 
-
 # Metalware Specific
 everyware_METALWARE_REPO="${everyware_METALWARE_REPO:-dev/everyware}"
 
@@ -59,6 +45,23 @@ if [[ $everyware_IPA_SECUREPASSWORD == "REPLACE_ME" || $everyware_IPA_INSECUREPA
     echo "  curl http://path/to/domain0-gateway.sh |everyware_IPA_SECUREPASSWORD=MySecurePassword everyware_IPA_INSECUREPASSWORD=MyInsecurePassword /bin/bash"
     exit 1
 fi
+
+echo "
+
+#################
+# PREREQUISITES #
+#################
+
+"
+yum install -y syslinux git httpd epel-release ipa-server bind bind-dyndb-ldap ipa-server-dns firefox
+yum install -y openvpn easy-rsa
+yum update -y
+
+firewall-cmd --add-service ldap --add-service ldaps --add-service kerberos\
+    --add-service kpasswd --add-service http --add-service https\
+    --add-service dns --add-service mountd --add-service nfs\
+    --add-service ntp --add-service syslog\
+    --zone external --permanent
 
 echo "
 
