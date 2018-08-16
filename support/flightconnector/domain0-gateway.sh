@@ -22,6 +22,8 @@ firewall-cmd --add-service ldap --add-service ldaps --add-service kerberos\
 ########
 
 # General
+everyware_CLOUDWARE_DOMAIN_NAME="${everyware_CLUSTER_NAME:-$(hostname -d |sed 's/^[^.]*.//;s/\..*//g')}" # e.g. 'dom0.mycluster.alces.network' becomes 'mycluster'
+everyware_CLOUDWARE_DOMAIN_NETWORK="${everyware_CLOUDWARE_DOMAIN_NETWORK:-10.78.0.0}"
 everyware_PRIMARY_INTERFACE="${everyware_PRIMARY_INTERFACE:-eth0}"
 everyware_CLUSTER1_NAME="${everyware_CLUSTER1_NAME:-cluster1}"
 everyware_CLUSTER1_NETWORK="${everyware_CLUSTER1_NETWORK:-10.100.1.0}"
@@ -41,7 +43,8 @@ everyware_METALWARE_VERSION="${everyware_METALWARE_VERSION:-2018.3.0}"
 everyware_METALWARE_REPO="${everyware_METALWARE_REPO:-dev/everyware}"
 
 # IPA Specific
-everyware_IPA_PASSWORD="${everyware_IPA_PASSWORD:-REPLACE_ME}"
+everyware_IPA_SECUREPASSWORD="${everyware_IPA_SECUREPASSWORD:-REPLACE_ME}"
+everyware_IPA_INSECUREPASSWORD="${everyware_IPA_INSECUREPASSWORD:-REPLACE_ME}"
 everyware_IPA_HOST="${everyware_IPA_HOST:-$(hostname -f)}"
 everyware_IPA_HOSTIP="${everyware_IPA_HOSTIP:-$(gethostip -d $(hostname))}"
 everyware_IPA_REALM="${everyware_IPA_REALM:-$(hostname -d |sed 's/^[^.]*.//g' |tr '[a-z]' '[A-Z]')}"
@@ -50,10 +53,10 @@ everyware_IPA_DOMAIN="${everyware_IPA_DOMAIN:-$(hostname -d)}"
 everyware_IPA_DNS="${everyware_IPA_DNS:-$(grep nameserver -m 1 /etc/resolv.conf  |sed 's/nameserver //g')}"
 everyware_IPA_REVERSE="${everyware_IPA_REVERSE:-$(gethostip -d $(hostname) |awk -F. '{print $2"."$1}')}"
 
-if [ $everyware_IPA_PASSWORD == "REPLACE_ME" ] ; then
-    echo "The IPA password needs to be provided as a CLI argument"
+if [ $everyware_IPA_SECUREPASSWORD == "REPLACE_ME" || $everyware_IPA_INSECUREPASSWORD == "REPLACE_ME" ] ; then
+    echo "The IPA passwords needs to be provided as a CLI argument"
     echo "To do this when curling the script:"
-    echo "  curl http://path/to/domain0-gateway.sh |everyware_IPA_PASSWORD=MySecurePassword /bin/bash"
+    echo "  curl http://path/to/domain0-gateway.sh |everyware_IPA_SECUREPASSWORD=MySecurePassword everyware_IPA_INSECUREPASSWORD=MyInsecurePassword /bin/bash"
     exit 1
 fi
 
@@ -358,8 +361,168 @@ cd /var/lib/metalware/repo/
 git checkout $everyware_METALWARE_REPO
 mv plugins/* ../plugins/
 
-# Workaround for build errors
-mkdir -p /var/lib/tftpboot/pxelinux.cfg
+# Update metalware config
+#
+#  Ideally this would be done with configure --answers but due to this requiring questions
+#  to be in configure.yaml it does not achieve the goal of minimising the questions
+#  being asked.
+#
+#     metal configure domain --answers "{ \"cluster_name\": \"$everyware_CLOUDWARE_DOMAIN_NAME/\" }"
+#
+#  The `--answers` are currently being used alongside stripping out some questions to reach a
+#  comfortable medium where configure will not usually need to be run and if it is then most
+#  of the questions are already answered
+
+## Domain config
+metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstrun\": \"true\", \"metalware_internal--plugin_enabled--firstrun\": \"true\", \"metalware_internal--plugin_enabled--flightdirect\": \"false\", \"metalware_internal--plugin_enabled--ganglia\": \"true\", \"ganglia_serverip\": \"$everyware_IPA_HOSTIP\", \"metalware_internal--plugin_enabled--infiniband\": \"false\", \"metalware_internal--plugin_enabled--ipa\": \"true\", \"ipa_serverip\": \"$everyware_IPA_HOSTIP\", \"ipa_servername\": \"$everyware_IPA_HOST\", \"ipa_insecurepassword\": \"$everyware_IPA_INSECUREPASSWORD\", \"ipa_userdir\": \"/home/\", \"metalware_internal--plugin_enabled--lustre\": \"false\", \"metalware_internal--plugin_enabled--nfs\": \"true\", \"nfs_isclient\": \"true\", \"metalware_internal--plugin_enabled--nvidia\": \"false\", \"metalware_internal--plugin_enabled--rootrun\": \"false\", \"metalware_internal--plugin_enabled--slurm\": \"false\", \"metalware_internal--plugin_enabled--yumrepo\": \"false\" }"
+
+cat << EOF > /var/lib/metalware/repo/config/domain.yaml
+cluster: $everyware_CLOUDWARE_DOMAIN_NAME
+# GENERATE with openssl passwd -1 \$PASSWD.
+# XXX Change this so admin enters plain text root password, and we generate
+# encrypted password here?
+encrypted_root_password: '<%= answer.root_password %>'
+profile: MASTER
+ssh_key: '<%= answer.root_ssh_key %>'
+build_method: basic
+
+domain: $everyware_IPA_REALM_DOWNCASE
+cloudware_domain: $everyware_CLOUDWARE_DOMAIN_NETWORK
+search_domains: "<% config.networks.each do |network, details| -%><% next if network.to_s == 'ext' %><%= details.domain %><%= if network.to_s == 'bmc' then '.mgt' else '' end %>.<%= config.domain %> <% end -%><%= config.domain %>"
+dns_type: "<%= answer.dns_type %>"
+externaldns: $everyware_IPA_DNS
+internaldns: $everyware_IPA_HOSTIP
+
+# Properties for specific config.networks.
+networks:
+  pri:
+    defined: true
+    interface: eth0
+    hostname: "<%= config.networks.pri.short_hostname %>.<%= config.domain %>"
+    domain: pri
+    short_hostname: "<%= node.name.sub(node.group.name + '-', '') %>.<%= config.networks.pri.domain %>"
+    ip: <%= answer.pri_network_ip_node || answer.pri_network_ip || "10.100.#{node.group.index}.#{node.index + 19}"%>
+    netmask: 255.255.255.0
+    network: <%= answer.pri_network_network || "10.100.#{node.group.index}.0" %>
+    gateway: <%= answer.pri_network_gateway || "10.100.#{node.group.index}.10" %>
+    primary: true
+    named_fwd_zone: "<%= config.networks.pri.domain %>.<%= config.domain %>"
+    named_rev_zone: <% split_net = config.networks.pri.network.split(/\./) -%><%= split_net[1] %>.<%= split_net[0] %>
+    firewallpolicy: trusted
+
+files:
+  platform:
+    - /opt/alces/install/scripts/aws.sh
+  main:
+    - main.sh
+  setup:
+    - local-script.sh
+  core:
+    - core/base.sh
+    - core/chrony.sh
+    - core/configs/chrony.conf
+    - core/firstrun_scripts/chronyfix.bash
+    - core/syslog.sh
+    - core/configs/metalware.conf
+    - core/configs/rsyslog-remote
+    - core/firstrun_scripts/firewall_rsyslog.bash
+    - core/postfix.sh
+    - core/network-base.sh
+    - core/network-join.sh
+    - core/networking.sh
+    - core/configs/authorized_keys
+    - core/firstrun_scripts/firewall_main.bash
+  scripts:
+    - local-script.sh
+
+ntp:
+  is_server: false
+  server: gateway.dom0.<%= config.domain %>
+
+rsyslog:
+  is_server: false
+  server: gateway
+
+firewall:
+  enabled: true
+  internal:
+    services: 'ssh http dhcp dns https mountd nfs ntp rpc-bind smtp syslog tftp tftp-client'
+  external:
+    services: 'ssh'
+  management:
+    services: 'ssh snmp'
+
+postfix:
+  relayhost: gateway.dom0.<%= config.domain %>
+EOF
+
+metal sync
+
+## Local config
+metal configure local --answers "{ \"ganglia_isserver\": \"true\", \"nfs_isserver\": \"true\"}"
+
+cat << EOF > /var/lib/metalware/repo/config/local.yaml
+networks:
+  pri:
+    defined: true
+    ip: $everyware_IPA_HOSTIP
+    netmask: 255.255.0.0
+    network: $everyware_CLOUDWARE_DOMAIN_NETWORK
+    short_hostname: $everyware_IPA_HOST
+    interface: $everyware_PRIMARY_INTERFACE
+build_method: self
+files:
+  setup:
+    - local/dns.sh
+    - local/xinetd.sh
+    - local/http.sh
+  main:
+    - local/main.sh
+  core:
+    - core/base.sh
+    - core/chrony.sh
+    - core/configs/chrony.conf
+    - core/firstrun_scripts/chronyfix.bash
+    - core/syslog.sh
+    - core/configs/metalware.conf
+    - core/configs/rsyslog-remote
+    - core/firstrun_scripts/firewall_rsyslog.bash
+    - core/postfix.sh
+    - core/network-base.sh
+    - core/network-join.sh
+    - core/networking.sh
+    - core/configs/authorized_keys
+    - local/extra.sh
+    - core/configs/dhcpd.conf
+    - core/configs/pxelinux_default
+    - core/configs/named.conf
+    - core/configs/http/deployment.conf
+    - core/configs/http/installer.conf
+    - core/configs/kscomplete.php
+    - core/firstrun_scripts/firewall_main.bash
+build:
+  pxeboot_path: /var/lib/tftpboot/boot
+ntp:
+  is_server: true
+rsyslog:
+  is_server: true
+EOF
+
+metal sync
+
+## Cluster configs
+metal configure group $everyware_CLUSTER1_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER1_NAME-node[01-10],$everyware_CLUSTER1_NAME-login1\", \"genders_all_group\": \"true\" }"
+metal configure group $everyware_CLUSTER2_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER2_NAME-node[01-10],$everyware_CLUSTER2_NAME-login1\", \"genders_all_group\": \"true\" }"
+metal configure group $everyware_CLUSTER3_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER3_NAME-node[01-10],$everyware_CLUSTER3_NAME-login1\", \"genders_all_group\": \"true\" }"
+metal configure group $everyware_CLUSTER4_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER4_NAME-node[01-10],$everyware_CLUSTER4_NAME-login1\", \"genders_all_group\": \"true\" }"
+
+metal sync
+
+## Cluster login node configs
+metal configure node $everyware_CLUSTER1_NAME-login1 --answers "{ \"pri_network_ip_node\": \"10.100.<%= node.group.index %>.10\", \"pri_network_gateway\": \"10.100.<%= node.group.index %>.1\" }"
+metal configure node $everyware_CLUSTER2_NAME-login1 --answers "{ \"pri_network_ip_node\": \"10.100.<%= node.group.index %>.10\", \"pri_network_gateway\": \"10.100.<%= node.group.index %>.1\" }"
+metal configure node $everyware_CLUSTER3_NAME-login1 --answers "{ \"pri_network_ip_node\": \"10.100.<%= node.group.index %>.10\", \"pri_network_gateway\": \"10.100.<%= node.group.index %>.1\" }"
+metal configure node $everyware_CLUSTER4_NAME-login1 --answers "{ \"pri_network_ip_node\": \"10.100.<%= node.group.index %>.10\", \"pri_network_gateway\": \"10.100.<%= node.group.index %>.1\" }"
 
 
 
@@ -380,7 +543,7 @@ make setup
 
 mkdir /opt/directory/etc
 echo "cw_ACCESS_fqdn=$(hostname -f)" > /opt/directory/etc/access.rc
-echo "IPAPASSWORD=$everyware_IPA_PASSWORD" > /opt/directory/etc/config
+echo "IPAPASSWORD=$everyware_IPA_SECUREPASSWORD" > /opt/directory/etc/config
 
 mkdir -p /var/www/html/secure
 
@@ -407,7 +570,7 @@ echo 'AcceptEnv FC_*' >> /etc/ssh/sshd_config
 # IPA Server Install
 systemctl restart dbus # fix for certmonger error https://bugzilla.redhat.com/show_bug.cgi?id=1504688
 
-ipa-server-install -a $everyware_IPA_PASSWORD --hostname $everyware_IPA_HOST --ip-address=$everyware_IPA_HOSTIP -r "$everyware_IPA_REALM" -p $everyware_IPA_PASSWORD -n "$everyware_IPA_DOMAIN" --no-ntp --setup-dns --forwarder="$everyware_IPA_DNS" --reverse-zone="$everyware_IPA_REVERSE.in-addr.arpa." --ssh-trust-dns --unattended
+ipa-server-install -a $everyware_IPA_SECUREPASSWORD --hostname $everyware_IPA_HOST --ip-address=$everyware_IPA_HOSTIP -r "$everyware_IPA_REALM" -p $everyware_IPA_SECUREPASSWORD -n "$everyware_IPA_DOMAIN" --no-ntp --setup-dns --forwarder="$everyware_IPA_DNS" --reverse-zone="$everyware_IPA_REVERSE.in-addr.arpa." --ssh-trust-dns --unattended
 
 # Set resolv.conf
 cat << EOF > /etc/resolv.conf
@@ -418,7 +581,7 @@ EOF
 # Ensure PEERDNS=no in ifcfg-$everyware_PRIMARY_INTERFACE
 sed '/^PEERDNS=/{h;s/=.*/=no/};${x;/^$/{s//PEERDNS=no/;H};x}' /etc/sysconfig/network-scripts/ifcfg-$everyware_PRIMARY_INTERFACE -i
 
-echo $everyware_IPA_PASSWORD |kinit admin
+echo $everyware_IPA_SECUREPASSWORD |kinit admin
 
 ipa dnszone-add $everyware_CLUSTER1_NAME.$everyware_IPA_REALM_DOWNCASE
 ipa dnszone-add $everyware_CLUSTER2_NAME.$everyware_IPA_REALM_DOWNCASE
