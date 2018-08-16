@@ -34,7 +34,7 @@ everyware_CLUSTER4_NETWORK="${everyware_CLUSTER4_NETWORK:-10.100.4.0}"
 
 # Software
 everyware_CLOUDWARE_VERSION="${everyware_CLOUDWARE_VERSION:-dev/everyware}"
-everyware_METALWARE_VERSION="${everyware_METALWARE_VERSION:-2018.3.0-rc2}"
+everyware_METALWARE_VERSION="${everyware_METALWARE_VERSION:-2018.3.0}"
 
 
 # Metalware Specific
@@ -45,7 +45,7 @@ everyware_IPA_PASSWORD="${everyware_IPA_PASSWORD:-REPLACE_ME}"
 everyware_IPA_HOST="${everyware_IPA_HOST:-$(hostname -f)}"
 everyware_IPA_HOSTIP="${everyware_IPA_HOSTIP:-$(gethostip -d $(hostname))}"
 everyware_IPA_REALM="${everyware_IPA_REALM:-$(hostname -d |sed 's/^[^.]*.//g' |tr '[a-z]' '[A-Z]')}"
-everyware_IPA_REALM_DOWNCASE="${everyware_IPA_REALM:-$(hostname -d |sed 's/^[^.]*.//g')}"
+everyware_IPA_REALM_DOWNCASE="${everyware_IPA_REALM_DOWNCASE:-$(hostname -d |sed 's/^[^.]*.//g')}"
 everyware_IPA_DOMAIN="${everyware_IPA_DOMAIN:-$(hostname -d)}"
 everyware_IPA_DNS="${everyware_IPA_DNS:-$(grep nameserver -m 1 /etc/resolv.conf  |sed 's/nameserver //g')}"
 everyware_IPA_REVERSE="${everyware_IPA_REVERSE:-$(gethostip -d $(hostname) |awk -F. '{print $2"."$1}')}"
