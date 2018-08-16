@@ -26,7 +26,7 @@ everyware_CLUSTER4_NETWORK="${everyware_CLUSTER4_NETWORK:-10.100.4.0}"
 
 # Software
 everyware_CLOUDWARE_VERSION="${everyware_CLOUDWARE_VERSION:-dev/everyware}"
-everyware_METALWARE_VERSION="${everyware_METALWARE_VERSION:-2018.3.0}"
+everyware_METALWARE_VERSION="${everyware_METALWARE_VERSION:-2018.3.1}"
 
 # Metalware Specific
 everyware_METALWARE_REPO="${everyware_METALWARE_REPO:-dev/everyware}"
@@ -383,6 +383,7 @@ mv plugins/* ../plugins/
 metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstrun\": true, \
     \"metalware_internal--plugin_enabled--firstrun\": true, \
     \"metalware_internal--plugin_enabled--flightdirect\": false, \
+    \"metalware_internal--plugin_enabled--flightcenter\": true, \
     \"metalware_internal--plugin_enabled--ganglia\": true, \
     \"ganglia_serverip\": \"$everyware_IPA_HOSTIP\", \
     \"metalware_internal--plugin_enabled--infiniband\": false, \
@@ -482,15 +483,7 @@ EOF
 metal sync
 
 ## Local config
-#metal configure local --answers "{ \"ganglia_isserver\": true, \"nfs_isserver\": true }"
-
-## Workaround until local --answers is merged into official release
-mkdir -p /var/lib/metalware/staging/var/lib/metalware/rendered/system
-echo 'local    orphan' > /var/lib/metalware/staging/var/lib/metalware/rendered/system/genders
-cat << EOF > /var/lib/metalware/answers/nodes/local.yaml
-ganglia_isserver: true
-nfs_isserver: true
-EOF
+metal configure local --answers "{ \"ganglia_isserver\": true, \"nfs_isserver\": true }"
 
 cat << EOF > /var/lib/metalware/repo/config/local.yaml
 networks:
