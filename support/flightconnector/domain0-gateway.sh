@@ -13,7 +13,7 @@ yum install -y syslinux
 
 # General
 everyware_CLOUDWARE_SHORT_HOSTNAME="${everyware_CLOUDWARE_SHORT_HOSTNAME:-$(hostname -f |awk -F. '{print $1"."$2}')}"
-everyware_CLOUDWARE_DOMAIN_NAME="${everyware_CLUSTER_NAME:-$(hostname -d |awk -F. '{print $2}'}" # e.g. 'dom0.mycluster.alces.network' becomes 'mycluster'
+everyware_CLOUDWARE_DOMAIN_NAME="${everyware_CLUSTER_NAME:-$(hostname -d |awk -F. '{print $2}')}" # e.g. 'dom0.mycluster.alces.network' becomes 'mycluster'
 everyware_CLOUDWARE_DOMAIN_NETWORK="${everyware_CLOUDWARE_DOMAIN_NETWORK:-10.78.0.0}"
 everyware_PRIMARY_INTERFACE="${everyware_PRIMARY_INTERFACE:-eth0}"
 everyware_CLUSTER1_NAME="${everyware_CLUSTER1_NAME:-cluster1}"
