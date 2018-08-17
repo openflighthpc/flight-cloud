@@ -550,11 +550,6 @@ metal configure node $everyware_CLUSTER3_NAME-login1 --answers "{ \"pri_network_
 metal configure node $everyware_CLUSTER4_NAME-login1 --answers "{ \"pri_network_ip_node\": \"10.100.<%= node.group.index %>.10\", \"pri_network_gateway\": \"10.100.<%= node.group.index %>.1\" }"
 
 
-# Build local node
-metal template local && metal sync
-metal build local
-
-
 echo "
 
 ##############
