@@ -485,7 +485,7 @@ EOF
 metal sync
 
 ## Local config
-metal configure local --answers "{ \"ganglia_isserver\": true, \"nfs_isserver\": true }"
+metal configure local --answers "{ \"pri_network_short_hostname\": \"$everyware_CLOUDWARE_SHORT_HOSTNAME\", \"ganglia_isserver\": true, \"nfs_isserver\": true }"
 
 cat << EOF > /var/lib/metalware/repo/config/local.yaml
 networks:
@@ -494,7 +494,7 @@ networks:
     ip: $everyware_IPA_HOSTIP
     netmask: 255.255.0.0
     network: $everyware_CLOUDWARE_DOMAIN_NETWORK
-    short_hostname: $everyware_CLOUDWARE_SHORT_HOSTNAME
+    short_hostname: <%= answer.pri_network_short_hostname %>
     interface: $everyware_PRIMARY_INTERFACE
     gateway: $everyware_CLOUDWARE_DOMAIN_GATEWAY
 build_method: self
