@@ -195,3 +195,8 @@ Resources:
               - "runcmd:\n"
               - "- [ sh, -c, 'systemctl disable cloud-init' ]\n"
               - "- [ sh, -c, 'touch /etc/cloud/cloud-init.disabled' ]\n"
+              - Fn::Join:
+                - ''
+                - - "- [ sh, -c, 'ip route replace default via 10.100."
+                  - Ref: clusterIndex
+                  - ".10 dev eth0']\n"
