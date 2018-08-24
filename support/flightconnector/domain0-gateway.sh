@@ -16,6 +16,7 @@ everyware_CLOUDWARE_SHORT_HOSTNAME="${everyware_CLOUDWARE_SHORT_HOSTNAME:-$(host
 everyware_CLOUDWARE_DOMAIN_NAME="${everyware_CLUSTER_NAME:-$(hostname -d |awk -F. '{print $2}')}" # e.g. 'dom0.mycluster.alces.network' becomes 'mycluster'
 everyware_CLOUDWARE_DOMAIN_GATEWAY="${everyware_CLOUDWARE_DOMAIN_GATEWAY:-10.78.100.1}"
 everyware_CLOUDWARE_DOMAIN_NETWORK="${everyware_CLOUDWARE_DOMAIN_NETWORK:-10.78.0.0}"
+everyware_CLUSTERS_NETWORK="${everyware_CLOUDWARE_DOMAIN_NETWORK:-10.100.0.0}"
 everyware_PRIMARY_INTERFACE="${everyware_PRIMARY_INTERFACE:-eth0}"
 everyware_CLUSTER1_NAME="${everyware_CLUSTER1_NAME:-cluster1}"
 everyware_CLUSTER1_NETWORK="${everyware_CLUSTER1_NETWORK:-10.100.1.0}"
@@ -414,6 +415,7 @@ build_method: basic
 
 domain: $everyware_IPA_REALM_DOWNCASE
 cloudware_domain: $everyware_CLOUDWARE_DOMAIN_NETWORK
+clusters_network: $everyware_CLUSTERS_NETWORK
 search_domains: "<% config.networks.each do |network, details| -%><% next if network.to_s == 'ext' %><%= details.domain %><%= if network.to_s == 'bmc' then '.mgt' else '' end %>.<%= config.domain %> <% end -%><%= config.domain %>"
 dns_type: "<%= answer.dns_type %>"
 externaldns: $everyware_IPA_DNS
@@ -425,9 +427,9 @@ networks:
     defined: true
     interface: eth0
     hostname: "<%= config.networks.pri.short_hostname %>.<%= config.domain %>"
-    domain: pri
+    domain: <%= answer.pri_network_domain %>
     short_hostname: "<%= node.name.sub(node.group.name + '-', '') %>.<%= config.networks.pri.domain %>"
-    ip: <%= answer.pri_network_ip_node || answer.pri_network_ip || "10.100.#{node.group.index}.#{node.index + 19}"%>
+    ip: <%= answer.pri_network_ip_node || "10.100.#{node.group.index}.#{node.index + 19}"%>
     netmask: 255.255.255.0
     network: <%= answer.pri_network_network || "10.100.#{node.group.index}.0" %>
     gateway: <%= answer.pri_network_gateway || "10.100.#{node.group.index}.10" %>
@@ -538,10 +540,10 @@ EOF
 metal sync
 
 ## Cluster configs
-metal configure group $everyware_CLUSTER1_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER1_NAME-node[01-10],$everyware_CLUSTER1_NAME-login1\", \"genders_all_group\": true }"
-metal configure group $everyware_CLUSTER2_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER2_NAME-node[01-10],$everyware_CLUSTER2_NAME-login1\", \"genders_all_group\": true }"
-metal configure group $everyware_CLUSTER3_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER3_NAME-node[01-10],$everyware_CLUSTER3_NAME-login1\", \"genders_all_group\": true }"
-metal configure group $everyware_CLUSTER4_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER4_NAME-node[01-10],$everyware_CLUSTER4_NAME-login1\", \"genders_all_group\": true }"
+metal configure group $everyware_CLUSTER1_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER1_NAME-node[01-10],$everyware_CLUSTER1_NAME-login1\", \"genders_all_group\": true, \"pri_network_domain\": \"$everyware_CLUSTER1_NAME\" }"
+metal configure group $everyware_CLUSTER2_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER2_NAME-node[01-10],$everyware_CLUSTER2_NAME-login1\", \"genders_all_group\": true, \"pri_network_domain\": \"$everyware_CLUSTER2_NAME\" }"
+metal configure group $everyware_CLUSTER3_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER3_NAME-node[01-10],$everyware_CLUSTER3_NAME-login1\", \"genders_all_group\": true, \"pri_network_domain\": \"$everyware_CLUSTER3_NAME\" }"
+metal configure group $everyware_CLUSTER4_NAME --answers "{ \"genders_host_range\": \"$everyware_CLUSTER4_NAME-node[01-10],$everyware_CLUSTER4_NAME-login1\", \"genders_all_group\": true, \"pri_network_domain\": \"$everyware_CLUSTER4_NAME\" }"
 
 metal sync
 
