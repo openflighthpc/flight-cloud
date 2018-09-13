@@ -369,6 +369,7 @@ cd /opt/directory/cli/bin
 curl https://s3-eu-west-1.amazonaws.com/flightconnector/directory/resources/sandbox-starter > sandbox-starter
 
 # IPA Admin User Config
+useradd ipaadmin
 su - ipaadmin -c "ssh-keygen -f /home/ipaadmin/.ssh/id_rsa -N ''"
 cat << EOF > /home/ipaadmin/.ssh/authorized_keys
 command="/opt/directory/cli/bin/sandbox-starter",no-port-forwarding,no-x11-forwarding,no-agent-forwarding $(cat /home/ipaadmin/.ssh/id_rsa.pub)
