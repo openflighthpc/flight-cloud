@@ -185,6 +185,26 @@ cd /var/lib/metalware/repo/
 git checkout dev/everyware-minimalrepo
 mv plugins/* ../plugins/
 
+metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstrun\": true, \
+    \"root_password\": \"REPLACEME\", \
+    \"root_ssh_key\": \"REPLACEME\", \
+    \"metalware_internal--plugin_enabled--firstrun\": true, \
+    \"metalware_internal--plugin_enabled--flightdirect\": false, \
+    \"metalware_internal--plugin_enabled--flightcenter\": true, \
+    \"metalware_internal--plugin_enabled--ganglia\": true, \
+    \"ganglia_serverip\": \"10.78.100.10\", \
+    \"metalware_internal--plugin_enabled--infiniband\": false, \
+    \"metalware_internal--plugin_enabled--ipa\": true, \
+    \"ipa_serverip\": \"10.78.100.10\", \
+    \"ipa_userdir\": \"/users/\", \
+    \"metalware_internal--plugin_enabled--lustre\": false, \
+    \"metalware_internal--plugin_enabled--nfs\": true, \
+    \"nfs_isclient\": true, \
+    \"metalware_internal--plugin_enabled--nvidia\": false, \
+    \"metalware_internal--plugin_enabled--rootrun\": false, \
+    \"metalware_internal--plugin_enabled--slurm\": false, \
+    \"metalware_internal--plugin_enabled--yumrepo\": false }"
+
 cat << EOF > /var/lib/metalware/repo/config/domain.yaml
 cluster: '<%= answer.cluster_name %>'
 # GENERATE with openssl passwd -1 \$PASSWD.
@@ -269,24 +289,6 @@ firewall:
 postfix:
   relayhost: gateway.dom0.<%= config.domain %>
 EOF
-
-metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstrun\": true, \
-    \"metalware_internal--plugin_enabled--firstrun\": true, \
-    \"metalware_internal--plugin_enabled--flightdirect\": false, \
-    \"metalware_internal--plugin_enabled--flightcenter\": true, \
-    \"metalware_internal--plugin_enabled--ganglia\": true, \
-    \"ganglia_serverip\": \"10.78.100.10\", \
-    \"metalware_internal--plugin_enabled--infiniband\": false, \
-    \"metalware_internal--plugin_enabled--ipa\": true, \
-    \"ipa_serverip\": \"10.78.100.10\", \
-    \"ipa_userdir\": \"/users/\", \
-    \"metalware_internal--plugin_enabled--lustre\": false, \
-    \"metalware_internal--plugin_enabled--nfs\": true, \
-    \"nfs_isclient\": true, \
-    \"metalware_internal--plugin_enabled--nvidia\": false, \
-    \"metalware_internal--plugin_enabled--rootrun\": false, \
-    \"metalware_internal--plugin_enabled--slurm\": false, \
-    \"metalware_internal--plugin_enabled--yumrepo\": false }"
 
 metal sync
 
