@@ -186,6 +186,7 @@ git checkout dev/everyware-minimalrepo
 mv plugins/* ../plugins/
 
 metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstrun\": true, \
+    \"cluster_name\": \"REPLACEME\", \
     \"root_password\": \"REPLACEME\", \
     \"root_ssh_key\": \"REPLACEME\", \
     \"metalware_internal--plugin_enabled--firstrun\": true, \
@@ -222,7 +223,7 @@ cloudware_domain: 10.78.0.0
 clusters_network: 10.100.0.0
 search_domains: "<% config.networks.each do |network, details| -%><% next if network.to_s == 'ext' %><%= details.domain %><%= if network.to_s == 'bmc' then '.mgt' else '' end %>.<%= config.domain %> <% end -%><%= config.domain %>"
 dns_type: "<%= answer.dns_type %>"
-externaldns: <%= answer.externaldns %>
+externaldns: 10.78.100.2
 internaldns: 10.78.100.10
 kernelappendoptions: "console=tty0 console=ttyS1,115200n8"
 jobid: ""
