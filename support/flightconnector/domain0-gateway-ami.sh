@@ -217,12 +217,12 @@ ssh_key: '<%= answer.root_ssh_key %>'
 
 # Generic networking properties.
 domain: <%= answer.domain %>
-cloudware_domain: 10.75.0.0
+cloudware_domain: 10.78.0.0
 clusters_network: 10.100.0.0
 search_domains: "<% config.networks.each do |network, details| -%><% next if network.to_s == 'ext' %><%= details.domain %><%= if network.to_s == 'bmc' then '.mgt' else '' end %>.<%= config.domain %> <% end -%><%= config.domain %>"
 dns_type: "<%= answer.dns_type %>"
 externaldns: <%= answer.externaldns %>
-internaldns: 10.75.100.10
+internaldns: 10.78.100.10
 kernelappendoptions: "console=tty0 console=ttyS1,115200n8"
 jobid: ""
 
@@ -301,9 +301,9 @@ cat << EOF > /var/lib/metalware/repo/config/local.yaml
 networks:
   pri:
     defined: true
-    ip: 10.75.100.10
+    ip: 10.78.100.10
     netmask: 255.255.0.0
-    network: 10.75.0.0
+    network: 10.78.0.0
     short_hostname: <%= answer.pri_network_short_hostname %>
     interface: eth0
     gateway: 10.78.100.1
