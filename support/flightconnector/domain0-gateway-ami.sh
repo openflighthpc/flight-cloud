@@ -197,6 +197,7 @@ metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstr
     \"metalware_internal--plugin_enabled--ipa\": true, \
     \"ipa_serverip\": \"10.78.100.10\", \
     \"ipa_userdir\": \"/users/\", \
+    \"ipa_insecurepassword\": \"REPLACEME\", \
     \"metalware_internal--plugin_enabled--lustre\": false, \
     \"metalware_internal--plugin_enabled--nfs\": true, \
     \"nfs_isclient\": true, \
