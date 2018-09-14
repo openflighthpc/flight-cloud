@@ -178,7 +178,7 @@ curl -sL https://git.io/vbsTg | alces_OS=el7 alces_SOURCE_BRANCH=dev/everyware-m
 #############
 # METALWARE #
 #############
-curl -sL http://git.io/metalware-installer |alces_OS=el7 alces_SOURCE_BRANCH=2018.3.1 /bin/bash
+curl -sL http://git.io/metalware-installer |alces_OS=el7 alces_SOURCE_BRANCH=2018.4.0-rc1 /bin/bash
 source /etc/profile.d/alces-metalware.sh
 metal repo use https://github.com/alces-software/metalware-repo-base.git
 cd /var/lib/metalware/repo/
