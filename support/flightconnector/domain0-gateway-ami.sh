@@ -196,6 +196,7 @@ metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstr
     \"metalware_internal--plugin_enabled--infiniband\": false, \
     \"metalware_internal--plugin_enabled--ipa\": true, \
     \"ipa_serverip\": \"10.78.100.10\", \
+    \"ipa_servername\": \"gateway.dom0\", \
     \"ipa_userdir\": \"/users/\", \
     \"ipa_insecurepassword\": \"REPLACEME\", \
     \"metalware_internal--plugin_enabled--lustre\": false, \
@@ -232,17 +233,14 @@ networks:
     interface: eth0
     hostname: "<%= config.networks.pri.short_hostname %>.<%= config.domain %>"
     domain: <%= answer.pri_network_domain %>
-    short_hostname: "<%= node.name.sub(node.group.name + '-', '') %>.<%= config.networks.
-pri.domain %>"
-    ip: <%= answer.pri_network_ip_node || "10.100.#{node.group.index}.#{node.index + 19}"
-%>
+    short_hostname: "<%= node.name.sub(node.group.name + '-', '') %>.<%= config.networks.pri.domain %>"
+    ip: <%= answer.pri_network_ip_node || "10.100.#{node.group.index}.#{node.index + 19}"%>
     netmask: 255.255.255.0
     network: <%= answer.pri_network_network || "10.100.#{node.group.index}.0" %>
     gateway: <%= answer.pri_network_gateway || "10.100.#{node.group.index}.10" %>
     primary: true
     named_fwd_zone: "<%= config.networks.pri.domain %>.<%= config.domain %>"
-    named_rev_zone: <% split_net = config.networks.pri.network.split(/\./) -%><%= split_n
-et[1] %>.<%= split_net[0] %>
+    named_rev_zone: <% split_net = config.networks.pri.network.split(/\./) -%><%= split_net[1] %>.<%= split_net[0] %>
     firewallpolicy: trusted
 
 files:
