@@ -1,3 +1,16 @@
+#############
+# VARIABLES #
+#############
+ROOT_PASSWORD="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
+IPA_PASS_SECURE="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
+IPA_PASS_INSECURE="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
+
+cat << EOF > /root/details.txt
+Root Pass: $ROOT_PASSWORD
+IPA Secure Password: $IPA_PASS_SECURE
+IPA Insecure Password: $IPA_PASS_INSECURE
+EOF
+
 #######
 # VPN #
 #######
@@ -19,13 +32,15 @@ systemctl restart openvpn@flightconnector
 #############
 # METALWARE #
 #############
-metal configure domain --answers "{ \"cluster_name\": \"$CLUSTER_NAME\", \
-    \"root_password\": \"$ROOT_PASSWORD\", \
-    \"externaldns\": \"$IP_FROM_RESOLVCONF\", \
-    \"ipa_serverip\": \"$everyware_IPA_HOSTIP\", \
-    \"ipa_insecurepassword\": \"$everyware_IPA_INSECUREPASSWORD\" }"
 
-metal sync
+sed -i "s/root_password: REPLACEME/root_password: $ROOT_PASSWORD/g;s/ipa_insecurepassword: REPLACEME/ipa_insecurepassword: $IPA_PASS_INSECURE/g" /var/lib/metalware/answers/domain.yaml
+
+
+# FIX THIS IN METLAWARE SO IT DOESN'T OVERWRITE
+#
+#metal configure domain --answers "{ \"cluster_name\": \"$CLUSTER_NAME\", \
+#    \"root_password\": \"$(openssl -1 passwd $(cat /dev/urandom |tr -dc 'a-zA-Z0-0'      |fold -w 8 |head -1))\", \
+#    \"ipa_insecurepassword\": \"$everyware_IPA_INSECUREPASSWORD\" }"
 
 metal template local
 metal sync
@@ -41,13 +56,17 @@ systemctl restart chronyd
 # IPA #
 #######
 
-echo "cw_ACCESS_fqdn=$(hostname -f)" > /opt/directory/etc/access.rc
-echo "IPAPASSWORD=$everyware_IPA_SECUREPASSWORD" > /opt/directory/etc/config
+IPA_REALM=$(hostname -d |sed 's/^[^.]*.//g' |tr '[a-z]' '[A-Z]')
+IPA_DOMAIN=$(hostname -d)
+IPA_REVERSE=$(hostname -d |sed 's/^[^.]*.//g' |tr '[a-z]' '[A-Z]')
 
-ipa-server-install -a $everyware_IPA_SECUREPASSWORD --hostname $everyware_IPA_HOST --ip-address=$everyware_IPA_HOSTIP -r "$everyware_IPA_REALM" -p $everyware_IPA_SECUREPASSWORD -n "$everyware_IPA_DOMAIN" --no-ntp --setup-dns --forwarder="$everyware_IPA_DNS" --reverse-zone="$everyware_IPA_REVERSE.in-addr.arpa." --ssh-trust-dns --unattended
+echo "cw_ACCESS_fqdn=$(hostname -f)" > /opt/directory/etc/access.rc
+echo "IPAPASSWORD=$IPA_PASS_SECURE" > /opt/directory/etc/config
+
+ipa-server-install -a $IPA_PASS_SECURE --hostname $(hostname -f) --ip-address=10.75.100.10 -r "$IPA_REALM" -p $IPA_PASS_SECURE -n "$IPA_DOMAIN" --no-ntp --setup-dns --forwarder="10.75.100.2" --reverse-zone="$IPA_REVERSE.in-addr.arpa." --ssh-trust-dns --unattended
 
 cat << EOF > /etc/resolv.conf
-search $everyware_IPA_DOMAIN
+search $IPA_DOMAIN
 nameserver 127.0.0.1
 EOF
 
