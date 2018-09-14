@@ -4,6 +4,7 @@
 ROOT_PASSWORD="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
 IPA_PASS_SECURE="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
 IPA_PASS_INSECURE="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
+CLUSTER_NAME="$(hostname -d |awk -F. '{print $2}')"
 
 cat << EOF > /root/details.txt
 Root Pass: $ROOT_PASSWORD
@@ -33,7 +34,7 @@ systemctl restart openvpn@flightconnector
 # METALWARE #
 #############
 
-sed -i "s/root_password: REPLACEME/root_password: $ROOT_PASSWORD/g;s/ipa_insecurepassword: REPLACEME/ipa_insecurepassword: $IPA_PASS_INSECURE/g" /var/lib/metalware/answers/domain.yaml
+sed -i "s/root_password: REPLACEME/root_password: $ROOT_PASSWORD/g;s/ipa_insecurepassword: REPLACEME/ipa_insecurepassword: $IPA_PASS_INSECURE/g;s/cluster_name: REPLACEME/cluster_name: $CLUSTER_NAME/g" /var/lib/metalware/answers/domain.yaml
 
 
 # FIX THIS IN METLAWARE SO IT DOESN'T OVERWRITE
