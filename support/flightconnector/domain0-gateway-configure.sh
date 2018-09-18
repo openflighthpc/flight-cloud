@@ -5,7 +5,7 @@ ROOT_PASSWORD="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
 IPA_PASS_SECURE="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
 IPA_PASS_INSECURE="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
 CLUSTER_NAME="$(hostname -d |awk -F. '{print $2}')"
-SSH_KEY="$(head -n 1 .ssh/authorized_keys |sed 's/.* ssh-rsa/ssh-rsa/g')"
+SSH_KEY="$(head -n 1 .ssh/authorized_keys |sed 's/.* ssh-rsa/ssh-rsa/g' | sed 's/\//\\\//g')" # Escape slashes so sed doesn't break
 
 cat << EOF > /root/details.txt
 Root Pass: $ROOT_PASSWORD
@@ -51,7 +51,7 @@ metal build local
 
 systemctl enable gmetad
 systemctl start gmetad
-cp /var/lib/metalware/rendered/local/files/repo/core/chrony.conf /etc/chrony.conf
+cp -f /var/lib/metalware/rendered/local/files/repo/core/chrony.conf /etc/chrony.conf
 systemctl restart chronyd
 
 #######
@@ -105,6 +105,7 @@ EOF
 echo
 echo "#########################################################"
 echo "The configuration has completed, now manually:"
+echo "  - Reboot this machine"
 echo "  - Update /root/.flightconnector.yml"
 echo "#########################################################"
 echo
