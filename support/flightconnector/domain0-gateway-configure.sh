@@ -64,7 +64,13 @@ IPA_REVERSE=$(hostname -d |sed 's/^[^.]*.//g' |tr '[a-z]' '[A-Z]')
 echo "cw_ACCESS_fqdn=$(hostname -f)" > /opt/directory/etc/access.rc
 echo "IPAPASSWORD=$IPA_PASS_SECURE" > /opt/directory/etc/config
 
+# Temporarily stop HTTP server to avoid error:
+#   IPA requires port 8443 for PKI but it is currently in use.
+systemctl stop httpd
+
 ipa-server-install -a $IPA_PASS_SECURE --hostname $(hostname -f) --ip-address=10.78.100.10 -r "$IPA_REALM" -p $IPA_PASS_SECURE -n "$IPA_DOMAIN" --no-ntp --setup-dns --forwarder="10.78.100.2" --reverse-zone="$IPA_REVERSE.in-addr.arpa." --ssh-trust-dns --unattended
+
+systemctl start httpd
 
 cat << EOF > /etc/resolv.conf
 search $IPA_DOMAIN
