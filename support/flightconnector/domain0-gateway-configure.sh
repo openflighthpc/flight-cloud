@@ -5,6 +5,7 @@ ROOT_PASSWORD="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
 IPA_PASS_SECURE="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
 IPA_PASS_INSECURE="$(cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w 8 |head -1)"
 CLUSTER_NAME="$(hostname -d |awk -F. '{print $2}')"
+SSH_KEY="$(head -n 1 .ssh/authorized_keys |sed 's/.* ssh-rsa/ssh-rsa/g')"
 
 cat << EOF > /root/details.txt
 Root Pass: $ROOT_PASSWORD
@@ -34,13 +35,13 @@ systemctl restart openvpn@flightconnector
 # METALWARE #
 #############
 
-sed -i "s/root_password: REPLACEME/root_password: $ROOT_PASSWORD/g;s/ipa_insecurepassword: REPLACEME/ipa_insecurepassword: $IPA_PASS_INSECURE/g;s/cluster_name: REPLACEME/cluster_name: $CLUSTER_NAME/g" /var/lib/metalware/answers/domain.yaml
+sed -i "s/root_password: REPLACEME/root_password: $ROOT_PASSWORD/g;s/ipa_insecurepassword: REPLACEME/ipa_insecurepassword: $IPA_PASS_INSECURE/g;s/cluster_name: REPLACEME/cluster_name: $CLUSTER_NAME/g;s/root_ssh_key: REPLACEME/root_ssh_key: $SSH_KEY/g" /var/lib/metalware/answers/domain.yaml
 
 
 # FIX THIS IN METLAWARE SO IT DOESN'T OVERWRITE
 #
 #metal configure domain --answers "{ \"cluster_name\": \"$CLUSTER_NAME\", \
-#    \"root_password\": \"$(openssl -1 passwd $(cat /dev/urandom |tr -dc 'a-zA-Z0-0'      |fold -w 8 |head -1))\", \
+#    \"root_password\": \"$(openssl -1 passwd $(cat /dev/urandom |tr -dc 'a-zA-Z0-0' |fold -w 8 |head -1))\", \
 #    \"ipa_insecurepassword\": \"$everyware_IPA_INSECUREPASSWORD\" }"
 
 metal template local
@@ -59,7 +60,7 @@ systemctl restart chronyd
 
 IPA_REALM=$(hostname -d |sed 's/^[^.]*.//g' |tr '[a-z]' '[A-Z]')
 IPA_DOMAIN=$(hostname -d)
-IPA_REVERSE=$(hostname -d |sed 's/^[^.]*.//g' |tr '[a-z]' '[A-Z]')
+IPA_REVERSE=$(gethostip -d $(hostname) |awk -F. '{print $2"."$1}')
 
 echo "cw_ACCESS_fqdn=$(hostname -f)" > /opt/directory/etc/access.rc
 echo "IPAPASSWORD=$IPA_PASS_SECURE" > /opt/directory/etc/config
