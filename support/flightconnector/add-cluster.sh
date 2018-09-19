@@ -162,7 +162,7 @@ fc machine create --domain $CLOUDWARE_DOMAIN --role login --cluster-index $CLUST
 
 sleep 60
 
-LOGIN_NODE_IP="$(fc machine info -d $CLOUDWARE_DOMAIN $LOGIN_NODE |grep -i external |awk '{print $4}')"
+LOGIN_NODE_IP="$(fc machine info -d $CLOUDWARE_DOMAIN $LOGIN_NODE |grep "External IP" |awk '{print $5}')"
 
 ################
 # BUILD IT ALL #
