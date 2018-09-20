@@ -36,7 +36,7 @@ help() {
 To add a cluster using this script first export the relevant variables as explained below:
     CLUSTER_NAME = The name of the cluster (e.g. export CLUSTER_NAME="cluster1")
     LOGIN_NODE = The name of the login node (e.g. export LOGIN_NODE="cluster1-login1")
-    CLUSTER_GROUPS = A space separated list of primary node groups (e.g. export CLUSTER_GROUPS="login nodes gpu")
+    CLUSTER_GROUPS = A space separated list of primary node groups (e.g. export CLUSTER_GROUPS="nodes gpu")
         <GROUP NAME>_NODES = A space separated list of nodes for each of the above groups (e.g.
             export nodes_NODES="cluster1-node01 cluster1-node02 cluster1-node03 cluster1-node04 cluster1-node05"
             export gpu_NODES="cluster1-gpu01 cluster1-gpu02")
@@ -67,6 +67,8 @@ for group in $(echo $CLUSTER_GROUPS) ; do
         help
         exit 1
     fi
+
+    # TODO Check for clustername in nodenames
 done
 
 #################
@@ -166,17 +168,21 @@ done
 #############
 # CLOUDWARE #
 #############
+source /etc/profile.d/cloudware.sh
+
 CLOUDWARE_DOMAIN="$CLUSTER_NAME-$(echo $DOMAIN_NAME |sed 's/\./\-/g')"
 
-fc domain create -t domainU --cluster-index $CLUSTER_INDEX --networkcidr $CLUSTER_NETWORK_PREFIX.0/24 --prisubnetcidr $CLUSTER_NETWORK_PREFIX.0/24 $CLOUDWARE_DOMAIN
+echo "Creating $CLUSTER_NAME domain"
+flightconnector domain create -t domainU --cluster-index $CLUSTER_INDEX --networkcidr $CLUSTER_NETWORK_PREFIX.0/24 --prisubnetcidr $CLUSTER_NETWORK_PREFIX.0/24 $CLOUDWARE_DOMAIN
 
 sleep 5
 
-fc machine create --domain $CLOUDWARE_DOMAIN --role login --cluster-index $CLUSTER_INDEX --priip $CLUSTER_NETWORK_PREFIX.10 $LOGIN_NODE
+echo "Creating $LOGIN_NODE"
+flightconnector machine create --domain $CLOUDWARE_DOMAIN --role login --cluster-index $CLUSTER_INDEX --priip $CLUSTER_NETWORK_PREFIX.10 $LOGIN_NODE
 
 sleep 5
 
-LOGIN_NODE_IP="$(fc machine info -d $CLOUDWARE_DOMAIN $LOGIN_NODE |grep "External IP" |awk '{print $5}')"
+LOGIN_NODE_IP="$(flightconnector machine info -d $CLOUDWARE_DOMAIN $LOGIN_NODE |grep "External IP" |awk '{print $5}')"
 
 ################
 # BUILD IT ALL #
@@ -200,9 +206,10 @@ ssh alces@$LOGIN_NODE_IP "sudo init 6"
 sleep 60
 
 for group in $(echo $CLUSTER_GROUPS) ; do
+    echo "Creating nodes in $group"
     NODES="${group}_NODES"
     for node in $(echo ${!NODES}) ; do
-        fc machine create --domain $CLOUDWARE_DOMAIN --role compute --cluster-index $CLUSTER_INDEX --priip $(gethostip -d $node) --type tiny $node &
+        flightconnector machine create --domain $CLOUDWARE_DOMAIN --role compute --cluster-index $CLUSTER_INDEX --priip $(gethostip -d $node) --type tiny $node &
     done
 done
 
