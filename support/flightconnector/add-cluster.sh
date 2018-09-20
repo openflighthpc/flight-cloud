@@ -36,7 +36,7 @@ help() {
 To add a cluster using this script first export the relevant variables as explained below:
     CLUSTER_NAME = The name of the cluster (e.g. export CLUSTER_NAME="cluster1")
     LOGIN_NODE = The name of the login node (e.g. export LOGIN_NODE="cluster1-login1")
-    GROUPS = A space separated list of primary node groups (e.g. export GROUPS="login nodes gpu")
+    CLUSTER_GROUPS = A space separated list of primary node groups (e.g. export CLUSTER_GROUPS="login nodes gpu")
         <GROUP NAME>_NODES = A space separated list of nodes for each of the above groups (e.g.
             export nodes_NODES="cluster1-node01 cluster1-node02 cluster1-node03 cluster1-node04 cluster1-node05"
             export gpu_NODES="cluster1-gpu01 cluster1-gpu02")
@@ -49,7 +49,7 @@ EOF
 }
 
 
-for variable in CLUSTER_NAME LOGIN_NODE GROUPS ; do
+for variable in CLUSTER_NAME LOGIN_NODE CLUSTER_GROUPS ; do
     if [ -z ${!variable+x} ] ; then
         echo "$variable is unset, export before continuing"
         echo
@@ -58,7 +58,7 @@ for variable in CLUSTER_NAME LOGIN_NODE GROUPS ; do
     fi
 done
 
-for group in $(echo $GROUPS) ; do
+for group in $(echo $CLUSTER_GROUPS) ; do
     # Check for nodes
     VAR="${group}_NODES"
     if [ -z ${!VAR+x} ] ; then
@@ -69,10 +69,10 @@ for group in $(echo $GROUPS) ; do
     fi
 done
 
-
 #################
 # OPENVPN SETUP #
 #################
+cd /etc/openvpn/easyrsa
 ./easyrsa --req-cn=$CLUSTER_NAME gen-req $CLUSTER_NAME nopass
 ./easyrsa sign-req client $CLUSTER_NAME
 
@@ -99,7 +99,7 @@ systemctl restart openvpn@flightconnector
 #############
 
 # Configure login node group
-metal configure group $CLUSTER_NAME-$login --answers \
+metal configure group $LOGIN_NODE --answers \
     "{ \"genders_host_range\": \"$LOGIN_NODE\", \
     \"genders_additional_groups\": \"$CLUSTER_NAME\", \
     \"genders_all_group\": true, \
@@ -107,15 +107,22 @@ metal configure group $CLUSTER_NAME-$login --answers \
     \"pri_network_gateway\": \"$CLUSTER_NETWORK_PREFIX.1\", \
     \"pri_network_domain\": \"$CLUSTER_NAME\"}"
 
+# Ensure login node uses external firewall zone for eth0
+cat << EOF > /var/lib/metalware/repo/config/$LOGIN_NODE
+networks:
+  pri:
+    firewallpolicy: external
+EOF
+
 # When adding multiple nodes node.index is not going to work for the subnet so offset by node count
 # This starts at 10 as the login node will be .10 so first node will be .11
 GROUP_STEP=10
 
-for group in $(echo $GROUPS) ; do
+for group in $(echo $CLUSTER_GROUPS) ; do
     NODES="${group}_NODES"
     SEC_GROUPS="${group}_SEC_GROUPS"
     metal configure group $CLUSTER_NAME-$group --answers \
-        "{ \"genders_host_range\": \"${!NODES}\", \
+        "{ \"genders_host_range\": \"$(echo ${!NODES}|sed 's/ /,/g')\", \
         \"genders_additional_groups\": \"$CLUSTER_NAME,$(echo ${!SEC_GROUPS}|sed 's/ /,/g')\", \
         \"genders_all_group\": true, \
         \"pri_network_ip\": \"$CLUSTER_NETWORK_PREFIX.<%= node.index + $GROUP_STEP %>\", \
@@ -144,11 +151,14 @@ echo $IPA_PASS_SECURE |kinit admin
 
 ipa dnszone-add $CLUSTER_NAME.$DOMAIN_NAME
 
+# Add login node
+ipa host-add $(echo $LOGIN_NODE |sed "s/$CLUSTER_NAME-//g").$CLUSTER_NAME.$DOMAIN_NAME --password="$IPA_PASS_INSECURE" --ip-address="$CLUSTER_NETWORK_PREFIX.10"
+
 # Add all the nodes
-for group in $(echo $GROUPS) ; do
+for group in $(echo $CLUSTER_GROUPS) ; do
     NODES="${group}_NODES"
     for node in $(echo ${!NODES}) ; do
-        ipa host-add $(echo $node |sed "s/$CLUSTER_NAME-//g").$CLUSTER_NAME.$DOMAIN_NAME --password="$IPA_PASS_INSECURE" --ip-address="$(gethostip -x $node)"
+        ipa host-add $(echo $node |sed "s/$CLUSTER_NAME-//g").$CLUSTER_NAME.$DOMAIN_NAME --password="$IPA_PASS_INSECURE" --ip-address="$(gethostip -d $node)"
     done
 done
 
@@ -164,7 +174,7 @@ sleep 5
 
 fc machine create --domain $CLOUDWARE_DOMAIN --role login --cluster-index $CLUSTER_INDEX --priip $CLUSTER_NETWORK_PREFIX.10 $LOGIN_NODE
 
-sleep 60
+sleep 5
 
 LOGIN_NODE_IP="$(fc machine info -d $CLOUDWARE_DOMAIN $LOGIN_NODE |grep "External IP" |awk '{print $5}')"
 
@@ -177,42 +187,53 @@ ssh alces@$LOGIN_NODE_IP "sudo init 6"
 
 sleep 60
 
-metal template $CLUSTER_NAME-$LOGIN_NODE
+metal template $LOGIN_NODE
 metal sync
-metal build $CLUSTER_NAME-$LOGIN_NODE &
+metal build $LOGIN_NODE &
 
-ssh alces@$LOGIN_NODE_IP "curl http://10.78.100.10/metalware/basic/cluster1-login1 |sudo /bin/bash"
+ssh alces@$LOGIN_NODE_IP "curl http://10.78.100.10/metalware/basic/$LOGIN_NODE |sudo /bin/bash"
+
+wait
+
 ssh alces@$LOGIN_NODE_IP "sudo init 6"
 
-sleep 30
+sleep 60
 
-for group in $(echo $GROUPS) ; do
+for group in $(echo $CLUSTER_GROUPS) ; do
     NODES="${group}_NODES"
-    for node in $(echo $NODES) ; do
-        fc machine create --domain $CLOUDWARE_DOMAIN --role compute --cluster-index $CLUSTER_INDEX --priip $(gethostip -d $node) $node &
+    for node in $(echo ${!NODES}) ; do
+        fc machine create --domain $CLOUDWARE_DOMAIN --role compute --cluster-index $CLUSTER_INDEX --priip $(gethostip -d $node) --type tiny $node &
     done
 done
 
 wait
 
-sleep 30
+sleep 15
 
 metal template -g all
 metal sync
 
-for group in $(echo $GROUPS) ; do
+for group in $(echo $CLUSTER_GROUPS) ; do
     metal build -g $CLUSTER_NAME-$group &
 done
 
-for group in $(echo $GROUPS) ; do
+for group in $(echo $CLUSTER_GROUPS) ; do
     NODES="${group}_NODES"
-    for node in $(echo $NODES) ; do
+    for node in $(echo ${!NODES}) ; do
         ssh alces@$node "curl http://10.78.100.10/metalware/basic/$node |sudo /bin/bash" &
     done
 done
 
 wait
 
+for group in $(echo $CLUSTER_GROUPS) ; do
+    NODES="${group}_NODES"
+    for node in $(echo ${!NODES}) ; do
+        ssh alces@$node "init 6" &
+    done
+done
+
+wait
 
 ############
 # INDEXING #
