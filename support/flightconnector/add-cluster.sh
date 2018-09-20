@@ -60,9 +60,10 @@ done
 
 for group in $(echo $GROUPS) ; do
     # Check for nodes
-    VAR="$group\_NODES"
+    VAR="${group}_NODES"
     if [ -z ${!VAR+x} ] ; then
         echo "$VAR is unset, set this to a space-separated list of nodenames for the group"
+        echo
         help
         exit 1
     fi
@@ -111,9 +112,11 @@ metal configure group $CLUSTER_NAME-$login --answers \
 GROUP_STEP=10
 
 for group in $(echo $GROUPS) ; do
+    NODES="${group}_NODES"
+    SEC_GROUPS="${group}_SEC_GROUPS"
     metal configure group $CLUSTER_NAME-$group --answers \
-        "{ \"genders_host_range\": \"$(eval echo \$$group\_NODES)\", \
-        \"genders_additional_groups\": \"$CLUSTER_NAME,$(eval echo \$$group\_SEC_GROUPS |sed 's/ /,/g')\", \
+        "{ \"genders_host_range\": \"${!NODES}\", \
+        \"genders_additional_groups\": \"$CLUSTER_NAME,$(echo ${!SEC_GROUPS}|sed 's/ /,/g')\", \
         \"genders_all_group\": true, \
         \"pri_network_ip\": \"$CLUSTER_NETWORK_PREFIX.<%= node.index + $GROUP_STEP %>\", \
         \"pri_network_gateway\": \"$CLUSTER_NETWORK_PREFIX.10\", \
@@ -122,7 +125,7 @@ for group in $(echo $GROUPS) ; do
     metal sync
 
     # Increase the value to be added to the index
-    NODECOUNT=$(eval echo \$$group\_NODES |wc -w)
+    NODECOUNT=$(echo ${!NODES} |wc -w)
     GROUP_STEP=$(( GROUP_STEP + NODECOUNT ))
     echo "GROUP_STEP increased by $NODECOUNT to $GROUP_STEP"
 done
@@ -143,7 +146,8 @@ ipa dnszone-add $CLUSTER_NAME.$DOMAIN_NAME
 
 # Add all the nodes
 for group in $(echo $GROUPS) ; do
-    for node in $(eval echo \$$group\_NODES) ; do
+    NODES="${group}_NODES"
+    for node in $(echo ${!NODES}) ; do
         ipa host-add $(echo $node |sed "s/$CLUSTER_NAME-//g").$CLUSTER_NAME.$DOMAIN_NAME --password="$IPA_PASS_INSECURE" --ip-address="$(gethostip -x $node)"
     done
 done
@@ -168,14 +172,14 @@ LOGIN_NODE_IP="$(fc machine info -d $CLOUDWARE_DOMAIN $LOGIN_NODE |grep "Externa
 # BUILD IT ALL #
 ################
 
-ssh alces@$LOGIN_NODE_IP "sudo bash -l -s" -- < install_$CLUSTER_NAME.run
+ssh alces@$LOGIN_NODE_IP "sudo bash -l -s" -- < /root/install_$CLUSTER_NAME.run
 ssh alces@$LOGIN_NODE_IP "sudo init 6"
 
 sleep 60
 
-metal template cluster1-login1
+metal template $CLUSTER_NAME-$LOGIN_NODE
 metal sync
-metal build cluster1-login1 &
+metal build $CLUSTER_NAME-$LOGIN_NODE &
 
 ssh alces@$LOGIN_NODE_IP "curl http://10.78.100.10/metalware/basic/cluster1-login1 |sudo /bin/bash"
 ssh alces@$LOGIN_NODE_IP "sudo init 6"
@@ -183,7 +187,8 @@ ssh alces@$LOGIN_NODE_IP "sudo init 6"
 sleep 30
 
 for group in $(echo $GROUPS) ; do
-    for node in $(eval echo \$$group\_NODES) ; do
+    NODES="${group}_NODES"
+    for node in $(echo $NODES) ; do
         fc machine create --domain $CLOUDWARE_DOMAIN --role compute --cluster-index $CLUSTER_INDEX --priip $(gethostip -d $node) $node &
     done
 done
@@ -200,7 +205,8 @@ for group in $(echo $GROUPS) ; do
 done
 
 for group in $(echo $GROUPS) ; do
-    for node in $(eval echo \$$group\_NODES) ; do
+    NODES="${group}_NODES"
+    for node in $(echo $NODES) ; do
         ssh alces@$node "curl http://10.78.100.10/metalware/basic/$node |sudo /bin/bash" &
     done
 done
