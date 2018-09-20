@@ -236,7 +236,7 @@ wait
 for group in $(echo $CLUSTER_GROUPS) ; do
     NODES="${group}_NODES"
     for node in $(echo ${!NODES}) ; do
-        ssh alces@$node "init 6" &
+        ssh root@$node "init 6" &
     done
 done
 
