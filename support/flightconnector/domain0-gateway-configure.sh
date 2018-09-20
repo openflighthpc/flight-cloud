@@ -78,12 +78,40 @@ search $IPA_DOMAIN
 nameserver 127.0.0.1
 EOF
 
+echo "$IPA_PASS_SECURE" |kinit admin
+
+ipa group-add ClusterUsers --desc="Generic Cluster Users"
+ipa config-mod --defaultshell /bin/bash
+ipa config-mod --homedirectory /users
+ipa config-mod --defaultgroup ClusterUsers
+ipa pwpolicy-mod --maxlife=999
+
+ipa hbacrule-disable allow_all
+ipa hbacrule-add siteaccess --desc "Allow admin access to admin hosts"
+ipa hbacrule-add useraccess --desc "Allow user access to user hosts"
+ipa hbacrule-add-service siteaccess --hbacsvcs sshd
+ipa hbacrule-add-service useraccess --hbacsvcs sshd
+ipa hbacrule-add-user siteaccess --groups AdminUsers
+ipa hbacrule-add-user useraccess --groups ClusterUsers
+ipa hbacrule-add-host siteaccess --hostgroups adminnodes
+ipa hbacrule-add-host useraccess --hostgroups usernodes
+
+ipa sudorule-add --cmdcat=all All
+ipa sudorule-add-user --groups=adminusers All
+ipa sudorule-mod All --hostcat='all'
+ipa sudorule-add-option All --sudooption '!authenticate'
+ipa sudorule-add --cmdcat=all Site
+ipa sudorule-add-user --groups=siteadmins Site
+ipa sudorule-mod Site --hostcat=''
+ipa sudorule-add-option Site --sudooption '!authenticate'
+ipa sudorule-add-host Site --hostgroups=sitenodes
+
 #############
 # CLOUDWARE #
 #############
 
 cat << EOF > ~/.flightconnector.yml
-general
+general:
   log_file: '/var/log/cloudware.log'
 provider:
   azure:
