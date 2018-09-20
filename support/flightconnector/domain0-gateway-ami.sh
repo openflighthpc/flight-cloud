@@ -140,7 +140,7 @@ systemctl disable cloud-init
 systemctl disable cloud-init-local
 systemctl disable cloud-config
 systemctl disable cloud-final
-irewall-cmd --new-zone $CLUSTER --permanent
+firewall-cmd --new-zone $CLUSTER --permanent
 firewall-cmd --add-interface tun0 --zone $CLUSTER --permanent
 firewall-cmd --remove-interface eth0 --zone public
 firewall-cmd --remove-interface eth0 --zone public --permanent
@@ -197,7 +197,7 @@ metal configure domain --answers "{ \"metalware_internal--plugin_enabled--firstr
     \"metalware_internal--plugin_enabled--infiniband\": false, \
     \"metalware_internal--plugin_enabled--ipa\": true, \
     \"ipa_serverip\": \"10.78.100.10\", \
-    \"ipa_servername\": \"gateway.dom0\", \
+    \"ipa_servername\": \"REPLACEME\", \
     \"ipa_userdir\": \"/users/\", \
     \"ipa_insecurepassword\": \"REPLACEME\", \
     \"metalware_internal--plugin_enabled--lustre\": false, \
@@ -227,6 +227,7 @@ externaldns: 10.78.100.2
 internaldns: 10.78.100.10
 kernelappendoptions: "console=tty0 console=ttyS1,115200n8"
 jobid: ""
+build_method: basic
 
 networks:
   pri:
@@ -234,8 +235,8 @@ networks:
     interface: eth0
     hostname: "<%= config.networks.pri.short_hostname %>.<%= config.domain %>"
     domain: <%= answer.pri_network_domain %>
-    short_hostname: "<%= node.name.sub(node.group.name + '-', '') %>.<%= config.networks.pri.domain %>"
-    ip: <%= answer.pri_network_ip_node || "10.100.#{node.group.index}.#{node.index + 19}"%>
+    short_hostname: "<%= node.name.sub(/(.*)-/, '') %>.<%= config.networks.pri.domain %>"
+    ip: <%= answer.pri_network_ip_node || answer.pri_network_ip || "10.100.#{node.group.index}.#{node.index + 19}"%>
     netmask: 255.255.255.0
     network: <%= answer.pri_network_network || "10.100.#{node.group.index}.0" %>
     gateway: <%= answer.pri_network_gateway || "10.100.#{node.group.index}.10" %>
