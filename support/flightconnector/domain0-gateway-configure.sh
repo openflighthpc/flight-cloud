@@ -35,7 +35,7 @@ systemctl restart openvpn@flightconnector
 # METALWARE #
 #############
 
-sed -i "s/root_password: REPLACEME/root_password: $ROOT_PASSWORD/g;s/ipa_insecurepassword: REPLACEME/ipa_insecurepassword: $IPA_PASS_INSECURE/g;s/cluster_name: REPLACEME/cluster_name: $CLUSTER_NAME/g;s/root_ssh_key: REPLACEME/root_ssh_key: $SSH_KEY/g;s/ipa_servername: REPLACEME/ipa_servername: $(hostname -f)/g" /var/lib/metalware/answers/domain.yaml
+sed -i "s/root_password: REPLACEME/root_password: $(openssl -1 passwd $ROOT_PASSWORD)/g;s/ipa_insecurepassword: REPLACEME/ipa_insecurepassword: $IPA_PASS_INSECURE/g;s/cluster_name: REPLACEME/cluster_name: $CLUSTER_NAME/g;s/root_ssh_key: REPLACEME/root_ssh_key: $SSH_KEY/g;s/ipa_servername: REPLACEME/ipa_servername: $(hostname -f)/g" /var/lib/metalware/answers/domain.yaml
 
 
 # FIX THIS IN METLAWARE SO IT DOESN'T OVERWRITE
