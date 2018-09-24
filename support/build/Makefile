@@ -17,13 +17,13 @@ KICKSTART_RENDERED=/tmp/$(IMAGE_NAME).ks
 TDL=centos7.tdl
 TDL_RENDERED=/tmp/$(IMAGE_NAME).tdl
 OZ_CFG=oz.cfg
-VM_DIR=/mnt/resource
+VM_DIR=/opt/vm
 QEMU_IMG_BIN=/usr/bin/qemu-img
 XML=domain.xml
 XML_RENDERED=$(IMAGE_NAME).xml
 
 # AWS config
-AWS_BUCKET=alces-cloudware
+AWS_BUCKET=cloudware-images
 AWS_BUCKET_DIR=images
 AWS_REGION=eu-west-1
 
