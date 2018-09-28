@@ -6,7 +6,7 @@
 # Some rights reserved, see LICENSE.
 #==============================================================================
 # Image config
-PLATFORM=azure # default to azure
+PLATFORM=aws
 IMAGE_TYPE=alces-cloudware-base
 IMAGE_VERSION=2018.2.1
 IMAGE_NAME=$(IMAGE_TYPE)-$(IMAGE_VERSION)-$(PLATFORM)
