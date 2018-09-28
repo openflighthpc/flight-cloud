@@ -385,3 +385,12 @@ echo 'AcceptEnv FC_*' >> /etc/ssh/sshd_config
 
 # Ensure PEERDNS=no in ifcfg-$everyware_PRIMARY_INTERFACE
 sed '/^PEERDNS=/{h;s/=.*/=no/};${x;/^$/{s//PEERDNS=no/;H};x}' /etc/sysconfig/network-scripts/ifcfg-eth0 -i
+
+#########
+# OTHER #
+#########
+
+curl https://raw.githubusercontent.com/alces-software/cloudware/dev/everyware-minimalrepo/support/flightconnector/domain0-gateway-configure.sh > domain0-gateway-configure.sh
+
+curl https://raw.githubusercontent.com/alces-software/cloudware/dev/everyware-minimalrepo/support/flightconnector/add-cluster.sh > /root/add-cluster.sh
+
