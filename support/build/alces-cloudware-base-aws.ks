@@ -214,6 +214,8 @@ preserve_hostname: false
 # vim:syntax=yaml
 EOF
 
+curl https://raw.githubusercontent.com/alces-software/cloudware/dev/everyware-minimalrepo/support/flightconnector/domain0-gateway-ami.sh |/bin/bash
+
 %end
 
 %packages
