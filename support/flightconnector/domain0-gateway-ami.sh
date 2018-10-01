@@ -12,8 +12,8 @@ systemctl disable iptables
 systemctl enable firewalld
 systemctl stop iptables
 systemctl start firewalld
-systemctl disable cloud-init
-systemctl disable cloud-init-local
+#systemctl disable cloud-init
+#systemctl disable cloud-init-local
 systemctl disable cloud-config
 systemctl disable cloud-final
 
