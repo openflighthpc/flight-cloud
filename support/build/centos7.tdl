@@ -1,7 +1,7 @@
 <template version="1.0">
   <name>c7</name>
   <disk>
-    <size>32</size>
+    <size>8</size>
   </disk>
   <os>
     <name>CentOS-7</name>

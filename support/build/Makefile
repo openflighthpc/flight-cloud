@@ -23,7 +23,7 @@ XML=domain.xml
 XML_RENDERED=$(IMAGE_NAME).xml
 
 # AWS config
-AWS_BUCKET=cloudware-images
+AWS_BUCKET=cloudware-images-eu1
 AWS_BUCKET_DIR=images
 AWS_REGION=eu-west-1
 
