@@ -1,8 +1,10 @@
 require 'rspec/core/rake_task'
+require 'standalone_migrations'
 
 require_relative 'lib/cloudware'
 
 RSpec::Core::RakeTask.new(:spec)
+StandaloneMigrations::Tasks.load_tasks
 
 task :default => 'docker:spec'
 
