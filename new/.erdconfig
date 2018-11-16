@@ -1,0 +1,5 @@
+# vim:set ft=yaml:
+
+# Regenerate `rails-erd` diagram with `bundle exec erd`.
+
+filename: docs/erd
