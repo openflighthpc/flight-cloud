@@ -1,0 +1,11 @@
+db:
+  image: postgres:11.1
+cloudware:
+  build: .
+  volumes:
+    - .:/cloudware
+  links:
+    - db
+  command: bash
+  stdin_open: true
+  tty: true

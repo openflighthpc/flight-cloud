@@ -4,9 +4,29 @@ require_relative 'lib/cloudware'
 
 RSpec::Core::RakeTask.new(:spec)
 
-task :default => :spec
+task :default => 'docker:spec'
 
 task :console do
   require "pry"
   Pry.start
+end
+
+namespace :docker do
+  # Define some useful shortcuts for running common commands in already running
+  # Cloudware Docker container (assumes containers have already been built and
+  # run with `docker-compose up`).
+  {
+    bash: 'bash',
+    console: 'bundle exec rake console',
+    spec: 'bundle exec rake spec',
+  }.each do |task_name, command|
+    desc "Run '#{command}' in running Cloudware container"
+    task task_name do
+      docker_exec command
+    end
+  end
+
+  def docker_exec(command)
+    sh "docker-compose exec cloudware #{command}"
+  end
 end
