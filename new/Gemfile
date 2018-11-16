@@ -9,6 +9,9 @@ gem 'standalone_migrations'
 
 group :test do
   gem 'rspec'
+  # Install from Git to get access to features like testing `optional`
+  # relationships (https://github.com/thoughtbot/shoulda-matchers/issues/1069).
+  gem 'shoulda-matchers', github: 'thoughtbot/shoulda-matchers'
 end
 
 group :development do

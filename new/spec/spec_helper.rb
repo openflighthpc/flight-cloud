@@ -1,5 +1,11 @@
-require "bundler/setup"
-require "cloudware"
+require 'bundler/setup'
+require 'shoulda-matchers'
+
+require 'cloudware'
+
+# Set our equivalent of `RAILS_ENV` for tests.
+ENV['APP_ENV'] = 'test'
+
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -10,5 +16,15 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  config.include(Shoulda::Matchers::ActiveModel, type: :model)
+  config.include(Shoulda::Matchers::ActiveRecord, type: :model)
+end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :active_record
   end
 end
