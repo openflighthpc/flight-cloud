@@ -1,10 +1,13 @@
 
-# Set up Bundler, require all Gems, and then autoload everything under
-# `lib/cloudware` (so don't need to inconsistently litter `require`s
+# Set up Bundler, require always needed Gems, and then autoload everything
+# under `lib/cloudware` (so don't need to inconsistently litter `require`s
 # everywhere; instead, so long as things are defined in the correct, consistent
 # directory structure, everything will just be autoloaded when used).
 require 'bundler/setup'
-Bundler.require
+
+require 'require_all'
+require 'active_record'
+
 autoload_all 'lib/cloudware'
 
 # Similar to how `config/database.yml` is loaded in Rails (see
