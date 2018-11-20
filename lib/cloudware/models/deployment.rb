@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'models/application'
+require 'providers/AWS'
 
 module Cloudware
   module Models
@@ -17,6 +18,7 @@ module Cloudware
       end
 
       def deploy
+        Providers::AWS.deploy(template)
       end
     end
   end

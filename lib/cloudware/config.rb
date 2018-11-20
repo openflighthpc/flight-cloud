@@ -26,6 +26,7 @@ require 'ostruct'
 require 'whirly'
 require 'aws-sdk-cloudformation'
 require 'aws-sdk-ec2'
+require 'azure_mgmt_resources'
 
 Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
