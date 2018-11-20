@@ -28,10 +28,20 @@ require 'aws-sdk-cloudformation'
 require 'aws-sdk-ec2'
 require 'azure_mgmt_resources'
 
+require 'active_support/core_ext/module/delegation'
+
 Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
 module Cloudware
   class Config
+    class << self
+      def cache
+        @cache ||= new
+      end
+
+      delegate_missing_to :cache
+    end
+
     attr_accessor :log_file, :azure, :aws, :providers, :default
 
     def initialize

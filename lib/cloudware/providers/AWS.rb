@@ -10,7 +10,7 @@ module Cloudware
         end
       end
 
-      @credentials = Config.new.credentials.aws
+      @credentials = Config.credentials.aws
     end
   end
 end
