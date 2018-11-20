@@ -6,7 +6,7 @@ require 'providers/AWS'
 module Cloudware
   module Models
     class Deployment < Application
-      attr_accessor :name, :provider
+      attr_accessor :template_name, :name, :provider
 
       def tag_name
         "cloudware-deploy-#{name}"
@@ -19,7 +19,7 @@ module Cloudware
 
       def path
         ext = (provider == 'aws' ? '.yaml' : '.json')
-        File.join('/var/lib/cloudware/templates', provider, name) + ext
+        File.join('/var/lib/cloudware/templates', provider, template_name) + ext
       end
 
       def template

@@ -59,7 +59,7 @@ module Cloudware
     end
 
     command 'deploy' do |c|
-      cli_syntax(c, 'NAME')
+      cli_syntax(c, 'TEMPLATE NAME')
       c.description = 'Deploy'
       action(c, Commands::Deploy)
     end
