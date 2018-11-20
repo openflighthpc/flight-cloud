@@ -37,7 +37,6 @@ require 'active_model'
 require 'active_model/errors'
 
 require 'colorize'
-require 'gcp'
 require 'config'
 require 'logger'
 require 'memoist'

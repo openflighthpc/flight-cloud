@@ -28,7 +28,6 @@ require 'exceptions'
 require 'command'
 
 require 'require_all'
-require 'providers'
 require_all 'lib/cloudware/commands/**/*.rb'
 
 module Cloudware
@@ -57,6 +56,12 @@ module Cloudware
     def self.cli_syntax(command, args_str = '')
       s = "flightconnector #{command.name} #{args_str} [options]".squish
       command.syntax = s
+    end
+
+    command 'deploy' do |c|
+      cli_syntax(c, 'NAME')
+      c.description = 'Deploy'
+      action(c, Commands::Deploy)
     end
   end
 end
