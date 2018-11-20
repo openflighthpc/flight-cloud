@@ -8,6 +8,7 @@ module Cloudware
       end
 
       include ActiveModel::Model
+      extend Memoist
 
       def initialize(*_a, **parameters)
         @errors = ActiveModel::Errors.new(self)

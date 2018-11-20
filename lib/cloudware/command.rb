@@ -2,6 +2,8 @@
 
 module Cloudware
   class Command
+    extend Memoist
+
     def initialize(argv, options)
       @argv = argv.freeze
       @options = OpenStruct.new(options.__hash__)
