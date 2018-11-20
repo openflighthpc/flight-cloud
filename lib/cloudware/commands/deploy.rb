@@ -10,12 +10,13 @@ module Cloudware
 
       def run
         @name = argv[0]
+        deployment.deploy
       end
 
       private
 
       def deployment
-        Deployment.new(name: name, provider: 'aws')
+        Models::Deployment.new(name: name, provider: 'aws')
       end
       memoize :deployment
     end

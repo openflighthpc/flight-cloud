@@ -11,6 +11,13 @@ module Cloudware
         ext = (provider == 'aws' ? '.yaml' : '.json')
         File.join('/var/lib/cloudware/templates', provider, name) + ext
       end
+
+      def template
+        File.read(path)
+      end
+
+      def deploy
+      end
     end
   end
 end
