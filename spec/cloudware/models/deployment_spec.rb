@@ -29,4 +29,22 @@ RSpec.describe Cloudware::Models::Deployment do
       expect(template[:key2]).to eq(parent_results[:parent_key2])
     end
   end
+
+  context 'with machine ids' do
+    let(:machines) { ['node1', 'node2'] }
+    let(:results) do
+      prefix = Cloudware::Models::Machine::TAG_PREFIX
+      machines.each_with_object({}) do |name, memo|
+        memo[:"#{prefix}#{name}"] = "#{name}-id"
+      end
+    end
+
+    before { allow(subject).to receive(:results).and_return(results) }
+
+    describe '#machines' do
+      it 'returns objects with the machine names' do
+        expect(subject.machines.map(&:name)).to contain_exactly(*machines)
+      end
+    end
+  end
 end

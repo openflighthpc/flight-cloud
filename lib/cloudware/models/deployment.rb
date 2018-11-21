@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'models/application'
+require 'models/machine'
 require 'providers/AWS'
 
 module Cloudware
@@ -30,6 +31,14 @@ module Cloudware
         Data.load(results_path)
       end
       memoize :results
+
+      def machines
+        results.select { |k, _v| /\A#{Machine::TAG_PREFIX}/.match?(k) }
+               .map do |key, _|
+          name = key.to_s.sub(Machine::TAG_PREFIX, '')
+          Machine.new(name: name)
+        end
+      end
 
       private
 
