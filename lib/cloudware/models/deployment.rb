@@ -6,15 +6,11 @@ require 'providers/AWS'
 module Cloudware
   module Models
     class Deployment < Application
-      attr_accessor :template_name, :name, :provider
+      attr_accessor :template_name, :name
+      delegate :region, :provider, to: Config
 
       def tag_name
         "cloudware-deploy-#{name}"
-      end
-
-      # TODO: Set this in the same way as the original version
-      def region
-        'eu-west-1'
       end
 
       def path

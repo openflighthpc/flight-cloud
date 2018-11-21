@@ -19,8 +19,7 @@ module Cloudware
       def deployment
         Models::Deployment.new(
           template_name: template,
-          name: name,
-          provider: 'aws'
+          name: name
         )
       end
       memoize :deployment
