@@ -15,7 +15,12 @@ module Cloudware
 
       def path
         ext = (provider == 'aws' ? '.yaml' : '.json')
-        File.join('/var/lib/cloudware/templates', provider, template_name) + ext
+        File.join(
+          Config.content_path,
+          'templates',
+          provider,
+          "#{template_name}#{ext}"
+        )
       end
 
       def template
@@ -23,7 +28,12 @@ module Cloudware
       end
 
       def deploy
-        puts Providers::AWS.new(region).deploy(tag_name, template)
+        results = Providers::AWS.new(region).deploy(tag_name, template)
+        Data.dump(results_path, results)
+      end
+
+      def results_path
+        File.join(Config.content_path, 'deployments', "#{name}.yaml")
       end
     end
   end

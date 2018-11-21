@@ -42,6 +42,8 @@ require 'logger'
 require 'memoist'
 require 'parallel'
 
+require 'data'
+
 module Cloudware
   class << self
     def config
