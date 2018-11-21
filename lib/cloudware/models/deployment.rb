@@ -24,7 +24,7 @@ module Cloudware
       end
 
       def template
-        File.read(path)
+        raw_template
       end
 
       def deploy
@@ -38,6 +38,12 @@ module Cloudware
 
       def results_path
         File.join(Config.content_path, 'deployments', "#{name}.yaml")
+      end
+
+      private
+
+      def raw_template
+        File.read(path)
       end
     end
   end
