@@ -7,7 +7,11 @@ module Cloudware
   class Data
     class << self
       def load(file)
-        YAML.load_file(file)
+        load_string(File.read(file))
+      end
+
+      def load_string(string)
+        YAML.load(string).deep_symbolize_keys
       end
 
       def dump(file, data)
