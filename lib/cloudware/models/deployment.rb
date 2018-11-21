@@ -45,7 +45,7 @@ module Cloudware
       def provider_client
         Providers::AWS.new(region)
       end
-      memoize :provider
+      memoize :provider_client
 
       def tag
         "cloudware-deploy-#{name}"
