@@ -9,7 +9,7 @@ module Cloudware
       attr_accessor :template_name, :name, :parent
       delegate :region, :provider, to: Config
 
-      def tag_name
+      def tag
         "cloudware-deploy-#{name}"
       end
 
@@ -31,7 +31,7 @@ module Cloudware
       end
 
       def deploy
-        raw_results = Providers::AWS.new(region).deploy(tag_name, template)
+        raw_results = Providers::AWS.new(region).deploy(tag, template)
         Data.dump(results_path, raw_results)
       end
 
