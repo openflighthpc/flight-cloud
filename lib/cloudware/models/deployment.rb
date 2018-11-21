@@ -31,7 +31,7 @@ module Cloudware
         "cloudware-deploy-#{name}"
       end
 
-      def path
+      def template_path
         ext = (provider == 'aws' ? '.yaml' : '.json')
         File.join(
           Config.content_path,
@@ -46,7 +46,7 @@ module Cloudware
       end
 
       def raw_template
-        File.read(path)
+        File.read(template_path)
       end
     end
   end
