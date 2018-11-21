@@ -6,7 +6,7 @@ require 'providers/AWS'
 module Cloudware
   module Models
     class Deployment < Application
-      attr_accessor :template_name, :name
+      attr_accessor :template_name, :name, :parent
       delegate :region, :provider, to: Config
 
       def tag_name
