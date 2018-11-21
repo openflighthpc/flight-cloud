@@ -23,6 +23,7 @@ module Cloudware
 
       def destroy
         FileUtils.rm_f(results_path)
+        provider.destroy(tag)
       end
 
       def results
