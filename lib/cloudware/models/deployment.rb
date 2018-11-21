@@ -17,13 +17,13 @@ module Cloudware
       end
 
       def deploy
-        raw_results = provider.deploy(tag, template)
+        raw_results = provider_client.deploy(tag, template)
         Data.dump(results_path, raw_results)
       end
 
       def destroy
         FileUtils.rm_f(results_path)
-        provider.destroy(tag)
+        provider_client.destroy(tag)
       end
 
       def results
@@ -32,7 +32,7 @@ module Cloudware
 
       private
 
-      def provider
+      def provider_client
         Providers::AWS.new(region)
       end
       memoize :provider
