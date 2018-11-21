@@ -24,7 +24,10 @@ module Cloudware
       end
 
       def template
-        raw_template
+        return raw_template unless parent
+        parent.results.reduce(raw_template) do |memo, (key, value)|
+          memo.gsub("%#{key}%", value)
+        end
       end
 
       def deploy
