@@ -17,7 +17,7 @@ module Cloudware
       end
 
       def deploy
-        raw_results = Providers::AWS.new(region).deploy(tag, template)
+        raw_results = provider.deploy(tag, template)
         Data.dump(results_path, raw_results)
       end
 
@@ -30,6 +30,11 @@ module Cloudware
       end
 
       private
+
+      def provider
+        Providers::AWS.new(region)
+      end
+      memoize :provider
 
       def tag
         "cloudware-deploy-#{name}"
