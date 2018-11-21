@@ -33,10 +33,10 @@ module Cloudware
       memoize :results
 
       def machines
-        results.select { |k, _v| /\A#{Machine::TAG_PREFIX}/.match?(k) }
+        results.select { |k, _| /\A#{Machine::TAG_PREFIX}/.match?(k) }
                .map do |key, _|
           name = key.to_s.sub(Machine::TAG_PREFIX, '')
-          Machine.new(name: name)
+          Machine.new(name: name, deployment: self)
         end
       end
 

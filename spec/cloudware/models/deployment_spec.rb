@@ -45,6 +45,11 @@ RSpec.describe Cloudware::Models::Deployment do
       it 'returns objects with the machine names' do
         expect(subject.machines.map(&:name)).to contain_exactly(*machines)
       end
+
+      it 'creates objects that back reference the deployment' do
+        machine_deployments = subject.machines.map(&:deployment)
+        expect(machine_deployments.uniq).to contain_exactly(subject)
+      end
     end
   end
 end
