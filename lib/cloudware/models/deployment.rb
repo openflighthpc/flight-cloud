@@ -21,6 +21,9 @@ module Cloudware
         Data.dump(results_path, raw_results)
       end
 
+      def destroy
+      end
+
       def results
         Data.load(results_path)
       end
