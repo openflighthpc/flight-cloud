@@ -11,9 +11,9 @@ module Cloudware
         @region = region
       end
 
-      def deploy(name, template)
-        client.create_stack(stack_name: name, template_body: template)
-        client.wait_until(:stack_create_complete, stack_name: name)
+      def deploy(tag, template)
+        client.create_stack(stack_name: tag, template_body: template)
+        client.wait_until(:stack_create_complete, stack_name: tag)
               .stacks
               .first
               .outputs
