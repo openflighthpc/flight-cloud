@@ -28,8 +28,12 @@ module Cloudware
       end
 
       def deploy
-        results = Providers::AWS.new(region).deploy(tag_name, template)
-        Data.dump(results_path, results)
+        raw_results = Providers::AWS.new(region).deploy(tag_name, template)
+        Data.dump(results_path, raw_results)
+      end
+
+      def results
+        Data.load(results_path)
       end
 
       def results_path

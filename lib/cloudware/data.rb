@@ -6,6 +6,10 @@ require 'fileutils'
 module Cloudware
   class Data
     class << self
+      def load(file)
+        YAML.load_file(file)
+      end
+
       def dump(file, data)
         FileUtils.mkdir_p(File.dirname(file))
         File.write(file, YAML.dump(data.to_h))
