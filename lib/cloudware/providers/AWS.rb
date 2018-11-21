@@ -14,6 +14,13 @@ module Cloudware
       def deploy(name, template)
         client.create_stack(stack_name: name, template_body: template)
         client.wait_until(:stack_create_complete, stack_name: name)
+              .stacks
+              .first
+              .outputs
+              .reduce({}) do |memo, output|
+                memo[output.output_key] = output.output_value
+                memo
+              end
       end
 
       private

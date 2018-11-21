@@ -23,7 +23,7 @@ module Cloudware
       end
 
       def deploy
-        Providers::AWS.new(region).deploy(tag_name, template)
+        puts Providers::AWS.new(region).deploy(tag_name, template)
       end
     end
   end
