@@ -38,7 +38,7 @@
 $src_dir = '/tmp/cloudware'
 $script = <<SHELL
   # Login as root and change to project dir
-  echo 'sudo su -' > /home/vagrant/.bashrc
+  echo 'sudo su -' >> /home/vagrant/.bashrc
   echo 'cd #{$src_dir}' >> /root/.bashrc
 
   # Update system clock
