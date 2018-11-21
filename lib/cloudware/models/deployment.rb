@@ -29,6 +29,7 @@ module Cloudware
       def results
         Data.load(results_path)
       end
+      memoize :results
 
       private
 
