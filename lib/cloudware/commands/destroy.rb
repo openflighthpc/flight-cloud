@@ -9,7 +9,7 @@ module Cloudware
       attr_reader :name
 
       def run
-        @name = argv[1]
+        @name = argv[0]
         deployment.destroy
       end
 

@@ -22,6 +22,7 @@ module Cloudware
       end
 
       def destroy
+        FileUtils.rm_f(results_path)
       end
 
       def results
