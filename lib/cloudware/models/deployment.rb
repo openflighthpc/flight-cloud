@@ -9,20 +9,6 @@ module Cloudware
       attr_accessor :template_name, :name, :parent
       delegate :region, :provider, to: Config
 
-      def tag
-        "cloudware-deploy-#{name}"
-      end
-
-      def path
-        ext = (provider == 'aws' ? '.yaml' : '.json')
-        File.join(
-          Config.content_path,
-          'templates',
-          provider,
-          "#{template_name}#{ext}"
-        )
-      end
-
       def template
         return raw_template unless parent
         parent.results.reduce(raw_template) do |memo, (key, value)|
@@ -39,11 +25,25 @@ module Cloudware
         Data.load(results_path)
       end
 
+      private
+
+      def tag
+        "cloudware-deploy-#{name}"
+      end
+
+      def path
+        ext = (provider == 'aws' ? '.yaml' : '.json')
+        File.join(
+          Config.content_path,
+          'templates',
+          provider,
+          "#{template_name}#{ext}"
+        )
+      end
+
       def results_path
         File.join(Config.content_path, 'deployments', "#{name}.yaml")
       end
-
-      private
 
       def raw_template
         File.read(path)
