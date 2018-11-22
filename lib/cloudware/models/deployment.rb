@@ -33,7 +33,7 @@ module Cloudware
       memoize :results
 
       def machines
-        results.select { |k, _| /\A#{Machine::TAG_PREFIX}/.match?(k) }
+        results.select { |k, _| Machine.tag?(k) }
                .map do |key, _|
           Machine.new(tag: key.to_s, deployment: self)
         end

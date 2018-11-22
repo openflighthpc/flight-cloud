@@ -8,6 +8,10 @@ module Cloudware
     class Machine < Application
       TAG_PREFIX = 'cloudwareNodeID'
 
+      def self.tag?(tag)
+        /\A#{TAG_PREFIX}/.match?(tag)
+      end
+
       attr_accessor :name, :deployment
 
       def tag=(tag)
