@@ -4,14 +4,15 @@ module Cloudware
   module Providers
     class AWS
       class Machine
-        attr_reader :machine_id, :client
+        attr_reader :instance
 
-        def initialize(machine_id, client)
-          @machine_id = machine_id
-          @client = client
+        def initialize(machine_id, region)
+          @instance = Aws::EC2::Resource.new(region: region)
+                                        .instance(machine_id)
         end
 
         def status
+          instance.state.name
         end
       end
 
@@ -41,7 +42,7 @@ module Cloudware
       end
 
       def machine(id)
-        Machine.new(id, client)
+        Machine.new(id, region)
       end
 
       private
