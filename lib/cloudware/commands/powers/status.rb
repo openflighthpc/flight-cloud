@@ -3,7 +3,9 @@
 module Cloudware
   module Commands
     module Powers
-      class Status < Command
+      class Status < Power
+        def run_power
+        end
       end
     end
   end
