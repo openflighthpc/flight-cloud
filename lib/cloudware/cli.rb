@@ -78,12 +78,16 @@ module Cloudware
       c.sub_command_group = true
     end
 
-    command 'power status' do |c|
+    def shared_power_attr(c)
       cli_syntax(c, 'MACHINE')
-      c.description = 'Check the power state of a machine'
       c.option '-d', '--deployment DEPLOYMENT', String,
                'The deployment the machine was created in'
       c.hidden = true
+    end
+
+    command 'power status' do |c|
+      shared_power_attr(c)
+      c.description = 'Check the power state of a machine'
       action(c, Commands::Powers::Status)
     end
   end
