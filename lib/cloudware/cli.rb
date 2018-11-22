@@ -71,5 +71,18 @@ module Cloudware
       c.description = 'Destroy'
       action(c, Commands::Destroy)
     end
+
+    command 'power' do |c|
+      cli_syntax(c)
+      c.description = 'Power'
+      c.sub_command_group = true
+    end
+
+    command 'power status' do |c|
+      cli_syntax(c, 'DEPLOYMENT MACHINE')
+      c.description = 'Check the power state of a machine'
+      c.hidden = true
+      action(c, Commands::Powers::Status)
+    end
   end
 end
