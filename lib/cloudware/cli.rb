@@ -96,5 +96,11 @@ module Cloudware
       c.description = 'Turn the machine off'
       action(c, Commands::Powers::Off)
     end
+
+    command 'power on' do |c|
+      shared_power_attr(c)
+      c.description = 'Turn the machine on'
+      action(c, Commands::Powers::On)
+    end
   end
 end

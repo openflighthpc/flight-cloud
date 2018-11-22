@@ -9,7 +9,7 @@ module Cloudware
     class Machine < Application
       include Concerns::ProviderClient
 
-      delegate :status, :off, to: :machine_client
+      delegate :status, :off, :on, to: :machine_client
       delegate :region, :provider, to: :deployment
 
       TAG_PREFIX = 'cloudwareNodeID'

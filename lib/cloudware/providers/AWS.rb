@@ -18,6 +18,10 @@ module Cloudware
         def off
           instance.stop
         end
+
+        def on
+          instance.start
+        end
       end
 
       extend Memoist
