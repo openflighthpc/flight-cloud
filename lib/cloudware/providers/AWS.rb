@@ -14,6 +14,10 @@ module Cloudware
         def status
           instance.state.name
         end
+
+        def off
+          instance.stop
+        end
       end
 
       extend Memoist
