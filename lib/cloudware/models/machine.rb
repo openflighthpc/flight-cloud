@@ -25,6 +25,10 @@ module Cloudware
         "#{TAG_PREFIX}#{name}"
       end
 
+      def provider_id
+        deployment.results[tag.to_sym]
+      end
+
       def status
       end
     end
