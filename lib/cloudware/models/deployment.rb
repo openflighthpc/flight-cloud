@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'models/concerns/provider_client'
 require 'models/application'
 require 'models/machine'
 require 'providers/AWS'
@@ -7,6 +8,8 @@ require 'providers/AWS'
 module Cloudware
   module Models
     class Deployment < Application
+      include Concerns::ProviderClient
+
       attr_accessor :template_name, :name, :parent
       delegate :region, :provider, to: Config
 
@@ -41,11 +44,6 @@ module Cloudware
       end
 
       private
-
-      def provider_client
-        Providers::AWS.new(region)
-      end
-      memoize :provider_client
 
       def tag
         "cloudware-deploy-#{name}"

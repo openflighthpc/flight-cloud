@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 require 'models/application'
+require 'models/concerns/provider_client'
 require 'providers/AWS'
 
 module Cloudware
   module Models
     class Machine < Application
+      include Concerns::ProviderClient
+
       TAG_PREFIX = 'cloudwareNodeID'
 
       def self.tag?(tag)
