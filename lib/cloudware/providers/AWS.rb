@@ -3,6 +3,18 @@
 module Cloudware
   module Providers
     class AWS
+      class Machine
+        attr_reader :machine_id, :client
+
+        def initialize(machine_id, client)
+          @machine_id = machine_id
+          @client = client
+        end
+
+        def status
+        end
+      end
+
       extend Memoist
 
       attr_reader :region
@@ -26,6 +38,10 @@ module Cloudware
       def destroy(tag)
         client.delete_stack(stack_name: tag)
         client.wait_until(:stack_delete_complete, stack_name: tag)
+      end
+
+      def machine(id)
+        Machine.new(id, client)
       end
 
       private

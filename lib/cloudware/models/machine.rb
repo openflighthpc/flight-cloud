@@ -9,6 +9,9 @@ module Cloudware
     class Machine < Application
       include Concerns::ProviderClient
 
+      delegate :status, to: :machine_client
+      delegate :region, :provider, to: :deployment
+
       TAG_PREFIX = 'cloudwareNodeID'
 
       def self.tag?(tag)
@@ -25,12 +28,16 @@ module Cloudware
         "#{TAG_PREFIX}#{name}"
       end
 
+      private
+
       def provider_id
         deployment.results[tag.to_sym]
       end
 
-      def status
+      def machine_client
+        provider_client.machine(provider_id)
       end
+      memoize :machine_client
     end
   end
 end
