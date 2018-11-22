@@ -28,13 +28,14 @@ module Cloudware
       end
 
       def results
+        return nil unless File.exist?(results_path)
         Data.load(results_path)
       end
       memoize :results
 
       def machines
-        results.select { |k, _| Machine.tag?(k) }
-               .map do |key, _|
+        results&.select { |k, _| Machine.tag?(k) }
+               &.map do |key, _|
           Machine.new(tag: key.to_s, deployment: self)
         end
       end
