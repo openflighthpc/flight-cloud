@@ -21,7 +21,14 @@ module Cloudware
         end
 
         def machine
-          deployment.machines.find { |m| m.name == machine_name }
+          deployment.machines
+                    &.find { |m| m.name == machine_name }
+                    .tap do |machine|
+            raise InvalidInput, <<-MISSING.squish if machine.nil?
+              Could not locate node '#{machine_name}' within deployment
+              '#{deployment_name}'
+            MISSING
+          end
         end
       end
     end
