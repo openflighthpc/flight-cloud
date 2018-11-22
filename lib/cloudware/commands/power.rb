@@ -7,8 +7,8 @@ module Cloudware
         attr_reader :deployment_name, :machine_name
 
         def run
-          @deployment_name = argv[0]
-          @machine_name = argv[1]
+          @deployment_name = options.deployment
+          @machine_name = argv[0]
           run_power
         end
 

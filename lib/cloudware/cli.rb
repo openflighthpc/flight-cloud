@@ -79,8 +79,10 @@ module Cloudware
     end
 
     command 'power status' do |c|
-      cli_syntax(c, 'DEPLOYMENT MACHINE')
+      cli_syntax(c, 'MACHINE')
       c.description = 'Check the power state of a machine'
+      c.option '-d', '--deployment DEPLOYMENT', String,
+               'The deployment the machine was created in'
       c.hidden = true
       action(c, Commands::Powers::Status)
     end
