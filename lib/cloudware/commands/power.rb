@@ -19,7 +19,10 @@ module Cloudware
         def deployment
           Models::Deployment.build(name: deployment_name)
         end
-        memoize :deployment
+
+        def machine
+          deployment.machines.find { |m| m.name == machine_name }
+        end
       end
     end
   end

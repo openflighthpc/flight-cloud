@@ -21,6 +21,9 @@ module Cloudware
       def tag
         "#{TAG_PREFIX}#{name}"
       end
+
+      def status
+      end
     end
   end
 end
