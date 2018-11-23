@@ -73,7 +73,7 @@ module Cloudware
     end
 
     def credentials
-      @credentials = OpenStruct.new(
+      @credentials ||= OpenStruct.new(
         aws: Aws::Credentials.new(aws.access_key_id, aws.secret_access_key),
         azure: build_azure_credentials
       )
@@ -81,6 +81,10 @@ module Cloudware
 
     def base_dir
       File.expand_path(File.join(__dir__, '../..'))
+    end
+
+    def context
+      @context ||= Context.new
     end
 
     private

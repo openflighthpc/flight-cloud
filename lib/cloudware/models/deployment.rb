@@ -11,7 +11,7 @@ module Cloudware
       include Concerns::ProviderClient
 
       attr_accessor :template_name, :name
-      delegate :region, :provider, to: Config
+      delegate :region, :provider, :context, to: Config
 
       def template
         return raw_template
