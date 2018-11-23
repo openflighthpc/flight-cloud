@@ -10,7 +10,7 @@ module Cloudware
     class Deployment < Application
       include Concerns::ProviderClient
 
-      attr_accessor :template_name, :name
+      attr_accessor :template_name, :name, :results
       delegate :region, :provider, :context, to: Config
 
       def template
@@ -30,12 +30,6 @@ module Cloudware
         FileUtils.rm_f(results_path)
         provider_client.destroy(tag)
       end
-
-      def results
-        return nil unless File.exist?(results_path)
-        Data.load(results_path)
-      end
-      memoize :results
 
       def machines
         results&.select { |k, _| Machine.tag?(k) }
