@@ -10,14 +10,15 @@ module Cloudware
     class Deployment < Application
       include Concerns::ProviderClient
 
-      attr_accessor :template_name, :name, :parent
+      attr_accessor :template_name, :name
       delegate :region, :provider, to: Config
 
       def template
-        return raw_template unless parent
-        parent.results.reduce(raw_template) do |memo, (key, value)|
-          memo.gsub("%#{key}%", value)
-        end
+        return raw_template
+        # TODO: Reimplement parents as a context
+        # parent.results.reduce(raw_template) do |memo, (key, value)|
+        #   memo.gsub("%#{key}%", value)
+        # end
       end
 
       def deploy
