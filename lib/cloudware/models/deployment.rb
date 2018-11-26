@@ -22,12 +22,10 @@ module Cloudware
       end
 
       def deploy
-        raw_results = provider_client.deploy(tag, template)
-        Data.dump(results_path, raw_results)
+        self.results = provider_client.deploy(tag, template)
       end
 
       def destroy
-        FileUtils.rm_f(results_path)
         provider_client.destroy(tag)
       end
 
@@ -52,10 +50,6 @@ module Cloudware
           provider,
           "#{template_name}#{ext}"
         )
-      end
-
-      def results_path
-        File.join(Config.content_path, 'deployments', "#{name}.yaml")
       end
 
       def raw_template
