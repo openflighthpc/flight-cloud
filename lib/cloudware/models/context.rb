@@ -21,7 +21,7 @@ module Cloudware
       DeploymentData = Struct.new(:name, :results)
 
       def stack
-        @stack ||= []
+        @stack ||= Data.load(path, default_value: [])
       end
 
       def path

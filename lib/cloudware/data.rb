@@ -14,13 +14,26 @@ module Cloudware
       end
 
       def load_string(string, default_value: DEFAULT_VALUE)
-        raw = YAML.load(string).deep_symbolize_keys
-        raw.nil? ? default_value : raw
+        raw = convert_keys(YAML.load(string))
+        raw ? raw : default_value
       end
 
       def dump(file, data)
         FileUtils.mkdir_p(File.dirname(file))
         File.write(file, YAML.dump(data.to_h))
+      end
+
+      private
+
+      def convert_keys(obj)
+        case obj
+        when Hash
+          obj.deep_symbolize_keys
+        when Enumerable
+          obj.each { |sub_obj| convert_keys(sub_obj) }
+        else
+          obj
+        end
       end
     end
   end
