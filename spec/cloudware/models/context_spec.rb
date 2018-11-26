@@ -39,6 +39,12 @@ RSpec.describe Cloudware::Models::Context do
         expect(new_context.results).to eq(subject.results)
       end
     end
+
+    describe '#desployments' do
+      it 'returns the deploument' do
+        expect(subject.deployments.map(&:name)).to eq(deployments.map(&:name))
+      end
+    end
   end
 
   context 'with two deployments' do

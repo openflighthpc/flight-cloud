@@ -3,7 +3,9 @@
 module Cloudware
   module Models
     class Context < Application
-      attr_reader :deployments
+      def deployments
+        stack.map(&:deployment)
+      end
 
       def deployments=(input_deployments)
         @stack = [] # Reset the cache
@@ -36,7 +38,11 @@ module Cloudware
 
       private
 
-      DeploymentData = Struct.new(:name, :results)
+      DeploymentData = Struct.new(:name, :results) do
+        def deployment
+          Deployment.new(name: name, results: results)
+        end
+      end
 
       def stack
         @stack ||= Data.load(path, default_value: []).map do |data|
