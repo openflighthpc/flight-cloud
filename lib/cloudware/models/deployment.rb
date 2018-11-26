@@ -33,6 +33,7 @@ module Cloudware
       end
 
       def destroy
+        context&.remove_deployment(deployment)
         provider_client.destroy(tag)
       end
 
