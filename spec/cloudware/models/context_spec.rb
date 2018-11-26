@@ -23,6 +23,17 @@ RSpec.describe Cloudware::Models::Context do
         new_context = build(:context)
         expect(new_context.results).to eq(subject.results)
       end
+
+      context 'with updated deployment results' do
+        let(:updated_results) { { single_key: 'something else' } }
+        before { deployment.results = updated_results }
+
+        it 'saves updated deployment results' do
+          subject.save
+          new_context = build(:context)
+          expect(new_context.results).to eq(updated_results)
+        end
+      end
     end
 
     describe '#deployments' do
