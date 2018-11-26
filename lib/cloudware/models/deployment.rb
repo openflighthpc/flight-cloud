@@ -3,6 +3,7 @@
 require 'models/concerns/provider_client'
 require 'models/application'
 require 'models/machine'
+require 'models/context'
 require 'providers/AWS'
 
 module Cloudware
@@ -11,8 +12,13 @@ module Cloudware
       include Concerns::ProviderClient
 
       SAVE_ATTR = [:template_name, :name, :results]
-      attr_accessor(*SAVE_ATTR, :context)
+      attr_accessor(*SAVE_ATTR)
+      attr_reader :context
       delegate :region, :provider, to: Config
+
+      def context=(input)
+        @context = input.tap { |c| c.with_deployment(self) }
+      end
 
       def template
         return raw_template

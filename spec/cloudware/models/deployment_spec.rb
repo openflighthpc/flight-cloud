@@ -52,4 +52,14 @@ RSpec.describe Cloudware::Models::Deployment do
       end
     end
   end
+
+  context 'with a deployment context' do
+    let(:context) { build(:context) }
+
+    it 'is automatically added to the context' do
+      deployment = build(:deployment, context: context)
+      find_deployment = context.deployments.find { |d| d.name == deployment.name }
+      expect(find_deployment).to eq(deployment)
+    end
+  end
 end
