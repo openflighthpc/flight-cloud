@@ -11,12 +11,19 @@ module Cloudware
       def run
         @name = argv[0]
         deployment.destroy
+      ensure
+        context.save
       end
 
       private
 
+      def context
+        Models::Context.new
+      end
+      memoize :context
+
       def deployment
-        Models::Deployment.new(name: name)
+        Models::Deployment.new(name: name, context: context)
       end
       memoize :deployment
     end

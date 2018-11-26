@@ -12,6 +12,7 @@ module Cloudware
         @template = argv[0]
         @name = argv[1]
         deployment.deploy
+      ensure
         context.save
       end
 
