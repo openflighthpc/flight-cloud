@@ -36,6 +36,13 @@ module Cloudware
         end
       end
 
+      def to_h
+        {
+          name: name,
+          results: results
+        }
+      end
+
       private
 
       def tag

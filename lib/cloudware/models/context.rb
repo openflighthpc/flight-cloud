@@ -4,7 +4,7 @@ module Cloudware
   module Models
     class Context < Application
       def deployments
-        stack.map(&:deployment)
+        stack
       end
 
       def deployments=(input_deployments)
@@ -22,9 +22,7 @@ module Cloudware
       end
 
       def with_deployment(deployment)
-        new_data = DeploymentData.new(deployment.name,
-                                      deployment.results)
-        stack.push(new_data)
+        stack.push(deployment)
       end
 
       def remove_deployment(deployment)
@@ -38,15 +36,9 @@ module Cloudware
 
       private
 
-      DeploymentData = Struct.new(:name, :results) do
-        def deployment
-          Deployment.new(name: name, results: results)
-        end
-      end
-
       def stack
         @stack ||= Data.load(path, default_value: []).map do |data|
-          DeploymentData.new(*data.values)
+          Deployment.new(**data)
         end
       end
 

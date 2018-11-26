@@ -4,6 +4,7 @@ require 'rspec/wait'
 require File.join(File.dirname(__FILE__), '../lib/cloudware')
 Bundler.setup(:development)
 require 'pry'
+require 'pry-byebug'
 require 'fakefs/spec_helpers'
 require 'factory_bot'
 
