@@ -18,7 +18,7 @@ module Cloudware
 
       def results
         deployments.map(&:results)
-             .each_with_object({}) do |results, memo|
+                   .each_with_object({}) do |results, memo|
           memo.merge!(results || {})
         end
       end
