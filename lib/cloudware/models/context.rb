@@ -3,6 +3,15 @@
 module Cloudware
   module Models
     class Context < Application
+      attr_reader :deployments
+
+      def deployments=(input_deployments)
+        @stack = [] # Reset the cache
+        input_deployments.each do |deployment|
+          add_deployment(deployment)
+        end
+      end
+
       def results
         stack.map(&:results)
              .each_with_object({}) do |results, memo|

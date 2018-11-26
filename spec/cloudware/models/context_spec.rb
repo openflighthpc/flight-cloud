@@ -3,8 +3,21 @@ require 'models/context'
 
 RSpec.describe Cloudware::Models::Context do
   subject do
-    build(:context) do |context|
-      deployments.each { |d| context.add_deployment(d) }
+    build(:context, deployments: deployments)
+  end
+
+  describe '#deployment=' do
+    let(:first_results) { { key: 'first' } }
+    let(:first_deployment) { build(:deployment, results: first_results) }
+    let(:deployments) { [first_deployment] }
+
+    it 'sets the deployment' do
+      expect(subject.results).to eq(first_results)
+    end
+
+    it 'replaces existing deployments' do
+      subject.deployments = [build(:deployment)]
+      expect(subject.results).to eq({})
     end
   end
 
