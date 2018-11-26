@@ -12,14 +12,21 @@ module Cloudware
         @template = argv[0]
         @name = argv[1]
         deployment.deploy
+        context.save
       end
 
       private
 
+      def context
+        Models::Context.new
+      end
+      memoize :context
+
       def deployment
         Models::Deployment.new(
           template_name: template,
-          name: name
+          name: name,
+          context: context
         )
       end
       memoize :deployment
