@@ -16,12 +16,19 @@ module Cloudware
         stack.push(new_data)
       end
 
+      def save
+        save_data = stack.map(&:to_h)
+        Data.dump(path, save_data)
+      end
+
       private
 
       DeploymentData = Struct.new(:name, :results)
 
       def stack
-        @stack ||= Data.load(path, default_value: [])
+        @stack ||= Data.load(path, default_value: []).map do |data|
+          DeploymentData.new(*data.values)
+        end
       end
 
       def path

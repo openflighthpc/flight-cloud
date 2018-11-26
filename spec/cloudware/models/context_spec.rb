@@ -18,6 +18,14 @@ RSpec.describe Cloudware::Models::Context do
         expect(subject.results).to eq(deployments.first.results)
       end
     end
+
+    describe '#save' do
+      it 'saves the context so it can be reloaded' do
+        subject.save
+        new_context = described_class.new
+        expect(new_context.results).to eq(subject.results)
+      end
+    end
   end
 
   context 'with multiple deployments' do
