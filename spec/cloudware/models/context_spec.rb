@@ -29,8 +29,10 @@ RSpec.describe Cloudware::Models::Context do
     let(:final_deployment) { build(:deployment, results: final_results) }
     let(:deployments) { [initial_deployment, final_deployment] }
 
-    it 'replaces the earlier results with the latter' do
-      expect(subject.results).to eq(merged_results)
+    describe '#results' do
+      it 'replaces the earlier results with the latter' do
+        expect(subject.results).to eq(merged_results)
+      end
     end
   end
 end
