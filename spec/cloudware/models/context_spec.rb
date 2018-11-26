@@ -4,7 +4,7 @@ require 'models/context'
 RSpec.describe Cloudware::Models::Context do
   subject do
     described_class.new.tap do |context|
-      allow(context).to receive(:deployments).and_return(deployments)
+      deployments.each { |d| context.add_deployment(d) }
     end
   end
 

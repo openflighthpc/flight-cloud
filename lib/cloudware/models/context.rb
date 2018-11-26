@@ -10,7 +10,10 @@ module Cloudware
         end
       end
 
-      def deployments
+      def add_deployment(deployment)
+        new_data = DeploymentData.new(deployment.name,
+                                      deployment.results)
+        stack.push(new_data)
       end
 
       private
@@ -18,10 +21,7 @@ module Cloudware
       DeploymentData = Struct.new(:name, :results)
 
       def stack
-        @stack ||= deployments.map do |deployment|
-          DeploymentData.new(deployment.name,
-                             deployment.results)
-        end
+        @stack ||= []
       end
     end
   end
