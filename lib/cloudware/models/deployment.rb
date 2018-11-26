@@ -10,7 +10,8 @@ module Cloudware
     class Deployment < Application
       include Concerns::ProviderClient
 
-      attr_accessor :template_name, :name, :results, :context
+      SAVE_ATTR = [:template_name, :name, :results]
+      attr_accessor(*SAVE_ATTR, :context)
       delegate :region, :provider, to: Config
 
       def template
@@ -37,10 +38,9 @@ module Cloudware
       end
 
       def to_h
-        {
-          name: name,
-          results: results
-        }
+        SAVE_ATTR.each_with_object({}) do |key, memo|
+          memo[key] = send(key)
+        end
       end
 
       private
