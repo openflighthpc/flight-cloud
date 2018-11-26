@@ -34,6 +34,8 @@ Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
 module Cloudware
   class Config
+    PATH = File.expand_path('~/.flightconnector.yml')
+
     class << self
       def cache
         @cache ||= new
@@ -89,7 +91,7 @@ module Cloudware
     private
 
     def config_path
-      File.expand_path('~/.flightconnector.yml')
+      PATH
     end
 
     def build_azure_credentials

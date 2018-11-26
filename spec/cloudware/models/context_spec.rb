@@ -9,7 +9,7 @@ RSpec.describe Cloudware::Models::Context do
   end
 
   context 'with a single deployment' do
-    let(:results) { { key: 'value' } }
+    let(:results) { { single_key: 'value' } }
     let(:deployment) { build(:deployment, results: results) }
     let(:deployments) { [deployment] }
 
