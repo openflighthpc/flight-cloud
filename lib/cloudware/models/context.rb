@@ -10,7 +10,7 @@ module Cloudware
       def deployments=(input_deployments)
         @stack = [] # Reset the cache
         input_deployments.each do |deployment|
-          add_deployment(deployment)
+          with_deployment(deployment)
         end
       end
 
@@ -21,7 +21,7 @@ module Cloudware
         end
       end
 
-      def add_deployment(deployment)
+      def with_deployment(deployment)
         new_data = DeploymentData.new(deployment.name,
                                       deployment.results)
         stack.push(new_data)
