@@ -8,5 +8,8 @@ FactoryBot.define do
     name 'test-deployment'
     template_name 'test-template'
     results {}
+    association :context, strategy: :build
   end
+
+  factory :context, class: models::Context
 end

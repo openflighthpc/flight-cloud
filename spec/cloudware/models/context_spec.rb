@@ -3,7 +3,7 @@ require 'models/context'
 
 RSpec.describe Cloudware::Models::Context do
   subject do
-    described_class.new.tap do |context|
+    build(:context) do |context|
       deployments.each { |d| context.add_deployment(d) }
     end
   end
@@ -22,7 +22,7 @@ RSpec.describe Cloudware::Models::Context do
     describe '#save' do
       it 'saves the context so it can be reloaded' do
         subject.save
-        new_context = described_class.new
+        new_context = build(:context)
         expect(new_context.results).to eq(subject.results)
       end
     end

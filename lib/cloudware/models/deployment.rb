@@ -10,8 +10,8 @@ module Cloudware
     class Deployment < Application
       include Concerns::ProviderClient
 
-      attr_accessor :template_name, :name, :results
-      delegate :region, :provider, :context, to: Config
+      attr_accessor :template_name, :name, :results, :context
+      delegate :region, :provider, to: Config
 
       def template
         return raw_template
