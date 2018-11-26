@@ -28,18 +28,27 @@ RSpec.describe Cloudware::Models::Context do
     end
   end
 
-  context 'with multiple deployments' do
+  context 'with two deployments' do
     let(:initial_results) { { key: 'value', replaced_key: 'wrong' } }
     let(:final_results) { { replaced_key: 'correct' } }
     let(:merged_results) { initial_results.merge(final_results) }
 
     let(:initial_deployment) { build(:deployment, results: initial_results) }
-    let(:final_deployment) { build(:deployment, results: final_results) }
+    let(:final_deployment) do
+      build(:deployment, name: 'final', results: final_results)
+    end
     let(:deployments) { [initial_deployment, final_deployment] }
 
     describe '#results' do
       it 'replaces the earlier results with the latter' do
         expect(subject.results).to eq(merged_results)
+      end
+    end
+
+    describe '#remove_deployment' do
+      it 'removes the deployment' do
+        subject.remove_deployment(initial_deployment)
+        expect(subject.results).to eq(final_results)
       end
     end
   end

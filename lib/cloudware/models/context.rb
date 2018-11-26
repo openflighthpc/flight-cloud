@@ -16,6 +16,10 @@ module Cloudware
         stack.push(new_data)
       end
 
+      def remove_deployment(deployment)
+        stack.delete_if { |d| d.name == deployment.name }
+      end
+
       def save
         save_data = stack.map(&:to_h)
         Data.dump(path, save_data)
