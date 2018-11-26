@@ -6,21 +6,6 @@ RSpec.describe Cloudware::Models::Context do
     build(:context, deployments: deployments)
   end
 
-  describe '#deployment=' do
-    let(:first_results) { { key: 'first' } }
-    let(:first_deployment) { build(:deployment, results: first_results) }
-    let(:deployments) { [first_deployment] }
-
-    it 'sets the deployment' do
-      expect(subject.results).to eq(first_results)
-    end
-
-    it 'replaces existing deployments' do
-      subject.deployments = [build(:deployment)]
-      expect(subject.results).to eq({})
-    end
-  end
-
   context 'with a single deployment' do
     let(:results) { { single_key: 'value' } }
     let(:deployment) { build(:deployment, results: results) }
@@ -40,9 +25,20 @@ RSpec.describe Cloudware::Models::Context do
       end
     end
 
-    describe '#desployments' do
+    describe '#deployments' do
       it 'returns the deploument' do
         expect(subject.deployments.map(&:name)).to eq(deployments.map(&:name))
+      end
+    end
+
+    describe '#deployments=' do
+      it 'sets the deployment' do
+        expect(subject.results).to eq(results)
+      end
+
+      it 'replaces existing deployments' do
+        subject.deployments = [build(:deployment)]
+        expect(subject.results).to eq({})
       end
     end
   end
