@@ -24,7 +24,14 @@ module Cloudware
       end
 
       def with_deployment(deployment)
-        deployments.push(deployment)
+        existing_index = deployments.find_index do |cur_deployment|
+          cur_deployment.name == deployment.name
+        end
+        if existing_index
+          deployments[existing_index] = deployment
+        else
+          deployments.push(deployment)
+        end
       end
 
       def remove_deployment(deployment)

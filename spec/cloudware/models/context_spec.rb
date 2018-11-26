@@ -41,6 +41,31 @@ RSpec.describe Cloudware::Models::Context do
         expect(subject.results).to eq({})
       end
     end
+
+    describe '#with_deployment' do
+      before { subject.with_deployment(new_deployment) }
+
+      context 'with a completely new deployment' do
+        let(:new_deployment) { build(:deployment, name: 'new') }
+
+        it 'adds new deployments to the end of the stack' do
+          expect(subject.deployments.length).to eq(2)
+          expect(subject.deployments.last).to eq(new_deployment)
+        end
+      end
+
+      context 'with a deployment of the same name' do
+        let(:new_results) { { single_key: 'new-value' } }
+        let(:new_deployment) do
+          build(:deployment, name: deployment.name, results: new_results)
+        end
+
+        it 'updates existing deployment' do
+          expect(subject.deployments.length).to eq(1)
+          expect(subject.deployments.first.results).to eq(new_results)
+        end
+      end
+    end
   end
 
   context 'with two deployments' do
