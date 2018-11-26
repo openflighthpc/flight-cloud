@@ -23,6 +23,10 @@ module Cloudware
       def stack
         @stack ||= []
       end
+
+      def path
+        File.join(Config.content_path, 'contexts/default.yaml')
+      end
     end
   end
 end

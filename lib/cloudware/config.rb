@@ -43,7 +43,7 @@ module Cloudware
     end
 
     attr_accessor :log_file, :aws, :azure, :providers
-    attr_reader :provider, :region, :content_path,  :context_path
+    attr_reader :provider, :region, :content_path
 
     def initialize
       config = YAML.load_file(config_path)
@@ -65,7 +65,6 @@ module Cloudware
       @region  = @default[:region]
 
       @content_path = '/var/lib/cloudware'
-      @content_path = File.join(content_path, 'contexts/default.yaml')
     end
 
     def log
