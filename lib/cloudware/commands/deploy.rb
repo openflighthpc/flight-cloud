@@ -42,11 +42,9 @@ module Cloudware
       def replacement_mapping
         params.map do |replace_key, deployment_str|
           name, deployment_key = deployment_str.split('.', 2)
+          deployment_key ||= replace_key
           results = context.find_by_name(name)&.results || {}
-          raise InvalidInput, <<-ERROR.squish unless deployment_key
-            '#{deployment_str}' must be in format: 'deployment.key'
-          ERROR
-          [replace_key, results[deployment_key]]
+          [replace_key, results[deployment_key.to_sym]]
         end.to_h
       end
 
