@@ -10,11 +10,19 @@ module Cloudware
       def run
         @template = argv[0]
         @name = argv[1]
-        deployment.deploy
-        context.save
+        error_if_deployment_exists
+        begin deployment.deploy
+        ensure context.save
+        end
       end
 
       private
+
+      def error_if_deployment_exists
+        raise InvalidInput, <<-ERROR.squish if context.find_by_name(name)
+          The '#{name}' deployment already exists
+        ERROR
+      end
 
       def context
         Models::Context.new
