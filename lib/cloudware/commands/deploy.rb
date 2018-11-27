@@ -11,7 +11,6 @@ module Cloudware
         @template = argv[0]
         @name = argv[1]
         deployment.deploy
-      ensure
         context.save
       end
 
@@ -33,11 +32,13 @@ module Cloudware
 
       def replacement_mapping
         params.map do |replace_key, deployment_str|
-          deployment_name, deployment_key = deployment_str.split('.', 2)
+          name, deployment_key = deployment_str.split('.', 2)
+          results = context.find_by_name(name)&.results || {}
           raise InvalidInput, <<-ERROR.squish unless deployment_key
             '#{deployment_str}' must be in format: 'deployment.key'
           ERROR
-        end
+          [replace_key, results[deployment_key]]
+        end.to_h
       end
 
       def params
