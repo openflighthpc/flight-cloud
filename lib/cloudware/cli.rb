@@ -61,6 +61,8 @@ module Cloudware
     command 'deploy' do |c|
       cli_syntax(c, 'TEMPLATE NAME')
       c.description = 'Deploy'
+      c.option '-p', "--params 'REPLACE_KEY=DEPLOYMENT.OUTPUT_KEY...'",
+               String, 'A space separate list of keys to replace'
       action(c, Commands::Deploy)
     end
 

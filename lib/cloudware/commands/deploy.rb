@@ -31,6 +31,10 @@ module Cloudware
         )
       end
       memoize :deployment
+
+      def params
+        options.params
+      end
     end
   end
 end
