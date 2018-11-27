@@ -23,7 +23,7 @@ module Cloudware
       def template
         return raw_template unless replacements
         replacements.reduce(raw_template) do |memo, (key, value)|
-          memo.gsub("%#{key}%", value)
+          memo.gsub("%#{key}%", value.to_s)
         end
       end
 
