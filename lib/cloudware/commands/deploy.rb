@@ -11,6 +11,7 @@ module Cloudware
       def run
         @template = argv[0]
         @name = argv[1]
+        params
         deployment.deploy
       ensure
         context.save
@@ -33,7 +34,13 @@ module Cloudware
       memoize :deployment
 
       def params
-        options.params
+        (options.params || '').chomp.split.map do |param_str|
+          param_str.split('=', 2).tap do |array|
+            raise InvalidInput, <<-ERROR.squish unless array.length == 2
+              '#{param_str}' does not form a key value pair
+            ERROR
+          end
+        end.to_h.deep_symbolize_keys
       end
     end
   end
