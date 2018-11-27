@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 require 'models/deployment'
 
 module Cloudware
@@ -11,7 +10,6 @@ module Cloudware
       def run
         @template = argv[0]
         @name = argv[1]
-        params
         deployment.deploy
       ensure
         context.save
@@ -32,6 +30,15 @@ module Cloudware
         )
       end
       memoize :deployment
+
+      def replacement_mapping
+        params.map do |replace_key, deployment_str|
+          deployment_name, deployment_key = deployment_str.split('.', 2)
+          raise InvalidInput, <<-ERROR.squish unless deployment_key
+            '#{deployment_str}' must be in format: 'deployment.key'
+          ERROR
+        end
+      end
 
       def params
         (options.params || '').chomp.split.map do |param_str|
