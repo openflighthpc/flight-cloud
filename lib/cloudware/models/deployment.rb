@@ -21,11 +21,10 @@ module Cloudware
       end
 
       def template
-        return raw_template
-        # TODO: Reimplement parents as a context
-        # parent.results.reduce(raw_template) do |memo, (key, value)|
-        #   memo.gsub("%#{key}%", value)
-        # end
+        return raw_template unless replacements
+        replacements.reduce(raw_template) do |memo, (key, value)|
+          memo.gsub("%#{key}%", value)
+        end
       end
 
       def deploy
