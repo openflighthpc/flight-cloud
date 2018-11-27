@@ -43,6 +43,10 @@ module Cloudware
         Data.dump(path, save_data)
       end
 
+      def find_by_name(name)
+        deployments.find { |d| d.name == name }
+      end
+
       private
 
       def path

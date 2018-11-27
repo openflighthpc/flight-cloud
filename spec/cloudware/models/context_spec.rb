@@ -102,5 +102,16 @@ RSpec.describe Cloudware::Models::Context do
         expect(subject.results).to eq(final_results)
       end
     end
+
+    describe '#find_by_name' do
+      it 'returns nil if the deployment is missing' do
+        expect(subject.find_by_name('missing')).to be_nil
+      end
+
+      it 'returns the deployment' do
+        name = final_deployment.name
+        expect(subject.find_by_name(name)).to eq(final_deployment)
+      end
+    end
   end
 end
