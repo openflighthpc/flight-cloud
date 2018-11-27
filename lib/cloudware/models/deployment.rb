@@ -11,7 +11,7 @@ module Cloudware
     class Deployment < Application
       include Concerns::ProviderClient
 
-      SAVE_ATTR = [:template_name, :name, :results]
+      SAVE_ATTR = [:template_name, :name, :results, :replacements]
       attr_accessor(*SAVE_ATTR)
       attr_reader :context
       delegate :region, :provider, to: Config

@@ -25,7 +25,8 @@ module Cloudware
         Models::Deployment.new(
           template_name: template,
           name: name,
-          context: context
+          context: context,
+          replacements: replacement_mapping
         )
       end
       memoize :deployment
