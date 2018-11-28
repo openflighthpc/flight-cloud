@@ -9,7 +9,10 @@ module Cloudware
     class Machine < Application
       include Concerns::ProviderClient
 
-      TAG_PREFIX = 'cloudwareNODE'
+      NODE_PREFIX = 'cloudwareNODE'
+      TAG_FLAG = 'TAG'
+
+      PROVIDER_ID_FLAG = 'ID'
 
       class << self
         def build_from_deployment(deployment)
@@ -24,8 +27,12 @@ module Cloudware
         end
 
         def name_from_tag(tag)
-          regex = /(?<=\A#{TAG_PREFIX}).*(?=TAG.*\Z)/
+          regex = /(?<=\A#{NODE_PREFIX}).*(?=#{TAG_FLAG}.*\Z)/
           regex.match(tag.to_s)&.to_a&.first
+        end
+
+        def tag_generator(name, tag)
+          :"#{NODE_PREFIX}#{name}#{TAG_FLAG}#{tag}"
         end
       end
 
