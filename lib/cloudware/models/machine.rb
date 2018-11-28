@@ -14,14 +14,18 @@ module Cloudware
       class << self
         def build_from_deployment(deployment)
           (deployment.results || {})
-                     .select { |k, _| Machine.tag?(k) }
-                     .map do |key, _|
-            Machine.new(tag: key.to_s, deployment: deployment)
+                     .keys
+                     .map { |k| Machine.name_from_tag(k) }
+                     .uniq
+                     .reject { |n| n.nil? }
+                     .map do |name|
+            Machine.new(name: name, deployment: deployment)
           end
         end
 
-        def tag?(tag)
-          /\A#{TAG_PREFIX}/.match?(tag)
+        def name_from_tag(tag)
+          regex = /(?<=\A#{TAG_PREFIX}).*(?=TAG.*\Z)/
+          regex.match(tag.to_s)&.to_a&.first
         end
       end
 
@@ -29,14 +33,6 @@ module Cloudware
 
       delegate :status, :off, :on, to: :machine_client
       delegate :region, :provider, to: :deployment
-
-      def tag=(tag)
-        self.name = /(?<=\AcloudwareNODE).*(?=TAG.*\Z)/.match(tag).to_s
-      end
-
-      def tag
-        "#{TAG_PREFIX}#{name}"
-      end
 
       private
 
