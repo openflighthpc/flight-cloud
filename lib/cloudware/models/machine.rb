@@ -11,8 +11,17 @@ module Cloudware
 
       TAG_PREFIX = 'cloudwareNODE'
 
-      def self.tag?(tag)
-        /\A#{TAG_PREFIX}/.match?(tag)
+      class << self
+        def build_from_deployment(deployment)
+          deployment.results&.select { |k, _| Machine.tag?(k) }
+                 &.map do |key, _|
+            Machine.new(tag: key.to_s, deployment: deployment)
+          end
+        end
+
+        def tag?(tag)
+          /\A#{TAG_PREFIX}/.match?(tag)
+        end
       end
 
       attr_accessor :name, :deployment
