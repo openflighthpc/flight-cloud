@@ -29,7 +29,7 @@ RSpec.describe Cloudware::Models::Deployment do
     let(:results) do
       prefix = Cloudware::Models::Machine::TAG_PREFIX
       machines.each_with_object({}) do |name, memo|
-        memo[:"#{prefix}#{name}"] = "#{name}-id"
+        memo[:"#{prefix}#{name}TAGid"] = "#{name}-id"
       end
     end
 

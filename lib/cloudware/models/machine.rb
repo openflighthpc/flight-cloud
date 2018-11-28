@@ -9,7 +9,7 @@ module Cloudware
     class Machine < Application
       include Concerns::ProviderClient
 
-      TAG_PREFIX = 'cloudwareNodeID'
+      TAG_PREFIX = 'cloudwareNODE'
 
       def self.tag?(tag)
         /\A#{TAG_PREFIX}/.match?(tag)
@@ -21,7 +21,7 @@ module Cloudware
       delegate :region, :provider, to: :deployment
 
       def tag=(tag)
-        self.name = tag.sub(TAG_PREFIX, '')
+        self.name = /(?<=\AcloudwareNODE).*(?=TAG.*\Z)/.match(tag).to_s
       end
 
       def tag
