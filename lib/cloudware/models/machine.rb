@@ -13,8 +13,9 @@ module Cloudware
 
       class << self
         def build_from_deployment(deployment)
-          deployment.results&.select { |k, _| Machine.tag?(k) }
-                 &.map do |key, _|
+          (deployment.results || {})
+                     .select { |k, _| Machine.tag?(k) }
+                     .map do |key, _|
             Machine.new(tag: key.to_s, deployment: deployment)
           end
         end
