@@ -45,8 +45,8 @@ module Cloudware
         id_tag = self.class.tag_generator(name, PROVIDER_ID_FLAG)
         (deployment.results || {})[id_tag].tap do |id|
           raise ModelValidationError, <<-ERROR.squish unless id
-            The provider id for node '#{name}' has not been set. Make sure
-            '#{id_tag}' has been set in the deployment output
+            Machine '#{name}' is missing its provider ID. Make sure
+            '#{id_tag}' is set within the deployment output
           ERROR
         end
       end
