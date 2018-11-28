@@ -9,9 +9,6 @@ module Cloudware
     class Machine < Application
       include Concerns::ProviderClient
 
-      delegate :status, :off, :on, to: :machine_client
-      delegate :region, :provider, to: :deployment
-
       TAG_PREFIX = 'cloudwareNodeID'
 
       def self.tag?(tag)
@@ -19,6 +16,9 @@ module Cloudware
       end
 
       attr_accessor :name, :deployment
+
+      delegate :status, :off, :on, to: :machine_client
+      delegate :region, :provider, to: :deployment
 
       def tag=(tag)
         self.name = tag.sub(TAG_PREFIX, '')
