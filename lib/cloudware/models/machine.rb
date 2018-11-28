@@ -41,11 +41,17 @@ module Cloudware
       delegate :status, :off, :on, to: :machine_client
       delegate :region, :provider, to: :deployment
 
-      private
-
       def provider_id
-        deployment.results[tag.to_sym]
+        id_tag = self.class.tag_generator(name, PROVIDER_ID_FLAG)
+        (deployment.results || {})[id_tag].tap do |id|
+          raise ModelValidationError, <<-ERROR.squish unless id
+            The provider id for node '#{name}' has not been set. Make sure
+            '#{id_tag}' has been set in the deployment output
+          ERROR
+        end
       end
+
+      private
 
       def machine_client
         provider_client.machine(provider_id)
