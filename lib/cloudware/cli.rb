@@ -28,6 +28,7 @@ require 'exceptions'
 require 'command'
 
 require 'require_all'
+require_all 'lib/cloudware/commands/concerns/**/*.rb'
 require_all 'lib/cloudware/commands/**/*.rb'
 
 module Cloudware

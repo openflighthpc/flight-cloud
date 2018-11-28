@@ -4,6 +4,8 @@ module Cloudware
   module Commands
     module Powers
       class Power < Command
+        include Commands::Concerns::ExistingDeployment
+
         attr_reader :deployment_name, :machine_name
 
         def run
@@ -17,14 +19,6 @@ module Cloudware
         end
 
         private
-
-        def deployment
-          Models::Context.new.find_by_name(deployment_name).tap do |deployment|
-            raise InvalidInput, <<-ERROR.squish unless deployment
-              Could not find deployment '#{deployment_name}'
-            ERROR
-          end
-        end
 
         def machine
           Models::Machine.new(name: machine_name, deployment: deployment)
