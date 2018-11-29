@@ -7,6 +7,7 @@ module Cloudware
     module Infos
       class Machine < Command
         include Concerns::ExistingDeployment
+        include Concerns::Table
         attr_reader :machine_name, :deployment_name
 
         def run
@@ -23,10 +24,9 @@ module Cloudware
         end
         memoize :machine
 
-        def table
-          TTY::Table.new header: ['Tag', 'Value']
+        def table_header
+          ['Tag', 'Value']
         end
-        memoize :table
       end
     end
   end
