@@ -49,6 +49,10 @@ module Cloudware
           end
         end
 
+        def tag_generator(tag)
+          self.class.tag_generator(name, tag)
+        end
+
         def extract_tag(key)
           regex = /(?<=\A#{self.class.tag_generator(Regexp.escape(name), '')}).*/
           regex.match(key.to_s)&.to_a&.first&.to_sym

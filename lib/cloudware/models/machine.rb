@@ -17,7 +17,7 @@ module Cloudware
       delegate :region, :provider, to: :deployment
 
       def provider_id
-        id_tag = self.class.tag_generator(name, PROVIDER_ID_FLAG)
+        id_tag = self.tag_generator(PROVIDER_ID_FLAG)
         (deployment.results || {})[id_tag].tap do |id|
           raise ModelValidationError, <<-ERROR.squish unless id
             Machine '#{name}' is missing its provider ID. Make sure
