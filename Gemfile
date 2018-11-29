@@ -16,7 +16,7 @@ gem 'ipaddr'
 gem 'memoist'
 gem 'parallel'
 gem 'require_all'
-gem 'terminal-table'
+gem 'tty-table'
 gem 'whirly'
 
 group :development do

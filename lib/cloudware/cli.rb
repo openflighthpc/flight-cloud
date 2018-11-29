@@ -22,7 +22,6 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 require 'commander'
-require 'terminal-table'
 require 'whirly'
 require 'exceptions'
 require 'command'
