@@ -8,12 +8,10 @@ module Cloudware
   module Models
     class Machine < Application
       include Concerns::ProviderClient
-      include Concerns::Tags
+      include Concerns::DeploymentTags
 
       TAG_TYPE = 'NODE'
       PROVIDER_ID_FLAG = 'ID'
-
-      attr_accessor :name, :deployment
 
       delegate :status, :off, :on, to: :machine_client
       delegate :region, :provider, to: :deployment

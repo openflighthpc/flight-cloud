@@ -3,10 +3,8 @@
 module Cloudware
   module Models
     class Domain < Application
-      include Concerns::Tags
+      include Concerns::DeploymentTags
       TAG_TYPE = 'DOMAIN'
-
-      attr_accessor :name, :deployment
     end
   end
 end

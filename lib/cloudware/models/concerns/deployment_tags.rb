@@ -3,7 +3,7 @@
 module Cloudware
   module Models
     module Concerns
-      module Tags
+      module DeploymentTags
         # NOTE: The TAG_TYPE must be set as a constant on the base model
 
         def self.included(base)
@@ -39,6 +39,8 @@ module Cloudware
             :"#{prefix}#{name}#{flag}#{tag}"
           end
         end
+
+        attr_accessor :name, :deployment
 
         def tags
           (deployment.results || {}).each_with_object({}) do |(key, value), memo|
