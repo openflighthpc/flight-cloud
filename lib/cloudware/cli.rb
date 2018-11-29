@@ -73,6 +73,19 @@ module Cloudware
       action(c, Commands::Destroy)
     end
 
+    command 'info' do |c|
+      cli_syntax(c)
+      c.description = 'Info'
+      c.sub_command_group = true
+    end
+
+    command 'info machine' do |c|
+      cli_syntax(c, 'NAME')
+      c.description = 'Machine Info'
+      c.hidden = true
+      action(c, Commands::Infos::Machine)
+    end
+
     command 'power' do |c|
       cli_syntax(c)
       c.description = 'Power'
