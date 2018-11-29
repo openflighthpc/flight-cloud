@@ -104,6 +104,15 @@ module Cloudware
       action(c, Commands::Infos::Machine)
     end
 
+    command 'info domain' do |c|
+      cli_syntax(c, 'NAME')
+      c.description = 'Domain Info'
+      c.option '-d', '--deployment DEPLOYMENT', String,
+               'The deployment the machine was created in'
+      c.hidden = true
+      action(c, Commands::Infos::Domain)
+    end
+
     command 'power' do |c|
       cli_syntax(c)
       c.description = 'Power'
