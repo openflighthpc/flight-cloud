@@ -7,7 +7,7 @@ module Cloudware
     module Lists
       class Machine < Command
         def run
-          puts machines
+          puts header_tags
         end
 
         private
@@ -19,6 +19,13 @@ module Cloudware
                          .flatten
         end
         memoize :machines
+
+        def header_tags
+          machines.map { |m| m.tags.keys }
+                  .flatten
+                  .uniq
+        end
+        memoize :header_tags
       end
     end
   end
