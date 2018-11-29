@@ -6,8 +6,11 @@ module Cloudware
   module Commands
     module Lists
       class Machine < Command
+        include Concerns::Table
+
         def run
-          puts header_tags
+          add_rows
+          puts render_table
         end
 
         private
@@ -26,6 +29,18 @@ module Cloudware
                   .uniq
         end
         memoize :header_tags
+
+        def table_header
+          ['Machine', 'Deployment', *header_tags]
+        end
+
+        def add_rows
+          machines.each do |machine|
+            tags = machine.tags
+            machine_values = header_tags.map { |k| tags[k] }
+            table << [machine.name, machine.deployment.name, *machine_values]
+          end
+        end
       end
     end
   end

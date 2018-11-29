@@ -14,7 +14,7 @@ module Cloudware
           @deployment_name = options.deployment
           @machine_name = argv[0]
           machine.tags.each { |row| table << row }
-          puts table.render(:unicode)
+          puts render_table
         end
 
         private
