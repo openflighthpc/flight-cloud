@@ -24,7 +24,11 @@ RSpec.describe Cloudware::ParseParam do
 
     context 'with a deployment' do
       let(:result_string) { 'value from deployment' }
-      let(:deployment_results) { { key => result_string } }
+      let(:other_key) { :my_super_other_key }
+      let(:other_result) { 'I am the other keys result' }
+      let(:deployment_results) do
+        { key => result_string, other_key => other_result }
+      end
       let(:deployment_name) { 'my-deployment' }
       let(:deployment) do
         build(:deployment, name: deployment_name, results: deployment_results)
@@ -36,6 +40,13 @@ RSpec.describe Cloudware::ParseParam do
         it 'returns the deployment results matching the key' do
           input_value = "*#{deployment_name}"
           expect(subject.pair(key, input_value)).to eq(result_string)
+        end
+      end
+
+      context 'with *<deployment-name>.<other-key>' do
+        it 'ignores the input key an uses the other-key instead' do
+          input_value = "*#{deployment_name}.#{other_key}"
+          expect(subject.pair(key, input_value)).to eq(other_result)
         end
       end
     end
