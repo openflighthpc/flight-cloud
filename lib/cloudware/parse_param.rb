@@ -1,6 +1,6 @@
 
 module Cloudware
-  class ParseParam
+  class ParamParser
     attr_reader :context
 
     def initialize(context)

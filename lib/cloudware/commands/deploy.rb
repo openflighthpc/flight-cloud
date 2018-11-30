@@ -47,7 +47,7 @@ module Cloudware
       end
 
       def parser
-        ParseParam.new(context)
+        ParamParser.new(context)
       end
       memoize :parser
     end

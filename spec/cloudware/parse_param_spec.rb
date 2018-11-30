@@ -2,7 +2,7 @@
 
 require 'parse_param'
 
-RSpec.describe Cloudware::ParseParam do
+RSpec.describe Cloudware::ParamParser do
   shared_context 'parse-param-deployment' do
     let(:result_string) { 'value from deployment' }
     let(:other_key) { :my_super_other_key }
