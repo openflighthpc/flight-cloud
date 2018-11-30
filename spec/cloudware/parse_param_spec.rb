@@ -66,5 +66,15 @@ RSpec.describe Cloudware::ParseParam do
         expect { subject.string(str) }.to raise_error(Cloudware::InvalidInput)
       end
     end
+
+    context 'with a regular key=value string' do
+      let(:key) { :my_key }
+      let(:value) { 'my-value' }
+      let(:input) { "#{key}=#{value}" }
+
+      it 'returns the key value pairing' do
+        expect(subject.string(input)).to eq([key, value])
+      end
+    end
   end
 end

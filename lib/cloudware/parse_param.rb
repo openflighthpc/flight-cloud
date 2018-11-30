@@ -24,6 +24,7 @@ module Cloudware
         raise InvalidInput, <<-ERROR.squish unless array.length == 2
           '#{input}' does not form a key value pair
         ERROR
+        array[0] = array[0].to_sym
       end
     end
   end
