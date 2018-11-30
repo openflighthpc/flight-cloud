@@ -15,27 +15,31 @@ module Cloudware
 
         private
 
-        def machines
+        def context_method
+          :machines
+        end
+
+        def models
           Models::Context.new
                          .deployments
-                         .map(&:machines)
+                         .map(&context_method)
                          .flatten
         end
-        memoize :machines
+        memoize :models
 
         def header_tags
-          machines.map { |m| m.tags.keys }
+          models.map { |m| m.tags.keys }
                   .flatten
                   .uniq
         end
         memoize :header_tags
 
         def table_header
-          ['Machine', 'Deployment', *header_tags]
+          [context_method.to_s.capitalize, 'Deployment', *header_tags]
         end
 
         def add_rows
-          machines.each do |machine|
+          models.each do |machine|
             tags = machine.tags
             machine_values = header_tags.map { |k| tags[k] }
             table << [machine.name, machine.deployment.name, *machine_values]
