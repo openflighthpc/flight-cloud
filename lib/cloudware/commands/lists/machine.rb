@@ -6,7 +6,7 @@ module Cloudware
       class Machine < List
         private
 
-        def context_method
+        def deployment_method
           :machines
         end
       end

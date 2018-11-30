@@ -13,14 +13,14 @@ module Cloudware
 
       private
 
-      def context_method
+      def deployment_method
         raise NotImplementedError
       end
 
       def models
         Models::Context.new
                        .deployments
-                       .map(&context_method)
+                       .map(&deployment_method)
                        .flatten
       end
       memoize :models
@@ -33,7 +33,7 @@ module Cloudware
       memoize :header_tags
 
       def table_header
-        [context_method.to_s.capitalize, 'Deployment', *header_tags]
+        [deployment_method.to_s.capitalize, 'Deployment', *header_tags]
       end
 
       def add_rows
