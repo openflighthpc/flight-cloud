@@ -58,4 +58,13 @@ RSpec.describe Cloudware::ParseParam do
       end
     end
   end
+
+  describe '#string' do
+    context 'when the string is missing an =' do
+      it 'issues an user error' do
+        str = 'i-am-not-a-key-value-pair'
+        expect { subject.string(str) }.to raise_error(Cloudware::InvalidInput)
+      end
+    end
+  end
 end

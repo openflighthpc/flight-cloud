@@ -18,5 +18,13 @@ module Cloudware
         value.to_s
       end
     end
+
+    def string(input)
+      input.split('=', 2).tap do |array|
+        raise InvalidInput, <<-ERROR.squish unless array.length == 2
+          '#{input}' does not form a key value pair
+        ERROR
+      end
+    end
   end
 end
