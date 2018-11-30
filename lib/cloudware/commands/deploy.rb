@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'models/deployment'
+require 'parse_param'
 
 module Cloudware
   module Commands
@@ -40,23 +41,15 @@ module Cloudware
       memoize :deployment
 
       def replacement_mapping
-        params.map do |replace_key, deployment_str|
-          name, deployment_key = deployment_str.split('.', 2)
-          deployment_key ||= replace_key
-          results = context.find_by_name(name)&.results || {}
-          [replace_key, results[deployment_key.to_sym]]
+        (options.params || '').chomp.split.map do |param_str|
+          parser.string(param_str)
         end.to_h
       end
 
-      def params
-        (options.params || '').chomp.split.map do |param_str|
-          param_str.split('=', 2).tap do |array|
-            raise InvalidInput, <<-ERROR.squish unless array.length == 2
-              '#{param_str}' does not form a key value pair
-            ERROR
-          end
-        end.to_h.deep_symbolize_keys
+      def parser
+        ParseParam.new(context)
       end
+      memoize :parser
     end
   end
 end
