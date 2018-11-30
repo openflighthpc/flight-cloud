@@ -43,7 +43,7 @@ module Cloudware
       def replacement_mapping
         (options.params || '').chomp.split.map do |param_str|
           parser.string(param_str)
-        end.to_h
+        end.to_h.merge(deployment_name: name)
       end
 
       def parser
