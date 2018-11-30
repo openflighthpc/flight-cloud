@@ -22,6 +22,13 @@ RSpec.describe Cloudware::ParseParam do
       expect(subject.pair(key, regular)).to eq(regular)
     end
 
+    context 'when referencing a missing deployment' do
+      it 'returns an empty string' do
+        input = '*missing-deployment'
+        expect(subject.pair(key, input)).to eq('')
+      end
+    end
+
     context 'with a deployment' do
       let(:result_string) { 'value from deployment' }
       let(:other_key) { :my_super_other_key }
