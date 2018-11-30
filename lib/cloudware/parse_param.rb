@@ -25,6 +25,7 @@ module Cloudware
           '#{input}' does not form a key value pair
         ERROR
         array[0] = array[0].to_sym
+        array[1] = pair(array[0], array[1])
       end
     end
   end

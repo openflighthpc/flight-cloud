@@ -3,12 +3,26 @@
 require 'parse_param'
 
 RSpec.describe Cloudware::ParseParam do
+  shared_context 'parse-param-deployment' do
+    let(:result_string) { 'value from deployment' }
+    let(:other_key) { :my_super_other_key }
+    let(:other_result) { 'I am the other keys result' }
+    let(:deployment_results) do
+      { key => result_string, other_key => other_result }
+    end
+    let(:deployment_name) { 'my-deployment' }
+    let(:deployment) do
+      build(:deployment, name: deployment_name, results: deployment_results)
+    end
+
+    before { context.with_deployment(deployment) }
+  end
+
   subject { described_class.new(context) }
   let(:context) { build(:context) }
+  let(:key) { :my_key }
 
   describe '#pair' do
-    let(:key) { :my_key }
-
     it 'replaces nil values with empty string' do
       expect(subject.pair(key, nil)).to eq('')
     end
@@ -30,18 +44,7 @@ RSpec.describe Cloudware::ParseParam do
     end
 
     context 'with a deployment' do
-      let(:result_string) { 'value from deployment' }
-      let(:other_key) { :my_super_other_key }
-      let(:other_result) { 'I am the other keys result' }
-      let(:deployment_results) do
-        { key => result_string, other_key => other_result }
-      end
-      let(:deployment_name) { 'my-deployment' }
-      let(:deployment) do
-        build(:deployment, name: deployment_name, results: deployment_results)
-      end
-
-      before { context.with_deployment(deployment) }
+      include_context 'parse-param-deployment'
 
       context 'with *<deployment-name> inputs' do
         it 'returns the deployment results matching the key' do
@@ -68,12 +71,20 @@ RSpec.describe Cloudware::ParseParam do
     end
 
     context 'with a regular key=value string' do
-      let(:key) { :my_key }
       let(:value) { 'my-value' }
       let(:input) { "#{key}=#{value}" }
 
       it 'returns the key value pairing' do
         expect(subject.string(input)).to eq([key, value])
+      end
+    end
+
+    context 'with a deployment' do
+      include_context 'parse-param-deployment'
+
+      it 'replaces the referenced result' do
+        str = "#{key}=*#{deployment_name}"
+        expect(subject.string(str)).to eq([key, result_string])
       end
     end
   end
