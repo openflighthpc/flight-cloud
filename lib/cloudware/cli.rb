@@ -76,19 +76,6 @@ module Cloudware
       action(c, Commands::Destroy)
     end
 
-    command 'list' do |c|
-      cli_syntax(c)
-      c.description = 'list'
-      c.sub_command_group = true
-    end
-
-    command 'list machines' do |c|
-      cli_syntax(c)
-      c.description = 'List all the machines'
-      c.hidden = true
-      action(c, Commands::Lists::Machine)
-    end
-
     command 'info' do |c|
       cli_syntax(c)
       c.description = 'Info'
@@ -111,6 +98,26 @@ module Cloudware
                'The deployment the machine was created in'
       c.hidden = true
       action(c, Commands::Infos::Domain)
+    end
+
+    command 'list' do |c|
+      cli_syntax(c)
+      c.description = 'list'
+      c.sub_command_group = true
+    end
+
+    command 'list machines' do |c|
+      cli_syntax(c)
+      c.description = 'List all the machines'
+      c.hidden = true
+      action(c, Commands::Lists::Machine)
+    end
+
+    command 'list domains' do |c|
+      cli_syntax(c)
+      c.description = 'List all the domains'
+      c.hidden = true
+      action(c, Commands::Lists::Domain)
     end
 
     command 'power' do |c|
