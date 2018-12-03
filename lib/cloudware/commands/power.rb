@@ -22,7 +22,10 @@ module Cloudware
 
         def machines
           if options.group
-            raise NotImplementedError
+            Models::Context.new.deployments
+                               .map(&:machines)
+                               .flatten
+                               .select { |m| m.groups.include?(machine_name) }
           else
             [Models::Machine.new(name: machine_name, deployment: deployment)]
           end
