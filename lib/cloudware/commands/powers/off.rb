@@ -4,7 +4,7 @@ module Cloudware
   module Commands
     module Powers
       class Off < Power
-        def run_power
+        def run_power(machine)
           machine.off
         end
       end

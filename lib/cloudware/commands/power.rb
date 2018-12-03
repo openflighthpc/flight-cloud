@@ -11,10 +11,10 @@ module Cloudware
         def run
           @deployment_name = options.deployment
           @machine_name = argv[0]
-          run_power
+          run_power(machine)
         end
 
-        def run_power
+        def run_power(machine)
           raise NotImplementedError
         end
 
