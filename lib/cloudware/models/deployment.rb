@@ -5,7 +5,6 @@ require 'models/application'
 require 'models/machine'
 require 'models/domain'
 require 'models/context'
-require 'providers/AWS'
 
 module Cloudware
   module Models
@@ -15,7 +14,6 @@ module Cloudware
       SAVE_ATTR = [:template_name, :name, :results, :replacements]
       attr_accessor(*SAVE_ATTR)
       attr_reader :context
-      delegate :region, :provider, to: Config
 
       def context=(input)
         @context = input.tap { |c| c.with_deployment(self) }
