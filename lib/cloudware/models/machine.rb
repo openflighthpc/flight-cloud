@@ -12,6 +12,7 @@ module Cloudware
 
       TAG_TYPE = 'NODE'
       PROVIDER_ID_FLAG = 'ID'
+      GROUPS_TAG = 'groups'
 
       delegate :status, :off, :on, to: :machine_client
       delegate :region, :provider, to: :deployment
@@ -23,6 +24,10 @@ module Cloudware
             '#{long_tag}' is set within the deployment output
           ERROR
         end
+      end
+
+      def groups
+        fetch_result(GROUPS_TAG, default: '').split(',')
       end
 
       private
