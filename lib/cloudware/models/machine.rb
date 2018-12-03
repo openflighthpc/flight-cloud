@@ -32,14 +32,6 @@ module Cloudware
 
       private
 
-      def fetch_result(short_tag, default: nil)
-        long_tag = self.tag_generator(short_tag)
-        result = (deployment.results || {})[long_tag]
-        return result unless result.nil?
-        return default unless default.nil?
-        yield long_tag if block_given?
-      end
-
       def machine_client
         provider_client.machine(provider_id)
       end
