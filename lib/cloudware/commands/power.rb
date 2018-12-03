@@ -6,11 +6,11 @@ module Cloudware
       class Power < Command
         include Commands::Concerns::ExistingDeployment
 
-        attr_reader :deployment_name, :machine_name
+        attr_reader :deployment_name, :identifier
 
         def run
           @deployment_name = options.deployment
-          @machine_name = argv[0]
+          @identifier = argv[0]
           machines.each { |m| run_power(m) }
         end
 
@@ -25,9 +25,9 @@ module Cloudware
             Models::Context.new.deployments
                                .map(&:machines)
                                .flatten
-                               .select { |m| m.groups.include?(machine_name) }
+                               .select { |m| m.groups.include?(identifier) }
           else
-            [Models::Machine.new(name: machine_name, deployment: deployment)]
+            [Models::Machine.new(name: identifier, deployment: deployment)]
           end
         end
         memoize :machines
