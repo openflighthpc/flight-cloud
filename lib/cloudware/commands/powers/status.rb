@@ -5,7 +5,7 @@ module Cloudware
     module Powers
       class Status < Power
         def run_power(machine)
-          puts machine.status
+          puts "#{machine.name}: #{machine.status}"
         end
       end
     end
