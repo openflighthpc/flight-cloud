@@ -1,16 +1,11 @@
 # frozen_string_literal: true
 
+require 'providers/base'
+
 module Cloudware
   module Providers
     module AWS
-      class Machine
-        attr_reader :instance
-
-        def initialize(machine_id, region)
-          @instance = Aws::EC2::Resource.new(region: region)
-                                        .instance(machine_id)
-        end
-
+      class Machine < Base::Machine
         def status
           instance.state.name
         end
@@ -22,17 +17,17 @@ module Cloudware
         def on
           instance.start
         end
+
+        private
+
+        def instance
+          Aws::EC2::Resource.new(region: region)
+                            .instance(machine_id)
+        end
+        memoize :instance
       end
 
-      class Client
-        extend Memoist
-
-        attr_reader :region
-
-        def initialize(region)
-          @region = region
-        end
-
+      class Client < Base::Client
         def deploy(tag, template)
           client.create_stack(stack_name: tag, template_body: template)
           client.wait_until(:stack_create_complete, stack_name: tag)
@@ -48,10 +43,6 @@ module Cloudware
         def destroy(tag)
           client.delete_stack(stack_name: tag)
           client.wait_until(:stack_delete_complete, stack_name: tag)
-        end
-
-        def machine(id)
-          AWS::Machine.new(id, region)
         end
 
         private
