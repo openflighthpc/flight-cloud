@@ -18,7 +18,7 @@ module Cloudware
       delegate :region, :provider, to: :deployment
 
       def provider_id
-        fetch_result(PROVIDER_ID_FLAG).tap do |long_tag|
+        fetch_result(PROVIDER_ID_FLAG) do |long_tag|
           raise ModelValidationError, <<-ERROR.squish
             Machine '#{name}' is missing its provider ID. Make sure
             '#{long_tag}' is set within the deployment output

@@ -24,8 +24,9 @@ RSpec.describe Cloudware::Models::Machine do
 
   context 'with a machine results within the deployment' do
     let(:group_names) { ['group1', 'group2'] }
+    let(:id) { 'I am the provider id' }
     let(:machine_tags) do
-      { key1: 'value1', key2: 'value2', groups: group_names.join(',') }
+      { key1: 'value1', ID: id, groups: group_names.join(',') }
     end
     let(:machine_name) { 'test-machine' }
     let(:deployment_results) do
@@ -44,6 +45,12 @@ RSpec.describe Cloudware::Models::Machine do
     describe('#groups') do
       it 'returns the list of groups' do
         expect(subject.groups).to contain_exactly(*group_names)
+      end
+    end
+
+    describe '#provider_id' do
+      it 'returns the id' do
+        expect(subject.provider_id).to eq(id)
       end
     end
   end
