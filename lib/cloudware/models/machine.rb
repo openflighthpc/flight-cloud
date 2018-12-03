@@ -17,20 +17,22 @@ module Cloudware
       delegate :region, :provider, to: :deployment
 
       def provider_id
-        fetch_result(PROVIDER_ID_FLAG).tap do |id|
-          raise ModelValidationError, <<-ERROR.squish unless id
+        fetch_result(PROVIDER_ID_FLAG).tap do |long_tag|
+          raise ModelValidationError, <<-ERROR.squish
             Machine '#{name}' is missing its provider ID. Make sure
-            '#{self.tag_generator(PROVIDER_ID_FLAG)}' is set within the
-            deployment output
+            '#{long_tag}' is set within the deployment output
           ERROR
         end
       end
 
       private
 
-      def fetch_result(short_tag)
+      def fetch_result(short_tag, default: nil)
         long_tag = self.tag_generator(short_tag)
-        (deployment.results || {})[long_tag]
+        result = (deployment.results || {})[long_tag]
+        return result unless result.nil?
+        return default unless default.nil?
+        yield long_tag if block_given?
       end
 
       def machine_client
