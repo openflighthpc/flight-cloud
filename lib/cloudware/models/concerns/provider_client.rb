@@ -9,7 +9,7 @@ module Cloudware
         private
 
         def provider_client
-          Providers::AWS.new(region)
+          Providers::AWS::Client.new(region)
         end
         memoize :provider_client
       end
