@@ -11,7 +11,7 @@ module Cloudware
         def run
           @deployment_name = options.deployment
           @machine_name = argv[0]
-          run_power(machine)
+          machines.each { |m| run_power(m) }
         end
 
         def run_power(machine)
@@ -20,10 +20,14 @@ module Cloudware
 
         private
 
-        def machine
-          Models::Machine.new(name: machine_name, deployment: deployment)
+        def machines
+          if options.group
+            raise NotImplementedError
+          else
+            [Models::Machine.new(name: machine_name, deployment: deployment)]
+          end
         end
-        memoize :machine
+        memoize :machines
       end
     end
   end
