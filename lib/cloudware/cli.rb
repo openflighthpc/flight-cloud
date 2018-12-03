@@ -127,9 +127,12 @@ module Cloudware
     end
 
     def self.shared_power_attr(c)
-      cli_syntax(c, 'MACHINE')
+      cli_attr = 'IDENTIFIER'
+      cli_syntax(c, cli_attr)
       c.option '-d', '--deployment DEPLOYMENT', String,
                'The deployment the machine was created in'
+      c.option '-g', '--group',
+               "Preform the action over the group specified by #{cli_attr}"
       c.hidden = true
     end
 
