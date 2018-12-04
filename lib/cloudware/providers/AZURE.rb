@@ -1,11 +1,38 @@
 # frozen_string_literal: true
 
+require 'azure_mgmt_compute'
 require 'providers/base'
 
 module Cloudware
   module Providers
     module AZURE
       class Machine < Base::Machine
+        STATE_REGEX = /PowerState\//
+
+        def status
+          compute_client.virtual_machines.instance_view(
+            resource_group_name, machine_name
+          ).statuses
+           .reverse
+           .find { |s| STATE_REGEX.match?(s.code) }
+           .code
+           .sub(STATE_REGEX, '')
+        end
+
+        private
+
+        def resource_group_name
+          /(?<=\/resourceGroups\/)[^\/]*/.match(machine_id).to_a.first
+        end
+
+        def machine_name
+          /(?<=\/virtualMachines\/).*/.match(machine_id).to_a.first
+        end
+
+        def compute_client
+          klass = Azure::Compute::Profiles::Latest::Mgmt::Client
+          klass.new(Config.credentials.azure)
+        end
       end
 
       class Client < Base::Client
@@ -49,8 +76,8 @@ module Cloudware
         end
 
         def resource_client
-          mod = Azure::Resources::Profiles::Latest::Mgmt::Client
-          mod.new(Config.credentials.azure)
+          klass = Azure::Resources::Profiles::Latest::Mgmt::Client
+          klass.new(Config.credentials.azure)
         end
         memoize :resource_client
       end
