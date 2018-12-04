@@ -20,10 +20,19 @@ module Cloudware
                          .to_h
         end
 
+        def destroy(name)
+          rg_name = resource_group_name(name)
+          resource_client.resource_groups.delete(rg_name)
+        end
+
         private
 
+        def resource_group_name(name)
+          "#{name}-rg"
+        end
+
         def create_resource_group(name)
-          rg_name = "#{name}-rg"
+          rg_name = resource_group_name(name)
           group = resource_client.model_classes.resource_group.new
           group.location = region
           resource_client.resource_groups.create_or_update(rg_name, group)
