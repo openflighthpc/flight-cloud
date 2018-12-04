@@ -10,16 +10,28 @@ module Cloudware
         STATE_REGEX = /PowerState\//
 
         def status
-          compute_client.virtual_machines.instance_view(
-            resource_group_name, machine_name
-          ).statuses
-           .reverse
-           .find { |s| STATE_REGEX.match?(s.code) }
-           .code
-           .sub(STATE_REGEX, '')
+          compute_client.virtual_machines
+                        .instance_view(*name_inputs)
+                        .statuses
+                        .reverse
+                        .find { |s| STATE_REGEX.match?(s.code) }
+                        .code
+                        .sub(STATE_REGEX, '')
+        end
+
+        def off
+          compute_client.virtual_machines.power_off(*name_inputs)
+        end
+
+        def on
+          compute_client.virtual_machines.start(*name_inputs)
         end
 
         private
+
+        def name_inputs
+          [resource_group_name, machine_name]
+        end
 
         def resource_group_name
           /(?<=\/resourceGroups\/)[^\/]*/.match(machine_id).to_a.first
