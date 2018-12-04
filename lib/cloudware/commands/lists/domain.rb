@@ -3,7 +3,9 @@
 module Cloudware
   module Commands
     module Lists
-      class Domain < List
+      class Domain < Command
+        include Concerns::ModelList
+
         private
 
         def deployment_method
