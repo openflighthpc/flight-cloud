@@ -14,6 +14,10 @@ module Cloudware
           deployment = build_deployment(template)
           resource_client.deployments
                          .create_or_update(group.name, name, deployment)
+                         .properties
+                         .outputs
+                         .map { |k, v| [k.to_sym, v['value']] }
+                         .to_h
         end
 
         private
