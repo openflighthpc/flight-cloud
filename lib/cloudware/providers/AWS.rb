@@ -21,8 +21,9 @@ module Cloudware
         private
 
         def instance
-          Aws::EC2::Resource.new(region: region)
-                            .instance(machine_id)
+          Aws::EC2::Resource.new(
+            region: region, credentials: Config.credentials.aws
+          ).instance(machine_id)
         end
         memoize :instance
       end
