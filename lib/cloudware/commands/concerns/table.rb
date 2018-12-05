@@ -11,7 +11,11 @@ module Cloudware
         end
 
         def page_table
-          TTY::Pager.new.page(render_table)
+          if $stdout.isatty
+            TTY::Pager.new.page(render_table)
+          else
+            puts render_table
+          end
         end
 
         def render_table
