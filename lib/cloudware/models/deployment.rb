@@ -3,7 +3,6 @@
 require 'models/concerns/provider_client'
 require 'models/application'
 require 'models/machine'
-require 'models/domain'
 require 'models/context'
 
 module Cloudware
@@ -37,10 +36,6 @@ module Cloudware
 
       def machines
         Machine.build_from_deployment(self)
-      end
-
-      def domains
-        Domain.build_from_deployment(self)
       end
 
       def to_h
