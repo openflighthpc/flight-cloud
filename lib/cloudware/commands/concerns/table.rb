@@ -9,7 +9,7 @@ module Cloudware
         end
 
         def render_table
-          table.render(:unicode)
+          table.render(:unicode, multiline: true, width: table.width + 10)
         end
       end
     end
