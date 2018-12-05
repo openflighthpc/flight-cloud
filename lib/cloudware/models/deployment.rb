@@ -4,6 +4,7 @@ require 'models/concerns/provider_client'
 require 'models/application'
 require 'models/machine'
 require 'models/context'
+require 'pathname'
 
 module Cloudware
   module Models
@@ -51,6 +52,7 @@ module Cloudware
       end
 
       def template_path
+        return template_name if Pathname.new(template_name).absolute?
         ext = (provider == 'aws' ? '.yaml' : '.json')
         File.join(
           Config.content_path,
