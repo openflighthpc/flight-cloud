@@ -13,7 +13,7 @@ module Cloudware
           Models::Context.new.deployments.each do |deployment|
             table << generate_row(deployment)
           end
-          puts render_table
+          page_table
         end
 
         def table_attributes

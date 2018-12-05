@@ -11,7 +11,7 @@ module Cloudware
 
         def run
           add_rows
-          puts render_table
+          page_table
         end
 
         private
