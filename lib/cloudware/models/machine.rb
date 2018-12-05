@@ -10,7 +10,6 @@ module Cloudware
       include Concerns::ProviderClient
       include Concerns::DeploymentTags
 
-      TAG_TYPE = 'NODE'
       PROVIDER_ID_FLAG = 'ID'
       GROUPS_TAG = 'groups'
 

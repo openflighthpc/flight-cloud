@@ -11,10 +11,6 @@ module Cloudware
         end
 
         module ClassMethods
-          def prefix
-            "cloudware#{self::TAG_TYPE}"
-          end
-
           def flag
             'TAG'
           end
@@ -31,12 +27,12 @@ module Cloudware
           end
 
           def name_from_tag(tag)
-            regex = /(?<=\A#{prefix}).*(?=#{flag}.*\Z)/
+            regex = /\A.*(?=#{flag}.*\Z)/
             regex.match(tag.to_s)&.to_a&.first
           end
 
           def tag_generator(name, tag)
-            :"#{prefix}#{name}#{flag}#{tag}"
+            :"#{name}#{flag}#{tag}"
           end
         end
 
