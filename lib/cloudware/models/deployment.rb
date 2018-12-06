@@ -15,6 +15,8 @@ module Cloudware
       attr_accessor(*SAVE_ATTR)
       attr_reader :context
 
+      define_model_callbacks :deploy
+
       def context=(input)
         @context = input.tap { |c| c.with_deployment(self) }
       end
@@ -27,7 +29,9 @@ module Cloudware
       end
 
       def deploy
-        self.results = provider_client.deploy(tag, template)
+        run_callbacks(:deploy) do
+          self.results = provider_client.deploy(tag, template)
+        end
       end
 
       def destroy
