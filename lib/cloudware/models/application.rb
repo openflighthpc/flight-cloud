@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'English'
+
 module Cloudware
   module Models
     class Application
