@@ -99,19 +99,19 @@ module Cloudware
 
     command 'destroy' do |c|
       cli_syntax(c, 'NAME')
-      c.description = 'Destroy'
+      c.description = 'Destroy the deployment and related resources'
       action(c, Commands::Destroy)
     end
 
     command 'info' do |c|
       cli_syntax(c)
-      c.description = 'Info'
+      c.description = 'Information related subcommands'
       c.sub_command_group = true
     end
 
     command 'info machine' do |c|
       cli_syntax(c, 'NAME')
-      c.description = 'Machine Info'
+      c.description = 'Display the tag information about a machine'
       c.option '-d', '--deployment DEPLOYMENT', String,
                'The deployment the machine was created in'
       c.hidden = true
@@ -120,7 +120,7 @@ module Cloudware
 
     command 'list' do |c|
       cli_syntax(c)
-      c.description = 'list'
+      c.description = 'List related subcommands'
       c.sub_command_group = true
     end
 
@@ -140,7 +140,7 @@ module Cloudware
 
     command 'power' do |c|
       cli_syntax(c)
-      c.description = 'Power'
+      c.description = 'Power related commands'
       c.sub_command_group = true
     end
 
