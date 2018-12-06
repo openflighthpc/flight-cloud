@@ -92,7 +92,7 @@ module Cloudware
         `OUTPUT_KEY` is used in the sustitution. If `OUTPUT_KEY` is missing,
         then it is assumed to be the same as `REPLACE_KEY`.
       DESC
-      c.option '-p', "--params '<REPLACE_KEY=[*]IDENTIFIER[.OUTPUT_KEY] >...'",
+      c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
                String, 'A space separate list of keys to replace'
       action(c, Commands::Deploy)
     end
