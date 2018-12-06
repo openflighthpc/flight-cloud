@@ -64,8 +64,35 @@ module Cloudware
 
     command 'deploy' do |c|
       cli_syntax(c, 'TEMPLATE NAME')
-      c.description = 'Deploy'
-      c.option '-p', "--params '<REPLACE_KEY=DEPLOYMENT[.OUTPUT_KEY] >...'",
+      c.summary = 'Deploy new resource(s) from template'
+      c.description = <<-DESC.strip_heredoc
+        Deploy new resource(s) from the specified TEMPLATE. The templates can
+        be stored within the template directories below. The file extension is
+        automatically inferred depending on the provider.
+          => #{Config.content_path}/templates/<provider>
+
+        Alternatively the absolute path (including extension) to the template
+        can be used.
+
+        The deployment will be given the NAME lable which will also dictate the
+        name given to the provider. There maybe minor variations depending on
+        the platform.
+
+        The templates also support basic rendering of parameters from the
+        command line. This is intended to provide minor tweaks to the templates
+        (e.g. IPs or names). Major difference should use separate templates.
+
+        The key value pairs to be rendered are given by the `--param` option.
+        The renderer will replace occurrences of `%REPLACE_KEY%` in the template
+        with the `IDENTIFIER`. By default this is a simple string substitution.
+
+        It is possible to reference keys within previous deployments using the
+        `*` prefix. This will cause `*IDENTIFIER` to be interpreted as a
+        deployment name. In this case, the deployment result corresponding with
+        `OUTPUT_KEY` is used in the sustitution. If `OUTPUT_KEY` is missing,
+        then it is assumed to be the same as `REPLACE_KEY`.
+      DESC
+      c.option '-p', "--params '<REPLACE_KEY=[*]IDENTIFIER[.OUTPUT_KEY] >...'",
                String, 'A space separate list of keys to replace'
       action(c, Commands::Deploy)
     end
