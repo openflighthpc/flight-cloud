@@ -12,10 +12,10 @@ __cloudware() {
   bin/cloud "$@"
 }
 
-flight_aws() {
+flight-aws() {
   ( export CLOUDWARE_PROVIDER='aws' && __cloudware )
 }
 
-flight_azure() {
+flight-azure() {
   ( export CLOUDWARE_PROVIDER='azure' && __cloudware )
 }
