@@ -64,7 +64,7 @@ module Cloudware
 
       @default = OpenStruct.new(config['default'])
       @provider = ENV['CLOUDWARE_PROVIDER']
-      @region  = @default[:region]
+      @region  = config['provider'][provider]['default_region']
 
       @content_path = '/var/lib/cloudware'
     end

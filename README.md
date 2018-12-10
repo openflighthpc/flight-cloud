@@ -86,14 +86,18 @@ Provider credentials can be provided either:
 The following example shows the configuration required to setup both AWS and
 Azure providers in the Cloudware configuration file:
 
+The default region for each provider is also specified within the config
+
 ```yaml
 provider:
   azure:
+    default_region: <insert azure region>
     tenant_id: '<insert your tenant ID here>'
     subscription_id: '<insert your subscription ID here>'
     client_secret: '<insert your client secret here>'
     client_id: '<insert your client ID here>'
   aws:
+    default_region: <insert aws region>
     access_key_id: '<insert your access key here>'
     secret_access_key: '<insert your secret key here>'
 ```
