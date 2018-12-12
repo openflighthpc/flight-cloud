@@ -45,6 +45,7 @@ module Cloudware
     program :description, 'Cloud orchestration tool'
 
     global_option('--debug', 'Enables the development mode')
+    global_option('--region', "Specify a provider's region")
 
     suppress_trace_class UserError
 
