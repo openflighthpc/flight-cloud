@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'tty-spinner'
+require 'spinner'
 
 module Cloudware
   module Providers
@@ -44,6 +44,7 @@ module Cloudware
       class Client
         extend Memoist
         include HasCredentials
+        include Spinner
 
         attr_reader :region
 
@@ -61,11 +62,6 @@ module Cloudware
 
         def machine(id)
           self.class.parent::Machine.new(id, region)
-        end
-
-        def with_spinner(msg = '', &block)
-          spinner = TTY::Spinner.new("[:spinner] #{msg}", format: :shark)
-          spinner.run { |_| yield }
         end
       end
     end
