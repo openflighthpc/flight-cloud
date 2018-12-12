@@ -73,13 +73,6 @@ module Cloudware
       Cloudware.log
     end
 
-    def credentials
-      @credentials ||= OpenStruct.new(
-        aws: Aws::Credentials.new(aws.access_key_id, aws.secret_access_key),
-        azure: build_azure_credentials
-      )
-    end
-
     def base_dir
       File.expand_path(File.join(__dir__, '../..'))
     end

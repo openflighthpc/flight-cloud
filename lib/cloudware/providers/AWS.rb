@@ -7,7 +7,13 @@ module Cloudware
     module AWS
       class Credentials < Base::Credentials
         def self.build
-          Config.credentials.aws
+          Aws::Credentials.new(config.access_key_id, config.secret_access_key)
+        end
+
+        private
+
+        def self.config
+          Config.aws
         end
       end
 

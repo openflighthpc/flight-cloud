@@ -7,10 +7,6 @@ module Cloudware
   module Providers
     module AZURE
       class Credentials < Base::Credentials
-        def self.config
-          Config.azure
-        end
-
         def self.build
           {
             subscription_id: config.subscription_id,
@@ -18,6 +14,12 @@ module Cloudware
             client_id: config.client_id,
             client_secret: config.client_secret
           }
+        end
+
+        private
+
+        def self.config
+          Config.azure
         end
       end
 
