@@ -24,7 +24,7 @@ module Cloudware
     end
 
     def context
-      Context.new
+      Context.new(region: options.region)
     end
     memoize :context
 
