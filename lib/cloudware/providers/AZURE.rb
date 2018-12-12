@@ -12,11 +12,7 @@ module Cloudware
         end
 
         def self.build
-          token = MsRestAzure::ApplicationTokenProvider.new(
-            config.tenant_id, config.client_id, config.client_secret
-          )
           {
-            credentials: MsRest::TokenCredentials.new(token),
             subscription_id: config.subscription_id,
             tenant_id: config.tenant_id,
             client_id: config.client_id,
