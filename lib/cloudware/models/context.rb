@@ -3,6 +3,13 @@
 module Cloudware
   module Models
     class Context < Application
+      attr_writer :region
+
+      def initialize(region: nil, **other_args)
+        super(**other_args)
+        @region = region || Config.region
+      end
+
       def deployments
         @deployments ||= Data.load(path, default_value: []).map do |data|
           Deployment.new(**data)
@@ -53,7 +60,7 @@ module Cloudware
         File.join(Config.content_path,
                   'contexts',
                   Config.provider,
-                  "#{Config.region}.yaml")
+                  "#{region}.yaml")
       end
     end
   end
