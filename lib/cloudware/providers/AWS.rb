@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'aws-sdk-cloudformation'
+require 'aws-sdk-ec2'
 require 'providers/base'
 
 module Cloudware

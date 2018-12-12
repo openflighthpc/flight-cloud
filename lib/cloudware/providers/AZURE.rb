@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'azure_mgmt_resources'
 require 'azure_mgmt_compute'
 require 'providers/base'
 

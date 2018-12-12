@@ -24,9 +24,6 @@
 require 'yaml'
 require 'ostruct'
 require 'whirly'
-require 'aws-sdk-cloudformation'
-require 'aws-sdk-ec2'
-require 'azure_mgmt_resources'
 
 require 'active_support/core_ext/module/delegation'
 
