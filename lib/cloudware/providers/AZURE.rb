@@ -7,8 +7,21 @@ module Cloudware
   module Providers
     module AZURE
       class Credentials < Base::Credentials
+        def self.config
+          Config.azure
+        end
+
         def self.build
-          Config.credentials.azure
+          token = MsRestAzure::ApplicationTokenProvider.new(
+            config.tenant_id, config.client_id, config.client_secret
+          )
+          {
+            credentials: MsRest::TokenCredentials.new(token),
+            subscription_id: config.subscription_id,
+            tenant_id: config.tenant_id,
+            client_id: config.client_id,
+            client_secret: config.client_secret
+          }
         end
       end
 
