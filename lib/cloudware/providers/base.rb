@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'tty-spinner'
+
 module Cloudware
   module Providers
     module Base
@@ -61,8 +63,9 @@ module Cloudware
           self.class.parent::Machine.new(id, region)
         end
 
-        def with_spinner(msg = '')
-          yield
+        def with_spinner(msg = '', &block)
+          spinner = TTY::Spinner.new("[:spinner] #{msg}", format: :shark)
+          spinner.run { |_| yield }
         end
       end
     end
