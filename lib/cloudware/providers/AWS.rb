@@ -5,6 +5,12 @@ require 'providers/base'
 module Cloudware
   module Providers
     module AWS
+      class Credentials < Base::Credentials
+        def self.build
+          Config.credentials.aws
+        end
+      end
+
       class Machine < Base::Machine
         def status
           instance.state.name
@@ -22,7 +28,7 @@ module Cloudware
 
         def instance
           Aws::EC2::Resource.new(
-            region: region, credentials: Config.credentials.aws
+            region: region, credentials: credentials
           ).instance(machine_id)
         end
         memoize :instance
@@ -50,8 +56,7 @@ module Cloudware
 
         def client
           Aws::CloudFormation::Client.new(
-            region: region,
-            credentials: Config.credentials.aws
+            region: region, credentials: credentials
           )
         end
         memoize :client

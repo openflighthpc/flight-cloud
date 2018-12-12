@@ -6,6 +6,12 @@ require 'providers/base'
 module Cloudware
   module Providers
     module AZURE
+      class Credentials < Base::Credentials
+        def self.build
+          Config.credentials.azure
+        end
+      end
+
       class Machine < Base::Machine
         STATE_REGEX = /PowerState\//
 
@@ -43,7 +49,7 @@ module Cloudware
 
         def compute_client
           klass = Azure::Compute::Profiles::Latest::Mgmt::Client
-          klass.new(Config.credentials.azure)
+          klass.new(credentials)
         end
       end
 
@@ -89,7 +95,7 @@ module Cloudware
 
         def resource_client
           klass = Azure::Resources::Profiles::Latest::Mgmt::Client
-          klass.new(Config.credentials.azure)
+          klass.new(credentials)
         end
         memoize :resource_client
       end
