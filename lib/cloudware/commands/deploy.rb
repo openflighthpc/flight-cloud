@@ -25,11 +25,6 @@ module Cloudware
         ERROR
       end
 
-      def context
-        Models::Context.new
-      end
-      memoize :context
-
       def deployment
         Models::Deployment.new(
           template_name: template,

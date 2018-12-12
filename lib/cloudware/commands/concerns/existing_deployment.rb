@@ -5,7 +5,7 @@ module Cloudware
     module Concerns
       module ExistingDeployment
         def deployment
-          Models::Context.new.find_by_name(deployment_name).tap do |deployment|
+          context.find_by_name(deployment_name).tap do |deployment|
             raise InvalidInput, <<-ERROR.squish unless deployment
               Could not find deployment '#{deployment_name}'
             ERROR
