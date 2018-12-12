@@ -84,10 +84,6 @@ module Cloudware
       File.expand_path(File.join(__dir__, '../..'))
     end
 
-    def context
-      @context ||= Context.new
-    end
-
     private
 
     def config_path
