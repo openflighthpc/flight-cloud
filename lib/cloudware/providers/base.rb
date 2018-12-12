@@ -60,6 +60,10 @@ module Cloudware
         def machine(id)
           self.class.parent::Machine.new(id, region)
         end
+
+        def with_spinner(msg = '')
+          yield
+        end
       end
     end
   end

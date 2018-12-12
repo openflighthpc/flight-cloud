@@ -44,15 +44,19 @@ module Cloudware
 
       class Client < Base::Client
         def deploy(tag, template)
-          client.create_stack(stack_name: tag, template_body: template)
-          client.wait_until(:stack_create_complete, stack_name: tag)
-                .stacks
-                .first
-                .outputs
-                .reduce({}) do |memo, output|
-                  memo[output.output_key] = output.output_value
-                  memo
-                end
+          with_spinner('Launching deployment') do
+            client.create_stack(stack_name: tag, template_body: template)
+          end
+          with_spinner('Waiting for deployment to finish') do
+            client.wait_until(:stack_create_complete, stack_name: tag)
+                  .stacks
+                  .first
+                  .outputs
+                  .reduce({}) do |memo, output|
+                    memo[output.output_key] = output.output_value
+                    memo
+                  end
+          end
         end
 
         def destroy(tag)
