@@ -9,7 +9,8 @@ module Cloudware
       module ProviderClient
         extend Memoist
 
-        delegate :provider, :region, to: Config
+        delegate :provider, to: Config
+        delegate :region, to: :context
 
         private
 

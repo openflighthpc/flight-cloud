@@ -3,11 +3,11 @@
 module Cloudware
   module Models
     class Context < Application
-      attr_writer :region
+      attr_reader :region
 
       def initialize(region: nil, **other_args)
         super(**other_args)
-        @region = region || Config.region
+        @region = region || Config.default_region
       end
 
       def deployments
