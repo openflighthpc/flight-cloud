@@ -9,6 +9,7 @@ require 'fakefs/spec_helpers'
 require 'factory_bot'
 
 SPEC_DIR = File.expand_path(File.dirname(__FILE__))
+ENV['CLOUDWARE_PROVIDER'] = 'aws'
 
 RSpec.configure do |config|
   config.include FakeFS::SpecHelpers::All
