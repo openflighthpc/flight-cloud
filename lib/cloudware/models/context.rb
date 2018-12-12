@@ -50,7 +50,10 @@ module Cloudware
       private
 
       def path
-        File.join(Config.content_path, 'contexts', "#{Config.provider}.yaml")
+        File.join(Config.content_path,
+                  'contexts',
+                  Config.provider,
+                  "#{Config.region}.yaml")
       end
     end
   end
