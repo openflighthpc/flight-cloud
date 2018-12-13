@@ -22,6 +22,8 @@ module Cloudware
         tty_spinner.spin if foreground
       end
       results
+    ensure
+      tty_spinner.stop('') if foreground
     end
 
     private
@@ -37,10 +39,8 @@ module Cloudware
 
   module WithSpinner
     def with_spinner(msg = '', &block)
-      spinner = Spinner.new("[:spinner] #{msg}", format: :shark)
-      results = nil
-      spinner.run_with_background_checks(&block)
-      results
+      Spinner.new("[:spinner] #{msg}", format: :pipe)
+             .run(&block)
     end
   end
 end

@@ -2,6 +2,10 @@
 
 require_relative '../lib/cloudware.rb'
 
-Cloudware::Spinner.new('[:spinner] Spinning')
-                  .run { sleep 10 }
+include Cloudware::WithSpinner
+result = with_spinner('Spinning') do
+  sleep 10
+  'I am the results string'
+end
+puts result
 
