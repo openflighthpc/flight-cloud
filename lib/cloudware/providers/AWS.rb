@@ -58,8 +58,10 @@ module Cloudware
         end
 
         def destroy(tag)
-          client.delete_stack(stack_name: tag)
-          client.wait_until(:stack_delete_complete, stack_name: tag)
+          with_spinner('Destroying resources...') do
+            client.delete_stack(stack_name: tag)
+            client.wait_until(:stack_delete_complete, stack_name: tag)
+          end
         end
 
         private
