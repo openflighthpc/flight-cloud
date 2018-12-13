@@ -13,7 +13,7 @@ module Cloudware
         @name = argv[1]
         error_if_deployment_exists
         begin
-          with_spinner('Deploying resources...') do
+          with_spinner('Deploying resources...', done: 'Done') do
             deployment.deploy
           end
         ensure context.save

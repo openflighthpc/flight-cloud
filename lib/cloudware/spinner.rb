@@ -7,12 +7,12 @@ module Cloudware
     CHECK_SPIN = 10
     SPIN_DELAY = 0.1
 
-    def initialize(*a, **k)
-      @tty_spinner = TTY::Spinner.new(*a, **k)
+    def initialize(message, **k)
+      @tty_spinner = TTY::Spinner.new(message, **k)
       @tty_cmd = TTY::Command.new
     end
 
-    def run(&block)
+    def run(done_message = '', &block)
       results = nil
       thr = Thread.new { results = yield }
       count = 0
@@ -23,7 +23,7 @@ module Cloudware
       end
       results
     ensure
-      tty_spinner.stop('') if foreground
+      tty_spinner.stop(done_message) if foreground
     end
 
     private
@@ -38,9 +38,9 @@ module Cloudware
   end
 
   module WithSpinner
-    def with_spinner(msg = '', &block)
+    def with_spinner(msg = '', done: '', &block)
       Spinner.new("[:spinner] #{msg}", format: :pipe)
-             .run(&block)
+             .run(done, &block)
     end
   end
 end
