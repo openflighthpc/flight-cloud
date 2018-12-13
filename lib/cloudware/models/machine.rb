@@ -8,7 +8,7 @@ module Cloudware
   module Models
     class Machine < Application
       include Concerns::ProviderClient
-      include Concerns::DeploymentTags
+      include Concerns::ModelTags
 
       PROVIDER_ID_FLAG = 'ID'
       GROUPS_TAG = 'groups'

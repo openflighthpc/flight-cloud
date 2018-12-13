@@ -3,7 +3,7 @@
 module Cloudware
   module Models
     module Concerns
-      module DeploymentTags
+      module ModelTags
         # NOTE: The TAG_TYPE must be set as a constant on the base model
 
         def self.included(base)
