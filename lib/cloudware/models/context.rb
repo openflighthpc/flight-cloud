@@ -50,7 +50,7 @@ module Cloudware
         Data.dump(path, save_data)
       end
 
-      def find_by_name(name)
+      def find_deployment(name)
         deployments.find { |d| d.name == name }
       end
 
