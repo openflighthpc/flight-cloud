@@ -1,5 +1,6 @@
 
 require 'tty-spinner'
+require 'tty-command'
 
 module Cloudware
   class Spinner < TTY::Spinner
@@ -8,6 +9,7 @@ module Cloudware
 
     def initialize(*a, **k)
       @tty_spinner = TTY::Spinner.new(*a, **k)
+      @tty_cmd = TTY::Command.new
     end
 
     def run(&block)
@@ -15,19 +17,21 @@ module Cloudware
       thr = Thread.new { results = yield }
       count = 0
       until thr.join(SPIN_DELAY)
-        update_background_status if count % CHECK_SPIN == 0
+        update_foreground_status if count % CHECK_SPIN == 0
         count += 1
-        tty_spinner.spin
+        tty_spinner.spin if foreground
       end
       results
     end
 
     private
 
-    attr_reader :tty_spinner
+    attr_reader :tty_spinner, :tty_cmd
+    attr_accessor :foreground
 
-    def update_background_status
-      puts 'updating'
+    def update_foreground_status
+      status = `ps -o stat= -p #{Process.pid}`
+      self.foreground = /.*\+.*/.match?(status)
     end
   end
 

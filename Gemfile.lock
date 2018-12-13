@@ -166,6 +166,8 @@ GEM
     thread_safe (0.3.6)
     timeliness (0.3.8)
     tty-color (0.4.3)
+    tty-command (0.8.2)
+      pastel (~> 0.7.0)
     tty-cursor (0.6.0)
     tty-pager (0.11.0)
       strings (~> 0.1.0)
@@ -218,6 +220,7 @@ DEPENDENCIES
   rspec-wait
   rubocop (~> 0.52.1)
   rubocop-rspec
+  tty-command
   tty-pager
   tty-spinner
   tty-table
