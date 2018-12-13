@@ -44,7 +44,7 @@ module Cloudware
       class Client
         extend Memoist
         include HasCredentials
-        include Spinner
+        include WithSpinner
 
         attr_reader :region
 
