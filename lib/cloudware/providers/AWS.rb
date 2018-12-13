@@ -44,10 +44,8 @@ module Cloudware
 
       class Client < Base::Client
         def deploy(tag, template)
-          with_spinner('Launching deployment') do
+          with_spinner('Deploying resources...') do
             client.create_stack(stack_name: tag, template_body: template)
-          end
-          with_spinner('Waiting for deployment to finish') do
             client.wait_until(:stack_create_complete, stack_name: tag)
                   .stacks
                   .first
