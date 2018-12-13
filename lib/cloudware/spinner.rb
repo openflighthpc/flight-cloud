@@ -9,8 +9,11 @@ module Cloudware
 
     def run(&block)
       results = nil
-      tty_spinner.run { |_| results = yield }
+      thr = Thread.new { results = yield }
+      tty_spinner.spin until thr.join(0.1)
       results
+    ensure
+      tty_spinner.stop
     end
 
     private
