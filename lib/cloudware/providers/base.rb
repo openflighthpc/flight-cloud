@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'spinner'
-
 module Cloudware
   module Providers
     module Base
@@ -44,7 +42,6 @@ module Cloudware
       class Client
         extend Memoist
         include HasCredentials
-        include WithSpinner
 
         attr_reader :region
 

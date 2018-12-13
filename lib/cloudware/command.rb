@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
+require 'spinner'
+
 module Cloudware
   class Command
     extend Memoist
+    include WithSpinner
 
     def initialize(argv, options)
       @argv = argv.freeze

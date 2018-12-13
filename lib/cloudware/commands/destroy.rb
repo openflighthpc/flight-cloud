@@ -10,7 +10,9 @@ module Cloudware
 
       def run
         @name = argv[0]
-        deployment.destroy
+        with_spinner('Destroying resources...') do
+          deployment.destroy
+        end
       ensure
         context.save
       end
