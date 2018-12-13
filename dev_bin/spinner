@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/cloudware.rb'
+
+Cloudware::Spinner.new('[:spinner] Spinning')
+                  .run_with_background_checks { sleep 10 }
+
