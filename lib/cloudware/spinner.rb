@@ -3,6 +3,9 @@ require 'tty-spinner'
 
 module Cloudware
   class Spinner < TTY::Spinner
+    CHECK_SPIN = 10
+    SPIN_DELAY = 0.1
+
     def initialize(*a, **k)
       @tty_spinner = TTY::Spinner.new(*a, **k)
     end
@@ -10,15 +13,22 @@ module Cloudware
     def run(&block)
       results = nil
       thr = Thread.new { results = yield }
-      tty_spinner.spin until thr.join(0.1)
+      count = 0
+      until thr.join(SPIN_DELAY)
+        update_background_status if count % CHECK_SPIN == 0
+        count += 1
+        tty_spinner.spin
+      end
       results
-    ensure
-      tty_spinner.stop
     end
 
     private
 
     attr_reader :tty_spinner
+
+    def update_background_status
+      puts 'updating'
+    end
   end
 
   module WithSpinner
