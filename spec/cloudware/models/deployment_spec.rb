@@ -84,6 +84,11 @@ RSpec.describe Cloudware::Models::Deployment do
           expect { subject.deploy }.not_to raise_error
         end
 
+        it 'saves it self to the context' do
+          subject.deploy
+          expect(context.deployments).to include(subject)
+        end
+
         context 'without a context' do
           let(:context) { nil }
 
