@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
+require 'providers/base'
+
 RSpec.describe Cloudware::Models::Deployment do
   let(:replacements) { nil }
   let(:context) { build(:context) }
   let(:double_client) do
-    client = subject.send(:provider_client)
-    object_double(client)
+    object_double(Cloudware::Providers::Base::Client.new('region'))
   end
 
   subject do
