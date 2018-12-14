@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'providers/AWS'
-require 'providers/AZURE'
-
 module Cloudware
   module Models
     module Concerns
@@ -15,7 +12,13 @@ module Cloudware
         private
 
         def provider_client
-          mod = (provider == 'aws' ? Providers::AWS : Providers::AZURE)
+          if provider == 'aws'
+            require 'providers/AWS'
+            mod = Providers::AWS
+          else
+            require 'providers/AZURE'
+            mod = Providers::AZURE
+          end
           mod::Client.new(region)
         end
         memoize :provider_client

@@ -3,8 +3,21 @@
 module Cloudware
   module Providers
     module Base
+      module HasCredentials
+        def credentials
+          self.class.parent::Credentials.build
+        end
+      end
+
+      class Credentials
+        def self.build
+          raise NotImplementedError
+        end
+      end
+
       class Machine
         extend Memoist
+        include HasCredentials
 
         attr_reader :machine_id, :region
 
@@ -28,6 +41,7 @@ module Cloudware
 
       class Client
         extend Memoist
+        include HasCredentials
 
         attr_reader :region
 

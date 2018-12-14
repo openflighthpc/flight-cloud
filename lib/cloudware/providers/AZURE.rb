@@ -1,11 +1,29 @@
 # frozen_string_literal: true
 
+require 'azure_mgmt_resources'
 require 'azure_mgmt_compute'
 require 'providers/base'
 
 module Cloudware
   module Providers
     module AZURE
+      class Credentials < Base::Credentials
+        def self.build
+          {
+            subscription_id: config.subscription_id,
+            tenant_id: config.tenant_id,
+            client_id: config.client_id,
+            client_secret: config.client_secret
+          }
+        end
+
+        private
+
+        def self.config
+          Config.azure
+        end
+      end
+
       class Machine < Base::Machine
         STATE_REGEX = /PowerState\//
 
@@ -43,7 +61,7 @@ module Cloudware
 
         def compute_client
           klass = Azure::Compute::Profiles::Latest::Mgmt::Client
-          klass.new(Config.credentials.azure)
+          klass.new(credentials)
         end
       end
 
@@ -89,7 +107,7 @@ module Cloudware
 
         def resource_client
           klass = Azure::Resources::Profiles::Latest::Mgmt::Client
-          klass.new(Config.credentials.azure)
+          klass.new(credentials)
         end
         memoize :resource_client
       end

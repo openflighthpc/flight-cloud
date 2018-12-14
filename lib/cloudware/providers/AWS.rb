@@ -1,10 +1,24 @@
 # frozen_string_literal: true
 
+require 'aws-sdk-cloudformation'
+require 'aws-sdk-ec2'
 require 'providers/base'
 
 module Cloudware
   module Providers
     module AWS
+      class Credentials < Base::Credentials
+        def self.build
+          Aws::Credentials.new(config.access_key_id, config.secret_access_key)
+        end
+
+        private
+
+        def self.config
+          Config.aws
+        end
+      end
+
       class Machine < Base::Machine
         def status
           instance.state.name
@@ -22,7 +36,7 @@ module Cloudware
 
         def instance
           Aws::EC2::Resource.new(
-            region: region, credentials: Config.credentials.aws
+            region: region, credentials: credentials
           ).instance(machine_id)
         end
         memoize :instance
@@ -50,8 +64,7 @@ module Cloudware
 
         def client
           Aws::CloudFormation::Client.new(
-            region: region,
-            credentials: Config.credentials.aws
+            region: region, credentials: credentials
           )
         end
         memoize :client
