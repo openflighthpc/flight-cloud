@@ -3,7 +3,9 @@
 module Cloudware
   module Commands
     module Lists
-      class Machine < List
+      class Machine < Command
+        include Concerns::ModelList
+
         private
 
         def deployment_method

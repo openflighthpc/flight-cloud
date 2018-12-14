@@ -17,6 +17,7 @@ gem 'memoist'
 gem 'parallel'
 gem 'require_all'
 gem 'tty-table'
+gem 'tty-pager'
 gem 'whirly'
 
 group :development do

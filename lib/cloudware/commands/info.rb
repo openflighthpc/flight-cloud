@@ -13,7 +13,7 @@ module Cloudware
         @deployment_name = options.deployment
         @name = argv[0]
         models.tags.each { |row| table << row }
-        puts render_table
+        page_table
       end
 
       private

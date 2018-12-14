@@ -106,11 +106,11 @@ module Cloudware
       c.sub_command_group = true
     end
 
-    command 'list machines' do |c|
+    command 'list deployments' do |c|
       cli_syntax(c)
-      c.description = 'List all the machines'
+      c.description = 'List all the deployments'
       c.hidden = true
-      action(c, Commands::Lists::Machine)
+      action(c, Commands::Lists::Deployment)
     end
 
     command 'list domains' do |c|
@@ -118,6 +118,13 @@ module Cloudware
       c.description = 'List all the domains'
       c.hidden = true
       action(c, Commands::Lists::Domain)
+    end
+
+    command 'list machines' do |c|
+      cli_syntax(c)
+      c.description = 'List all the machines'
+      c.hidden = true
+      action(c, Commands::Lists::Machine)
     end
 
     command 'power' do |c|
