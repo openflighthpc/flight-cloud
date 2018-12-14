@@ -39,12 +39,8 @@ require 'active_model'
 require 'active_model/errors'
 
 require 'colorize'
-require 'config'
-require 'logger'
 require 'memoist'
 require 'parallel'
-
-require 'data'
 
 module Cloudware
   class << self
@@ -62,4 +58,8 @@ module Cloudware
   end
 end
 
+require 'config'
 require 'cli'
+require 'logger'
+require 'data'
+
