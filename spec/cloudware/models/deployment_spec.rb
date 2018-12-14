@@ -60,10 +60,9 @@ RSpec.describe Cloudware::Models::Deployment do
   context 'with a deployment context' do
     let(:context) { build(:context) }
 
-    it 'is automatically added to the context' do
+    it 'does not update the context on build' do
       deployment = build(:deployment, context: context)
-      find_deployment = context.deployments.find { |d| d.name == deployment.name }
-      expect(find_deployment).to eq(deployment)
+      expect(context.deployments).not_to include(deployment)
     end
   end
 

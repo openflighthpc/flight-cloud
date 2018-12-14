@@ -12,16 +12,11 @@ module Cloudware
       include Concerns::ProviderClient
 
       SAVE_ATTR = [:template_name, :name, :results, :replacements]
-      attr_accessor(*SAVE_ATTR)
-      attr_reader :context
+      attr_accessor(*SAVE_ATTR, :context)
 
       define_model_callbacks :deploy
 
       before_deploy :validate_replacement_tags
-
-      def context=(input)
-        @context = input.tap { |c| c.with_deployment(self) }
-      end
 
       def template
         return raw_template unless replacements
