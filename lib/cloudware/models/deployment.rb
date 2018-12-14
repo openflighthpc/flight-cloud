@@ -3,6 +3,7 @@
 require 'models/concerns/provider_client'
 require 'models/application'
 require 'models/machine'
+require 'models/context'
 require 'providers/AWS'
 
 module Cloudware
@@ -10,36 +11,42 @@ module Cloudware
     class Deployment < Application
       include Concerns::ProviderClient
 
-      attr_accessor :template_name, :name, :parent
+      SAVE_ATTR = [:template_name, :name, :results]
+      attr_accessor(*SAVE_ATTR)
+      attr_reader :context
       delegate :region, :provider, to: Config
 
+      def context=(input)
+        @context = input.tap { |c| c.with_deployment(self) }
+      end
+
       def template
-        return raw_template unless parent
-        parent.results.reduce(raw_template) do |memo, (key, value)|
-          memo.gsub("%#{key}%", value)
-        end
+        return raw_template
+        # TODO: Reimplement parents as a context
+        # parent.results.reduce(raw_template) do |memo, (key, value)|
+        #   memo.gsub("%#{key}%", value)
+        # end
       end
 
       def deploy
-        raw_results = provider_client.deploy(tag, template)
-        Data.dump(results_path, raw_results)
+        self.results = provider_client.deploy(tag, template)
       end
 
       def destroy
-        FileUtils.rm_f(results_path)
+        context&.remove_deployment(self)
         provider_client.destroy(tag)
       end
-
-      def results
-        return nil unless File.exist?(results_path)
-        Data.load(results_path)
-      end
-      memoize :results
 
       def machines
         results&.select { |k, _| Machine.tag?(k) }
                &.map do |key, _|
           Machine.new(tag: key.to_s, deployment: self)
+        end
+      end
+
+      def to_h
+        SAVE_ATTR.each_with_object({}) do |key, memo|
+          memo[key] = send(key)
         end
       end
 
@@ -57,10 +64,6 @@ module Cloudware
           provider,
           "#{template_name}#{ext}"
         )
-      end
-
-      def results_path
-        File.join(Config.content_path, 'deployments', "#{name}.yaml")
       end
 
       def raw_template

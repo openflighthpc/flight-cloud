@@ -20,6 +20,7 @@ gem 'terminal-table'
 gem 'whirly'
 
 group :development do
+  gem 'fakefs'
   gem 'factory_bot'
   gem 'pry'
   gem 'pry-byebug'

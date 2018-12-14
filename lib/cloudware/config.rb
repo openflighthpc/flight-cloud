@@ -34,6 +34,8 @@ Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
 module Cloudware
   class Config
+    PATH = File.expand_path('~/.flightconnector.yml')
+
     class << self
       def cache
         @cache ||= new
@@ -72,7 +74,7 @@ module Cloudware
     end
 
     def credentials
-      @credentials = OpenStruct.new(
+      @credentials ||= OpenStruct.new(
         aws: Aws::Credentials.new(aws.access_key_id, aws.secret_access_key),
         azure: build_azure_credentials
       )
@@ -82,10 +84,14 @@ module Cloudware
       File.expand_path(File.join(__dir__, '../..'))
     end
 
+    def context
+      @context ||= Context.new
+    end
+
     private
 
     def config_path
-      File.expand_path('~/.flightconnector.yml')
+      PATH
     end
 
     def build_azure_credentials

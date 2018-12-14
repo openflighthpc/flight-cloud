@@ -7,6 +7,9 @@ FactoryBot.define do
   factory :deployment, class: models::Deployment do
     name 'test-deployment'
     template_name 'test-template'
-    parent nil
+    results {}
+    association :context, strategy: :build
   end
+
+  factory :context, class: models::Context
 end
