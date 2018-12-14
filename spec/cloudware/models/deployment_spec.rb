@@ -2,15 +2,24 @@
 
 RSpec.describe Cloudware::Models::Deployment do
   let(:replacements) { nil }
-  subject { build(:deployment, replacements: replacements) }
+  let(:context) { build(:context) }
   let(:double_client) do
     client = subject.send(:provider_client)
     object_double(client)
   end
 
+  subject do
+    build(:deployment, replacements: replacements, context: context)
+  end
+
   # Mock the provider_client
   before do
     allow(subject).to receive(:provider_client).and_return(double_client)
+  end
+
+  it 'does not update the context on build' do
+    deployment = build(:deployment, context: context)
+    expect(context.deployments).not_to include(deployment)
   end
 
   context 'with a replacement hash' do
@@ -54,15 +63,6 @@ RSpec.describe Cloudware::Models::Deployment do
         machine_deployments = subject.machines.map(&:deployment)
         expect(machine_deployments.uniq).to contain_exactly(subject)
       end
-    end
-  end
-
-  context 'with a deployment context' do
-    let(:context) { build(:context) }
-
-    it 'does not update the context on build' do
-      deployment = build(:deployment, context: context)
-      expect(context.deployments).not_to include(deployment)
     end
   end
 
