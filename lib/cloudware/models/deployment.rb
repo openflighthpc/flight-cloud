@@ -30,8 +30,7 @@ module Cloudware
       def deploy
         run_callbacks(:deploy) do
           if errors.blank?
-            self.results = provider_client.deploy(tag, template)
-            context.with_deployment(self)
+            run_deploy
           else
             raise ModelValidationError, <<-ERROR.strip_heredoc.chomp
               Failed to deploy resources. The following errors have occurred:
@@ -57,6 +56,12 @@ module Cloudware
       end
 
       private
+
+      def run_deploy
+        self.results = provider_client.deploy(tag, template)
+      ensure
+        context.with_deployment(self)
+      end
 
       def tag
         "cloudware-deploy-#{name}"

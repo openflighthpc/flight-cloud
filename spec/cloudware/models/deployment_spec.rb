@@ -91,6 +91,13 @@ RSpec.describe Cloudware::Models::Deployment do
       end
     end
 
+    shared_examples 'savable deployment' do
+      it 'saves to the context' do
+        begin subject.deploy; rescue RuntimeError; end
+        expect(context.deployments).to include(subject)
+      end
+    end
+
     describe '#deploy' do
       before { allow(double_client).to receive(:deploy) }
 
@@ -101,17 +108,12 @@ RSpec.describe Cloudware::Models::Deployment do
           expect { subject.deploy }.not_to raise_error
         end
 
-        it 'saves to the context' do
-          begin subject.deploy; rescue RuntimeError; end
-          expect(context.deployments).to include(subject)
-        end
+        it_behaves_like 'savable deployment'
 
         context 'without a context' do
           let(:context) { nil }
 
-          describe '#deploy' do
-            include_examples 'deploy raises ModelValidationError'
-          end
+          include_examples 'deploy raises ModelValidationError'
         end
 
         context 'with an existing deployment' do
@@ -122,6 +124,14 @@ RSpec.describe Cloudware::Models::Deployment do
           before { context.deployments = [existing_deployment] }
 
           it_behaves_like 'validation error deployment'
+        end
+
+        context 'with a provider related error' do
+          before do
+            allow(double_client).to receive(:deploy).and_raise(RuntimeError)
+          end
+
+          it_behaves_like 'savable deployment'
         end
       end
 
