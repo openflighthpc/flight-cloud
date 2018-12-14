@@ -6,6 +6,8 @@ require 'models/machine'
 require 'models/context'
 require 'pathname'
 
+require 'erb'
+
 module Cloudware
   module Models
     class Deployment < Application
@@ -32,10 +34,15 @@ module Cloudware
           if errors.blank?
             run_deploy
           else
-            raise ModelValidationError, <<-ERROR.strip_heredoc.chomp
-              Failed to deploy resources. The following errors have occurred:
-              #{errors.messages.map { |k, v| "#{k}: #{v.first}" }.join("\n")}
-            ERROR
+            msg = ERB.new(<<-TEMPLATE, nil, '-').result(binding)
+Failed to deploy resources. The following errors have occurred:
+<% errors.messages.map do |key, messages| -%>
+<% messages.each do |message| -%>
+<%= key %>: <%= message %>
+<% end -%>
+<% end -%>
+TEMPLATE
+            raise ModelValidationError, msg
           end
         end
       end
@@ -83,7 +90,7 @@ module Cloudware
       end
 
       def validate_replacement_tags
-        /%[\w-]*%/.match(template).to_a.each do |match|
+        template.scan(/%[\w-]*%/).each do |match|
           errors.add(match, 'Was not replaced in the template')
         end
       end
