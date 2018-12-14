@@ -17,6 +17,7 @@ module Cloudware
       define_model_callbacks :deploy
 
       before_deploy :validate_replacement_tags
+      before_deploy :validate_context
 
       def template
         return raw_template unless replacements
@@ -78,6 +79,11 @@ module Cloudware
         /%[\w-]*%/.match(template).to_a.each do |match|
           errors.add(match, 'Was not replaced in the template')
         end
+      end
+
+      def validate_context
+        return if context.is_a? Cloudware::Models::Context
+        errors.add(:context, 'Is not a context model')
       end
     end
   end

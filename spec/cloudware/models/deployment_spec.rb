@@ -83,6 +83,18 @@ RSpec.describe Cloudware::Models::Deployment do
         it 'passes' do
           expect { subject.deploy }.not_to raise_error
         end
+
+        context 'without a context' do
+          let(:context) { nil }
+
+          describe '#deploy' do
+            it 'errors' do
+              expect do
+                subject.deploy
+              end.to raise_error(Cloudware::ModelValidationError)
+            end
+          end
+        end
       end
 
       context 'with a replacement tag' do
