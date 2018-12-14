@@ -55,10 +55,6 @@ module Cloudware
     def log
       @log ||= Logger.new(config.log_file)
     end
-
-    def render_file_path(path)
-      File.expand_path(File.join(__dir__, "../providers/#{path}"))
-    end
   end
 end
 
