@@ -19,10 +19,8 @@ module Cloudware
 
         def machines
           if options.group
-            context.deployments
-                   .map(&:machines)
-                   .flatten
-                   .select { |m| m.groups.include?(identifier) }
+            Models::Machine.build_from_context(context)
+                           .select { |m| m.groups.include?(identifier) }
           else
             [Models::Machine.new(name: identifier, context: context)]
           end
