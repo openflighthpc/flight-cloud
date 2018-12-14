@@ -11,9 +11,9 @@ module Cloudware
         @region = region
       end
 
-      def deploy(name, template)
-        client.create_stack(stack_name: name, template_body: template)
-        client.wait_until(:stack_create_complete, stack_name: name)
+      def deploy(tag, template)
+        client.create_stack(stack_name: tag, template_body: template)
+        client.wait_until(:stack_create_complete, stack_name: tag)
               .stacks
               .first
               .outputs
@@ -21,6 +21,11 @@ module Cloudware
                 memo[output.output_key] = output.output_value
                 memo
               end
+      end
+
+      def destroy(tag)
+        client.delete_stack(stack_name: tag)
+        client.wait_until(:stack_delete_complete, stack_name: tag)
       end
 
       private

@@ -65,5 +65,11 @@ module Cloudware
                'Subsitute the parents deployment output into the template'
       action(c, Commands::Deploy)
     end
+
+    command 'destroy' do |c|
+      cli_syntax(c, 'NAME')
+      c.description = 'Destroy'
+      action(c, Commands::Destroy)
+    end
   end
 end
