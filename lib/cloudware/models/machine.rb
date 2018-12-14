@@ -12,18 +12,22 @@ module Cloudware
 
       TAG_TYPE = 'NODE'
       PROVIDER_ID_FLAG = 'ID'
+      GROUPS_TAG = 'groups'
 
       delegate :status, :off, :on, to: :machine_client
       delegate :region, :provider, to: :deployment
 
       def provider_id
-        id_tag = self.tag_generator(PROVIDER_ID_FLAG)
-        (deployment.results || {})[id_tag].tap do |id|
-          raise ModelValidationError, <<-ERROR.squish unless id
+        fetch_result(PROVIDER_ID_FLAG) do |long_tag|
+          raise ModelValidationError, <<-ERROR.squish
             Machine '#{name}' is missing its provider ID. Make sure
-            '#{id_tag}' is set within the deployment output
+            '#{long_tag}' is set within the deployment output
           ERROR
         end
+      end
+
+      def groups
+        fetch_result(GROUPS_TAG, default: '').split(',')
       end
 
       private
