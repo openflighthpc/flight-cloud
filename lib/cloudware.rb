@@ -53,7 +53,7 @@ module Cloudware
     end
 
     def root_dir
-      @root_dir ||= File.dirname(__FILE__)
+      @root_dir ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))
     end
   end
 end
