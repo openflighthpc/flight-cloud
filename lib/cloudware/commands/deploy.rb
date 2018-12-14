@@ -12,7 +12,10 @@ module Cloudware
         @template = argv[0]
         @name = argv[1]
         error_if_deployment_exists
-        begin deployment.deploy
+        begin
+          with_spinner('Deploying resources...', done: 'Done') do
+            deployment.deploy
+          end
         ensure context.save
         end
       end

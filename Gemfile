@@ -16,8 +16,10 @@ gem 'ipaddr'
 gem 'memoist'
 gem 'parallel'
 gem 'require_all'
+gem 'tty-command'
 gem 'tty-table'
 gem 'tty-pager'
+gem 'tty-spinner'
 gem 'whirly'
 
 group :development do
