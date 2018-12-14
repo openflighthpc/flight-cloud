@@ -61,6 +61,8 @@ module Cloudware
     command 'deploy' do |c|
       cli_syntax(c, 'TEMPLATE NAME')
       c.description = 'Deploy'
+      c.option '--parent NAME', String,
+               'Subsitute the parents deployment output into the template'
       action(c, Commands::Deploy)
     end
   end
