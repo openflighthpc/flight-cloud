@@ -45,7 +45,7 @@ module Cloudware
     end
 
     attr_accessor :log_file, :aws, :azure, :providers
-    attr_reader :provider, :region, :content_path
+    attr_reader :provider, :default_region, :content_path
 
     def initialize
       config = YAML.load_file(config_path)
@@ -64,7 +64,7 @@ module Cloudware
 
       @default = OpenStruct.new(config['default'])
       @provider = ENV['CLOUDWARE_PROVIDER']
-      @region  = config['provider'][provider]['default_region']
+      @default_region = config['provider'][provider]['default_region']
 
       @content_path = '/var/lib/cloudware'
     end
@@ -82,10 +82,6 @@ module Cloudware
 
     def base_dir
       File.expand_path(File.join(__dir__, '../..'))
-    end
-
-    def context
-      @context ||= Context.new
     end
 
     private

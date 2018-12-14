@@ -10,7 +10,7 @@ module Cloudware
         include Concerns::Table
 
         def run
-          Models::Context.new.deployments.each do |deployment|
+          context.deployments.each do |deployment|
             table << generate_row(deployment)
           end
           page_table

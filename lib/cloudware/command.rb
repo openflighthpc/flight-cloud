@@ -23,6 +23,11 @@ module Cloudware
       raise NotImplementedError
     end
 
+    def context
+      Models::Context.new(region: options.region)
+    end
+    memoize :context
+
     private
 
     attr_reader :argv, :options

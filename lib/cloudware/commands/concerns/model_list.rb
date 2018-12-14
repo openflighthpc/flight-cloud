@@ -21,10 +21,9 @@ module Cloudware
         end
 
         def models
-          Models::Context.new
-                         .deployments
-                         .map(&deployment_method)
-                         .flatten
+          context.deployments
+                 .map(&deployment_method)
+                 .flatten
         end
         memoize :models
 

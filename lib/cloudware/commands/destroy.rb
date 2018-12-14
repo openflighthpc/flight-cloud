@@ -17,11 +17,6 @@ module Cloudware
 
       private
 
-      def context
-        Models::Context.new
-      end
-      memoize :context
-
       def deployment
         Models::Deployment.new(name: name, context: context)
       end

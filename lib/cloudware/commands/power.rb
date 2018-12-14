@@ -22,10 +22,10 @@ module Cloudware
 
         def machines
           if options.group
-            Models::Context.new.deployments
-                               .map(&:machines)
-                               .flatten
-                               .select { |m| m.groups.include?(identifier) }
+            context.deployments
+                   .map(&:machines)
+                   .flatten
+                   .select { |m| m.groups.include?(identifier) }
           else
             [Models::Machine.new(name: identifier, deployment: deployment)]
           end

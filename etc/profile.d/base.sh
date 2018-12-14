@@ -13,9 +13,9 @@ __cloudware() {
 }
 
 flight-aws() {
-  ( export CLOUDWARE_PROVIDER='aws' && __cloudware )
+  ( export CLOUDWARE_PROVIDER='aws' && __cloudware "$@" )
 }
 
 flight-azure() {
-  ( export CLOUDWARE_PROVIDER='azure' && __cloudware )
+  ( export CLOUDWARE_PROVIDER='azure' && __cloudware "$@" )
 }
