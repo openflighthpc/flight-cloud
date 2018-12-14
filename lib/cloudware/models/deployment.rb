@@ -18,6 +18,7 @@ module Cloudware
 
       before_deploy :validate_replacement_tags
       before_deploy :validate_context
+      before_deploy :validate_no_existing_deployment
 
       def template
         return raw_template unless replacements
@@ -85,6 +86,12 @@ module Cloudware
       def validate_context
         return if context.is_a? Cloudware::Models::Context
         errors.add(:context, 'Is not a context model')
+      end
+
+      def validate_no_existing_deployment
+        return unless context.respond_to?(:find_deployment)
+        return unless context.find_deployment(name)
+        errors.add(:context, 'The deployment already exists')
       end
     end
   end
