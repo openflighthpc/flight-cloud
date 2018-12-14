@@ -62,7 +62,7 @@ Only Global Administrator can create apps if App Registrations under User settin
 ## Configuring Cloudware
 
 Cloudware can be configured using the global configuration file - Cloudware
-expects this configuration file to be located at `$HOME/.cloudware.yml`.
+expects this configuration file to be located at `<install-dir>/etc/config.yml`.
 
 ### Log configuration
 

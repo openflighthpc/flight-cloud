@@ -31,7 +31,7 @@ Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
 module Cloudware
   class Config
-    PATH = File.expand_path('~/.flightconnector.yml')
+    PATH = File.join(Cloudware.root_dir, 'etc/config.yml')
 
     class << self
       def cache
