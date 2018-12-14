@@ -16,20 +16,20 @@ module Cloudware
           raise NotImplementedError
         end
 
+        private
+
         def deployment
-          Models::Deployment.build(name: deployment_name)
+          Models::Context.new.find_by_name(deployment_name).tap do |deployment|
+            raise InvalidInput, <<-ERROR.squish unless deployment
+              Could not find deployment '#{deployment_name}'
+            ERROR
+          end
         end
 
         def machine
-          deployment.machines
-                    &.find { |m| m.name == machine_name }
-                    .tap do |machine|
-            raise InvalidInput, <<-MISSING.squish if machine.nil?
-              Could not locate node '#{machine_name}' within deployment
-              '#{deployment_name}'
-            MISSING
-          end
+          Models::Machine.new(name: machine_name, deployment: deployment)
         end
+        memoize :machine
       end
     end
   end

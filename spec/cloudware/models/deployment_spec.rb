@@ -27,9 +27,10 @@ RSpec.describe Cloudware::Models::Deployment do
   context 'with machine ids' do
     let(:machines) { ['node1', 'node2'] }
     let(:results) do
-      prefix = Cloudware::Models::Machine::TAG_PREFIX
       machines.each_with_object({}) do |name, memo|
-        memo[:"#{prefix}#{name}"] = "#{name}-id"
+        tag_suffix = Cloudware::Models::Machine::PROVIDER_ID_FLAG
+        tag = Cloudware::Models::Machine.tag_generator(name, tag_suffix)
+        memo[tag] = "#{name}-id"
       end
     end
 

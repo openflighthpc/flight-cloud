@@ -37,10 +37,7 @@ module Cloudware
       end
 
       def machines
-        results&.select { |k, _| Machine.tag?(k) }
-               &.map do |key, _|
-          Machine.new(tag: key.to_s, deployment: self)
-        end
+        Machine.build_from_deployment(self)
       end
 
       def to_h

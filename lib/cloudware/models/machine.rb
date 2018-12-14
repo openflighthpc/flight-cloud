@@ -9,30 +9,49 @@ module Cloudware
     class Machine < Application
       include Concerns::ProviderClient
 
-      delegate :status, :off, :on, to: :machine_client
-      delegate :region, :provider, to: :deployment
+      NODE_PREFIX = 'cloudwareNODE'
+      TAG_FLAG = 'TAG'
 
-      TAG_PREFIX = 'cloudwareNodeID'
+      PROVIDER_ID_FLAG = 'ID'
 
-      def self.tag?(tag)
-        /\A#{TAG_PREFIX}/.match?(tag)
+      class << self
+        def build_from_deployment(deployment)
+          (deployment.results || {})
+                     .keys
+                     .map { |k| Machine.name_from_tag(k) }
+                     .uniq
+                     .reject { |n| n.nil? }
+                     .map do |name|
+            Machine.new(name: name, deployment: deployment)
+          end
+        end
+
+        def name_from_tag(tag)
+          regex = /(?<=\A#{NODE_PREFIX}).*(?=#{TAG_FLAG}.*\Z)/
+          regex.match(tag.to_s)&.to_a&.first
+        end
+
+        def tag_generator(name, tag)
+          :"#{NODE_PREFIX}#{name}#{TAG_FLAG}#{tag}"
+        end
       end
 
       attr_accessor :name, :deployment
 
-      def tag=(tag)
-        self.name = tag.sub(TAG_PREFIX, '')
-      end
+      delegate :status, :off, :on, to: :machine_client
+      delegate :region, :provider, to: :deployment
 
-      def tag
-        "#{TAG_PREFIX}#{name}"
+      def provider_id
+        id_tag = self.class.tag_generator(name, PROVIDER_ID_FLAG)
+        (deployment.results || {})[id_tag].tap do |id|
+          raise ModelValidationError, <<-ERROR.squish unless id
+            Machine '#{name}' is missing its provider ID. Make sure
+            '#{id_tag}' is set within the deployment output
+          ERROR
+        end
       end
 
       private
-
-      def provider_id
-        deployment.results[tag.to_sym]
-      end
 
       def machine_client
         provider_client.machine(provider_id)
