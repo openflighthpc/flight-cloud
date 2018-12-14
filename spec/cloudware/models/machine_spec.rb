@@ -2,7 +2,10 @@
 
 RSpec.describe Cloudware::Models::Machine do
   let(:machine_name) { 'test' }
-  subject { described_class.new(name: machine_name, deployment: deployment) }
+  let(:context) do
+    build(:context).tap { |c| c.deployments = [deployment] }
+  end
+  subject { described_class.new(name: machine_name, context: context) }
 
   context 'with a blank deployment' do
     let(:deployment) { build(:deployment) }

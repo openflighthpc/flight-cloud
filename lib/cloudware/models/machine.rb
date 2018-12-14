@@ -14,7 +14,7 @@ module Cloudware
       GROUPS_TAG = 'groups'
 
       delegate :status, :off, :on, to: :machine_client
-      delegate :context, :provider, to: :deployment
+      delegate :region, :provider, to: :context
 
       def provider_id
         fetch_result(PROVIDER_ID_FLAG) do |long_tag|

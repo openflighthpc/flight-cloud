@@ -15,14 +15,14 @@ module Cloudware
             'TAG'
           end
 
-          def build_from_deployment(deployment)
-            (deployment.results || {})
-                       .keys
-                       .map { |k| self.name_from_tag(k) }
-                       .uniq
-                       .reject { |n| n.nil? }
-                       .map do |name|
-              self.new(name: name, deployment: deployment)
+          def build_from_context(context)
+            (context.results || {})
+                    .keys
+                    .map { |k| self.name_from_tag(k) }
+                    .uniq
+                    .reject { |n| n.nil? }
+                    .map do |name|
+              self.new(name: name, context: context)
             end
           end
 
@@ -36,10 +36,10 @@ module Cloudware
           end
         end
 
-        attr_accessor :name, :deployment
+        attr_accessor :name, :context
 
         def tags
-          (deployment.results || {}).each_with_object({}) do |(key, value), memo|
+          (context.results || {}).each_with_object({}) do |(key, value), memo|
             next unless (tag = extract_tag(key))
             memo[tag] = value
           end
@@ -56,7 +56,7 @@ module Cloudware
 
         def fetch_result(short_tag, default: nil)
           long_tag = self.tag_generator(short_tag)
-          result = (deployment.results || {})[long_tag]
+          result = (context.results || {})[long_tag]
           return result unless result.nil?
           return default unless default.nil?
           yield long_tag if block_given?
