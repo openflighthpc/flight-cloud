@@ -113,8 +113,6 @@ module Cloudware
     command 'info machine' do |c|
       cli_syntax(c, 'NAME')
       c.description = 'Display the tag information about a machine'
-      c.option '-d', '--deployment DEPLOYMENT', String,
-               'The deployment the machine was created in'
       c.hidden = true
       action(c, Commands::Infos::Machine)
     end

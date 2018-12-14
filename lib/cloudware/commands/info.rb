@@ -5,12 +5,10 @@ require 'tty-table'
 module Cloudware
   module Commands
     class Info < Command
-      include Concerns::ExistingDeployment
       include Concerns::Table
-      attr_reader :name, :deployment_name
+      attr_reader :name
 
       def run
-        @deployment_name = options.deployment
         @name = argv[0]
         models.tags.each { |row| table << row }
         page_table
@@ -23,7 +21,7 @@ module Cloudware
       end
 
       def models
-        model_class.new(name: name, deployment: deployment)
+        model_class.new(name: name, context: context)
       end
       memoize :models
 
