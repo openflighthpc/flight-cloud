@@ -26,6 +26,8 @@ lib_dir = File.dirname(__FILE__)
 $LOAD_PATH << File.join(lib_dir, 'cloudware')
 ENV['BUNDLE_GEMFILE'] ||= File.join(lib_dir, '..', 'Gemfile')
 
+Thread.report_on_exception = false
+
 require 'rubygems'
 require 'bundler'
 Bundler.setup(:default)
