@@ -2,3 +2,4 @@
 .vagrant/
 tmp/
 etc/config.yaml
+etc/config.yml
