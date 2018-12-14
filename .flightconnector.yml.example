@@ -8,16 +8,13 @@ general:
 # Provider credentials
 provider:
   azure:
-    tenant_id: 
-    subscription_id: 
-    client_secret: 
-    client_id: 
+    default_region:
+    tenant_id:
+    subscription_id:
+    client_secret:
+    client_id:
 
   aws:
-    access_key_id: 
-    secret_access_key: 
-
-# Default region and provider for the cluster
-default:
-  provider:
-  region:
+    default_region:
+    access_key_id:
+    secret_access_key:

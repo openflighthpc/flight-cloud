@@ -50,7 +50,7 @@ module Cloudware
       private
 
       def path
-        File.join(Config.content_path, 'contexts/default.yaml')
+        File.join(Config.content_path, 'contexts', "#{Config.provider}.yaml")
       end
     end
   end

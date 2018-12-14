@@ -5,12 +5,17 @@
 ##
 ################################################################################
 
-flightconnector() {
-  ( target='SED_TARGET_DURING_INSTALL' && \
-    cd $target && \
-    PATH="$target/opt/ruby/bin/:$PATH" && \
-    bin/cloud "$@"
-  )
+__cloudware() {
+  target='SED_TARGET_DURING_INSTALL' && \
+  cd $target && \
+  PATH="$target/opt/ruby/bin/:$PATH" && \
+  bin/cloud "$@"
 }
-alias fc=flightconnector
 
+flight-aws() {
+  ( export CLOUDWARE_PROVIDER='aws' && __cloudware )
+}
+
+flight-azure() {
+  ( export CLOUDWARE_PROVIDER='azure' && __cloudware )
+}
