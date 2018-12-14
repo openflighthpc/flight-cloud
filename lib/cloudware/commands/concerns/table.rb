@@ -19,7 +19,11 @@ module Cloudware
         end
 
         def render_table
-          table.render(:unicode, multiline: true, width: table.width + 10)
+          table.render(:unicode) do |renderer|
+            renderer.multiline = true
+            renderer.width = table.width + 10
+            renderer.border.separator = :each_row
+          end
         end
       end
     end

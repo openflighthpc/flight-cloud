@@ -15,6 +15,10 @@ module Cloudware
       attr_accessor(*SAVE_ATTR)
       attr_reader :context
 
+      define_model_callbacks :deploy
+
+      before_deploy :validate_replacement_tags
+
       def context=(input)
         @context = input.tap { |c| c.with_deployment(self) }
       end
@@ -27,7 +31,16 @@ module Cloudware
       end
 
       def deploy
-        self.results = provider_client.deploy(tag, template)
+        run_callbacks(:deploy) do
+          if errors.blank?
+            self.results = provider_client.deploy(tag, template)
+          else
+            raise ModelValidationError, <<-ERROR.strip_heredoc.chomp
+              Failed to deploy resources. The following errors have occurred:
+              #{errors.messages.map { |k, v| "#{k}: #{v.first}" }.join("\n")}
+            ERROR
+          end
+        end
       end
 
       def destroy
@@ -64,6 +77,12 @@ module Cloudware
 
       def raw_template
         File.read(template_path)
+      end
+
+      def validate_replacement_tags
+        /%[\w-]*%/.match(template).to_a.each do |match|
+          errors.add(match, 'Was not replaced in the template')
+        end
       end
     end
   end

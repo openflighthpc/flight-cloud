@@ -3,6 +3,15 @@
 RSpec.describe Cloudware::Models::Deployment do
   let(:replacements) { nil }
   subject { build(:deployment, replacements: replacements) }
+  let(:double_client) do
+    client = subject.send(:provider_client)
+    object_double(client)
+  end
+
+  # Mock the provider_client
+  before do
+    allow(subject).to receive(:provider_client).and_return(double_client)
+  end
 
   context 'with a replacement hash' do
     let(:replacements) { { replace_key1: 'value1', replace_key2: 'value2' } }
@@ -55,6 +64,36 @@ RSpec.describe Cloudware::Models::Deployment do
       deployment = build(:deployment, context: context)
       find_deployment = context.deployments.find { |d| d.name == deployment.name }
       expect(find_deployment).to eq(deployment)
+    end
+  end
+
+  context 'with an existing template' do
+    before do
+      path = subject.send(:template_path)
+      FileUtils.mkdir_p(File.dirname(path))
+      File.write(path, template_content)
+    end
+
+    describe '#deploy' do
+      before { allow(double_client).to receive(:deploy) }
+
+      context 'with a blank template' do
+        let(:template_content) { '' }
+
+        it 'passes' do
+          expect { subject.deploy }.not_to raise_error
+        end
+      end
+
+      context 'with a replacement tag' do
+        let(:template_content) { '%unreplaced-tag%' }
+
+        it 'errors' do
+          expect do
+            subject.deploy
+          end.to raise_error(Cloudware::ModelValidationError)
+        end
+      end
     end
   end
 end
