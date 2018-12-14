@@ -91,15 +91,6 @@ module Cloudware
       action(c, Commands::Infos::Machine)
     end
 
-    command 'info domain' do |c|
-      cli_syntax(c, 'NAME')
-      c.description = 'Domain Info'
-      c.option '-d', '--deployment DEPLOYMENT', String,
-               'The deployment the machine was created in'
-      c.hidden = true
-      action(c, Commands::Infos::Domain)
-    end
-
     command 'list' do |c|
       cli_syntax(c)
       c.description = 'list'
@@ -111,13 +102,6 @@ module Cloudware
       c.description = 'List all the deployments'
       c.hidden = true
       action(c, Commands::Lists::Deployment)
-    end
-
-    command 'list domains' do |c|
-      cli_syntax(c)
-      c.description = 'List all the domains'
-      c.hidden = true
-      action(c, Commands::Lists::Domain)
     end
 
     command 'list machines' do |c|

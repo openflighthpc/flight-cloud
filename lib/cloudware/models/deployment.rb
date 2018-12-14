@@ -3,8 +3,8 @@
 require 'models/concerns/provider_client'
 require 'models/application'
 require 'models/machine'
-require 'models/domain'
 require 'models/context'
+require 'pathname'
 
 module Cloudware
   module Models
@@ -39,10 +39,6 @@ module Cloudware
         Machine.build_from_deployment(self)
       end
 
-      def domains
-        Domain.build_from_deployment(self)
-      end
-
       def to_h
         SAVE_ATTR.each_with_object({}) do |key, memo|
           memo[key] = send(key)
@@ -56,6 +52,7 @@ module Cloudware
       end
 
       def template_path
+        return template_name if Pathname.new(template_name).absolute?
         ext = (provider == 'aws' ? '.yaml' : '.json')
         File.join(
           Config.content_path,
