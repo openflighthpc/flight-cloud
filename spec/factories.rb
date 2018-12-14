@@ -8,6 +8,7 @@ FactoryBot.define do
     name 'test-deployment'
     template_name 'test-template'
     results {}
+    replacements nil
     association :context, strategy: :build
   end
 

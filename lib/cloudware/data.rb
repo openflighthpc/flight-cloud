@@ -30,7 +30,7 @@ module Cloudware
         when Hash
           obj.deep_symbolize_keys
         when Enumerable
-          obj.each { |sub_obj| convert_keys(sub_obj) }
+          obj.map { |sub_obj| convert_keys(sub_obj) }
         else
           obj
         end
