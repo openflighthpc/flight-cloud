@@ -24,4 +24,6 @@
 #==============================================================================
 require_relative File.join(__FILE__, '../../../lib/cloudware')
 
+ENV['CLOUDWARE_PROVIDER'] = 'azure'
+
 Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__
