@@ -49,7 +49,7 @@ module Cloudware
       end
 
       def machines
-        Machine.build_from_deployment(self)
+        Machine.build_from_context(self)
       end
 
       def to_h

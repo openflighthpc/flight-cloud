@@ -4,6 +4,7 @@ module Cloudware
   module Models
     class Context < Application
       attr_reader :region
+      delegate :provider, to: Config
 
       def initialize(region: nil, **other_args)
         super(**other_args)
@@ -50,7 +51,7 @@ module Cloudware
         Data.dump(path, save_data)
       end
 
-      def find_by_name(name)
+      def find_deployment(name)
         deployments.find { |d| d.name == name }
       end
 
@@ -59,7 +60,7 @@ module Cloudware
       def path
         File.join(Config.content_path,
                   'contexts',
-                  Config.provider,
+                  provider,
                   "#{region}.yaml")
       end
     end

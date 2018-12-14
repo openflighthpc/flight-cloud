@@ -23,7 +23,7 @@ module Cloudware
       private
 
       def error_if_deployment_exists
-        raise InvalidInput, <<-ERROR.squish if context.find_by_name(name)
+        raise InvalidInput, <<-ERROR.squish if context.find_deployment(name)
           The '#{name}' deployment already exists
         ERROR
       end
