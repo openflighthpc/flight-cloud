@@ -34,7 +34,7 @@ module Cloudware
           if errors.blank?
             run_deploy
           else
-            msg = ERB.new(<<-TEMPLATE, nil, '-').result(binding)
+            msg = ERB.new(<<-TEMPLATE, nil, '-').result(binding).chomp
 Failed to deploy resources. The following errors have occurred:
 <% errors.messages.map do |key, messages| -%>
 <% messages.each do |message| -%>
