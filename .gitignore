@@ -1,5 +1,6 @@
 *.swp
 .vagrant/
 tmp/
+var/
 etc/config.yaml
 etc/config.yml

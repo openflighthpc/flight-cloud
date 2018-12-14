@@ -63,7 +63,7 @@ module Cloudware
       @provider = ENV['CLOUDWARE_PROVIDER']
       @default_region = config['provider'][provider]['default_region']
 
-      @content_path = '/var/lib/cloudware'
+      @content_path = File.join(Cloudware.root_dir, 'var')
     end
 
     def log
