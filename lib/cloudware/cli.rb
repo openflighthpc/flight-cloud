@@ -22,12 +22,16 @@
 # https://github.com/alces-software/cloudware
 #==============================================================================
 require 'commander'
-require 'terminal-table'
 require 'whirly'
 require 'exceptions'
 require 'command'
 
 require 'require_all'
+
+require_all 'lib/cloudware/models/concerns/**/*.rb'
+require_all 'lib/cloudware/models/**/*.rb'
+
+require_all 'lib/cloudware/commands/concerns/**/*.rb'
 require_all 'lib/cloudware/commands/**/*.rb'
 
 module Cloudware
@@ -70,6 +74,50 @@ module Cloudware
       cli_syntax(c, 'NAME')
       c.description = 'Destroy'
       action(c, Commands::Destroy)
+    end
+
+    command 'info' do |c|
+      cli_syntax(c)
+      c.description = 'Info'
+      c.sub_command_group = true
+    end
+
+    command 'info machine' do |c|
+      cli_syntax(c, 'NAME')
+      c.description = 'Machine Info'
+      c.option '-d', '--deployment DEPLOYMENT', String,
+               'The deployment the machine was created in'
+      c.hidden = true
+      action(c, Commands::Infos::Machine)
+    end
+
+    command 'info domain' do |c|
+      cli_syntax(c, 'NAME')
+      c.description = 'Domain Info'
+      c.option '-d', '--deployment DEPLOYMENT', String,
+               'The deployment the machine was created in'
+      c.hidden = true
+      action(c, Commands::Infos::Domain)
+    end
+
+    command 'list' do |c|
+      cli_syntax(c)
+      c.description = 'list'
+      c.sub_command_group = true
+    end
+
+    command 'list machines' do |c|
+      cli_syntax(c)
+      c.description = 'List all the machines'
+      c.hidden = true
+      action(c, Commands::Lists::Machine)
+    end
+
+    command 'list domains' do |c|
+      cli_syntax(c)
+      c.description = 'List all the domains'
+      c.hidden = true
+      action(c, Commands::Lists::Domain)
     end
 
     command 'power' do |c|

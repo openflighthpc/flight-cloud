@@ -46,7 +46,7 @@ title 'Configuring system'
 doing 'Creating required directories'
 mkdir -p ${target}
 mkdir -p ${target}/etc
-cp -R "${source}/"{Gemfile,Gemfile.lock,bin,lib,providers} "${target}"
+cp -R "${source}/"{Gemfile,Gemfile.lock,bin,lib} "${target}"
 say_done $?
 
 doing 'Creating log file'
