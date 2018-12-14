@@ -1,16 +1,26 @@
 # frozen_string_literal: true
 
+require 'providers/base'
+
 RSpec.describe Cloudware::Models::Deployment do
   let(:replacements) { nil }
-  subject { build(:deployment, replacements: replacements) }
+  let(:context) { build(:context) }
   let(:double_client) do
-    client = subject.send(:provider_client)
-    object_double(client)
+    object_double(Cloudware::Providers::Base::Client.new('region'))
+  end
+
+  subject do
+    build(:deployment, replacements: replacements, context: context)
   end
 
   # Mock the provider_client
   before do
     allow(subject).to receive(:provider_client).and_return(double_client)
+  end
+
+  it 'does not update the context on build' do
+    deployment = build(:deployment, context: context)
+    expect(context.deployments).not_to include(deployment)
   end
 
   context 'with a replacement hash' do
@@ -57,21 +67,35 @@ RSpec.describe Cloudware::Models::Deployment do
     end
   end
 
-  context 'with a deployment context' do
-    let(:context) { build(:context) }
-
-    it 'is automatically added to the context' do
-      deployment = build(:deployment, context: context)
-      find_deployment = context.deployments.find { |d| d.name == deployment.name }
-      expect(find_deployment).to eq(deployment)
-    end
-  end
-
   context 'with an existing template' do
     before do
       path = subject.send(:template_path)
       FileUtils.mkdir_p(File.dirname(path))
       File.write(path, template_content)
+    end
+
+    shared_examples 'deploy raises ModelValidationError' do
+      it 'raises ModelValidationError' do
+        expect do
+          subject.deploy
+        end.to raise_error(Cloudware::ModelValidationError)
+      end
+    end
+
+    shared_examples 'validation error deployment' do
+      include_examples 'deploy raises ModelValidationError'
+
+      it 'does not save to the context' do
+        begin subject.deploy; rescue RuntimeError; end
+        expect(context.deployments).not_to include(subject)
+      end
+    end
+
+    shared_examples 'savable deployment' do
+      it 'saves to the context' do
+        begin subject.deploy; rescue RuntimeError; end
+        expect(context.deployments).to include(subject)
+      end
     end
 
     describe '#deploy' do
@@ -83,16 +107,38 @@ RSpec.describe Cloudware::Models::Deployment do
         it 'passes' do
           expect { subject.deploy }.not_to raise_error
         end
+
+        it_behaves_like 'savable deployment'
+
+        context 'without a context' do
+          let(:context) { nil }
+
+          include_examples 'deploy raises ModelValidationError'
+        end
+
+        context 'with an existing deployment' do
+          let(:existing_deployment) do
+            build(:deployment, name: subject.name)
+          end
+
+          before { context.deployments = [existing_deployment] }
+
+          it_behaves_like 'validation error deployment'
+        end
+
+        context 'with a provider related error' do
+          before do
+            allow(double_client).to receive(:deploy).and_raise(RuntimeError)
+          end
+
+          it_behaves_like 'savable deployment'
+        end
       end
 
       context 'with a replacement tag' do
         let(:template_content) { '%unreplaced-tag%' }
 
-        it 'errors' do
-          expect do
-            subject.deploy
-          end.to raise_error(Cloudware::ModelValidationError)
-        end
+        it_behaves_like 'validation error deployment'
       end
     end
   end

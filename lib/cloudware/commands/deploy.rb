@@ -11,7 +11,6 @@ module Cloudware
       def run
         @template = argv[0]
         @name = argv[1]
-        error_if_deployment_exists
         begin
           with_spinner('Deploying resources...', done: 'Done') do
             deployment.deploy
@@ -21,12 +20,6 @@ module Cloudware
       end
 
       private
-
-      def error_if_deployment_exists
-        raise InvalidInput, <<-ERROR.squish if context.find_deployment(name)
-          The '#{name}' deployment already exists
-        ERROR
-      end
 
       def deployment
         Models::Deployment.new(

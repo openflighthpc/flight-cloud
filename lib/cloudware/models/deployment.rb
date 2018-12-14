@@ -6,22 +6,21 @@ require 'models/machine'
 require 'models/context'
 require 'pathname'
 
+require 'erb'
+
 module Cloudware
   module Models
     class Deployment < Application
       include Concerns::ProviderClient
 
       SAVE_ATTR = [:template_name, :name, :results, :replacements]
-      attr_accessor(*SAVE_ATTR)
-      attr_reader :context
+      attr_accessor(*SAVE_ATTR, :context)
 
       define_model_callbacks :deploy
 
       before_deploy :validate_replacement_tags
-
-      def context=(input)
-        @context = input.tap { |c| c.with_deployment(self) }
-      end
+      before_deploy :validate_context
+      before_deploy :validate_no_existing_deployment
 
       def template
         return raw_template unless replacements
@@ -33,12 +32,17 @@ module Cloudware
       def deploy
         run_callbacks(:deploy) do
           if errors.blank?
-            self.results = provider_client.deploy(tag, template)
+            run_deploy
           else
-            raise ModelValidationError, <<-ERROR.strip_heredoc.chomp
-              Failed to deploy resources. The following errors have occurred:
-              #{errors.messages.map { |k, v| "#{k}: #{v.first}" }.join("\n")}
-            ERROR
+            msg = ERB.new(<<-TEMPLATE, nil, '-').result(binding)
+Failed to deploy resources. The following errors have occurred:
+<% errors.messages.map do |key, messages| -%>
+<% messages.each do |message| -%>
+<%= key %>: <%= message %>
+<% end -%>
+<% end -%>
+TEMPLATE
+            raise ModelValidationError, msg
           end
         end
       end
@@ -60,6 +64,12 @@ module Cloudware
 
       private
 
+      def run_deploy
+        self.results = provider_client.deploy(tag, template)
+      ensure
+        context.with_deployment(self)
+      end
+
       def tag
         "cloudware-deploy-#{name}"
       end
@@ -80,9 +90,20 @@ module Cloudware
       end
 
       def validate_replacement_tags
-        /%[\w-]*%/.match(template).to_a.each do |match|
+        template.scan(/%[\w-]*%/).each do |match|
           errors.add(match, 'Was not replaced in the template')
         end
+      end
+
+      def validate_context
+        return if context.is_a? Cloudware::Models::Context
+        errors.add(:context, 'Is not a context model')
+      end
+
+      def validate_no_existing_deployment
+        return unless context.respond_to?(:find_deployment)
+        return unless context.find_deployment(name)
+        errors.add(:context, 'The deployment already exists')
       end
     end
   end
