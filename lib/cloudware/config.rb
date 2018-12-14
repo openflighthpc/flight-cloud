@@ -70,10 +70,6 @@ module Cloudware
       Cloudware.log
     end
 
-    def base_dir
-      File.expand_path(File.join(__dir__, '../..'))
-    end
-
     private
 
     def config_path
