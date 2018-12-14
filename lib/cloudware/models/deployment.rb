@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
+require 'models/concerns/provider_client'
 require 'models/application'
+require 'models/machine'
 require 'providers/AWS'
 
 module Cloudware
   module Models
     class Deployment < Application
+      include Concerns::ProviderClient
+
       attr_accessor :template_name, :name, :parent
       delegate :region, :provider, to: Config
 
@@ -27,15 +31,19 @@ module Cloudware
       end
 
       def results
+        return nil unless File.exist?(results_path)
         Data.load(results_path)
+      end
+      memoize :results
+
+      def machines
+        results&.select { |k, _| Machine.tag?(k) }
+               &.map do |key, _|
+          Machine.new(tag: key.to_s, deployment: self)
+        end
       end
 
       private
-
-      def provider_client
-        Providers::AWS.new(region)
-      end
-      memoize :provider
 
       def tag
         "cloudware-deploy-#{name}"

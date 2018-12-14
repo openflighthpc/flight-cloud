@@ -71,5 +71,36 @@ module Cloudware
       c.description = 'Destroy'
       action(c, Commands::Destroy)
     end
+
+    command 'power' do |c|
+      cli_syntax(c)
+      c.description = 'Power'
+      c.sub_command_group = true
+    end
+
+    def self.shared_power_attr(c)
+      cli_syntax(c, 'MACHINE')
+      c.option '-d', '--deployment DEPLOYMENT', String,
+               'The deployment the machine was created in'
+      c.hidden = true
+    end
+
+    command 'power status' do |c|
+      shared_power_attr(c)
+      c.description = 'Check the power state of a machine'
+      action(c, Commands::Powers::Status)
+    end
+
+    command 'power off' do |c|
+      shared_power_attr(c)
+      c.description = 'Turn the machine off'
+      action(c, Commands::Powers::Off)
+    end
+
+    command 'power on' do |c|
+      shared_power_attr(c)
+      c.description = 'Turn the machine on'
+      action(c, Commands::Powers::On)
+    end
   end
 end
