@@ -26,12 +26,24 @@ require 'ostruct'
 require 'whirly'
 require 'aws-sdk-cloudformation'
 require 'aws-sdk-ec2'
+require 'azure_mgmt_resources'
+
+require 'active_support/core_ext/module/delegation'
 
 Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
 module Cloudware
   class Config
-    attr_accessor :log_file, :azure, :aws, :providers, :default
+    class << self
+      def cache
+        @cache ||= new
+      end
+
+      delegate_missing_to :cache
+    end
+
+    attr_accessor :log_file, :aws, :azure, :providers
+    attr_reader :provider, :region, :content_path
 
     def initialize
       config = YAML.load_file(config_path)
@@ -49,6 +61,10 @@ module Cloudware
       end
 
       @default = OpenStruct.new(config['default'])
+      @provider = @default[:provider]
+      @region  = @default[:region]
+
+      @content_path = '/var/lib/cloudware'
     end
 
     def log
