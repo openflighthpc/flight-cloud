@@ -9,4 +9,6 @@ install:
   - sed -i 's#/var/log#/tmp#g' ~/.flightconnector.yml
   - touch /tmp/flightconnector.log
   - bundle install
-script: rspec
+script:
+  - export CLOUDWARE_PROVIDER=aws
+  - rspec
