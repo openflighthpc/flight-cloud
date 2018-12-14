@@ -84,8 +84,8 @@ RSpec.describe Cloudware::Models::Deployment do
           expect { subject.deploy }.not_to raise_error
         end
 
-        it 'saves it self to the context' do
-          subject.deploy
+        it 'saves to the context' do
+          begin subject.deploy; rescue RuntimeError; end
           expect(context.deployments).to include(subject)
         end
 
@@ -109,6 +109,11 @@ RSpec.describe Cloudware::Models::Deployment do
           expect do
             subject.deploy
           end.to raise_error(Cloudware::ModelValidationError)
+        end
+
+        it 'does not save to the context' do
+          begin subject.deploy; rescue RuntimeError; end
+          expect(context.deployments).not_to include(subject)
         end
       end
     end
