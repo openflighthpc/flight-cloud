@@ -62,4 +62,3 @@ require 'config'
 require 'cli'
 require 'logger'
 require 'data'
-

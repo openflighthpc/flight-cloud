@@ -13,7 +13,7 @@ module Cloudware
     class Deployment < Application
       include Concerns::ProviderClient
 
-      SAVE_ATTR = [:template_path, :name, :results, :replacements]
+      SAVE_ATTR = [:template_path, :name, :results, :replacements].freeze
       attr_accessor(*SAVE_ATTR, :context)
 
       define_model_callbacks :deploy
