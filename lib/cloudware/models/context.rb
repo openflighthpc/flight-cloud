@@ -27,6 +27,10 @@ module Cloudware
         end
       end
 
+      def machines
+        Machine.build_from_context(self)
+      end
+
       def results
         deployments.map(&:results)
                    .each_with_object({}) do |results, memo|
