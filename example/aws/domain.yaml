@@ -10,10 +10,10 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: 'mycluster'
+          Value: '%deployment_name%'
         -
           Key: 'alcescluster'
-          Value: mycluster
+          Value: %deployment_name%
 
   myclusterInternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -22,10 +22,10 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: 'mycluster'
+          Value: '%deployment_name%'
         -
           Key: 'alcescluster'
-          Value: mycluster
+          Value: %deployment_name%
   
   myclusterInternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -41,10 +41,10 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: 'mycluster'
+          Value: '%deployment_name%'
         -
           Key: 'alcescluster'
-          Value: mycluster
+          Value: %deployment_name%
 
   myclusternetwork1Subnet:
     Type: AWS::EC2::Subnet
@@ -57,10 +57,10 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: 'mycluster'
+          Value: '%deployment_name%'
         -
           Key: 'alcescluster'
-          Value: mycluster
+          Value: %deployment_name%
 
   network1SubnetRouteTableAssocation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -80,7 +80,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: mycluster
-      GroupDescription: 'Primary SG for mycluster'
+      GroupDescription: 'Primary SG for %deployment_name%'
       VpcId: !Ref myclusterNetwork
       SecurityGroupIngress:
         -
@@ -105,10 +105,10 @@ Resources:
       Tags:
         -
           Key: 'Name'
-          Value: 'mycluster'
+          Value: '%deployment_name%'
         -
           Key: 'alcescluster'
-          Value: mycluster
+          Value: %deployment_name%
 
 Outputs:
   networkID:
