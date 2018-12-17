@@ -7,6 +7,9 @@ module Cloudware
         include Concerns::MarkdownTemplate
 
         TEMPLATE = <<-TEMPLATE
+<% if deployments.empty? -%>
+No deployments found
+<% end -%>
 <% deployments.each do |deployment| -%>
 # Deployment: '<%= deployment.name %>'
 *Template*: <%= deployment.template_path %>
