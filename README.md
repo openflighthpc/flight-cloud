@@ -104,14 +104,21 @@ provider:
 
 ## Installation
 
-### Available platforms
+Cloudware requires a recent version of `ruby` (2.5.1+) and `bundler`. The
+following will install from source using `git`:
 
-* Enterprise Linux 7 distributions: RHEL, CentOS, Scientific Linux (`el7`)
+```
+cd /opt
+git clone https://github.com/alces-software/cloudware.git
+cd cloudware
+bundle install
 
-One-line installation, on compatible platforms:
+```
 
-```bash
-curl -sL https://git.io/vbsTg | alces_OS=el7 /bin/bash
+Then add the binaries onto the `PATH` using your `.bashrc` file or appropriate
+other location:
+```
+export PATH=$PATH:/opt/cloudware/bin
 ```
 
 ## License
