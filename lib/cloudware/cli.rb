@@ -98,19 +98,6 @@ module Cloudware
       action(c, Commands::Destroy)
     end
 
-    command 'info' do |c|
-      cli_syntax(c)
-      c.description = 'Information related subcommands'
-      c.sub_command_group = true
-    end
-
-    command 'info machine' do |c|
-      cli_syntax(c, 'NAME')
-      c.description = 'Display the tag information about a machine'
-      c.hidden = true
-      action(c, Commands::Infos::Machine)
-    end
-
     command 'list' do |c|
       cli_syntax(c)
       c.description = 'List related subcommands'
