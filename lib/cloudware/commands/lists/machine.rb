@@ -4,12 +4,9 @@ module Cloudware
   module Commands
     module Lists
       class Machine < Command
-        include Concerns::ModelList
+        include Pager
 
-        private
-
-        def deployment_method
-          :machines
+        def run
         end
       end
     end
