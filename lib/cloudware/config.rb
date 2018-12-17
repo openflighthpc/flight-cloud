@@ -31,7 +31,7 @@ Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
 module Cloudware
   class Config
-    PATH = File.expand_path('~/.flightconnector.yml')
+    PATH = File.join(Cloudware.root_dir, 'etc/config.yml')
 
     class << self
       def cache
@@ -63,15 +63,11 @@ module Cloudware
       @provider = ENV['CLOUDWARE_PROVIDER']
       @default_region = config['provider'][provider]['default_region']
 
-      @content_path = '/var/lib/cloudware'
+      @content_path = File.join(Cloudware.root_dir, 'var')
     end
 
     def log
       Cloudware.log
-    end
-
-    def base_dir
-      File.expand_path(File.join(__dir__, '../..'))
     end
 
     private

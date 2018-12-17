@@ -6,11 +6,11 @@ require 'parse_param'
 module Cloudware
   module Commands
     class Deploy < Command
-      attr_reader :name, :template
+      attr_reader :name, :template_path
 
       def run
-        @template = argv[0]
-        @name = argv[1]
+        @name = argv[0]
+        @template_path = argv[1]
         begin
           with_spinner('Deploying resources...', done: 'Done') do
             deployment.deploy
@@ -23,7 +23,7 @@ module Cloudware
 
       def deployment
         Models::Deployment.new(
-          template_name: template,
+          template_path: template_path,
           name: name,
           context: context,
           replacements: replacement_mapping

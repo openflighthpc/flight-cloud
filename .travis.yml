@@ -5,8 +5,10 @@ rvm:
  - 2.4.1
 sudo: required
 install:
-  - cp ./.flightconnector.yml.example ~/.flightconnector.yml
-  - sed -i 's#/var/log#/tmp#g' ~/.flightconnector.yml
+  - cp ./etc/config.yml.example ./etc/config.yml
+  - sed -i 's#/var/log#/tmp#g' ./etc/config.yml
   - touch /tmp/flightconnector.log
   - bundle install
-script: rspec
+script:
+  - export CLOUDWARE_PROVIDER=aws
+  - rspec

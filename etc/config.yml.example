@@ -1,6 +1,6 @@
 # Please fill this file out with your aws and azure keys
 # The file then needs to be stored in your home directory as:
-# ~/.flightconnector.yml
+# etc/config.yml
 
 general:
   log_file: '/var/log/flightconnector.log'

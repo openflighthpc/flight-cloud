@@ -1,4 +1,6 @@
 *.swp
 .vagrant/
 tmp/
-.flightconnector.yml
+var/
+etc/config.yaml
+etc/config.yml

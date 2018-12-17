@@ -13,7 +13,7 @@ module Cloudware
     class Deployment < Application
       include Concerns::ProviderClient
 
-      SAVE_ATTR = [:template_name, :name, :results, :replacements]
+      SAVE_ATTR = [:template_path, :name, :results, :replacements].freeze
       attr_accessor(*SAVE_ATTR, :context)
 
       define_model_callbacks :deploy
@@ -34,7 +34,7 @@ module Cloudware
           if errors.blank?
             run_deploy
           else
-            msg = ERB.new(<<-TEMPLATE, nil, '-').result(binding)
+            msg = ERB.new(<<-TEMPLATE, nil, '-').result(binding).chomp
 Failed to deploy resources. The following errors have occurred:
 <% errors.messages.map do |key, messages| -%>
 <% messages.each do |message| -%>
@@ -72,17 +72,6 @@ TEMPLATE
 
       def tag
         "cloudware-deploy-#{name}"
-      end
-
-      def template_path
-        return template_name if Pathname.new(template_name).absolute?
-        ext = (provider == 'aws' ? '.yaml' : '.json')
-        File.join(
-          Config.content_path,
-          'templates',
-          provider,
-          "#{template_name}#{ext}"
-        )
       end
 
       def raw_template

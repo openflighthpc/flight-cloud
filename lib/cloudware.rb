@@ -39,12 +39,8 @@ require 'active_model'
 require 'active_model/errors'
 
 require 'colorize'
-require 'config'
-require 'logger'
 require 'memoist'
 require 'parallel'
-
-require 'data'
 
 module Cloudware
   class << self
@@ -56,10 +52,13 @@ module Cloudware
       @log ||= Logger.new(config.log_file)
     end
 
-    def render_file_path(path)
-      File.expand_path(File.join(__dir__, "../providers/#{path}"))
+    def root_dir
+      @root_dir ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))
     end
   end
 end
 
+require 'config'
 require 'cli'
+require 'logger'
+require 'data'

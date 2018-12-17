@@ -64,20 +64,14 @@ module Cloudware
     end
 
     command 'deploy' do |c|
-      cli_syntax(c, 'TEMPLATE NAME')
+      cli_syntax(c, 'NAME TEMPLATE_PATH')
       c.summary = 'Deploy new resource(s) from template'
       c.description = <<-DESC.strip_heredoc
-        Deploy new resource(s) from the specified TEMPLATE. The templates can
-        be stored within the template directories below. The file extension is
-        automatically inferred depending on the provider.
-          => #{Config.content_path}/templates/<provider>
+        Deploy new resource(s) from the specified TEMPLATE_PATH. This should
+        specifiy the absolute path (including extension) to the template.
 
-        Alternatively the absolute path (including extension) to the template
-        can be used.
-
-        The deployment will be given the NAME lable which will also dictate the
-        name given to the provider. There maybe minor variations depending on
-        the platform.
+        The deployment will be given the NAME lable and logged locally. The name
+        used by the provider will be based off this with minor variations.
 
         The templates also support basic rendering of parameters from the
         command line. This is intended to provide minor tweaks to the templates
