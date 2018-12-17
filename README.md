@@ -6,11 +6,29 @@
 </div>
 
 ## Contents
+* [Installation](#installation)
 * [Configuring Cloud Authentication](#configuring-cloud-authentication)
 * [Configuring Cloudware](#configuring-cloudware)
-* [Installation](#installation)
-* [Usage](#usage)
 * [License](#license)
+
+## Installation
+
+Cloudware requires a recent version of `ruby` (2.5.1+) and `bundler`. The
+following will install from source using `git`:
+
+```
+cd /opt
+git clone https://github.com/alces-software/cloudware.git
+cd cloudware
+bundle install
+
+```
+
+Then add the binaries onto the `PATH` using your `.bashrc` file or appropriate
+other location:
+```
+export PATH=$PATH:/opt/cloudware/bin
+```
 
 ## Configuring Cloud Authentication
 
@@ -100,25 +118,6 @@ provider:
     default_region: <insert aws region>
     access_key_id: '<insert your access key here>'
     secret_access_key: '<insert your secret key here>'
-```
-
-## Installation
-
-Cloudware requires a recent version of `ruby` (2.5.1+) and `bundler`. The
-following will install from source using `git`:
-
-```
-cd /opt
-git clone https://github.com/alces-software/cloudware.git
-cd cloudware
-bundle install
-
-```
-
-Then add the binaries onto the `PATH` using your `.bashrc` file or appropriate
-other location:
-```
-export PATH=$PATH:/opt/cloudware/bin
 ```
 
 ## License
