@@ -4,10 +4,17 @@ module Cloudware
   module Commands
     module Lists
       class Machine < Command
-        include Pager
+        include Concerns::MarkdownTemplate
 
-        def run
-        end
+        TEMPLATE = <<-TEMPLATE
+<% machines.each do |machine| -%>
+# Machine: '<%= machine.name %>'
+<% machine.tags.each do |key, value| -%>
+- *<%= key %>*: <%= value %>
+<% end -%>
+<% end -%>
+
+TEMPLATE
       end
     end
   end

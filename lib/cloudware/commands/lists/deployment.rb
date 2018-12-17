@@ -1,14 +1,10 @@
 # frozen_string_literal: true
 
-require 'pager'
-require 'tty-color'
-require 'tty-markdown'
-
 module Cloudware
   module Commands
     module Lists
       class Deployment < Command
-        include Pager
+        include Concerns::MarkdownTemplate
 
         TEMPLATE = <<-TEMPLATE
 <% deployments.each do |deployment| -%>
@@ -27,14 +23,6 @@ module Cloudware
 
 <% end -%>
 TEMPLATE
-
-        def run
-          pager_puts(TTY::Markdown.parse(rendered_markdown))
-        end
-
-        def rendered_markdown
-          context.render(TEMPLATE)
-        end
       end
     end
   end
