@@ -8,23 +8,22 @@ Mappings:
       "AMI": "ami-c5f11ea2"
 Resources:
 
-  gateway1network1Interface:
+  mynodenetwork1Interface:
     Type: AWS::EC2::NetworkInterface
     Properties:
       SourceDestCheck: false
       GroupSet:
         - %securitygroup%
-      PrivateIpAddress: 10.10.2.101
       SubnetId: %network1SubnetID% 
       Tags:
         -
           Key: 'Name'
-          Value: 'gateway1'
+          Value: '%deployment_name%'
         -
           Key: 'alcescluster'
-          Value: gateway1
+          Value: %deployment_name%
 
-  gateway1:
+  mynode:
     Type: AWS::EC2::Instance
     Properties:
       AvailabilityZone: !Select
@@ -36,42 +35,38 @@ Resources:
       KeyName: %keyname%
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref gateway1network1Interface
+          NetworkInterfaceId: !Ref mynodenetwork1Interface
           DeviceIndex: 0
-        -
-          NetworkInterfaceId: !Ref gateway1network2Interface
-          DeviceIndex: 1
-
       Tags:
         -
           Key: 'Name'
-          Value: 'gateway1'
+          Value: '%deployment_name%'
         -
           Key: 'alcescluster'
-          Value: gateway1
+          Value: %deployment_name%
       UserData:
         Fn::Base64:
           Fn::Join:
             - ''
             - - "#cloud-config\n"
-              - "hostname: gateway1\n"
-              - "fqdn: gateway1.pri.mycluster.cluster.local\n"
+              - "hostname: %deployment_name%\n"
+              - "fqdn: %deployment_name%.pri.mycluster.cluster.local\n"
 
-  gateway1publicIp:
+  mynodepublicIp:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
 
-  gateway1publicIpAssociation:
+  mynodepublicIpAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      NetworkInterfaceId: !Ref gateway1network1Interface
-      AllocationId: !GetAtt gateway1publicIp.AllocationId
+      NetworkInterfaceId: !Ref mynodenetwork1Interface
+      AllocationId: !GetAtt mynodepublicIp.AllocationId
 
 Outputs:
-  gateway1TAGID:
-    Description: gateway1TAGID
-    Value: !Ref gateway1
-  gateway1TAGIP:
-    Description: gateway1TAGIP
-    Value: !Ref gateway1publicIp
+  %deployment_name%TAGID:
+    Description: %deployment_name%TAGID
+    Value: !Ref mynode
+  %deployment_name%TAGIP:
+    Description: %deployment_name%TAGIP
+    Value: !Ref mynodepublicIp
