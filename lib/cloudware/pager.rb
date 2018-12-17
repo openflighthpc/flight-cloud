@@ -6,7 +6,7 @@ module Cloudware
   module Pager
     def pager_puts(text)
       if $stdout.isatty
-        TTY::Pager.new.page(text)
+        TTY::Pager.new(command: 'less -SR').page(text)
       else
         puts text
       end
