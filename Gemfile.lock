@@ -108,7 +108,6 @@ GEM
       ms_rest (~> 0.7.0)
     multi_json (1.12.2)
     multipart-post (2.0.0)
-    necromancer (0.4.0)
     os (0.9.6)
     parallel (1.12.1)
     parser (2.5.1.0)
@@ -168,8 +167,6 @@ GEM
     thread_safe (0.3.6)
     timeliness (0.3.8)
     tty-color (0.4.3)
-    tty-command (0.8.2)
-      pastel (~> 0.7.0)
     tty-cursor (0.6.0)
     tty-markdown (0.4.0)
       kramdown (~> 1.16.2)
@@ -178,20 +175,9 @@ GEM
       strings (~> 0.1.0)
       tty-color (~> 0.4.2)
       tty-screen (~> 0.6.4)
-    tty-pager (0.11.0)
-      strings (~> 0.1.0)
-      tty-screen (~> 0.6.4)
-      tty-which (~> 0.3.0)
     tty-screen (0.6.5)
     tty-spinner (0.9.0)
       tty-cursor (~> 0.6.0)
-    tty-table (0.10.0)
-      equatable (~> 0.5.0)
-      necromancer (~> 0.4.0)
-      pastel (~> 0.7.2)
-      strings (~> 0.1.0)
-      tty-screen (~> 0.6.4)
-    tty-which (0.3.0)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
     uber (0.1.0)
@@ -229,12 +215,8 @@ DEPENDENCIES
   rspec-wait
   rubocop (~> 0.52.1)
   rubocop-rspec
-  tty-color
-  tty-command
   tty-markdown
-  tty-pager
   tty-spinner
-  tty-table
   whirly
 
 BUNDLED WITH
