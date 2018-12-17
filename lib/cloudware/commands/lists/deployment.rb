@@ -9,6 +9,25 @@ module Cloudware
       class Deployment < Command
         include Concerns::Table
 
+        TEMPLATE = <<-TEMPLATE
+<% deployments.each do |deployment| -%>
+# Deployment: <%= deployment.name %>
+template: <%= deployment.template_path %>
+
+## Results
+<% deployment.results.each do |key, value| -%>
+<%= key %>: <%= value %>
+<% end -%>
+
+## Replacements
+<% Replacements -%>
+<% deployment.replacements.each do |key, value| %>
+<%= key %>: <%= value %>
+<% end -%>
+
+<% end -%>
+TEMPLATE
+
         def run
           context.deployments.each do |deployment|
             table << generate_row(deployment)
