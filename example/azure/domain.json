@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "myclusternetwork",
+      "apiVersion": "2017-03-01",
+      "tags": {
+        "Name": "mycluster",
+        "alcescluster": "mycluster"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.10.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "myclusternetwork1",
+            "properties": {
+              "addressPrefix": "10.10.0.0/19"
+            }
+          }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "myclustersecuritygroup",
+      "apiVersion": "2017-03-01",
+      "tags": {
+        "Name": "mycluster",
+        "alcescluster": "mycluster"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [{
+           "name": "inbound-ssh",
+             "properties": {
+             "protocol": "TCP",
+             "sourcePortRange": "*",
+             "destinationPortRange": "22",
+             "sourceAddressPrefix": "*",
+             "destinationAddressPrefix": "*",
+             "access": "Allow",
+             "priority": 1000,
+             "direction": "Inbound"
+           }
+         }]
+       }
+    }
+  ],
+  "outputs": {
+    "networkID": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks', 'myclusternetwork')]"
+    },
+    "securitygroup": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/networkSecurityGroups', 'myclustersecuritygroup')]"
+    },
+    "network1SubnetID": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'myclusternetwork', 'myclusternetwork1')]"
+    }
+  }
+}    
