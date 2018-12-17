@@ -4,38 +4,37 @@
   "resources": [
     {
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "myclustergateway1pubIP",
+      "name": "myclustermynodepubIP",
       "apiVersion": "2017-03-01",
       "tags": {
-        "Name": "mycluster",
-        "alcescluster": "mycluster"
+        "Name": "%deployment_name%",
+        "alcescluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
         "publicIPAllocationMethod": "Static",
         "idleTimeoutInMinutes": 30,
         "dnsSettings": {
-          "domainNameLabel": "mycluster-gateway1"
+          "domainNameLabel": "%deployment_name%"
         }
       }
     },
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "myclustergateway1network1interface",
+      "name": "myclustermynodenetwork1interface",
       "apiVersion": "2017-03-01",
       "tags": {
-        "Name": "mycluster",
-        "alcescluster": "mycluster"
+        "Name": "%deployment_name%",
+        "alcescluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
         "ipConfigurations": [{
-          "name": "myclustergateway1network1ip",
+          "name": "myclustermynodenetwork1ip",
           "properties": {
-            "privateIPAllocationMethod": "Static",
-            "privateIPAddress": "10.10.2.101",
+            "privateIPAllocationMethod": "Dynamic",
             "publicIPAddress": {
-              "id": "[resourceId('Microsoft.Network/publicIpAddresses', 'myclustergateway1pubIP')]"
+              "id": "[resourceId('Microsoft.Network/publicIpAddresses', 'myclustermynodepubIP')]"
             },
             "subnet": {
               "id": "%network1SubnetID%"
@@ -47,16 +46,16 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIpAddresses', 'myclustergateway1pubIP')]"
+        "[resourceId('Microsoft.Network/publicIpAddresses', 'myclustermynodepubIP')]"
       ]
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "myclustergateway1",
+      "name": "myclustermynode",
       "apiVersion": "2016-04-30-preview",
       "tags": {
-        "Name": "mycluster",
-        "alcescluster": "mycluster"
+        "Name": "%deployment_name%",
+        "alcescluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
@@ -78,7 +77,7 @@
 	  }
 	},
 	"osProfile": {
-          "computerName": "gateway1.pri.mycluster.cluster.local",
+          "computerName": "mynode.pri.mycluster.cluster.local",
           "adminUsername": "alces",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
@@ -93,7 +92,7 @@
         "networkProfile": {
           "networkInterfaces": [
           {
-	    "id": "[resourceId('Microsoft.Network/networkInterfaces', 'myclustergateway1network1interface')]",
+	    "id": "[resourceId('Microsoft.Network/networkInterfaces', 'myclustermynodenetwork1interface')]",
 	    "properties": {
 	      "primary": true
 	    }
@@ -102,18 +101,18 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', 'myclustergateway1network1interface')]"
+        "[resourceId('Microsoft.Network/networkInterfaces', 'myclustermynodenetwork1interface')]"
       ]  
     }
   ],
   "outputs": {
-    "gateway1TAGID": {
+    "%deployment_name%TAGID": {
       "type": "string",
-      "value": "[resourceId('Microsoft.Compute/virtualMachines/', 'myclustergateway1')]"
+      "value": "[resourceId('Microsoft.Compute/virtualMachines/', 'myclustermynode')]"
     },
-    "gateway1TAGIP": {
+    "%deployment_name%TAGIP": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', 'myclustergateway1pubIP')).ipAddress]"
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', 'myclustermynodepubIP')).ipAddress]"
     }
   }
 }    

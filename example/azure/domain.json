@@ -7,8 +7,8 @@
       "name": "myclusternetwork",
       "apiVersion": "2017-03-01",
       "tags": {
-        "Name": "mycluster",
-        "alcescluster": "mycluster"
+        "Name": "%deployment_name%",
+        "alcescluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
@@ -24,7 +24,6 @@
               "addressPrefix": "10.10.0.0/19"
             }
           }
-          }
         ]
       }
     },
@@ -33,8 +32,8 @@
       "name": "myclustersecuritygroup",
       "apiVersion": "2017-03-01",
       "tags": {
-        "Name": "mycluster",
-        "alcescluster": "mycluster"
+        "Name": "%deployment_name%",
+        "alcescluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
