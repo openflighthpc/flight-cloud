@@ -6,17 +6,17 @@ module Cloudware
       class Machine < Command
         include Concerns::MarkdownTemplate
 
-        TEMPLATE = <<-TEMPLATE
-<% if machines.empty? -%>
-No machines found
-<% end -%>
-<% machines.each do |machine| -%>
-# Machine: '<%= machine.name %>'
-<% machine.tags.each do |key, value| -%>
-- *<%= key %>*: <%= value %>
-<% end -%>
+        TEMPLATE = <<~TEMPLATE
+  <% if machines.empty? -%>
+  No machines found
+  <% end -%>
+  <% machines.each do |machine| -%>
+  # Machine: '<%= machine.name %>'
+  <% machine.tags.each do |key, value| -%>
+  - *<%= key %>*: <%= value %>
+  <% end -%>
 
-<% end -%>
+  <% end -%>
 TEMPLATE
       end
     end

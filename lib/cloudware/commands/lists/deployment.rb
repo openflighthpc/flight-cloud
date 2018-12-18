@@ -6,25 +6,25 @@ module Cloudware
       class Deployment < Command
         include Concerns::MarkdownTemplate
 
-        TEMPLATE = <<-TEMPLATE
-<% if deployments.empty? -%>
-No deployments found
-<% end -%>
-<% deployments.each do |deployment| -%>
-# Deployment: '<%= deployment.name %>'
-*Template*: <%= deployment.template_path %>
+        TEMPLATE = <<~TEMPLATE
+  <% if deployments.empty? -%>
+  No deployments found
+  <% end -%>
+  <% deployments.each do |deployment| -%>
+  # Deployment: '<%= deployment.name %>'
+  *Template*: <%= deployment.template_path %>
 
-## Results
-<% deployment.results.each do |key, value| -%>
-- *<%= key %>*: <%= value %>
-<% end -%>
+  ## Results
+  <% deployment.results.each do |key, value| -%>
+  - *<%= key %>*: <%= value %>
+  <% end -%>
 
-## Replacements
-<% deployment.replacements.each do |key, value| -%>
-- *<%= key %>*: <%= value %>
-<% end -%>
+  ## Replacements
+  <% deployment.replacements.each do |key, value| -%>
+  - *<%= key %>*: <%= value %>
+  <% end -%>
 
-<% end -%>
+  <% end -%>
 TEMPLATE
       end
     end
