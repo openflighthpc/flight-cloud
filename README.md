@@ -145,7 +145,7 @@ reference templates.
 A basic domain can be launch by running:
 
 ```
-bin/cloud-aws deploy my-domain-name /opt/cloudware/examples/aws/domain.yaml
+bin/cloud-aws deploy my-domain /opt/cloudware/examples/aws/domain.yaml
 ```
 
 This will send the template to AWS and wait for domain to be created. It is
@@ -170,28 +170,28 @@ the template and are substituted in place.
 
 ```
 bin/cloud-aws deploy node01 /opt/cloudware/examples/aws/node.yaml \
-  --params 'keyname=my-aws-key-name securitygroup=*my-domain-name network1SubnetID=*my-domain-name'
+  --params 'keyname=my-aws-key securitygroup=*my-domain network1SubnetID=*my-domain'
 ```
 
 ##### Parameter Passing Dynamics
 `cloudware` supports to forms of parameter substitutions: **String Literals** and
 **Deployment Results**.
 
-**String Literals**: `keyname=my-aws-key-name`
+**String Literals**: `keyname=my-aws-key`
 Parameters are substituted as literal strings by default. In the above example,
 all occurrences of `%keyname%` in the template will be replaced with
-`my-aws-key-name`.
+`my-aws-key`.
 
-**Deployment Results**: `securitygroup=*my-domain-name`
+**Deployment Results**: `securitygroup=*my-domain`
 In some cases a deployment needs to reference a resource within a previous
 deployment. The is handled by returning the resource within the output of
 the previous deployment (see `domain.yaml` template outputs).
 
-By referencing the deployment using the asterisks (`*my-domain-name`), the
+By referencing the deployment using the asterisks (`*my-domain`), the
 domains `securitygroup` output is substituted into the template.
 
-**Deployment Results (Advanced)**: `securitygroup=*my-domain-name.securitygroup`
-The above command could have been ran with `*my-domain-name.securitygroup` with
+**Deployment Results (Advanced)**: `securitygroup=*my-domain.securitygroup`
+The above command could have been ran with `*my-domain.securitygroup` with
 the same results. This explicitly states the `securitygroup` output should be
 used.
 
@@ -206,6 +206,23 @@ However in order to provide a generalised mechanism, these native parameters
 are ignored. When adapting an existing template, consider replacing the default
 parameter with a `%key%` tag. This way cloudware can set the default as a means
 of passing the parameter by proxy.
+
+#### Destroying a Deployment
+
+Deployments are considered indivisible within `cloudware` and must be destroyed
+as an atomic whole. It is not possible to destroy a single resource within a
+`deployment`. If a particular resources needs to be created and destroyed
+regularly, then consider making it a standalone `deployment`.
+
+The previously created domain could be destroy by running the following:
+
+```
+bin/cloud destroy my-domain
+```
+
+*NOTE*: There are not checks for dependent resource in other deployments. In
+these cases, the other deployment records will not be deleted. However the
+provider may silently alter the resources.
 
 ## License
 
