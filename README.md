@@ -224,6 +224,26 @@ bin/cloud destroy my-domain
 these cases, the other deployment records will not be deleted. However the
 provider may silently alter the resources.
 
+#### Listing Machines
+
+`cloudware` does not track individual resources it creates. This allows for
+greater flexibility in the templates it can handle. Instead it only records
+the outputs from the templates it deploys.
+
+In order to manage machines, the deployment can return the following tags:
+- <machine-name>TAGID: The provider unique machine ID (*REQUIRED*)
+- <machine-name>TAGgroups: A comma separated list of groups the machine
+  belongs to (optional)
+- <machine-name>TAG<other-key>: Any other keys that are associated with
+  the machine (optional)
+
+The following returns the list of machines `cloudware` can manage. It returns
+the above tags associated with each machine.
+
+```
+bin/cloud-aws list machines
+```
+
 ## License
 
 AGPLv3+ License, see LICENSE.txt for details.
