@@ -9,6 +9,7 @@
 * [Installation](#installation)
 * [Configuring Cloudware](#configuring-cloudware)
 * [Configuring Cloud Authentication](#configuring-cloud-authentication)
+* [Usage](#usage)
 * [License](#license)
 
 ## Installation
@@ -120,6 +121,17 @@ Direct Link - https://portal.azure.com/#blade/Microsoft_Azure_Billing/Subscripti
 #### Notes
 
 Only Global Administrator can create apps if App Registrations under User settings in  Active Directory is set to no
+
+## Usage
+
+Once the appropriate credentials have been configured, `cloudware` it's time
+start interacting with the providers. There are separate application for each
+provider within the `bin` directory:
+1. AWS: `bin/cloud-aws`
+2. Azure: `bin/cloud-azure`
+
+This guide will focus on `aws` however the basic principles will also work on
+`azure`.
 
 ## License
 
