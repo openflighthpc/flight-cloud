@@ -133,6 +133,33 @@ provider within the `bin` directory:
 This guide will focus on `aws` however the basic principles will also work on
 `azure`.
 
+### Deploying Resources
+
+Cloud resources are created and destroyed using deployments. Each deployment
+is comprised of a `template` which sent to the provider and a `deployment_name`
+which is used as an identifier and label. Refer to the `examples/template` for
+reference templates.
+
+#### Deploying a Domain
+
+A basic domain can be launch by running:
+
+```
+bin/cloud-aws deploy my-domain-name /opt/cloudware/examples/aws/domain.yaml
+```
+
+This will send the template to AWS and wait for domain to be created. It is
+important to wait for the deployment to finish naturally. At the end of the
+deployment, the templates outputs will be saved. These outputs will be used
+to deploy machines within the domain.
+
+*NOTE*: `%deployment_name%` within the template
+Cloudware supports substitutions within the templates, which forms the basis
+of the parameter passing (see below). In addition to this, the built in
+`%deployment_name%` flag will be replaced with the name input from the command
+line. This way the deployment name does not need to be hard coded in the
+template.
+
 ## License
 
 AGPLv3+ License, see LICENSE.txt for details.
