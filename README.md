@@ -160,6 +160,53 @@ of the parameter passing (see below). In addition to this, the built in
 line. This way the deployment name does not need to be hard coded in the
 template.
 
+#### Deploying a Machine
+
+Deploying a machine within a domain needs to reference the existing resource
+created within the domain. To prevent having to hard code this within the
+templates, `cloudware` supports parameter passing. Cloudware parameters are
+denoted by `%my-tag%` keys within the templates. They can occur anywhere in
+the template and are substituted in place.
+
+```
+bin/cloud-aws deploy node01 /opt/cloudware/examples/aws/node.yaml \
+  --params 'keyname=my-aws-key-name securitygroup=*my-domain-name network1SubnetID=*my-domain-name'
+```
+
+##### Parameter Passing Dynamics
+`cloudware` supports to forms of parameter substitutions: **String Literals** and
+**Deployment Results**.
+
+**String Literals**: `keyname=my-aws-key-name`
+Parameters are substituted as literal strings by default. In the above example,
+all occurrences of `%keyname%` in the template will be replaced with
+`my-aws-key-name`.
+
+**Deployment Results**: `securitygroup=*my-domain-name`
+In some cases a deployment needs to reference a resource within a previous
+deployment. The is handled by returning the resource within the output of
+the previous deployment (see `domain.yaml` template outputs).
+
+By referencing the deployment using the asterisks (`*my-domain-name`), the
+domains `securitygroup` output is substituted into the template.
+
+**Deployment Results (Advanced)**: `securitygroup=*my-domain-name.securitygroup`
+The above command could have been ran with `*my-domain-name.securitygroup` with
+the same results. This explicitly states the `securitygroup` output should be
+used.
+
+If a however a different domain was used which returned the key as
+`othersecuritygroup`, it is still possible to use the same template. In this
+case, the key can be translated by:
+`securitygroup=*my-other-domain.othersecuritygroup`
+
+##### Native Provider Parameters
+Both `aws` and `azure` natively support parameters within the templates.
+However in order to provide a generalised mechanism, these native parameters
+are ignored. When adapting an existing template, consider replacing the default
+parameter with a `%key%` tag. This way cloudware can set the default as a means
+of passing the parameter by proxy.
+
 ## License
 
 AGPLv3+ License, see LICENSE.txt for details.
