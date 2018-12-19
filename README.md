@@ -243,10 +243,10 @@ greater flexibility in the templates it can handle. Instead it only records
 the outputs from the templates it deploys.
 
 In order to manage machines, the deployment can return the following tags:
-- <machine-name>TAGID: The provider unique machine ID (*REQUIRED*)
-- <machine-name>TAGgroups: A comma separated list of groups the machine
+- \<machine-name\>TAGID: The provider unique machine ID (*REQUIRED*)
+- \<machine-name\>TAGgroups: A comma separated list of groups the machine
   belongs to (optional)
-- <machine-name>TAG<other-key>: Any other keys that are associated with
+- \<machine-name\>TAG<other-key>: Any other keys that are associated with
   the machine (optional)
 
 The following returns the list of machines `cloudware` can manage. It returns
@@ -274,7 +274,7 @@ bin/cloud-aws power off my-machine
 ```
 
 **NOTE:** `power state` polls the providers for the state of machine and returns
-raw results. The terminology will therefore vary between providers
+the raw result. The terminology will therefore vary between providers
 
 ### Power Management Over a Group
 
