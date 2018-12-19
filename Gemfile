@@ -18,7 +18,6 @@ gem 'parallel'
 gem 'require_all'
 gem 'tty-markdown'
 gem 'tty-spinner'
-gem 'whirly'
 
 group :development do
   gem 'factory_bot'

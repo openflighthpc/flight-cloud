@@ -23,11 +23,8 @@
 #==============================================================================
 require 'yaml'
 require 'ostruct'
-require 'whirly'
 
 require 'active_support/core_ext/module/delegation'
-
-Whirly.configure spinner: 'dots2', stop: '[OK]'.green
 
 module Cloudware
   class Config
