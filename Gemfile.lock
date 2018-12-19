@@ -1,0 +1,176 @@
+GIT
+  remote: https://github.com/alces-software/commander
+  revision: 4090e181cf280f228543e35ad21af219a6d2f626
+  specs:
+    commander (4.4.4.pre.alces2)
+      highline (~> 1.7.2)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (5.2.0)
+      activesupport (= 5.2.0)
+    activesupport (5.2.0)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 0.7, < 2)
+      minitest (~> 5.1)
+      tzinfo (~> 1.1)
+    ast (2.4.0)
+    aws-partitions (1.37.0)
+    aws-sdk-cloudformation (1.2.0)
+      aws-sdk-core (~> 3)
+      aws-sigv4 (~> 1.0)
+    aws-sdk-core (3.9.0)
+      aws-partitions (~> 1.0)
+      aws-sigv4 (~> 1.0)
+      jmespath (~> 1.0)
+    aws-sdk-ec2 (1.18.0)
+      aws-sdk-core (~> 3)
+      aws-sigv4 (~> 1.0)
+    aws-sigv4 (1.0.2)
+    azure_mgmt_compute (0.15.1)
+      ms_rest_azure (~> 0.9.0)
+    azure_mgmt_network (0.15.1)
+      ms_rest_azure (~> 0.9.0)
+    azure_mgmt_resources (0.15.1)
+      ms_rest_azure (~> 0.9.0)
+    byebug (10.0.2)
+    coderay (1.1.2)
+    colorize (0.8.1)
+    concurrent-ruby (1.0.5)
+    diff-lcs (1.3)
+    domain_name (0.5.20170404)
+      unf (>= 0.0.5, < 1.0.0)
+    equatable (0.5.0)
+    factory_bot (4.8.2)
+      activesupport (>= 3.0.0)
+    fakefs (0.18.0)
+    faraday (0.13.1)
+      multipart-post (>= 1.2, < 3)
+    faraday-cookie_jar (0.0.6)
+      faraday (>= 0.7.4)
+      http-cookie (~> 1.0.0)
+    highline (1.7.10)
+    http-cookie (1.0.3)
+      domain_name (~> 0.5)
+    i18n (1.0.1)
+      concurrent-ruby (~> 1.0)
+    ipaddr (1.2.0)
+    jmespath (1.3.1)
+    memoist (0.16.0)
+    method_source (0.9.0)
+    minitest (5.11.3)
+    ms_rest (0.7.2)
+      concurrent-ruby (~> 1.0)
+      faraday (~> 0.9)
+      timeliness (~> 0.3)
+    ms_rest_azure (0.9.0)
+      concurrent-ruby (~> 1.0)
+      faraday (~> 0.9)
+      faraday-cookie_jar (~> 0.0.6)
+      ms_rest (~> 0.7.0)
+    multipart-post (2.0.0)
+    necromancer (0.4.0)
+    parallel (1.12.1)
+    parser (2.5.1.0)
+      ast (~> 2.4.0)
+    pastel (0.7.2)
+      equatable (~> 0.5.0)
+      tty-color (~> 0.4.0)
+    powerpack (0.1.1)
+    pry (0.11.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
+    pry-byebug (3.6.0)
+      byebug (~> 10.0)
+      pry (~> 0.10)
+    rainbow (3.0.0)
+    require_all (2.0.0)
+    rspec (3.7.0)
+      rspec-core (~> 3.7.0)
+      rspec-expectations (~> 3.7.0)
+      rspec-mocks (~> 3.7.0)
+    rspec-core (3.7.0)
+      rspec-support (~> 3.7.0)
+    rspec-expectations (3.7.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.7.0)
+    rspec-mocks (3.7.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.7.0)
+    rspec-support (3.7.0)
+    rspec-wait (0.0.9)
+      rspec (>= 3, < 4)
+    rubocop (0.52.1)
+      parallel (~> 1.10)
+      parser (>= 2.4.0.2, < 3.0)
+      powerpack (~> 0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (~> 1.0, >= 1.0.1)
+    rubocop-rspec (1.23.0)
+      rubocop (>= 0.52.1)
+    ruby-progressbar (1.9.0)
+    strings (0.1.1)
+      unicode-display_width (~> 1.3.0)
+      unicode_utils (~> 1.4.0)
+    thread_safe (0.3.6)
+    timeliness (0.3.8)
+    tty-color (0.4.3)
+    tty-command (0.8.2)
+      pastel (~> 0.7.0)
+    tty-cursor (0.6.0)
+    tty-pager (0.11.0)
+      strings (~> 0.1.0)
+      tty-screen (~> 0.6.4)
+      tty-which (~> 0.3.0)
+    tty-screen (0.6.5)
+    tty-spinner (0.9.0)
+      tty-cursor (~> 0.6.0)
+    tty-table (0.10.0)
+      equatable (~> 0.5.0)
+      necromancer (~> 0.4.0)
+      pastel (~> 0.7.2)
+      strings (~> 0.1.0)
+      tty-screen (~> 0.6.4)
+    tty-which (0.3.0)
+    tzinfo (1.2.5)
+      thread_safe (~> 0.1)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.7.4)
+    unicode-display_width (1.3.0)
+    unicode_utils (1.4.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  activemodel
+  activesupport
+  aws-sdk-cloudformation
+  aws-sdk-ec2
+  azure_mgmt_compute
+  azure_mgmt_network
+  azure_mgmt_resources
+  colorize
+  commander!
+  factory_bot
+  fakefs
+  ipaddr
+  memoist
+  parallel
+  pry
+  pry-byebug
+  require_all
+  rspec
+  rspec-wait
+  rubocop (~> 0.52.1)
+  rubocop-rspec
+  tty-command
+  tty-pager
+  tty-spinner
+  tty-table
+
+BUNDLED WITH
+   1.16.2
