@@ -4,7 +4,7 @@
 require 'tty-spinner'
 
 module Cloudware
-  class Spinner < TTY::Spinner
+  class Spinner
     CHECK_SPIN = 10
     SPIN_DELAY = 0.1
 
