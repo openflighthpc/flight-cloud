@@ -19,7 +19,8 @@ module Cloudware
     def run!
       run
     rescue Exception => e
-      handle_fatal_error(e)
+      Cloudware.log.fatal(e.message)
+      raise e
     end
 
     def run
@@ -34,11 +35,6 @@ module Cloudware
     private
 
     attr_reader :argv, :options
-
-    def handle_fatal_error(e)
-      Cloudware.log.fatal(e.message)
-      raise e
-    end
 
     def run_whirly(status)
       update_status = proc { |s| Whirly.status = s.bold }
