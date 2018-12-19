@@ -8,10 +8,10 @@ module Cloudware
 
         def run
           @identifier = argv[0]
-          machines.each { |m| run_power(m) }
+          machines.each { |m| run_power_command(m) }
         end
 
-        def run_power(_machine)
+        def run_power_command(machine)
           raise NotImplementedError
         end
 

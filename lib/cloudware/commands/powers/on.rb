@@ -4,7 +4,7 @@ module Cloudware
   module Commands
     module Powers
       class On < Power
-        def run_power(machine)
+        def run_power_command(machine)
           puts "Turning #{machine.name} on"
           machine.on
         end
