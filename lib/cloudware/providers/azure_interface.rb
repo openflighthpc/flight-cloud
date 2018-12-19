@@ -30,7 +30,7 @@ require 'providers/base'
 
 module Cloudware
   module Providers
-    module AZURE
+    module AzureInterface
       class Credentials < Base::Credentials
         def self.build
           {

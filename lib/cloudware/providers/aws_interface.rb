@@ -30,7 +30,7 @@ require 'providers/base'
 
 module Cloudware
   module Providers
-    module AWS
+    module AWSInterface
       class Credentials < Base::Credentials
         def self.build
           Aws::Credentials.new(config.access_key_id, config.secret_access_key)
