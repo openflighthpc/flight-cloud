@@ -210,6 +210,15 @@ are ignored. When adapting an existing template, consider replacing the default
 parameter with a `%key%` tag. This way cloudware can set the default as a means
 of passing the parameter by proxy.
 
+## Listing Deployments
+
+The following command will list the deployments including their results. This
+can be helpful when referencing deployments outputs as parameters.
+
+```
+bin/cloud-aws list deployments
+```
+
 ## Destroying a Deployment
 
 Deployments are considered indivisible within `cloudware` and must be destroyed
