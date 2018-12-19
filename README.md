@@ -178,11 +178,13 @@ bin/cloud-aws deploy node01 /opt/cloudware/examples/aws/node.yaml \
 **Deployment Results**.
 
 *String Literals*: `keyname=my-aws-key`
+
 Parameters are substituted as literal strings by default. In the above example,
 all occurrences of `%keyname%` in the template will be replaced with
 `my-aws-key`.
 
 *Deployment Results*: `securitygroup=*my-domain`
+
 In some cases a deployment needs to reference a resource within a previous
 deployment. The is handled by returning the resource within the output of
 the previous deployment (see `domain.yaml` template outputs).
@@ -191,6 +193,7 @@ By referencing the deployment using the asterisks (`*my-domain`), the
 domains `securitygroup` output is substituted into the template.
 
 *Deployment Results (Advanced)*: `securitygroup=*my-domain.securitygroup`
+
 The above command could have been ran with `*my-domain.securitygroup` with
 the same results. This explicitly states the `securitygroup` output should be
 used.
