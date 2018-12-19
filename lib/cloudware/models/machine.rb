@@ -2,7 +2,6 @@
 
 require 'models/application'
 require 'models/concerns/provider_client'
-require 'providers/AWS'
 
 module Cloudware
   module Models
