@@ -153,7 +153,7 @@ important to wait for the deployment to finish naturally. At the end of the
 deployment, the templates outputs will be saved. These outputs will be used
 to deploy machines within the domain.
 
-*NOTE*: `%deployment_name%` within the template
+**NOTE**: `%deployment_name%` within the template
 Cloudware supports substitutions within the templates, which forms the basis
 of the parameter passing (see below). In addition to this, the built in
 `%deployment_name%` flag will be replaced with the name input from the command
@@ -232,7 +232,7 @@ The previously created domain could be destroy by running the following:
 bin/cloud destroy my-domain
 ```
 
-*NOTE*: There are not checks for dependent resource in other deployments. In
+**NOTE:** There are not checks for dependent resource in other deployments. In
 these cases, the other deployment records will not be deleted. However the
 provider may silently alter the resources.
 
