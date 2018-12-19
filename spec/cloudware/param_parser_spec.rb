@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'parse_param'
+require 'param_parser'
 
 RSpec.describe Cloudware::ParamParser do
   shared_context 'parse-param-deployment' do

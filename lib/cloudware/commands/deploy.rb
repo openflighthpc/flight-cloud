@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'models/deployment'
-require 'parse_param'
+require 'param_parser'
 
 module Cloudware
   module Commands
