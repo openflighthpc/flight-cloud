@@ -42,7 +42,7 @@ module Cloudware
     attr_reader :provider, :default_region, :content_path
 
     def initialize
-      config = YAML.load_file(config_path)
+      config = YAML.load_file(PATH)
 
       self.log_file = config['general']['log_file'] || log.error('Unable to load log_file')
 
@@ -65,12 +65,6 @@ module Cloudware
 
     def log
       Cloudware.log
-    end
-
-    private
-
-    def config_path
-      PATH
     end
   end
 end
