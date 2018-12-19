@@ -15,7 +15,8 @@ module Cloudware
           with_spinner('Deploying resources...', done: 'Done') do
             deployment.deploy
           end
-        ensure context.save
+        ensure
+          context.save
         end
       end
 
