@@ -41,7 +41,7 @@ module Cloudware
           }
         end
 
-        private
+        private_class_method
 
         def self.config
           Config.azure
