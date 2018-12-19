@@ -22,7 +22,7 @@ module Cloudware
         context.find_deployment(name).tap do |deployment|
           if deployment.nil?
             raise InvalidInput, <<~ERROR.chomp
-  Could not find deployment '#{name}'
+              Could not find deployment '#{name}'
             ERROR
           end
         end

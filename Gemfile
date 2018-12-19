@@ -16,6 +16,7 @@ gem 'parallel'
 gem 'require_all'
 gem 'tty-markdown'
 gem 'tty-spinner'
+gem 'tty-table'
 
 group :development do
   gem 'factory_bot'
