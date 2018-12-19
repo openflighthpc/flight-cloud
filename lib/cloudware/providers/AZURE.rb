@@ -50,6 +50,7 @@ module Cloudware
 
       class Machine < Base::Machine
         STATE_REGEX = /PowerState\//
+        MGMT_CLASS = Azure::Resources::Profiles::Latest::Mgmt
 
         def status
           compute_client.virtual_machines
@@ -84,8 +85,7 @@ module Cloudware
         end
 
         def compute_client
-          klass = Azure::Compute::Profiles::Latest::Mgmt::Client
-          klass.new(credentials)
+          MGMT_CLASS::Client.new(credentials)
         end
       end
 
@@ -124,14 +124,13 @@ module Cloudware
             d.properties = resource_client.model_classes.deployment_properties
                                           .new.tap do |p|
               p.template = JSON.parse(template)
-              p.mode = Azure::Resources::Profiles::Latest::Mgmt::Models::DeploymentMode::Complete
+              p.mode = MGMT_CLASS::Models::DeploymentMode::Complete
             end
           end
         end
 
         def resource_client
-          klass = Azure::Resources::Profiles::Latest::Mgmt::Client
-          klass.new(credentials)
+          MGMT_CLASS::Client.new(credentials)
         end
         memoize :resource_client
       end
