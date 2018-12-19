@@ -19,9 +19,14 @@ module Cloudware
       private
 
       def deployment
-        Models::Deployment.new(name: name, context: context)
+        context.find_deployment(name).tap do |deployment|
+          if deployment.nil?
+            raise InvalidInput, <<~ERROR.chomp
+  Could not find deployment '#{name}'
+            ERROR
+          end
+        end
       end
-      memoize :deployment
     end
   end
 end
