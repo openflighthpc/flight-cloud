@@ -1,6 +1,5 @@
 
 require 'tty-spinner'
-require 'tty-command'
 
 module Cloudware
   class Spinner < TTY::Spinner
@@ -9,7 +8,6 @@ module Cloudware
 
     def initialize(message, **k)
       @tty_spinner = TTY::Spinner.new(message, **k)
-      @tty_cmd = TTY::Command.new
     end
 
     def run(done_message = '', &block)
@@ -28,7 +26,7 @@ module Cloudware
 
     private
 
-    attr_reader :tty_spinner, :tty_cmd
+    attr_reader :tty_spinner
     attr_accessor :foreground
 
     def update_foreground_status

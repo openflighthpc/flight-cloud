@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'erb'
+require 'ostruct'
+
 module Cloudware
   module Models
     class Context < Application
@@ -22,6 +25,10 @@ module Cloudware
         input_deployments.each do |deployment|
           with_deployment(deployment)
         end
+      end
+
+      def machines
+        Machine.build_from_context(self)
       end
 
       def results
@@ -53,6 +60,10 @@ module Cloudware
 
       def find_deployment(name)
         deployments.find { |d| d.name == name }
+      end
+
+      def render(template)
+        ERB.new(template, nil, '-').result(binding)
       end
 
       private
