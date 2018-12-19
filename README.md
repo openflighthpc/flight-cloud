@@ -256,6 +256,38 @@ the above tags associated with each machine.
 bin/cloud-aws list machines
 ```
 
+## Power Management
+
+The purpose of returning the machine id tag (`<name>TAGID`) is to allow
+`cloudware` to manage their power state. The power commands take the machine
+name which is internally converted to the ID.
+
+```
+# Check the power state of a machine
+bin/cloud-aws power state my-machine
+
+# Turn a machine on
+bin/cloud-aws power on my-machine
+
+# Turn a machine off
+bin/cloud-aws power off my-machine
+```
+
+**NOTE:** `power state` polls the providers for the state of machine and returns
+raw results. The terminology will therefore vary between providers
+
+### Power Management Over a Group
+
+In addition to powering machines individual, it is possible to run the commands
+over a group. All the `power` commands support groups using the `--group/-g`
+option. Machines can be assigned to a group using the groups tag:
+`<name>TAGgroups`
+
+```
+bin/cloud-aws power status -g my-group
+```
+
+
 # License
 
 AGPLv3+ License, see LICENSE.txt for details.
