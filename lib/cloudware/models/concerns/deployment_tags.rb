@@ -50,6 +50,22 @@ module Cloudware
             end
           end
 
+          #
+          # Extracts the models name from a tag
+          #
+          # Valid tags are given in the format:
+          # <name>TAG<tag>
+          #
+          # The regex matches the '<name>' component of the above tag if the
+          # syntax is correct, otherwise it returns nil.
+          #
+          # It therefore can also be used to filter out arbitrary tags from
+          # model tags
+          #
+          # Examples:
+          #   name_from_tag('node01TAGsome-key') => 'node01'
+          #   name_from_tag('some-other-string') =>  nil
+          #
           def name_from_tag(tag)
             regex = /\A.*(?=#{flag}.*\Z)/
             regex.match(tag.to_s)&.to_a&.first
@@ -73,6 +89,21 @@ module Cloudware
           self.class.tag_generator(name, tag)
         end
 
+        #
+        # Extract the tag component from the key
+        #
+        # Valid tags are given in the format:
+        # <name>TAG<tag>
+        #
+        # The regex matches the `<tag>` component of the above tag if the
+        # syntax matches with the correct name. Otherwise it returns `nil`
+        #
+        # Examples:
+        #
+        #   extract_tag('mynodeTAGkey')        => 'key'
+        #   extract_tag('differentnodeTAGkey') =>  nil
+        #   extract_tag('random-string')       =>  nil
+        #
         def extract_tag(key)
           regex = /(?<=\A#{self.class.tag_generator(Regexp.escape(name), '')}).*/
           regex.match(key.to_s)&.to_a&.first&.to_sym
