@@ -35,6 +35,8 @@ require 'bundler'
 
 if ENV['CLOUDWARE_DEBUG']
   Bundler.setup(:default, :development)
+  require 'pry'
+  require 'pry-byebug'
 else
   Bundler.setup(:default)
 end

@@ -1,5 +1,10 @@
 
+ENV['CLOUDWARE_DEBUG'] = 'true'
 require_relative 'lib/cloudware.rb'
+
+task :console do
+  Pry::REPL.start({})
+end
 
 task :spin do
   include Cloudware::WithSpinner
