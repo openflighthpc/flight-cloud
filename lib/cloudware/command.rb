@@ -34,10 +34,6 @@ module Cloudware
     def initialize(argv, options)
       @argv = argv.freeze
       @options = OpenStruct.new(options.__hash__)
-      if options.debug
-        Bundler.setup(:default, :development)
-        require 'pry'
-      end
     end
 
     def run!

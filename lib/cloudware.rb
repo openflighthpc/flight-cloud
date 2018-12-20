@@ -32,7 +32,12 @@ Thread.report_on_exception = false
 
 require 'rubygems'
 require 'bundler'
-Bundler.setup(:default)
+
+if ENV['CLOUDWARE_DEBUG']
+  Bundler.setup(:default, :development)
+else
+  Bundler.setup(:default)
+end
 
 # ActiveSupport modules
 require 'active_support/core_ext/string'
