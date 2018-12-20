@@ -24,10 +24,10 @@
 # ==============================================================================
 #
 
-require 'models/concerns/provider_client'
-require 'models/application'
-require 'models/machine'
-require 'models/context'
+require 'cloudware/models/concerns/provider_client'
+require 'cloudware/models/application'
+require 'cloudware/models/machine'
+require 'cloudware/models/context'
 require 'pathname'
 
 require 'erb'

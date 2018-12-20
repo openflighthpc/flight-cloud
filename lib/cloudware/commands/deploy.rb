@@ -24,8 +24,8 @@
 # ==============================================================================
 #
 
-require 'models/deployment'
-require 'param_parser'
+require 'cloudware/models/deployment'
+require 'cloudware/param_parser'
 
 module Cloudware
   module Commands

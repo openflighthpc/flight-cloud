@@ -24,8 +24,8 @@
 # ==============================================================================
 #
 
-require 'models/application'
-require 'models/concerns/provider_client'
+require 'cloudware/models/application'
+require 'cloudware/models/concerns/provider_client'
 
 module Cloudware
   module Models

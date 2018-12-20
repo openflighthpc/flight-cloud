@@ -25,8 +25,8 @@
 #
 
 require 'commander'
-require 'exceptions'
-require 'command'
+require 'cloudware/exceptions'
+require 'cloudware/command'
 
 require 'require_all'
 

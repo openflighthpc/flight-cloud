@@ -37,10 +37,10 @@ module Cloudware
 
         def provider_client
           if provider == 'aws'
-            require 'providers/aws_interface'
+            require 'cloudware/providers/aws_interface'
             mod = Providers::AWSInterface
           else
-            require 'providers/azure_interface'
+            require 'cloudware/providers/azure_interface'
             mod = Providers::AzureInterface
           end
           mod::Client.new(region)

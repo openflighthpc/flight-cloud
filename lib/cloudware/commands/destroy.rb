@@ -24,7 +24,7 @@
 # ==============================================================================
 #
 
-require 'models/deployment'
+require 'cloudware/models/deployment'
 
 module Cloudware
   module Commands

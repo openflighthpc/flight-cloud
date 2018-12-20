@@ -26,7 +26,7 @@
 
 require 'aws-sdk-cloudformation'
 require 'aws-sdk-ec2'
-require 'providers/base'
+require 'cloudware/providers/base'
 
 module Cloudware
   module Providers

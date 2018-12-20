@@ -25,7 +25,7 @@
 #
 
 lib_dir = File.dirname(__FILE__)
-$LOAD_PATH << File.join(lib_dir, 'cloudware')
+$LOAD_PATH << File.join(lib_dir)
 ENV['BUNDLE_GEMFILE'] ||= File.join(lib_dir, '..', 'Gemfile')
 
 Thread.report_on_exception = false
@@ -67,7 +67,7 @@ module Cloudware
   end
 end
 
-require 'config'
-require 'cli'
+require 'cloudware/config'
+require 'cloudware/cli'
 require 'logger'
-require 'data'
+require 'cloudware/data'

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'models/context'
+require 'cloudware/models/context'
 
 RSpec.describe Cloudware::Models::Context do
   subject do

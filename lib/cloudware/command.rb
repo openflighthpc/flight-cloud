@@ -24,7 +24,7 @@
 # ==============================================================================
 #
 
-require 'spinner'
+require 'cloudware/spinner'
 
 module Cloudware
   class Command

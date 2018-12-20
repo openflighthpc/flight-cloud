@@ -26,7 +26,7 @@
 
 require 'azure_mgmt_resources'
 require 'azure_mgmt_compute'
-require 'providers/base'
+require 'cloudware/providers/base'
 
 module Cloudware
   module Providers

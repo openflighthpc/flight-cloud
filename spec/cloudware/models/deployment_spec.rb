@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'providers/base'
+require 'cloudware/providers/base'
 
 RSpec.describe Cloudware::Models::Deployment do
   subject do
