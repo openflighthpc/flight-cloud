@@ -17,12 +17,12 @@ module Cloudware
 
           def build_from_context(context)
             (context.results || {})
-                    .keys
-                    .map { |k| self.name_from_tag(k) }
-                    .uniq
-                    .reject { |n| n.nil? }
-                    .map do |name|
-              self.new(name: name, context: context)
+              .keys
+              .map { |k| name_from_tag(k) }
+              .uniq
+              .reject(&:nil?)
+              .map do |name|
+              new(name: name, context: context)
             end
           end
 
@@ -55,7 +55,7 @@ module Cloudware
         end
 
         def fetch_result(short_tag, default: nil)
-          long_tag = self.tag_generator(short_tag)
+          long_tag = tag_generator(short_tag)
           result = (context.results || {})[long_tag]
           return result unless result.nil?
           return default unless default.nil?

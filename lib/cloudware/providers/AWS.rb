@@ -49,9 +49,8 @@ module Cloudware
                 .stacks
                 .first
                 .outputs
-                .reduce({}) do |memo, output|
+                .each_with_object({}) do |output, memo|
                   memo[output.output_key] = output.output_value
-                  memo
                 end
         end
 

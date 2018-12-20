@@ -34,13 +34,13 @@ module Cloudware
           if errors.blank?
             run_deploy
           else
-            msg = ERB.new(<<-TEMPLATE, nil, '-').result(binding).chomp
-Failed to deploy resources. The following errors have occurred:
-<% errors.messages.map do |key, messages| -%>
-<% messages.each do |message| -%>
-<%= key %>: <%= message %>
-<% end -%>
-<% end -%>
+            msg = ERB.new(<<~TEMPLATE, nil, '-').result(binding).chomp
+              Failed to deploy resources. The following errors have occurred:
+              <% errors.messages.map do |key, messages| -%>
+              <% messages.each do |message| -%>
+              <%= key %>: <%= message %>
+              <% end -%>
+              <% end -%>
 TEMPLATE
             raise ModelValidationError, msg
           end

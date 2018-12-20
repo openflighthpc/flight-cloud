@@ -13,7 +13,7 @@ module Cloudware
             subscription_id: config.subscription_id,
             tenant_id: config.tenant_id,
             client_id: config.client_id,
-            client_secret: config.client_secret
+            client_secret: config.client_secret,
           }
         end
 

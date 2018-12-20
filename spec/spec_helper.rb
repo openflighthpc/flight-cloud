@@ -8,7 +8,7 @@ require 'pry-byebug'
 require 'fakefs/spec_helpers'
 require 'factory_bot'
 
-SPEC_DIR = File.expand_path(File.dirname(__FILE__))
+SPEC_DIR = __dir__
 ENV['CLOUDWARE_PROVIDER'] = 'aws'
 
 RSpec.configure do |config|
@@ -19,7 +19,7 @@ RSpec.configure do |config|
   end
 
   # Clones in the default config file into the faked file system
-  config.before(:each) do
+  config.before do
     src = File.join(SPEC_DIR, 'fixtures/default-config.yaml')
     FileUtils.mkdir_p(File.dirname(Cloudware::Config::PATH))
     FakeFS::FileSystem.clone(src, Cloudware::Config::PATH)

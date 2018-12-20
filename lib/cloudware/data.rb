@@ -5,11 +5,11 @@ require 'fileutils'
 
 module Cloudware
   class Data
-    DEFAULT_VALUE = {}
+    DEFAULT_VALUE = {}.freeze
 
     class << self
       def load(file, default_value: DEFAULT_VALUE)
-        str = File.exists?(file) ? File.read(file) : ''
+        str = File.exist?(file) ? File.read(file) : ''
         load_string(str, default_value: default_value)
       end
 

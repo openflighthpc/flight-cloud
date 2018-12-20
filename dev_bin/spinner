@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require_relative '../lib/cloudware.rb'
 
@@ -8,4 +9,3 @@ result = with_spinner('Spinning') do
   'I am the results string'
 end
 puts result
-

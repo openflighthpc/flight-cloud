@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 require 'tty-spinner'
 
 module Cloudware
@@ -10,7 +12,7 @@ module Cloudware
       @tty_spinner = TTY::Spinner.new(message, **k)
     end
 
-    def run(done_message = '', &block)
+    def run(done_message = '')
       results = nil
       thr = Thread.new { results = yield }
       count = 0

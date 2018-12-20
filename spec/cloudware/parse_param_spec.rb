@@ -19,6 +19,7 @@ RSpec.describe Cloudware::ParamParser do
   end
 
   subject { described_class.new(context) }
+
   let(:context) { build(:context) }
   let(:key) { :my_key }
 

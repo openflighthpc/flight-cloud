@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 RSpec.describe Cloudware::Models::Machine do
+  subject { described_class.new(name: machine_name, context: context) }
+
   let(:machine_name) { 'test' }
   let(:context) do
     build(:context).tap { |c| c.deployments = [deployment] }
   end
-  subject { described_class.new(name: machine_name, context: context) }
 
   context 'with a blank deployment' do
     let(:deployment) { build(:deployment) }
@@ -34,7 +35,7 @@ RSpec.describe Cloudware::Models::Machine do
     let(:machine_name) { 'test-machine' }
     let(:deployment_results) do
       machine_tags.map do |key, value|
-        [Cloudware::Models::Machine.tag_generator(machine_name, key), value]
+        [described_class.tag_generator(machine_name, key), value]
       end.to_h.merge(random_other_key: 'value')
     end
     let(:deployment) { build(:deployment, results: deployment_results) }

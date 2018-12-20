@@ -21,8 +21,8 @@ gem 'tty-spinner'
 gem 'whirly'
 
 group :development do
-  gem 'fakefs'
   gem 'factory_bot'
+  gem 'fakefs'
   gem 'pry'
   gem 'pry-byebug'
   gem 'rspec'

@@ -11,7 +11,7 @@ module Cloudware
           machines.each { |m| run_power(m) }
         end
 
-        def run_power(machine)
+        def run_power(_machine)
           raise NotImplementedError
         end
 

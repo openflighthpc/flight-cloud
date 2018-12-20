@@ -12,4 +12,3 @@ module Cloudware
     end
   end
 end
-

@@ -3,14 +3,14 @@
 require 'providers/base'
 
 RSpec.describe Cloudware::Models::Deployment do
+  subject do
+    build(:deployment, replacements: replacements, context: context)
+  end
+
   let(:replacements) { nil }
   let(:context) { build(:context) }
   let(:double_client) do
     object_double(Cloudware::Providers::Base::Client.new('region'))
-  end
-
-  subject do
-    build(:deployment, replacements: replacements, context: context)
   end
 
   # Mock the provider_client
@@ -25,12 +25,12 @@ RSpec.describe Cloudware::Models::Deployment do
 
   context 'with a replacement hash' do
     let(:replacements) { { replace_key1: 'value1', replace_key2: 'value2' } }
-    let(:raw_template) {
+    let(:raw_template) do
       <<-TEMPLATE.strip_heredoc
         key1: '%replace_key1%'
         key2: '%replace_key2%'
       TEMPLATE
-    }
+    end
 
     before do
       allow(subject).to receive(:raw_template).and_return(raw_template)
