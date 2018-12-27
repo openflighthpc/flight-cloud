@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require 'rspec/wait'
+Bundler.setup(:default, :development)
 require File.join(File.dirname(__FILE__), '../lib/cloudware')
-Bundler.setup(:development)
 require 'pry'
 require 'pry-byebug'
 require 'fakefs/spec_helpers'
