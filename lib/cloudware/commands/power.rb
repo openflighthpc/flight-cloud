@@ -49,7 +49,6 @@ module Cloudware
             [Models::Machine.new(name: identifier, context: context)]
           end
         end
-        memoize :machines
       end
     end
   end
