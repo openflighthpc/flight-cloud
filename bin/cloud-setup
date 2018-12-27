@@ -1,5 +1,5 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
+# vi:syntax=ruby
 
 #
 # =============================================================================
@@ -35,10 +35,10 @@ require 'rubygems'
 require 'bundler'
 
 if ENV['CLOUDWARE_DEBUG']
-  Bundler.setup(:default, :development)
+  Bundler.setup(ENV['CLOUDWARE_PROVIDER'], :default, :development)
   require 'pry'
   require 'pry-byebug'
 else
-  Bundler.setup(:default)
+  Bundler.setup(ENV['CLOUDWARE_PROVIDER'], :default)
 end
 
