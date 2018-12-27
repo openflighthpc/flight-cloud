@@ -34,7 +34,7 @@ module Cloudware
 
       def run
         @name = argv[0]
-        @template_path = argv[1]
+        @template_path = File.expand_path(argv[1])
         begin
           with_spinner('Deploying resources...', done: 'Done') do
             deployment.deploy
