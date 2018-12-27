@@ -1,0 +1,72 @@
+---
+Description: 'Flight Domain Template'
+Mappings:
+  RegionMap:
+    eu-west-1:
+      "AMI": "ami-d266dfab"
+    eu-west-2:
+      "AMI": "ami-c5f11ea2"
+Resources:
+
+  mynodenetwork1Interface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SourceDestCheck: false
+      GroupSet:
+        - %securitygroup%
+      SubnetId: %network1SubnetID% 
+      Tags:
+        -
+          Key: 'Name'
+          Value: '%deployment_name%'
+        -
+          Key: 'alcescluster'
+          Value: %deployment_name%
+
+  mynode:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !FindInMap ["RegionMap", !Ref "AWS::Region", "AMI"]
+      InstanceType: t2.small
+      Monitoring: true
+      KeyName: %keyname%
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref mynodenetwork1Interface
+          DeviceIndex: 0
+      Tags:
+        -
+          Key: 'Name'
+          Value: '%deployment_name%'
+        -
+          Key: 'alcescluster'
+          Value: %deployment_name%
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - ''
+            - - "#cloud-config\n"
+              - "hostname: %deployment_name%\n"
+              - "fqdn: %deployment_name%.pri.mycluster.cluster.local\n"
+
+  mynodepublicIp:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  mynodepublicIpAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      NetworkInterfaceId: !Ref mynodenetwork1Interface
+      AllocationId: !GetAtt mynodepublicIp.AllocationId
+
+Outputs:
+  %deployment_name%TAGID:
+    Description: %deployment_name%TAGID
+    Value: !Ref mynode
+  %deployment_name%TAGIP:
+    Description: %deployment_name%TAGIP
+    Value: !Ref mynodepublicIp
