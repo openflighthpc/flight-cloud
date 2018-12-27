@@ -3,6 +3,30 @@
 require 'cloudware/providers/base'
 
 RSpec.describe Cloudware::Models::Deployment do
+  shared_examples 'deploy raises ModelValidationError' do
+    it 'raises ModelValidationError' do
+      expect do
+        subject.deploy
+      end.to raise_error(Cloudware::ModelValidationError)
+    end
+  end
+
+  shared_examples 'validation error deployment' do
+    include_examples 'deploy raises ModelValidationError'
+
+    it 'does not save to the context' do
+      begin subject.deploy; rescue RuntimeError; end
+      expect(context.deployments).not_to include(subject)
+    end
+  end
+
+  shared_examples 'savable deployment' do
+    it 'saves to the context' do
+      begin subject.deploy; rescue RuntimeError; end
+      expect(context.deployments).to include(subject)
+    end
+  end
+
   subject do
     build(:deployment, replacements: replacements, context: context)
   end
@@ -67,35 +91,17 @@ RSpec.describe Cloudware::Models::Deployment do
     end
   end
 
+  context 'without a template' do
+    describe '#deploy' do
+      include_examples 'deploy raises ModelValidationError'
+    end
+  end
+
   context 'with an existing template' do
     before do
       path = subject.send(:template_path)
       FileUtils.mkdir_p(File.dirname(path))
       File.write(path, template_content)
-    end
-
-    shared_examples 'deploy raises ModelValidationError' do
-      it 'raises ModelValidationError' do
-        expect do
-          subject.deploy
-        end.to raise_error(Cloudware::ModelValidationError)
-      end
-    end
-
-    shared_examples 'validation error deployment' do
-      include_examples 'deploy raises ModelValidationError'
-
-      it 'does not save to the context' do
-        begin subject.deploy; rescue RuntimeError; end
-        expect(context.deployments).not_to include(subject)
-      end
-    end
-
-    shared_examples 'savable deployment' do
-      it 'saves to the context' do
-        begin subject.deploy; rescue RuntimeError; end
-        expect(context.deployments).to include(subject)
-      end
     end
 
     describe '#deploy' do

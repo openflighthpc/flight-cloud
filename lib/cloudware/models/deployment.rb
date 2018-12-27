@@ -42,6 +42,7 @@ module Cloudware
 
       define_model_callbacks :deploy
 
+      before_deploy :validate_template_exists
       before_deploy :validate_replacement_tags
       before_deploy :validate_context
       before_deploy :validate_no_existing_deployment
@@ -102,7 +103,13 @@ TEMPLATE
         File.read(template_path)
       end
 
+      def validate_template_exists
+        return if File.exists?(template_path)
+        errors.add(:template, "No such template: #{template_path}")
+      end
+
       def validate_replacement_tags
+        return unless File.exists?(template_path)
         template.scan(/%[\w-]*%/).each do |match|
           errors.add(match, 'Was not replaced in the template')
         end
