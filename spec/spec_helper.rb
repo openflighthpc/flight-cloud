@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
-require 'rspec/wait'
+require 'rubygems'
+require 'bundler'
+
 Bundler.setup(:default, :development)
 require File.join(File.dirname(__FILE__), '../lib/cloudware')
+
+require 'rspec/wait'
+
 require 'pry'
 require 'pry-byebug'
 require 'fakefs/spec_helpers'
