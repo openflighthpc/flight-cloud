@@ -24,8 +24,6 @@
 # ==============================================================================
 #
 
-require 'English'
-
 module Cloudware
   module Models
     class Application
