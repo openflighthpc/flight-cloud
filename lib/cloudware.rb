@@ -24,23 +24,6 @@
 # ==============================================================================
 #
 
-lib_dir = File.dirname(__FILE__)
-$LOAD_PATH << File.join(lib_dir)
-ENV['BUNDLE_GEMFILE'] ||= File.join(lib_dir, '..', 'Gemfile')
-
-Thread.report_on_exception = false
-
-require 'rubygems'
-require 'bundler'
-
-if ENV['CLOUDWARE_DEBUG']
-  Bundler.setup(:default, :development)
-  require 'pry'
-  require 'pry-byebug'
-else
-  Bundler.setup(:default)
-end
-
 # ActiveSupport modules
 require 'active_support/core_ext/string'
 require 'active_support/core_ext/array'

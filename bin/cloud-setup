@@ -25,8 +25,20 @@
 # ==============================================================================
 #
 
-ENV['CLOUDWARE_PROVIDER'] = 'azure'
-load File.join(__dir__, 'cloud-setup')
+lib_dir = File.join(__dir__, '..', 'lib')
+$LOAD_PATH << File.join(lib_dir)
+ENV['BUNDLE_GEMFILE'] ||= File.join(__dir__, '..', 'Gemfile')
 
-require 'cloudware'
-Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__
+Thread.report_on_exception = false
+
+require 'rubygems'
+require 'bundler'
+
+if ENV['CLOUDWARE_DEBUG']
+  Bundler.setup(:default, :development)
+  require 'pry'
+  require 'pry-byebug'
+else
+  Bundler.setup(:default)
+end
+

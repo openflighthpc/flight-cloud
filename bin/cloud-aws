@@ -24,8 +24,9 @@
 # https://github.com/alces-software/cloudware
 # ==============================================================================
 #
-require_relative File.join(__FILE__, '../../../lib/cloudware')
 
 ENV['CLOUDWARE_PROVIDER'] = 'aws'
+load File.join(__dir__, 'cloud-setup')
 
+require 'cloudware'
 Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__
