@@ -39,7 +39,8 @@ module Cloudware
           <% machine.tags.each do |key, value| -%>
           - *<%= key %>*: <%= value %>
           <% end -%>
-           <% end -%>
+
+          <% end -%>
 TEMPLATE
       end
     end

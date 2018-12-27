@@ -37,15 +37,18 @@ module Cloudware
           <% deployments.each do |deployment| -%>
           # Deployment: '<%= deployment.name %>'
           *Template*: <%= deployment.template_path %>
-           ## Results
+
+          ## Results
           <% deployment.results.each do |key, value| -%>
           - *<%= key %>*: <%= value %>
           <% end -%>
-           ## Replacements
+
+          ## Replacements
           <% deployment.replacements.each do |key, value| -%>
           - *<%= key %>*: <%= value %>
           <% end -%>
-           <% end -%>
+
+          <% end -%>
 TEMPLATE
       end
     end
