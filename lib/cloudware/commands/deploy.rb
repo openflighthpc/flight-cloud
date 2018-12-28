@@ -51,19 +51,10 @@ module Cloudware
           template_path: template_path,
           name: name,
           context: context,
-          replacements: replacement_mapping
+          replacements: ReplacementFactory.new(context, name)
+                                          .build(options.params)
         )
       end
-      memoize :deployment
-
-      def replacement_mapping
-        parser.build(options.params)
-      end
-
-      def parser
-        ReplacementFactory.new(context, name)
-      end
-      memoize :parser
     end
   end
 end
