@@ -24,6 +24,8 @@
 # ==============================================================================
 #
 
+require 'shellwords'
+
 module Cloudware
   class ReplacementFactory
     attr_reader :context, :deployment_name
@@ -53,11 +55,11 @@ module Cloudware
     end
 
     def build(input_string)
-      (input_string || '').split(' ')
-                          .reject { |x| x.nil? }
-                          .map { |x| parse(x) }
-                          .to_h
-                          .merge(deployment_name: deployment_name)
+      Shellwords.split(input_string || '')
+                .reject { |x| x.nil? }
+                .map { |x| parse(x) }
+                .to_h
+                .merge(deployment_name: deployment_name)
     end
 
     private

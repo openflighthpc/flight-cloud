@@ -72,6 +72,12 @@ RSpec.describe Cloudware::ReplacementFactory do
       end
     end
 
+    shared_examples 'a literal key value replacement' do
+      it 'returns the key value pairing' do
+        expect(subject.build(input_string)).to include(key => value)
+      end
+    end
+
     context 'when the string is missing an =' do
       it 'issues an user error' do
         str = 'i-am-not-a-key-value-pair'
@@ -84,10 +90,15 @@ RSpec.describe Cloudware::ReplacementFactory do
       let(:input_string) { "#{key}=#{value}" }
 
       it_behaves_like 'a default replacement'
+      it_behaves_like 'a literal key value replacement'
+    end
 
-      it 'returns the key value pairing' do
-        expect(subject.build(input_string)).to include(key => value)
-      end
+    context 'when the value contains a correctly quoted space' do
+      let(:value) { 'some string with spaces' }
+      let(:input_string) { "#{key}='#{value}'" }
+
+      it_behaves_like 'a default replacement'
+      it_behaves_like 'a literal key value replacement'
     end
 
     context 'with a deployment' do
