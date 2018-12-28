@@ -25,6 +25,7 @@
 #
 
 require 'cloudware/spinner'
+require 'cloudware/log'
 
 module Cloudware
   class Command
@@ -39,7 +40,7 @@ module Cloudware
     def run!
       run
     rescue Exception => e
-      Cloudware.log.fatal(e.message)
+      Log.fatal(e.message)
       raise e
     end
 

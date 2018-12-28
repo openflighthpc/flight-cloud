@@ -36,14 +36,6 @@ require 'parallel'
 
 module Cloudware
   class << self
-    def config
-      @config ||= Config.new
-    end
-
-    def log
-      @log ||= Logger.new(config.log_file)
-    end
-
     def root_dir
       @root_dir ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))
     end
