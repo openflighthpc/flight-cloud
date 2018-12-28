@@ -63,13 +63,14 @@ module Cloudware
     private
 
     def parse(component_string)
-      component_string.split('=', 2).tap do |array|
-        raise InvalidInput, <<-ERROR.squish unless array.length == 2
+      components = component_string.split('=', 2)
+      unless components.length == 2
+        raise InvalidInput, <<-ERROR.squish
           '#{component_string}' does not form a key value pair
         ERROR
-        array[0] = array[0].to_sym
-        array[1] = parse_key_pair(array[0], array[1])
       end
+      key, value = components
+      [key.to_sym, parse_key_pair(key.to_sym, value)]
     end
   end
 end
