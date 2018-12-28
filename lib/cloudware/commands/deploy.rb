@@ -57,12 +57,11 @@ module Cloudware
       memoize :deployment
 
       def replacement_mapping
-        parser.build(options.params || '')
-              .merge(deployment_name: name)
+        parser.build(options.params)
       end
 
       def parser
-        ReplacementFactory.new(context)
+        ReplacementFactory.new(context, name)
       end
       memoize :parser
     end

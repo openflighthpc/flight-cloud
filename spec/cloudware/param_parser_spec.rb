@@ -18,8 +18,9 @@ RSpec.describe Cloudware::ReplacementFactory do
     before { context.with_deployment(deployment) }
   end
 
-  subject { described_class.new(context) }
+  subject { described_class.new(context, deployment_name) }
 
+  let(:deployment_name) { 'my-deployment-name' }
   let(:context) { build(:context) }
   let(:key) { :my_key }
 
@@ -64,6 +65,13 @@ RSpec.describe Cloudware::ReplacementFactory do
   end
 
   describe '#build' do
+    shared_examples 'a default replacement' do
+      it 'includes the deployment name' do
+        replacements = subject.build(input_string)
+        expect(replacements).to include(deployment_name: deployment_name)
+      end
+    end
+
     context 'when the string is missing an =' do
       it 'issues an user error' do
         str = 'i-am-not-a-key-value-pair'
@@ -73,33 +81,51 @@ RSpec.describe Cloudware::ReplacementFactory do
 
     context 'with a regular key=value string' do
       let(:value) { 'my-value' }
-      let(:input) { "#{key}=#{value}" }
+      let(:input_string) { "#{key}=#{value}" }
+
+      it_behaves_like 'a default replacement'
 
       it 'returns the key value pairing' do
-        expect(subject.build(input)).to include(key => value)
+        expect(subject.build(input_string)).to include(key => value)
       end
     end
 
     context 'with a deployment' do
+      let(:input_string) { "#{key}=*#{deployment_name}" }
       include_context 'parse-param-deployment'
 
+      it_behaves_like 'a default replacement'
+
       it 'replaces the referenced result' do
-        str = "#{key}=*#{deployment_name}"
-        expect(subject.build(str)).to include(key => result_string)
+        expect(subject.build(input_string)).to include(key => result_string)
       end
     end
 
     context 'with multi key-pair input string' do
       let(:test_hash) { { key1: 'string1', key2: 'string2' } }
-      let(:param_string) do
+      let(:input_string) do
         test_hash.reduce('') do |memo, (key, value)|
           memo += " #{key}=#{value}"
         end
       end
 
+      it_behaves_like 'a default replacement'
+
       it 'returns all the key pairs' do
-        expect(subject.build(param_string)).to include(**test_hash)
+        expect(subject.build(input_string)).to include(**test_hash)
       end
+    end
+
+    context 'with an empty string input' do
+      let(:input_string) { '' }
+
+      it_behaves_like 'a default replacement'
+    end
+
+    context 'wit a nil input' do
+      let(:input_string) { nil }
+
+      it_behaves_like 'a default replacement'
     end
   end
 end

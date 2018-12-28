@@ -26,10 +26,11 @@
 
 module Cloudware
   class ReplacementFactory
-    attr_reader :context
+    attr_reader :context, :deployment_name
 
-    def initialize(context)
+    def initialize(context, deployment_name)
       @context = context
+      @deployment_name = deployment_name
     end
 
     #
@@ -52,10 +53,11 @@ module Cloudware
     end
 
     def build(input_string)
-      input_string.split(' ')
-                  .reject { |x| x.nil? }
-                  .map { |x| parse(x) }
-                  .to_h
+      (input_string || '').split(' ')
+                          .reject { |x| x.nil? }
+                          .map { |x| parse(x) }
+                          .to_h
+                          .merge(deployment_name: deployment_name)
     end
 
     private
