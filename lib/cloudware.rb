@@ -44,5 +44,4 @@ end
 
 require 'cloudware/config'
 require 'cloudware/cli'
-require 'logger'
 require 'cloudware/data'
