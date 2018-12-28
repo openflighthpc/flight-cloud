@@ -48,7 +48,7 @@ module Cloudware
     def initialize
       config = Data.load(PATH)
 
-      self.log_file = config[:general][:log_file] || log.error('Unable to load log_file')
+      self.log_file = config[:general][:log_file]
 
       # Providers
       self.azure = OpenStruct.new(config[:provider][:azure])
@@ -59,10 +59,6 @@ module Cloudware
       @default_region = config[:provider][provider.to_sym][:default_region]
 
       @content_path = File.join(Cloudware.root_dir, 'var')
-    end
-
-    def log
-      Cloudware.log
     end
   end
 end
