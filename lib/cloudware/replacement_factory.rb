@@ -52,7 +52,10 @@ module Cloudware
     end
 
     def build(input_string)
-      parse(input_string)
+      input_string.split(' ')
+                  .reject { |x| x.nil? }
+                  .map { |x| parse(x) }
+                  .to_h
     end
 
     private

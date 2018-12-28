@@ -76,7 +76,7 @@ RSpec.describe Cloudware::ReplacementFactory do
       let(:input) { "#{key}=#{value}" }
 
       it 'returns the key value pairing' do
-        expect(subject.build(input)).to eq([key, value])
+        expect(subject.build(input)).to include(key => value)
       end
     end
 
@@ -85,7 +85,20 @@ RSpec.describe Cloudware::ReplacementFactory do
 
       it 'replaces the referenced result' do
         str = "#{key}=*#{deployment_name}"
-        expect(subject.build(str)).to eq([key, result_string])
+        expect(subject.build(str)).to include(key => result_string)
+      end
+    end
+
+    context 'with multi key-pair input string' do
+      let(:test_hash) { { key1: 'string1', key2: 'string2' } }
+      let(:param_string) do
+        test_hash.reduce('') do |memo, (key, value)|
+          memo += " #{key}=#{value}"
+        end
+      end
+
+      it 'returns all the key pairs' do
+        expect(subject.build(param_string)).to include(**test_hash)
       end
     end
   end

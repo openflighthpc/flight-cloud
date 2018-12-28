@@ -57,9 +57,8 @@ module Cloudware
       memoize :deployment
 
       def replacement_mapping
-        (options.params || '').chomp.split.map do |param_str|
-          parser.build(param_str)
-        end.to_h.merge(deployment_name: name)
+        parser.build(options.params || '')
+              .merge(deployment_name: name)
       end
 
       def parser
