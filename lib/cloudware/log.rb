@@ -31,9 +31,5 @@ module Cloudware
     def log
       @log ||= Logger.new(config.log_file)
     end
-
-    def config
-      Cloudware.config
-    end
   end
 end
