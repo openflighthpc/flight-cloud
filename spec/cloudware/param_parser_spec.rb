@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'cloudware/param_parser'
+require 'cloudware/replacement_factory'
 
-RSpec.describe Cloudware::ParamParser do
+RSpec.describe Cloudware::ReplacementFactory do
   shared_context 'parse-param-deployment' do
     let(:result_string) { 'value from deployment' }
     let(:other_key) { :my_super_other_key }

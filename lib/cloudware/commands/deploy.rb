@@ -25,7 +25,7 @@
 #
 
 require 'cloudware/models/deployment'
-require 'cloudware/param_parser'
+require 'cloudware/replacement_factory'
 
 module Cloudware
   module Commands
@@ -63,7 +63,7 @@ module Cloudware
       end
 
       def parser
-        ParamParser.new(context)
+        ReplacementFactory.new(context)
       end
       memoize :parser
     end

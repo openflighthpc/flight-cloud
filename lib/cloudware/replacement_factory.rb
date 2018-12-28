@@ -25,7 +25,7 @@
 #
 
 module Cloudware
-  class ParamParser
+  class ReplacementFactory
     attr_reader :context
 
     def initialize(context)
