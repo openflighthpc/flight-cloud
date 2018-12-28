@@ -55,11 +55,11 @@ module Cloudware
     end
 
     def build(input_string)
-      Shellwords.split(input_string || '')
-                .reject { |x| x.nil? }
-                .map { |x| parse(x) }
-                .to_h
-                .merge(deployment_name: deployment_name)
+      split_build_string(input_string)
+        .reject { |x| x.nil? }
+        .map { |x| parse(x) }
+        .to_h
+        .merge(deployment_name: deployment_name)
     end
 
     private
@@ -73,6 +73,12 @@ module Cloudware
       end
       key, value = components
       [key.to_sym, parse_key_pair(key.to_sym, value)]
+    end
+
+    def split_build_string(string)
+      Shellwords.split(string || '')
+    rescue ArgumentError => e
+      raise InvalidInput, e.message
     end
   end
 end

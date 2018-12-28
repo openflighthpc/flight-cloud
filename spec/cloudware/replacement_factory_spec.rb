@@ -78,11 +78,15 @@ RSpec.describe Cloudware::ReplacementFactory do
       end
     end
 
-    context 'when the string is missing an =' do
+    shared_examples 'an invalid input' do
       it 'issues an user error' do
-        str = 'i-am-not-a-key-value-pair'
-        expect { subject.build(str) }.to raise_error(Cloudware::InvalidInput)
+        expect { subject.build(value) }.to raise_error(Cloudware::InvalidInput)
       end
+    end
+
+    context 'when the string is missing an =' do
+      let(:value) { 'i-am-not-a-key-value-pair' }
+      it_behaves_like 'an invalid input'
     end
 
     context 'with a regular key=value string' do
@@ -99,6 +103,11 @@ RSpec.describe Cloudware::ReplacementFactory do
 
       it_behaves_like 'a default replacement'
       it_behaves_like 'a literal key value replacement'
+    end
+
+    context 'with an incorrectly quoted string' do
+      let(:value) { '"missing-closing-quote' }
+      it_behaves_like 'an invalid input'
     end
 
     context 'with a deployment' do
