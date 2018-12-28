@@ -32,7 +32,7 @@ module Cloudware
       @context = context
     end
 
-    def pair(key, value)
+    def parse_key_pair(key, value)
       return '' if value.nil? || value.empty?
       if value[0] == '*'
         name = /(?<=\A\*)[^\.]*/.match(value).to_s
@@ -50,7 +50,7 @@ module Cloudware
           '#{input}' does not form a key value pair
         ERROR
         array[0] = array[0].to_sym
-        array[1] = pair(array[0], array[1])
+        array[1] = parse_key_pair(array[0], array[1])
       end
     end
   end
