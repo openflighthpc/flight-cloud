@@ -32,6 +32,13 @@ module Cloudware
       @context = context
     end
 
+    #
+    # parse_key_pair:
+    #
+    # Determine the replacement value for a specific key pair, as this is the
+    # fundamental component of the `ReplacementFactory`, it is part of the
+    # public interface. This allows its behaviour to be tested
+    #
     def parse_key_pair(key, value)
       return '' if value.nil? || value.empty?
       if value[0] == '*'
@@ -45,9 +52,15 @@ module Cloudware
     end
 
     def build(input_string)
-      input_string.split('=', 2).tap do |array|
+      parse(input_string)
+    end
+
+    private
+
+    def parse(component_string)
+      component_string.split('=', 2).tap do |array|
         raise InvalidInput, <<-ERROR.squish unless array.length == 2
-          '#{input_string}' does not form a key value pair
+          '#{component_string}' does not form a key value pair
         ERROR
         array[0] = array[0].to_sym
         array[1] = parse_key_pair(array[0], array[1])
