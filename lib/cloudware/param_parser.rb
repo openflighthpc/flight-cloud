@@ -44,10 +44,10 @@ module Cloudware
       end
     end
 
-    def string(input)
-      input.split('=', 2).tap do |array|
+    def build(input_string)
+      input_string.split('=', 2).tap do |array|
         raise InvalidInput, <<-ERROR.squish unless array.length == 2
-          '#{input}' does not form a key value pair
+          '#{input_string}' does not form a key value pair
         ERROR
         array[0] = array[0].to_sym
         array[1] = parse_key_pair(array[0], array[1])

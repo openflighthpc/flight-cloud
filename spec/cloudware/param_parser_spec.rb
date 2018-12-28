@@ -63,11 +63,11 @@ RSpec.describe Cloudware::ParamParser do
     end
   end
 
-  describe '#string' do
+  describe '#build' do
     context 'when the string is missing an =' do
       it 'issues an user error' do
         str = 'i-am-not-a-key-value-pair'
-        expect { subject.string(str) }.to raise_error(Cloudware::InvalidInput)
+        expect { subject.build(str) }.to raise_error(Cloudware::InvalidInput)
       end
     end
 
@@ -76,7 +76,7 @@ RSpec.describe Cloudware::ParamParser do
       let(:input) { "#{key}=#{value}" }
 
       it 'returns the key value pairing' do
-        expect(subject.string(input)).to eq([key, value])
+        expect(subject.build(input)).to eq([key, value])
       end
     end
 
@@ -85,7 +85,7 @@ RSpec.describe Cloudware::ParamParser do
 
       it 'replaces the referenced result' do
         str = "#{key}=*#{deployment_name}"
-        expect(subject.string(str)).to eq([key, result_string])
+        expect(subject.build(str)).to eq([key, result_string])
       end
     end
   end
