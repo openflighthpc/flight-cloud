@@ -53,6 +53,10 @@ module Cloudware
     end
     memoize :context
 
+    def region
+      options.region || Config.default_region
+    end
+
     private
 
     attr_reader :argv, :options

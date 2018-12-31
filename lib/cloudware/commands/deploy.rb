@@ -40,7 +40,7 @@ module Cloudware
             deployment.deploy
           end
         ensure
-          context.save
+          context.save_deployments(deployment)
         end
       end
 
@@ -51,7 +51,7 @@ module Cloudware
           template_path: template_path,
           name: name,
           context: context,
-          region: options.region,
+          region: region,
           replacements: ReplacementFactory.new(context, name)
                                           .build(options.params)
         )
