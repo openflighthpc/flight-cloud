@@ -26,14 +26,11 @@
 
 module Cloudware
   class Context
-    attr_reader :region
+    attr_reader :region, :deployments
     delegate :provider, to: Config
 
     def initialize(region: nil)
       @region = region || Config.default_region
-    end
-
-    def deployments
       @deployments ||= Data.load(path, default_value: []).map do |data|
         Models::Deployment.new(**data)
       end
