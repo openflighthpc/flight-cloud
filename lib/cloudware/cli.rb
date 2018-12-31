@@ -88,26 +88,36 @@ module Cloudware
 
     command 'destroy' do |c|
       cli_syntax(c, 'NAME')
-      c.description = 'Destroy the deployment and related resources'
+      c.summary = 'Destroy a deployment and related resouces'
+      c.description = <<~DESC
+        Removes the deployment NAME and instructs the cloud provider to destroy
+        the related resources.
+      DESC
       action(c, Commands::Destroy)
     end
 
     command 'list' do |c|
       cli_syntax(c)
-      c.description = 'List related subcommands'
+      c.summary = 'List the deployed cloud resources'
       c.sub_command_group = true
     end
 
     command 'list deployments' do |c|
       cli_syntax(c)
-      c.description = 'List all the deployments'
+      c.description = 'List all the previous deployed templates'
       c.hidden = true
       action(c, Commands::Lists::Deployment)
     end
 
     command 'list machines' do |c|
       cli_syntax(c)
-      c.description = 'List all the machines'
+      c.summary = 'List all the previous deployed machines'
+      c.description = <<~DESC
+        List the machines created within a previous deployment. This command
+        does not poll the provider for any information. Instead it list the
+        deployment outputs which follow the machine tag format:
+        `<machine-name>TAG<key>`
+      DESC
       c.hidden = true
       action(c, Commands::Lists::Machine)
     end
