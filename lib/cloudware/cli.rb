@@ -62,7 +62,7 @@ module Cloudware
     end
 
     def self.cli_syntax(command, args_str = '')
-      s = "flightconnector #{command.name} #{args_str} [options]".squish
+      s = "#{program(:name)} #{command.name} #{args_str} [options]".squish
       command.syntax = s
     end
 
