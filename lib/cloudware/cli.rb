@@ -114,9 +114,10 @@ module Cloudware
       c.summary = 'List all the previous deployed machines'
       c.description = <<~DESC
         List the machines created within a previous deployment. This command
-        does not poll the provider for any information. Instead it list the
-        deployment outputs which follow the machine tag format:
-        `<machine-name>TAG<key>`
+        does not poll the provider for any information.
+
+        Instead it list the deployment outputs which follow the machine tag
+        format: `<machine-name>TAG<key>`
       DESC
       c.hidden = true
       action(c, Commands::Lists::Machine)
