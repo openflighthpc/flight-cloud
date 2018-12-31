@@ -50,6 +50,7 @@ module Cloudware
       end
     end
 
+    # NOTE: Deprecated, to be removed
     def with_deployment(deployment)
       existing_index = deployments.find_index do |cur_deployment|
         cur_deployment.name == deployment.name
@@ -63,6 +64,11 @@ module Cloudware
 
     def remove_deployment(deployment)
       deployments.delete_if { |d| d.name == deployment.name }
+    end
+
+    def save_deployments(*deployments)
+      deployments.each { |deployment| with_deployment(deployment) }
+      save
     end
 
     def save

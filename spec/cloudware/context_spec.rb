@@ -33,6 +33,26 @@ RSpec.describe Cloudware::Context do
     end
   end
 
+  def new_context
+    build(:context)
+  end
+
+  describe 'save_deployments' do
+    let(:deployments) { [] }
+
+    it 'saves the deployment' do
+      deployment = build(:deployment)
+      subject.save_deployments(deployment)
+      expect(new_context.deployments.first.name).to eq(deployment.name)
+    end
+
+    it 'can save multiple deployments' do
+      deployments = [build(:deployment), build(:deployment, name: 'other')]
+      subject.save_deployments(*deployments)
+      expect(new_context.deployments.map(&:name)).to eq(deployments.map(&:name))
+    end
+  end
+
   context 'with a single deployment' do
     let(:results) { { single_key: 'value' } }
     let(:deployment) { build(:deployment, results: results) }
@@ -70,15 +90,15 @@ RSpec.describe Cloudware::Context do
       end
     end
 
-    describe '#with_deployment' do
-      before { subject.with_deployment(new_deployment) }
+    describe '#save_deployments' do
+      before { subject.save_deployments(new_deployment) }
 
       context 'with a completely new deployment' do
         let(:new_deployment) { build(:deployment, name: 'new') }
 
-        it 'adds new deployments to the end of the stack' do
-          expect(subject.deployments.length).to eq(2)
-          expect(subject.deployments.last).to eq(new_deployment)
+        it 'it saves the new deployment to the end of the stack' do
+          expect(new_context.deployments.length).to eq(2)
+          expect(new_context.deployments.last.name).to eq(new_deployment.name)
         end
       end
 
@@ -88,9 +108,9 @@ RSpec.describe Cloudware::Context do
           build(:deployment, name: deployment.name, results: new_results)
         end
 
-        it 'updates existing deployment' do
-          expect(subject.deployments.length).to eq(1)
-          expect(subject.deployments.first.results).to eq(new_results)
+        it 'updates and saves the deployment' do
+          expect(new_context.deployments.length).to eq(1)
+          expect(new_context.deployments.first.results).to eq(new_results)
         end
       end
     end
