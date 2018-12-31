@@ -57,7 +57,7 @@ RSpec.describe Cloudware::Models::Deployment do
   end
 
   let(:replacements) { nil }
-  let(:context) { subject.build_context }
+  let(:context) { Cloudware::Context.new(region: subject.region) }
   let(:double_client) do
     object_double(Cloudware::Providers::Base::Client.new('region'))
   end

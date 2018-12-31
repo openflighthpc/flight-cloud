@@ -88,10 +88,6 @@ TEMPLATE
         end
       end
 
-      def build_context
-        Context.new(region: region)
-      end
-
       private
 
       def run_deploy
@@ -126,7 +122,7 @@ TEMPLATE
       end
 
       def validate_no_existing_deployment
-        context = build_context
+        context = Context.new(region: region)
         return unless context.respond_to?(:find_deployment)
         return unless context.find_deployment(name)
         errors.add(:context, 'The deployment already exists')
