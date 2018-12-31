@@ -26,7 +26,9 @@
 
 require 'commander'
 require 'cloudware/exceptions'
+
 require 'cloudware/command'
+require 'cloudware/version'
 
 require 'require_all'
 
@@ -42,8 +44,8 @@ module Cloudware
     extend Commander::UI::AskForClass
     extend Commander::Delegates
 
-    program :name, 'flightconnector'
-    program :version, '0.0.1'
+    program :name, File.basename($PROGRAM_NAME)
+    program :version, Cloudware::VERSION
     program :description, 'Cloud orchestration tool'
 
     global_option('--region REGION', 'Specify cloud platform region')
