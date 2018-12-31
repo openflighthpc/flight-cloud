@@ -29,7 +29,7 @@ require 'cloudware/context'
 RSpec.describe Cloudware::Context do
   subject do
     build(:context).tap do |ctx|
-      deployments.each { |d| ctx.with_deployment(d) }
+      deployments.each { |d| ctx.save_deployments(d) }
     end
   end
 
@@ -133,10 +133,10 @@ RSpec.describe Cloudware::Context do
       end
     end
 
-    describe '#remove_deployment' do
+    describe '#remove_deployments' do
       it 'removes the deployment' do
-        subject.remove_deployment(initial_deployment)
-        expect(subject.results).to eq(final_results)
+        subject.remove_deployments(initial_deployment)
+        expect(new_context.results).to eq(final_results)
       end
     end
 
