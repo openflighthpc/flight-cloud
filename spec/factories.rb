@@ -36,5 +36,5 @@ FactoryBot.define do
     association :context, strategy: :build
   end
 
-  factory :context, class: models::Context
+  factory :context, class: Cloudware::Context
 end

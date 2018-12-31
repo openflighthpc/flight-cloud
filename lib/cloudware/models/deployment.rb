@@ -24,10 +24,10 @@
 # ==============================================================================
 #
 
+require 'cloudware/context'
 require 'cloudware/models/concerns/provider_client'
 require 'cloudware/models/application'
 require 'cloudware/models/machine'
-require 'cloudware/models/context'
 require 'pathname'
 
 require 'erb'
@@ -118,7 +118,7 @@ TEMPLATE
       end
 
       def validate_context
-        return if context.is_a? Cloudware::Models::Context
+        return if context.is_a? Cloudware::Context
         errors.add(:context, 'Is not a context model')
       end
 

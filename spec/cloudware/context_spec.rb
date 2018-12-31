@@ -24,9 +24,9 @@
 # ==============================================================================
 #
 
-require 'cloudware/models/context'
+require 'cloudware/context'
 
-RSpec.describe Cloudware::Models::Context do
+RSpec.describe Cloudware::Context do
   subject do
     build(:context, deployments: deployments)
   end
