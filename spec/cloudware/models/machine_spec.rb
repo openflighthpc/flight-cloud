@@ -29,7 +29,7 @@ RSpec.describe Cloudware::Models::Machine do
 
   let(:machine_name) { 'test' }
   let(:context) do
-    build(:context).tap { |c| c.with_deployment(deployment) }
+    build(:context).tap { |c| c.save_deployments(deployment) }
   end
 
   context 'with a blank deployment' do
