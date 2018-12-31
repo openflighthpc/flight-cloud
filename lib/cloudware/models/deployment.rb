@@ -38,7 +38,7 @@ module Cloudware
       include Concerns::ProviderClient
 
       SAVE_ATTR = [
-        :template_path, :name, :results, :replacements, :region
+        :template_path, :name, :results, :replacements, :region, :deployment_error
       ].freeze
       attr_accessor(*SAVE_ATTR, :context)
 
@@ -92,8 +92,8 @@ TEMPLATE
 
       def run_deploy
         self.results = provider_client.deploy(tag, template)
-      ensure
-        context.with_deployment(self)
+      rescue => e
+        self.deployment_error = e.message
       end
 
       def tag
