@@ -60,7 +60,7 @@ module Cloudware
     end
 
     def spin?
-      foreground && !ENV['CLOUDWARE_DEBUG']
+      foreground && !Cloudware.debug?
     end
   end
 
