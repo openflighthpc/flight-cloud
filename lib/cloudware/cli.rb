@@ -62,8 +62,9 @@ module Cloudware
     end
 
     def self.cli_syntax(command, args_str = '')
-      s = "#{program(:name)} #{command.name} #{args_str} [options]".squish
-      command.syntax = s
+      command.syntax = <<~SYNTAX.squish
+        #{program(:name)} #{command.name} #{args_str} [options]
+      SYNTAX
     end
 
     command 'deploy' do |c|
