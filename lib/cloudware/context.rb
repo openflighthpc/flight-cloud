@@ -50,18 +50,6 @@ module Cloudware
       end
     end
 
-    # NOTE: Deprecated, to be removed
-    def with_deployment(deployment)
-      existing_index = deployments.find_index do |cur_deployment|
-        cur_deployment.name == deployment.name
-      end
-      if existing_index
-        deployments[existing_index] = deployment
-      else
-        deployments.push(deployment)
-      end
-    end
-
     def remove_deployments(*delete_deployments)
       delete_names = delete_deployments.map(&:name)
       deployments.delete_if { |d| delete_names.include?(d.name) }
@@ -69,7 +57,7 @@ module Cloudware
     end
 
     def save_deployments(*deployments)
-      deployments.each { |deployment| with_deployment(deployment) }
+      deployments.each { |deployment| add_deployment(deployment) }
       save
     end
 
@@ -87,6 +75,17 @@ module Cloudware
     end
 
     private
+
+    def add_deployment(deployment)
+      existing_index = deployments.find_index do |cur_deployment|
+        cur_deployment.name == deployment.name
+      end
+      if existing_index
+        deployments[existing_index] = deployment
+      else
+        deployments.push(deployment)
+      end
+    end
 
     def path
       File.join(Config.content_path,
