@@ -42,11 +42,11 @@ module Cloudware
       until thr.join(SPIN_DELAY)
         update_foreground_status if count % CHECK_SPIN == 0
         count += 1
-        tty_spinner.spin if foreground
+        tty_spinner.spin if spin?
       end
       results
     ensure
-      tty_spinner.stop(done_message) if foreground
+      tty_spinner.stop(done_message) if spin?
     end
 
     private
@@ -57,6 +57,10 @@ module Cloudware
     def update_foreground_status
       status = `ps -o stat= -p #{Process.pid}`
       self.foreground = /.*\+.*/.match?(status)
+    end
+
+    def spin?
+      foreground && !ENV['CLOUDWARE_DEBUG']
     end
   end
 
