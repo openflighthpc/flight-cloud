@@ -31,6 +31,8 @@ require 'cloudware/providers/base'
 module Cloudware
   module Providers
     module AzureInterface
+      MGMT_CLASS = Azure::Resources::Profiles::Latest::Mgmt
+
       class Credentials < Base::Credentials
         def self.build
           {
@@ -50,7 +52,6 @@ module Cloudware
 
       class Machine < Base::Machine
         STATE_REGEX = /PowerState\//
-        MGMT_CLASS = Azure::Resources::Profiles::Latest::Mgmt
 
         def status
           compute_client.virtual_machines
