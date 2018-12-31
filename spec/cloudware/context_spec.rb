@@ -28,7 +28,9 @@ require 'cloudware/context'
 
 RSpec.describe Cloudware::Context do
   subject do
-    build(:context, deployments: deployments)
+    build(:context).tap do |ctx|
+      deployments.each { |d| ctx.with_deployment(d) }
+    end
   end
 
   context 'with a single deployment' do
@@ -65,17 +67,6 @@ RSpec.describe Cloudware::Context do
     describe '#deployments' do
       it 'returns the deploument' do
         expect(subject.deployments.map(&:name)).to eq(deployments.map(&:name))
-      end
-    end
-
-    describe '#deployments=' do
-      it 'sets the deployment' do
-        expect(subject.results).to eq(results)
-      end
-
-      it 'replaces existing deployments' do
-        subject.deployments = [build(:deployment)]
-        expect(subject.results).to eq({})
       end
     end
 

@@ -151,7 +151,7 @@ RSpec.describe Cloudware::Models::Deployment do
             build(:deployment, name: subject.name)
           end
 
-          before { context.deployments = [existing_deployment] }
+          before { context.with_deployment(existing_deployment) }
 
           it_behaves_like 'validation error deployment'
         end

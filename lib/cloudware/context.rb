@@ -39,13 +39,6 @@ module Cloudware
       end
     end
 
-    def deployments=(input_deployments)
-      @deployments = [] # Reset the cache
-      input_deployments.each do |deployment|
-        with_deployment(deployment)
-      end
-    end
-
     def machines
       Models::Machine.build_from_context(self)
     end
