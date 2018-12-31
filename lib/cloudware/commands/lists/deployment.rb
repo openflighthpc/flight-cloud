@@ -39,8 +39,12 @@ module Cloudware
           *Template*: <%= deployment.template_path %>
 
           ## Results
+          <% if deployment.results.nil? || deployment.results.empty? -%>
+          No deployment results
+          <% else -%>
           <% deployment.results.each do |key, value| -%>
           - *<%= key %>*: <%= value %>
+          <% end -%>
           <% end -%>
 
           ## Replacements
