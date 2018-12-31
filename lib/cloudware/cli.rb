@@ -74,25 +74,15 @@ module Cloudware
         Deploy new resource(s) from the specified TEMPLATE. This should
         specifiy the absolute path (including extension) to the template.
 
-        The deployment will be given the NAME lable and logged locally. The name
+        The deployment will be given the NAME label and logged locally. The name
         used by the provider will be based off this with minor variations.
 
         The templates also support basic rendering of parameters from the
         command line. This is intended to provide minor tweaks to the templates
         (e.g. IPs or names). Major difference should use separate templates.
-
-        The key value pairs to be rendered are given by the `--param` option.
-        The renderer will replace occurrences of `%REPLACE_KEY%` in the template
-        with the `IDENTIFIER`. By default this is a simple string substitution.
-
-        It is possible to reference keys within previous deployments using the
-        `*` prefix. This will cause `*IDENTIFIER` to be interpreted as a
-        deployment name. In this case, the deployment result corresponding with
-        `OUTPUT_KEY` is used in the sustitution. If `OUTPUT_KEY` is missing,
-        then it is assumed to be the same as `REPLACE_KEY`.
       DESC
       c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
-               String, 'A space separate list of keys to replace'
+               String, 'A space separated list of keys to be replaced'
       action(c, Commands::Deploy)
     end
 
