@@ -38,7 +38,7 @@ module Cloudware
           deployment.destroy
         end
       ensure
-        context.save
+        context.remove_deployments(deployment)
       end
 
       private
