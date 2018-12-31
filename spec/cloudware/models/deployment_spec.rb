@@ -53,11 +53,11 @@ RSpec.describe Cloudware::Models::Deployment do
   end
 
   subject do
-    build(:deployment, replacements: replacements, context: context)
+    build(:deployment, replacements: replacements)
   end
 
   let(:replacements) { nil }
-  let(:context) { build(:context) }
+  let(:context) { subject.build_context }
   let(:double_client) do
     object_double(Cloudware::Providers::Base::Client.new('region'))
   end
@@ -65,11 +65,6 @@ RSpec.describe Cloudware::Models::Deployment do
   # Mock the provider_client
   before do
     allow(subject).to receive(:provider_client).and_return(double_client)
-  end
-
-  it 'does not update the context on build' do
-    deployment = build(:deployment, context: context)
-    expect(context.deployments).not_to include(deployment)
   end
 
   context 'with a replacement hash' do

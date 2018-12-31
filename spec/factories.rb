@@ -34,7 +34,6 @@ FactoryBot.define do
     results {}
     replacements nil
     region 'eu-west-1'
-    association :context, strategy: :build
   end
 
   factory :context, class: Cloudware::Context

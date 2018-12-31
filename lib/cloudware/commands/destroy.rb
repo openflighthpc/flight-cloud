@@ -34,7 +34,6 @@ module Cloudware
       def run
         @name = argv[0]
         with_spinner('Destroying resources...', done: 'Done') do
-          deployment.context = context # TODO: Remove this by refactoring context
           deployment.destroy
         end
       ensure

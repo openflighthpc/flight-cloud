@@ -40,7 +40,7 @@ module Cloudware
       SAVE_ATTR = [
         :template_path, :name, :results, :replacements, :region, :deployment_error
       ].freeze
-      attr_accessor(*SAVE_ATTR, :context)
+      attr_accessor(*SAVE_ATTR)
 
       define_model_callbacks :deploy
 
@@ -88,6 +88,10 @@ TEMPLATE
         end
       end
 
+      def build_context
+        Context.new(region: region)
+      end
+
       private
 
       def run_deploy
@@ -122,6 +126,7 @@ TEMPLATE
       end
 
       def validate_no_existing_deployment
+        context = build_context
         return unless context.respond_to?(:find_deployment)
         return unless context.find_deployment(name)
         errors.add(:context, 'The deployment already exists')
