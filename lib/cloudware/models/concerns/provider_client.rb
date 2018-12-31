@@ -31,7 +31,6 @@ module Cloudware
         extend Memoist
 
         delegate :provider, to: Config
-        delegate :region, to: :context
 
         private
 

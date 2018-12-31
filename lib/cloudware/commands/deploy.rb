@@ -51,6 +51,7 @@ module Cloudware
           template_path: template_path,
           name: name,
           context: context,
+          region: options.region,
           replacements: ReplacementFactory.new(context, name)
                                           .build(options.params)
         )
