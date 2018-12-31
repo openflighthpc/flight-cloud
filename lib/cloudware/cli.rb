@@ -124,15 +124,17 @@ module Cloudware
 
     command 'power' do |c|
       cli_syntax(c)
-      c.description = 'Power related commands'
+      c.description = 'Start or stop machine and check their power status'
       c.sub_command_group = true
     end
 
     def self.shared_power_attr(c)
+      action = c.name.split.last
       cli_attr = 'IDENTIFIER'
       cli_syntax(c, cli_attr)
-      c.option '-g', '--group',
-               "Preform the action over the group specified by #{cli_attr}"
+      c.option '-g', '--group', <<~DESC
+        Preform the '#{action}' action on machine in group '#{cli_attr}'
+      DESC
       c.hidden = true
     end
 
