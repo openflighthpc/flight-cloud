@@ -69,7 +69,7 @@ module Cloudware
 
     command 'deploy' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
-      c.summary = 'Deploy new resource(s) from template'
+      c.summary = 'Deploy new resource(s) define by a template'
       c.description = <<-DESC.strip_heredoc
         Deploy new resource(s) from the specified TEMPLATE. This should
         specifiy the absolute path (including extension) to the template.
