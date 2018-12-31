@@ -33,6 +33,7 @@ FactoryBot.define do
     template_path '/tmp/test-template'
     results {}
     replacements nil
+    region 'eu-west-1'
     association :context, strategy: :build
   end
 

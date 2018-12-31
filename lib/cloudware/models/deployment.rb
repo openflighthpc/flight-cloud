@@ -46,7 +46,7 @@ module Cloudware
 
       before_deploy :validate_template_exists
       before_deploy :validate_replacement_tags
-      before_deploy :validate_context
+      before_deploy :validate_region
       before_deploy :validate_no_existing_deployment
 
       def template
@@ -116,9 +116,9 @@ TEMPLATE
         end
       end
 
-      def validate_context
-        return if context.is_a? Cloudware::Context
-        errors.add(:context, 'Is not a context model')
+      def validate_region
+        return if region
+        errors.add(:region, 'No region specified')
       end
 
       def validate_no_existing_deployment
