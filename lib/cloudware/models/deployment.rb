@@ -100,7 +100,10 @@ TEMPLATE
         self.results = provider_client.deploy(tag, template)
       rescue => e
         self.deployment_error = e.message
-        raise e
+        raise DeploymentError, <<~ERROR.chomp
+          An error has occured. Please see for further details:
+          `#{Cloudware.app_name} list deployments --verbose`
+        ERROR
       ensure
         context.save_deployments(self)
       end

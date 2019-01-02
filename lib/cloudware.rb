@@ -42,6 +42,10 @@ module Cloudware
     def debug?
       !!ENV['CLOUDWARE_DEBUG']
     end
+
+    def app_name
+      File.basename($PROGRAM_NAME)
+    end
   end
 end
 

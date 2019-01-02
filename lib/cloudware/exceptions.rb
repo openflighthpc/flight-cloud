@@ -35,4 +35,5 @@ module Cloudware
   class InvalidInput < UserError; end
   class ModelValidationError < UserError; end
   class InvalidAzureRequest < UserError; end
+  class DeploymentError < UserError; end
 end

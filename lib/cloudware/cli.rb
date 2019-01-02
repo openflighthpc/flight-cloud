@@ -44,7 +44,7 @@ module Cloudware
     extend Commander::UI::AskForClass
     extend Commander::Delegates
 
-    program :name, File.basename($PROGRAM_NAME)
+    program :name, Cloudware.app_name
     program :version, Cloudware::VERSION
     program :description, 'Cloud orchestration tool'
 
