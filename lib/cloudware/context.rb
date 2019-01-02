@@ -76,6 +76,7 @@ module Cloudware
         if block_given?
           yield
           save_data = deployments.map(&:to_h)
+          file.truncate(0)
           Data.dump(file, save_data)
         end
       end
