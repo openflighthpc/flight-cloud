@@ -58,11 +58,6 @@ module Cloudware
       end
     end
 
-    def save
-      save_data = deployments.map(&:to_h)
-      Data.dump(path, save_data)
-    end
-
     def find_deployment(name)
       deployments.find { |d| d.name == name }
     end
@@ -79,7 +74,8 @@ module Cloudware
       end
       if block_given?
         yield
-        save
+        save_data = deployments.map(&:to_h)
+        Data.dump(path, save_data)
       end
     end
 
