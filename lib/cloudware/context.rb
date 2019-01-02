@@ -62,7 +62,7 @@ module Cloudware
       deployments.find { |d| d.name == name }
     end
 
-    def render(template)
+    def render(template, verbose: false)
       ERB.new(template, nil, '-').result(binding)
     end
 

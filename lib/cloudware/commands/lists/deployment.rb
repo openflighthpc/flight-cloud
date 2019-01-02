@@ -36,6 +36,15 @@ module Cloudware
           <% end -%>
           <% deployments.each do |deployment| -%>
           # Deployment: '<%= deployment.name %>'
+          <% if deployment.deployment_error -%>
+          *ERROR*: An error occured whilst deploying this template
+          <% if verbose -%>
+          See below for details
+          <% else -%>
+          Please use `--verbose` for further details
+          <% end -%>
+
+          <% end -%>
           *Template*: <%= deployment.template_path %>
 
           ## Results
