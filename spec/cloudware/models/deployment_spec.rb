@@ -48,7 +48,7 @@ RSpec.describe Cloudware::Models::Deployment do
     it 'does not error' do
       expect do
         subject.deploy
-      end.not_to raise_error StandardError
+      end.not_to raise_error
     end
   end
 
@@ -102,11 +102,6 @@ RSpec.describe Cloudware::Models::Deployment do
     describe '#machines' do
       it 'returns objects with the machine names' do
         expect(subject.machines.map(&:name)).to contain_exactly(*machines)
-      end
-
-      xit 'creates objects that back reference the deployment' do
-        machine_deployments = subject.machines.map(&:deployment)
-        expect(machine_deployments.uniq).to contain_exactly(subject)
       end
     end
   end
