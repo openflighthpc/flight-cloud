@@ -1,23 +1,47 @@
 # frozen_string_literal: true
 
+#
+# =============================================================================
+# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+#
+# This file is part of Alces Cloudware.
+#
+# Alces Cloudware is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Alces Cloudware is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Alces Cloudware.  If not, see <http://www.gnu.org/licenses/>.
+#
+# For more information on the Alces Cloudware, please visit:
+# https://github.com/alces-software/cloudware
+# ==============================================================================
+#
+
 require 'azure_mgmt_resources'
 require 'azure_mgmt_compute'
-require 'providers/base'
+require 'cloudware/providers/base'
 
 module Cloudware
   module Providers
-    module AZURE
+    module AzureInterface
       class Credentials < Base::Credentials
         def self.build
           {
             subscription_id: config.subscription_id,
             tenant_id: config.tenant_id,
             client_id: config.client_id,
-            client_secret: config.client_secret
+            client_secret: config.client_secret,
           }
         end
 
-        private
+        private_class_method
 
         def self.config
           Config.azure
@@ -26,6 +50,7 @@ module Cloudware
 
       class Machine < Base::Machine
         STATE_REGEX = /PowerState\//
+        MGMT_CLASS = Azure::Resources::Profiles::Latest::Mgmt
 
         def status
           compute_client.virtual_machines
@@ -60,8 +85,7 @@ module Cloudware
         end
 
         def compute_client
-          klass = Azure::Compute::Profiles::Latest::Mgmt::Client
-          klass.new(credentials)
+          MGMT_CLASS::Client.new(credentials)
         end
       end
 
@@ -100,14 +124,13 @@ module Cloudware
             d.properties = resource_client.model_classes.deployment_properties
                                           .new.tap do |p|
               p.template = JSON.parse(template)
-              p.mode = Azure::Resources::Profiles::Latest::Mgmt::Models::DeploymentMode::Complete
+              p.mode = MGMT_CLASS::Models::DeploymentMode::Complete
             end
           end
         end
 
         def resource_client
-          klass = Azure::Resources::Profiles::Latest::Mgmt::Client
-          klass.new(credentials)
+          MGMT_CLASS::Client.new(credentials)
         end
         memoize :resource_client
       end

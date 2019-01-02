@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'parse_param'
+require 'cloudware/param_parser'
 
 RSpec.describe Cloudware::ParamParser do
   shared_context 'parse-param-deployment' do
@@ -19,6 +19,7 @@ RSpec.describe Cloudware::ParamParser do
   end
 
   subject { described_class.new(context) }
+
   let(:context) { build(:context) }
   let(:key) { :my_key }
 

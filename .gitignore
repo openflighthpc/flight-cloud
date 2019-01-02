@@ -4,3 +4,5 @@ tmp/
 var/
 etc/config.yaml
 etc/config.yml
+vendor/
+.bundle/

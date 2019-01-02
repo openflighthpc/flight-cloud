@@ -1,30 +1,32 @@
 # frozen_string_literal: true
 
-#==============================================================================
-# Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
 #
-# This file/package is part of Alces Cloudware.
+# =============================================================================
+# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
 #
-# Alces Cloudware is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation, either version 3 of
-# the License, or (at your option) any later version.
+# This file is part of Alces Cloudware.
+#
+# Alces Cloudware is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
 #
 # Alces Cloudware is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this package.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Affero General Public License
+# along with Alces Cloudware.  If not, see <http://www.gnu.org/licenses/>.
 #
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
-#==============================================================================
+# ==============================================================================
+#
+
 require 'commander'
-require 'whirly'
-require 'exceptions'
-require 'command'
+require 'cloudware/exceptions'
+require 'cloudware/command'
 
 require 'require_all'
 
@@ -44,8 +46,7 @@ module Cloudware
     program :version, '0.0.1'
     program :description, 'Cloud orchestration tool'
 
-    global_option('--debug', 'Enables the development mode')
-    global_option('--region REGION', "Specify a provider's region")
+    global_option('--region REGION', 'Specify cloud platform region')
 
     suppress_trace_class UserError
 

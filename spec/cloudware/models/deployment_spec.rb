@@ -1,16 +1,40 @@
 # frozen_string_literal: true
 
-require 'providers/base'
+require 'cloudware/providers/base'
 
 RSpec.describe Cloudware::Models::Deployment do
-  let(:replacements) { nil }
-  let(:context) { build(:context) }
-  let(:double_client) do
-    object_double(Cloudware::Providers::Base::Client.new('region'))
+  shared_examples 'deploy raises ModelValidationError' do
+    it 'raises ModelValidationError' do
+      expect do
+        subject.deploy
+      end.to raise_error(Cloudware::ModelValidationError)
+    end
+  end
+
+  shared_examples 'validation error deployment' do
+    include_examples 'deploy raises ModelValidationError'
+
+    it 'does not save to the context' do
+      begin subject.deploy; rescue RuntimeError; end
+      expect(context.deployments).not_to include(subject)
+    end
+  end
+
+  shared_examples 'savable deployment' do
+    it 'saves to the context' do
+      begin subject.deploy; rescue RuntimeError; end
+      expect(context.deployments).to include(subject)
+    end
   end
 
   subject do
     build(:deployment, replacements: replacements, context: context)
+  end
+
+  let(:replacements) { nil }
+  let(:context) { build(:context) }
+  let(:double_client) do
+    object_double(Cloudware::Providers::Base::Client.new('region'))
   end
 
   # Mock the provider_client
@@ -25,12 +49,12 @@ RSpec.describe Cloudware::Models::Deployment do
 
   context 'with a replacement hash' do
     let(:replacements) { { replace_key1: 'value1', replace_key2: 'value2' } }
-    let(:raw_template) {
+    let(:raw_template) do
       <<-TEMPLATE.strip_heredoc
         key1: '%replace_key1%'
         key2: '%replace_key2%'
       TEMPLATE
-    }
+    end
 
     before do
       allow(subject).to receive(:raw_template).and_return(raw_template)
@@ -67,35 +91,17 @@ RSpec.describe Cloudware::Models::Deployment do
     end
   end
 
+  context 'without a template' do
+    describe '#deploy' do
+      include_examples 'deploy raises ModelValidationError'
+    end
+  end
+
   context 'with an existing template' do
     before do
       path = subject.send(:template_path)
       FileUtils.mkdir_p(File.dirname(path))
       File.write(path, template_content)
-    end
-
-    shared_examples 'deploy raises ModelValidationError' do
-      it 'raises ModelValidationError' do
-        expect do
-          subject.deploy
-        end.to raise_error(Cloudware::ModelValidationError)
-      end
-    end
-
-    shared_examples 'validation error deployment' do
-      include_examples 'deploy raises ModelValidationError'
-
-      it 'does not save to the context' do
-        begin subject.deploy; rescue RuntimeError; end
-        expect(context.deployments).not_to include(subject)
-      end
-    end
-
-    shared_examples 'savable deployment' do
-      it 'saves to the context' do
-        begin subject.deploy; rescue RuntimeError; end
-        expect(context.deployments).to include(subject)
-      end
     end
 
     describe '#deploy' do

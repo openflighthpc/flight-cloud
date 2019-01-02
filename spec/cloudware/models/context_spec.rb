@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require 'models/context'
+
+require 'cloudware/models/context'
 
 RSpec.describe Cloudware::Models::Context do
   subject do
@@ -26,6 +27,7 @@ RSpec.describe Cloudware::Models::Context do
 
       context 'with updated deployment results' do
         let(:updated_results) { { single_key: 'something else' } }
+
         before { deployment.results = updated_results }
 
         it 'saves updated deployment results' do
