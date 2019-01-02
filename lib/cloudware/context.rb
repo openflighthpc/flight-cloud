@@ -31,9 +31,7 @@ module Cloudware
 
     def initialize(region: nil)
       @region = region || Config.default_region
-      @deployments ||= Data.load(path, default_value: []).map do |data|
-        Models::Deployment.new(**data)
-      end
+      update_deployments
     end
 
     def machines
@@ -54,8 +52,9 @@ module Cloudware
     end
 
     def save_deployments(*deployments)
-      deployments.each { |deployment| add_deployment(deployment) }
-      save
+      update_deployments do
+        deployments.each { |deployment| add_deployment(deployment) }
+      end
     end
 
     def save
@@ -72,6 +71,16 @@ module Cloudware
     end
 
     private
+
+    def update_deployments
+      @deployments = Data.load(path, default_value: []).map do |data|
+        Models::Deployment.new(**data)
+      end
+      if block_given?
+        yield
+        save
+      end
+    end
 
     def add_deployment(deployment)
       existing_index = deployments.find_index do |cur_deployment|

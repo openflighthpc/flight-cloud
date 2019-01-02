@@ -153,8 +153,13 @@ RSpec.describe Cloudware::Context do
   end
 
   context 'with contention over the context file' do
-    let(:deployments) { [] }
-    let(:other_deployment) { build(:deployment, region: subject.region) }
+    let(:deployments) { [initial_deployment] }
+    let(:initial_deployment) do
+      build(:deployment, name: 'initial_deployment')
+    end
+    let(:other_deployment) do
+      build(:deployment, name: 'other-deployment')
+    end
     let(:other_context) { described_class.new(region: subject.region) }
 
     # Ensure the other context/deployment are created after the subject
@@ -165,6 +170,20 @@ RSpec.describe Cloudware::Context do
 
     it 'initially it does not include the other deployment' do
       expect(subject.find_deployment(other_deployment.name)).to be_nil
+    end
+
+    describe '#save_deployments' do
+      let(:new_deployment) do
+        build(:deployment, name: 'new_deployment', region: subject.region)
+      end
+      let(:all_names) do
+        [new_deployment, initial_deployment, other_deployment].map(&:name)
+      end
+      before { subject.save_deployments(new_deployment) }
+
+      it 'contains the initial, new, and other deployments' do
+        expect(subject.deployments.map(&:name)).to contain_exactly(*all_names)
+      end
     end
   end
 end
