@@ -131,7 +131,8 @@ TEMPLATE
       end
 
       def validate_no_existing_deployment
-        return unless context.respond_to?(:find_deployment)
+        # Reload the context during the validation `context(true)`
+        return unless context(true).respond_to?(:find_deployment)
         return unless context.find_deployment(name)
         errors.add(:context, 'The deployment already exists')
       end
