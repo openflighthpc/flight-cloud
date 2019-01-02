@@ -98,8 +98,8 @@ module Cloudware
       file.flock(File::LOCK_EX)
       yield file
     ensure
-      file.flock(File::LOCK_UN)
-      file.close
+      file&.flock(File::LOCK_UN)
+      file&.close
     end
 
     def path
