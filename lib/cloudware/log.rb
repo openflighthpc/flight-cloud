@@ -24,16 +24,17 @@
 # ==============================================================================
 #
 
+require 'active_support/core_ext/module/delegation'
 require 'logger'
 
 module Cloudware
   class Log
-    def log
-      @log ||= Logger.new(config.log_file)
-    end
+    class << self
+      def cache
+        @cache ||= Logger.new(Config.log_file)
+      end
 
-    def config
-      Cloudware.config
+      delegate_missing_to :cache
     end
   end
 end

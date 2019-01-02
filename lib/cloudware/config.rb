@@ -24,10 +24,11 @@
 # ==============================================================================
 #
 
-require 'yaml'
 require 'ostruct'
 
 require 'active_support/core_ext/module/delegation'
+
+require 'cloudware/data'
 
 module Cloudware
   class Config
@@ -45,29 +46,19 @@ module Cloudware
     attr_reader :provider, :default_region, :content_path
 
     def initialize
-      config = YAML.load_file(PATH)
+      config = Data.load(PATH)
 
-      self.log_file = config['general']['log_file'] || log.error('Unable to load log_file')
+      self.log_file = config[:general][:log_file]
 
       # Providers
-      self.azure = OpenStruct.new(config['provider']['azure'])
-      self.aws = OpenStruct.new(config['provider']['aws'])
+      self.azure = OpenStruct.new(config[:provider][:azure])
+      self.aws = OpenStruct.new(config[:provider][:aws])
 
-      # Providers List (identifying valid/present providers)
-      self.providers = []
-      config['provider'].each do |a, b|
-        providers << a if b.first[1].nil? || !b.first[1].empty?
-      end
-
-      @default = OpenStruct.new(config['default'])
+      @default = OpenStruct.new(config[:default])
       @provider = ENV['CLOUDWARE_PROVIDER']
-      @default_region = config['provider'][provider]['default_region']
+      @default_region = config[:provider][provider.to_sym][:default_region]
 
       @content_path = File.join(Cloudware.root_dir, 'var')
-    end
-
-    def log
-      Cloudware.log
     end
   end
 end
