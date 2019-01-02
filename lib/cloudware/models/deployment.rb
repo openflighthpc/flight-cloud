@@ -50,6 +50,8 @@ module Cloudware
       before_deploy :validate_region
       before_deploy :validate_no_existing_deployment
 
+      before_destroy :validate_existing_deployment
+
       def template
         return raw_template unless replacements
         replacements.reduce(raw_template) do |memo, (key, value)|
@@ -152,6 +154,13 @@ module Cloudware
         return unless context(true).respond_to?(:find_deployment)
         return unless context.find_deployment(name)
         errors.add(:context, 'The deployment already exists')
+      end
+
+      def validate_existing_deployment
+        # Reload the context during the validation `context(true)`
+        return unless context(true).respond_to?(:find_deployment)
+        return if context.find_deployment(name)
+        errors.add(:context, 'The deployment does not exists')
       end
     end
   end

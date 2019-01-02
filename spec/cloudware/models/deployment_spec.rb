@@ -192,6 +192,14 @@ RSpec.describe Cloudware::Models::Deployment do
           expect(context.find_deployment(subject.name)).to be_nil
         end
       end
+
+      context 'without an existing deployment' do
+        it 'raise ModelValidationError' do
+          expect do
+            subject.destroy
+          end.to raise_error(Cloudware::ModelValidationError)
+        end
+      end
     end
   end
 end
