@@ -32,12 +32,10 @@ RSpec.describe Cloudware::Data do
 
   before { FileUtils.mkdir_p(File.dirname(path)) }
 
-  context 'with a string file path' do
-    let(:file) { path }
-
+  shared_examples 'a data loader' do
     describe '#load' do
       it 'loads the content' do
-        File.write(file, YAML.dump(content))
+        File.write(path, YAML.dump(content))
         expect(described_class.load(file)).to eq(content)
       end
     end
@@ -48,5 +46,18 @@ RSpec.describe Cloudware::Data do
         expect(YAML.load_file(path)).to eq(content)
       end
     end
+  end
+
+  context 'with a string file path' do
+    let(:file) { path }
+
+    it_behaves_like 'a data loader'
+  end
+
+  context 'with a file point input' do
+    let!(:file) { File.open(path, 'a+') }
+    after { file.close }
+
+    it_behaves_like 'a data loader'
   end
 end
