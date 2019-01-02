@@ -46,9 +46,10 @@ module Cloudware
     end
 
     def remove_deployments(*delete_deployments)
-      delete_names = delete_deployments.map(&:name)
-      deployments.delete_if { |d| delete_names.include?(d.name) }
-      save
+      update_deployments do
+        delete_names = delete_deployments.map(&:name)
+        deployments.delete_if { |d| delete_names.include?(d.name) }
+      end
     end
 
     def save_deployments(*deployments)

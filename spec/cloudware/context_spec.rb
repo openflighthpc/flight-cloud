@@ -185,5 +185,25 @@ RSpec.describe Cloudware::Context do
         expect(subject.deployments.map(&:name)).to contain_exactly(*all_names)
       end
     end
+
+    describe '#remove_deployments' do
+      context 'when deleting the initial deployment' do
+        before { subject.remove_deployments(initial_deployment) }
+
+        it 'removes the intended deployment' do
+          expect(subject.find_deployment(initial_deployment.name)).to be_nil
+        end
+
+        it 'loads the other deployment into the context' do
+          other_name = other_deployment.name
+          expect(subject.find_deployment(other_name)&.name).to eq(other_name)
+        end
+      end
+
+      it 'can delete the other deployment' do
+        subject.remove_deployments(other_deployment)
+        expect(subject.find_deployment(other_deployment.name)).to be_nil
+      end
+    end
   end
 end
