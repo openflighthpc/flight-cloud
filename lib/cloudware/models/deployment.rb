@@ -62,15 +62,7 @@ module Cloudware
           if errors.blank?
             run_deploy
           else
-            msg = ERB.new(<<~TEMPLATE, nil, '-').result(binding).chomp
-              Failed to deploy resources. The following errors have occurred:
-              <% errors.messages.map do |key, messages| -%>
-              <% messages.each do |message| -%>
-              <%= key %>: <%= message %>
-              <% end -%>
-              <% end -%>
-TEMPLATE
-            raise ModelValidationError, msg
+            raise ModelValidationError, render_errors_message('deploy')
           end
         end
       end
@@ -79,6 +71,8 @@ TEMPLATE
         run_callbacks(:destroy) do
           if errors.blank?
             run_destroy
+          else
+            raise ModelValidationError, render_errors_message('destroy')
           end
         end
       end
@@ -115,6 +109,17 @@ TEMPLATE
       def run_destroy
         provider_client.destroy(tag)
         context.remove_deployments(self)
+      end
+
+      def render_errors_message(action)
+        ERB.new(<<~TEMPLATE, nil, '-').result(binding).chomp
+          Failed to <%= action %> resources. The following errors have occurred:
+          <% errors.messages.map do |key, messages| -%>
+          <% messages.each do |message| -%>
+          <%= key %>: <%= message %>
+          <% end -%>
+          <% end -%>
+        TEMPLATE
       end
 
       def tag
