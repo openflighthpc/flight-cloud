@@ -151,4 +151,20 @@ RSpec.describe Cloudware::Context do
       end
     end
   end
+
+  context 'with contention over the context file' do
+    let(:deployments) { [] }
+    let(:other_deployment) { build(:deployment, region: subject.region) }
+    let(:other_context) { described_class.new(region: subject.region) }
+
+    # Ensure the other context/deployment are created after the subject
+    before do
+      subject
+      other_context.save_deployments(other_deployment)
+    end
+
+    it 'initially it does not include the other deployment' do
+      expect(subject.find_deployment(other_deployment.name)).to be_nil
+    end
+  end
 end
