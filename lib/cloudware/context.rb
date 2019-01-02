@@ -94,8 +94,10 @@ module Cloudware
 
     def with_file_lock
       file = File.new(path, 'r+')
+      file.flock(File::LOCK_EX)
       yield file
     ensure
+      file.flock(File::LOCK_UN)
       file.close
     end
 
