@@ -32,7 +32,6 @@ require 'active_model/errors'
 
 require 'colorize'
 require 'memoist'
-require 'parallel'
 
 module Cloudware
   class << self
