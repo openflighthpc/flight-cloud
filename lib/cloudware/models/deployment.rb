@@ -43,6 +43,7 @@ module Cloudware
       attr_accessor(*SAVE_ATTR)
 
       define_model_callbacks :deploy
+      define_model_callbacks :destroy
 
       before_deploy :validate_template_exists
       before_deploy :validate_replacement_tags
@@ -75,8 +76,11 @@ TEMPLATE
       end
 
       def destroy
-        provider_client.destroy(tag)
-        context.remove_deployments(self)
+        run_callbacks(:destroy) do
+          if errors.blank?
+            run_destroy
+          end
+        end
       end
 
       def machines
@@ -106,6 +110,11 @@ TEMPLATE
         ERROR
       ensure
         context.save_deployments(self)
+      end
+
+      def run_destroy
+        provider_client.destroy(tag)
+        context.remove_deployments(self)
       end
 
       def tag
