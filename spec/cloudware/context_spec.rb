@@ -28,9 +28,7 @@ require 'cloudware/context'
 
 RSpec.describe Cloudware::Context do
   subject do
-    build(:context).tap do |ctx|
-      deployments.each { |d| ctx.save_deployments(d) }
-    end
+    build(:context).tap { |c| c.save_deployments(*deployments) }
   end
 
   def new_context
