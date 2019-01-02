@@ -36,5 +36,7 @@ FactoryBot.define do
     region 'eu-west-1'
   end
 
-  factory :context, class: Cloudware::Context
+  factory :context, class: Cloudware::Context do
+    initialize_with { new(region: 'eu-west-1') }
+  end
 end

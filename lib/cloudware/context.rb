@@ -94,7 +94,7 @@ module Cloudware
     end
 
     def with_file_lock
-      file = File.new(path, 'r+')
+      file = File.new(path, 'a+')
       file.flock(File::LOCK_EX)
       yield file
     ensure
@@ -108,7 +108,7 @@ module Cloudware
         'contexts',
         provider,
         "#{region}.yaml"
-      ).tap { |p| FileUtils.mkdir_p(p) }
+      ).tap { |p| FileUtils.mkdir_p(File.dirname(p)) }
     end
   end
 end
