@@ -76,6 +76,7 @@ TEMPLATE
 
       def destroy
         provider_client.destroy(tag)
+        context.remove_deployments(self)
       end
 
       def machines
