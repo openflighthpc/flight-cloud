@@ -69,13 +69,15 @@ module Cloudware
     private
 
     def update_deployments
-      @deployments = Data.load(path, default_value: []).map do |data|
-        Models::Deployment.new(**data)
-      end
-      if block_given?
-        yield
-        save_data = deployments.map(&:to_h)
-        Data.dump(path, save_data)
+      with_file_lock do |file|
+        @deployments = Data.load(file, default_value: []).map do |data|
+          Models::Deployment.new(**data)
+        end
+        if block_given?
+          yield
+          save_data = deployments.map(&:to_h)
+          Data.dump(file, save_data)
+        end
       end
     end
 
@@ -90,11 +92,20 @@ module Cloudware
       end
     end
 
+    def with_file_lock
+      file = File.new(path, 'r+')
+      yield file
+    ensure
+      file.close
+    end
+
     def path
-      File.join(Config.content_path,
-                'contexts',
-                provider,
-                "#{region}.yaml")
+      File.join(
+        Config.content_path,
+        'contexts',
+        provider,
+        "#{region}.yaml"
+      ).tap { |p| FileUtils.mkdir_p(p) }
     end
   end
 end
