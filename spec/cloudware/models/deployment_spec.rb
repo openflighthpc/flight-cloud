@@ -45,10 +45,10 @@ RSpec.describe Cloudware::Models::Deployment do
   end
 
   shared_examples 'validated deployment' do
-    it 'does not error' do
-      expect do
-        subject.deploy
-      end.not_to raise_error
+    it 'saves the deployment' do
+      begin subject.deploy; rescue; end
+      context = Cloudware::Context.new(region: subject.region)
+      expect(context.find_deployment(subject.name)&.name).to eq(subject.name)
     end
   end
 
@@ -162,7 +162,7 @@ RSpec.describe Cloudware::Models::Deployment do
           it_behaves_like 'validated deployment'
 
           it 'saves the deployment error message' do
-            subject.deploy
+            expect { subject.deploy }.to raise_error RuntimeError
             expect(subject.deployment_error).to eq(message)
           end
         end
