@@ -66,6 +66,10 @@ module Cloudware
       ERB.new(template, nil, '-').result(binding)
     end
 
+    def reload
+      update_deployments
+    end
+
     private
 
     def update_deployments
