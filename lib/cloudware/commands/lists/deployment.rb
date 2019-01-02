@@ -38,9 +38,7 @@ module Cloudware
           # Deployment: '<%= deployment.name %>'
           <% if deployment.deployment_error -%>
           *ERROR*: An error occured whilst deploying this template
-          <% if verbose -%>
-          See below for details
-          <% else -%>
+          <% unless verbose -%>
           Please use `--verbose` for further details
           <% end -%>
 
@@ -61,6 +59,16 @@ module Cloudware
           - *<%= key %>*: <%= value %>
           <% end -%>
 
+          <% if verbose && deployment.deployment_error -%>
+          ## Error
+          *NOTE:* This is `<%= provider %>`'s raw error message
+          Refer to their documentation for further details
+
+          ```
+          <%= deployment.deployment_error %>
+          ```
+
+          <% end -%>
           <% end -%>
 TEMPLATE
       end

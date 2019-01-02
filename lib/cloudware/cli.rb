@@ -106,6 +106,7 @@ module Cloudware
       cli_syntax(c)
       c.description = 'List all the previous deployed templates'
       c.hidden = true
+      c.option '-v', '--verbose', 'Show full error messages'
       action(c, Commands::Lists::Deployment)
     end
 
