@@ -47,6 +47,7 @@ module Cloudware
     program :name, Cloudware.app_name
     program :version, Cloudware::VERSION
     program :description, 'Cloud orchestration tool'
+    program :help_paging, false
 
     global_option('--region REGION', 'Specify cloud platform region')
 
