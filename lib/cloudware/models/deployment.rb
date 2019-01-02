@@ -151,15 +151,13 @@ module Cloudware
 
       def validate_no_existing_deployment
         # Reload the context during the validation `context(true)`
-        return unless context(true).respond_to?(:find_deployment)
-        return unless context.find_deployment(name)
+        return unless context(true).find_deployment(name)
         errors.add(:context, 'The deployment already exists')
       end
 
       def validate_existing_deployment
         # Reload the context during the validation `context(true)`
-        return unless context(true).respond_to?(:find_deployment)
-        return if context.find_deployment(name)
+        return if context(true).find_deployment(name)
         errors.add(:context, 'The deployment does not exists')
       end
     end
