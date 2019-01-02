@@ -24,15 +24,25 @@
 # ==============================================================================
 #
 
-module Cloudware
-  class ParamParser
-    attr_reader :context
+require 'shellwords'
 
-    def initialize(context)
+module Cloudware
+  class ReplacementFactory
+    attr_reader :context, :deployment_name
+
+    def initialize(context, deployment_name)
       @context = context
+      @deployment_name = deployment_name
     end
 
-    def pair(key, value)
+    #
+    # parse_key_pair:
+    #
+    # Determine the replacement value for a specific key pair, as this is the
+    # fundamental component of the `ReplacementFactory`, it is part of the
+    # public interface. This allows its behaviour to be tested
+    #
+    def parse_key_pair(key, value)
       return '' if value.nil? || value.empty?
       if value[0] == '*'
         name = /(?<=\A\*)[^\.]*/.match(value).to_s
@@ -44,14 +54,31 @@ module Cloudware
       end
     end
 
-    def string(input)
-      input.split('=', 2).tap do |array|
-        raise InvalidInput, <<-ERROR.squish unless array.length == 2
-          '#{input}' does not form a key value pair
+    def build(input_string)
+      split_build_string(input_string)
+        .reject { |x| x.nil? }
+        .map { |x| parse(x) }
+        .to_h
+        .merge(deployment_name: deployment_name)
+    end
+
+    private
+
+    def parse(component_string)
+      components = component_string.split('=', 2)
+      unless components.length == 2
+        raise InvalidInput, <<-ERROR.squish
+          '#{component_string}' does not form a key value pair
         ERROR
-        array[0] = array[0].to_sym
-        array[1] = pair(array[0], array[1])
       end
+      key, value = components
+      [key.to_sym, parse_key_pair(key.to_sym, value)]
+    end
+
+    def split_build_string(string)
+      Shellwords.split(string || '')
+    rescue ArgumentError => e
+      raise InvalidInput, e.message
     end
   end
 end

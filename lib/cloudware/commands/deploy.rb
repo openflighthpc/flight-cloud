@@ -25,7 +25,7 @@
 #
 
 require 'cloudware/models/deployment'
-require 'cloudware/param_parser'
+require 'cloudware/replacement_factory'
 
 module Cloudware
   module Commands
@@ -51,21 +51,10 @@ module Cloudware
           template_path: template_path,
           name: name,
           context: context,
-          replacements: replacement_mapping
+          replacements: ReplacementFactory.new(context, name)
+                                          .build(options.params)
         )
       end
-      memoize :deployment
-
-      def replacement_mapping
-        (options.params || '').chomp.split.map do |param_str|
-          parser.string(param_str)
-        end.to_h.merge(deployment_name: name)
-      end
-
-      def parser
-        ParamParser.new(context)
-      end
-      memoize :parser
     end
   end
 end
