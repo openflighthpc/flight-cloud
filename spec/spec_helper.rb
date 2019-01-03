@@ -50,8 +50,9 @@ RSpec.configure do |config|
   config.before do
     # Moves the config into place
     src = File.join(SPEC_DIR, 'fixtures/default-config.yaml')
-    FileUtils.mkdir_p(File.dirname(Cloudware::Config::PATH))
-    FakeFS::FileSystem.clone(src, Cloudware::Config::PATH)
+    dst = File.join(Cloudware::Config.root_dir, 'etc', 'config.yaml')
+    FileUtils.mkdir_p(File.dirname(dst))
+    FakeFS::FileSystem.clone(src, dst)
 
     # Create the log directory
     FileUtils.mkdir_p(File.dirname(Cloudware::Log.path))

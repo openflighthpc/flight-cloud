@@ -31,11 +31,13 @@ require 'active_support/core_ext/module/delegation'
 
 module Cloudware
   class Config
-    PATH = File.join(Cloudware.root_dir, 'etc/config.yml')
-
     class << self
       def cache
         @cache ||= new
+      end
+
+      def root_dir
+        File.expand_path(File.join(__dir__, '..', '..'))
       end
 
       delegate_missing_to :cache
@@ -43,7 +45,7 @@ module Cloudware
 
     def initialize
       @config = TTY::Config.new
-      config.prepend_path(File.join(Cloudware.root_dir, 'etc'))
+      config.prepend_path(File.join(self.class.root_dir, 'etc'))
       config.env_prefix = 'cloudware'
       config.set_from_env('provider')
       config.read
@@ -68,7 +70,7 @@ module Cloudware
     end
 
     def content_path
-      File.join(Cloudware.root_dir, 'var')
+      File.join(self.class.root_dir, 'var')
     end
 
     private
