@@ -5,15 +5,14 @@ general:
   log_file: '/var/log/flightconnector.log'
 
 # Provider credentials
-provider:
-  azure:
-    default_region:
-    tenant_id:
-    subscription_id:
-    client_secret:
-    client_id:
+azure:
+  default_region:
+  tenant_id:
+  subscription_id:
+  client_secret:
+  client_id:
 
-  aws:
-    default_region:
-    access_key_id:
-    secret_access_key:
+aws:
+  default_region:
+  access_key_id:
+  secret_access_key:

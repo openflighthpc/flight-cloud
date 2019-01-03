@@ -61,12 +61,12 @@ module Cloudware
 
     [:azure, :aws].each do |init_provider|
       define_method(init_provider) do
-        OpenStruct.new(config.fetch(:provider, init_provider))
+        OpenStruct.new(config.fetch(init_provider))
       end
     end
 
     def default_region
-      config.fetch(:provider, provider, :default_region)
+      config.fetch(provider, :default_region)
     end
 
     def content_path
