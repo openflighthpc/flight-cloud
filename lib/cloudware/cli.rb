@@ -95,6 +95,7 @@ module Cloudware
         Removes the deployment NAME and instructs the cloud provider to destroy
         the related resources.
       DESC
+      c.option '--force', 'Force delete the deployment from the context'
       action(c, Commands::Destroy)
     end
 
