@@ -86,7 +86,8 @@ module Cloudware
         end
 
         def compute_client
-          MGMT_CLASS::Client.new(credentials)
+          klass = Azure::Compute::Profiles::Latest::Mgmt::Client
+          klass.new(credentials)
         end
       end
 
@@ -125,13 +126,14 @@ module Cloudware
             d.properties = resource_client.model_classes.deployment_properties
                                           .new.tap do |p|
               p.template = JSON.parse(template)
-              p.mode = MGMT_CLASS::Models::DeploymentMode::Complete
+              p.mode = Azure::Resources::Profiles::Latest::Mgmt::Models::DeploymentMode::Complete
             end
           end
         end
 
         def resource_client
-          MGMT_CLASS::Client.new(credentials)
+          klass = Azure::Resources::Profiles::Latest::Mgmt::Client
+          klass.new(credentials)
         end
         memoize :resource_client
       end
