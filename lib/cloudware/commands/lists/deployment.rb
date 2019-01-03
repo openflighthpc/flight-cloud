@@ -43,6 +43,7 @@ module Cloudware
           <% end -%>
 
           <% end -%>
+          *Time Stamp*: <%= deployment.timestamp %>
           *Template*: <%= deployment.template_path %>
 
           ## Results

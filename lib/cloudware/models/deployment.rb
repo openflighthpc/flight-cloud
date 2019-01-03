@@ -29,6 +29,7 @@ require 'cloudware/models/concerns/provider_client'
 require 'cloudware/models/application'
 require 'cloudware/models/machine'
 require 'pathname'
+require 'time'
 
 require 'erb'
 
@@ -38,7 +39,8 @@ module Cloudware
       include Concerns::ProviderClient
 
       SAVE_ATTR = [
-        :template_path, :name, :results, :replacements, :region, :deployment_error
+        :template_path, :name, :results, :replacements, :region, :timestamp,
+        :deployment_error
       ].freeze
       attr_accessor(*SAVE_ATTR)
 
@@ -62,6 +64,7 @@ module Cloudware
       def deploy
         run_callbacks(:deploy) do
           if errors.blank?
+            self.timestamp = Time.now
             run_deploy
           else
             raise ModelValidationError, render_errors_message('deploy')
