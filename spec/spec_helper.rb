@@ -47,11 +47,16 @@ RSpec.configure do |config|
     FactoryBot.find_definitions
   end
 
-  # Clones in the default config file into the faked file system
   config.before do
+    # Moves the config into place
     src = File.join(SPEC_DIR, 'fixtures/default-config.yaml')
     FileUtils.mkdir_p(File.dirname(Cloudware::Config::PATH))
     FakeFS::FileSystem.clone(src, Cloudware::Config::PATH)
+
+    # Create the log directory
+    FileUtils.mkdir_p(File.dirname(Cloudware::Log.path))
+
+    # Stub the `flock` method in the tests as FakeFS doesn't implement it
     allow_any_instance_of(File).to receive(:flock)
   end
 

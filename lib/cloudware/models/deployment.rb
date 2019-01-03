@@ -100,6 +100,7 @@ module Cloudware
         self.results = provider_client.deploy(tag, template)
       rescue => e
         self.deployment_error = e.message
+        Log.error(e.message)
         raise DeploymentError, <<~ERROR.chomp
           An error has occured. Please see for further details:
           `#{Cloudware.app_name} list deployments --verbose`
