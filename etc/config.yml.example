@@ -14,7 +14,14 @@ aws:
   access_key_id:
   secret_access_key:
 
-# ADVANCED CONFIGURATION
+# ADVANCED CONFIGURATION (Optional)
+
+# ============================================================================
+# Content Directory
+# By default cloudware stores its content within the <install-dir>/var
+# directory. This can be optionally changed to a different location
+# =============================================================================
+# content_directory:
 
 # =============================================================================
 # LOG FILE

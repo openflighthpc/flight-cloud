@@ -90,7 +90,9 @@ module Cloudware
     end
 
     def content_path
-      File.join(self.class.root_dir, 'var')
+      config.fetch(:content_directory) do
+        File.join(self.class.root_dir, 'var')
+      end
     end
 
     def debug
