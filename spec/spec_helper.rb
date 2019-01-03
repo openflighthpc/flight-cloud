@@ -27,7 +27,7 @@
 require 'rubygems'
 require 'bundler'
 
-Bundler.setup(:default, :development)
+Bundler.setup(:default, :config, :development)
 require File.join(File.dirname(__FILE__), '../lib/cloudware')
 
 require 'rspec/wait'

@@ -3,17 +3,20 @@
 source 'https://rubygems.org'
 
 gem 'activemodel'
-gem 'activesupport'
 gem 'colorize'
 gem 'commander', git: 'https://github.com/alces-software/commander'
 gem 'ipaddr'
 gem 'memoist'
 gem 'parallel'
 gem 'require_all'
-gem 'tty-config'
 gem 'tty-markdown'
 gem 'tty-spinner'
 gem 'tty-table'
+
+group :config do
+  gem 'tty-config'
+  gem 'activesupport'
+end
 
 group :aws do
   gem 'aws-sdk-cloudformation'
