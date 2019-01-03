@@ -48,6 +48,7 @@ module Cloudware
       config.prepend_path(File.join(self.class.root_dir, 'etc'))
       config.env_prefix = 'cloudware'
       config.set_from_env('provider')
+      config.set_from_env('debug')
       config.read
     end
 
@@ -71,6 +72,10 @@ module Cloudware
 
     def content_path
       File.join(self.class.root_dir, 'var')
+    end
+
+    def debug
+      !!config.fetch(:debug)
     end
 
     private

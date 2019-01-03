@@ -17,9 +17,21 @@ aws:
   access_key_id:
   secret_access_key:
 
+# ADVANCED CONFIGURATION
+
 # =============================================================================
 # STATIC PROVIDER
 # The provider can be statically set within the config. This will override
 # the provider set within the binaries (not recommended)
+#
+# NOTE: There is a limited ability to set this with the `CLOUDWARE_PROVIDER`
+# env var if the source code is required directly (but not through bin/*)
 # =============================================================================
 # provider:
+
+# =============================================================================
+# DEBUG MODE
+# This will turn off the spinner and require the debugging libraries. This can
+# also be set with the `CLOUDWARE_DEBUG` env var
+# =============================================================================
+# debug: true
