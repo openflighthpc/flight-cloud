@@ -1,5 +1,3 @@
-inherit_from: .rubocop_todo.yml
-
 require: rubocop-rspec
 
 AllCops:
@@ -77,3 +75,9 @@ Style/FrozenStringLiteralComment:
 Lint/RescueException:
   Exclude:
     - 'lib/cloudware/command.rb'
+
+# RSpec uses a few key words prefixed with `have_` and similar. Whilst this
+# shouldn't happen in the main code base, its fine in the specs
+Naming/PredicateName:
+  Exclude:
+    - 'spec/**/*'
