@@ -37,18 +37,6 @@ Cloudware can be configured using the global configuration file - Cloudware
 expects this configuration file to be located at:
 `/opt/cloudware/etc/config.yml`
 
-## Log configuration
-
-In order to set up logging - a file needs to be specified. You may either
-create the file with the correct permissions, or allow Cloudware to create the
-log file for you. Specify the log file location in the configuration file using
-the below example:
-
-```yaml
-general:
-  log_file: '/var/log/cloudware.log'
-```
-
 ## Provider configuration
 
 Provider credentials can be provided either:
