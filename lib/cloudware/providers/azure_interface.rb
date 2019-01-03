@@ -31,8 +31,6 @@ require 'cloudware/providers/base'
 module Cloudware
   module Providers
     module AzureInterface
-      MGMT_CLASS = Azure::Resources::Profiles::Latest::Mgmt
-
       class Credentials < Base::Credentials
         def self.build
           {
@@ -86,12 +84,15 @@ module Cloudware
         end
 
         def compute_client
+          # NOTE: This is a different client then below
           klass = Azure::Compute::Profiles::Latest::Mgmt::Client
           klass.new(credentials)
         end
       end
 
       class Client < Base::Client
+        MGMT_CLASS = Azure::Resources::Profiles::Latest::Mgmt
+
         def deploy(name, template)
           group = create_resource_group(name)
           deployment = build_deployment(template)
@@ -126,14 +127,13 @@ module Cloudware
             d.properties = resource_client.model_classes.deployment_properties
                                           .new.tap do |p|
               p.template = JSON.parse(template)
-              p.mode = Azure::Resources::Profiles::Latest::Mgmt::Models::DeploymentMode::Complete
+              p.mode = MGMT_CLASS::Models::DeploymentMode::Complete
             end
           end
         end
 
         def resource_client
-          klass = Azure::Resources::Profiles::Latest::Mgmt::Client
-          klass.new(credentials)
+          MGMT_CLASS::Client.new(credentials)
         end
         memoize :resource_client
       end
