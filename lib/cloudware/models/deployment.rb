@@ -109,7 +109,15 @@ module Cloudware
       end
 
       def run_destroy
-        provider_client.destroy(tag)
+        begin
+          provider_client.destroy(tag)
+        rescue => e
+          Log.error(e.message)
+          raise DeploymentError, <<~ERROR.chomp
+            An has error occured when destroying '#{name}'. See logs for full
+            details: #{Log.path}
+          ERROR
+        end
         context.remove_deployments(self)
       end
 
