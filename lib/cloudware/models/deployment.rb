@@ -63,23 +63,20 @@ module Cloudware
 
       def deploy
         run_callbacks(:deploy) do
-          if errors.blank?
-            self.timestamp = Time.now
-            run_deploy
-          else
-            raise ModelValidationError, render_errors_message('deploy')
+          unless errors.blank?
+            raise ModelValidationError, render_errors_message('destroy')
           end
+          run_deploy
         end
       end
 
       def destroy(force: false)
         run_callbacks(:destroy) do
-          if errors.blank?
-            delete if force
-            run_destroy
-          else
+          unless errors.blank?
             raise ModelValidationError, render_errors_message('destroy')
           end
+          delete if force
+          run_destroy
         end
       end
 
@@ -101,6 +98,7 @@ module Cloudware
       memoize :context
 
       def run_deploy
+        self.timestamp = Time.now
         self.results = provider_client.deploy(tag, template)
       rescue => e
         self.deployment_error = e.message
