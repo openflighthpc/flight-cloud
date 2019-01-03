@@ -42,6 +42,14 @@ aws:
 # provider:
 
 # =============================================================================
+# APPNAME
+# The appname is inferred from the filepath that initiated the ruby process.
+# However it can be independently set in the config or with
+# `CLOUDWARE_APP_NAME` env var
+# =============================================================================
+# app_name:
+
+# =============================================================================
 # DEBUG MODE
 # This will turn off the spinner and require the debugging libraries. This can
 # also be set with the `CLOUDWARE_DEBUG` env var

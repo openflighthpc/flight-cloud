@@ -26,4 +26,5 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export CLOUDWARE_PROVIDER=azure
+export CLOUDWARE_APP_NAME=cloud-azure
 exec $DIR/cloud "$@"

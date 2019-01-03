@@ -47,8 +47,7 @@ module Cloudware
       @config = TTY::Config.new
       config.prepend_path(File.join(self.class.root_dir, 'etc'))
       config.env_prefix = 'cloudware'
-      config.set_from_env('provider')
-      config.set_from_env('debug')
+      ['provider', 'debug', 'app_name'].each { |x| config.set_from_env(x) }
       load_config
     end
 
@@ -85,7 +84,7 @@ module Cloudware
     end
 
     def app_name
-      File.basename($PROGRAM_NAME)
+      config.fetch(:app_name) { File.basename($PROGRAM_NAME) }
     end
 
     private
