@@ -38,10 +38,8 @@ module Cloudware
     def run(done_message = '')
       results = nil
       thr = Thread.new { results = yield }
-      count = 0
       until thr.join(SPIN_DELAY)
         update_foreground_status if (count % CHECK_SPIN).zero?
-        count += 1
         tty_spinner.spin if spin?
       end
       results
@@ -53,6 +51,11 @@ module Cloudware
 
     attr_reader :tty_spinner
     attr_accessor :foreground
+
+    def count
+      @count ||= -1
+      @count += 1
+    end
 
     def update_foreground_status
       status = `ps -o stat= -p #{Process.pid}`
