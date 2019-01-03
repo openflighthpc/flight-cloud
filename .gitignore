@@ -2,7 +2,7 @@
 .vagrant/
 tmp/
 var/
-etc/config.yaml
-etc/config.yml
+etc/config.*
+!etc/config.yml.example
 vendor/
 .bundle/
