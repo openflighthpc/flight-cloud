@@ -117,6 +117,7 @@ GEM
     thread_safe (0.3.6)
     timeliness (0.3.8)
     tty-color (0.4.3)
+    tty-config (0.3.0)
     tty-cursor (0.6.0)
     tty-markdown (0.4.0)
       kramdown (~> 1.16.2)
@@ -166,6 +167,7 @@ DEPENDENCIES
   rspec-wait
   rubocop (~> 0.52.1)
   rubocop-rspec
+  tty-config
   tty-markdown
   tty-spinner
   tty-table
