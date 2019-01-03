@@ -40,7 +40,7 @@ module Cloudware
       thr = Thread.new { results = yield }
       count = 0
       until thr.join(SPIN_DELAY)
-        update_foreground_status if count % CHECK_SPIN == 0
+        update_foreground_status if (count % CHECK_SPIN).zero?
         count += 1
         tty_spinner.spin if spin?
       end
