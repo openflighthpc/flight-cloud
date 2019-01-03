@@ -49,7 +49,22 @@ module Cloudware
       config.env_prefix = 'cloudware'
       config.set_from_env('provider')
       config.set_from_env('debug')
-      config.read
+
+      begin
+        config.read
+      rescue TTY::Config::ReadError
+        $stderr.puts <<~ERROR.chomp
+          Could not load the config file. Please check that it exists:
+          <install-dir>/etc/config.yaml
+        ERROR
+        exit 1
+      rescue
+        $stderr.puts <<~ERROR.chomp
+          An error occurred when loading the config file:
+          #{config.source_file}
+        ERROR
+        exit 1
+      end
     end
 
     def log_file
