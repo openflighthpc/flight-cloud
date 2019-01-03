@@ -72,18 +72,33 @@ module Cloudware
 
     private
 
-    def update_deployments
-      with_file_lock do |file|
-        @deployments = Data.load(file, default_value: []).map do |data|
+    class Updater
+      def self.load_deployments(file)
+        file.rewind
+        Data.load(file, default_value: []).map do |data|
           Models::Deployment.new(**data)
         end
+      end
+
+      def self.save_deployments(file, deployments)
+        file.truncate(0)
+        save_data = deployments.map(&:to_h)
+        Data.dump(file, save_data)
+      end
+    end
+
+    def update_deployments
+      with_file_lock do |file|
+        @deployments = Updater.load_deployments(file)
         if block_given?
           yield
-          save_data = deployments.map(&:to_h)
-          file.truncate(0)
-          Data.dump(file, save_data)
+          Updater.save_deployments(file, deployments)
         end
       end
+    end
+
+    def updater
+      @updater ||= Updater.new(self)
     end
 
     def add_deployment(deployment)
