@@ -30,7 +30,7 @@ module Cloudware
       class Machine < Command
         include Concerns::MarkdownTemplate
 
-        TEMPLATE = <<~TEMPLATE
+        TEMPLATE = <<~ERB
           <% if machines.empty? -%>
           No machines found
           <% end -%>
@@ -41,7 +41,7 @@ module Cloudware
           <% end -%>
 
           <% end -%>
-TEMPLATE
+        ERB
       end
     end
   end

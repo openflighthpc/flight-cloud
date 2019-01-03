@@ -30,7 +30,7 @@ module Cloudware
       class Deployment < Command
         include Concerns::MarkdownTemplate
 
-        TEMPLATE = <<~TEMPLATE
+        TEMPLATE = <<~ERB
           <% if deployments.empty? -%>
           No deployments found
           <% end -%>
@@ -62,7 +62,7 @@ module Cloudware
 
           <% if verbose && deployment.deployment_error -%>
           ## Error
-          *NOTE:* This is `<%= provider %>`'s raw error message
+          *NOTE:* This is `<%= provider %>'s` raw error message
           Refer to their documentation for further details
 
           ```
@@ -71,7 +71,7 @@ module Cloudware
 
           <% end -%>
           <% end -%>
-TEMPLATE
+        ERB
       end
     end
   end
