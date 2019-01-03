@@ -60,7 +60,10 @@ module Cloudware
     end
 
     def provider
-      config.fetch(:provider)
+      config.fetch(:provider) do
+        $stderr.puts 'No provider specified'
+        exit 1
+      end
     end
 
     [:azure, :aws].each do |init_provider|
