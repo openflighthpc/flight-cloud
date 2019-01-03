@@ -97,12 +97,20 @@ module Cloudware
     def load_config
       config.read
     rescue TTY::Config::ReadError
+      missing_config_error
+    rescue
+      invalid_config_error
+    end
+
+    def missing_config_error
       warn <<~ERROR.chomp
         Could not load the config file. Please check that it exists:
         <install-dir>/etc/config.yaml
       ERROR
       exit 1
-    rescue
+    end
+
+    def invalid_config_error
       warn <<~ERROR.chomp
         An error occurred when loading the config file:
         #{config.source_file}
