@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -82,6 +82,10 @@ module Cloudware
 
     def debug
       !!config.fetch(:debug)
+    end
+
+    def app_name
+      File.basename($PROGRAM_NAME)
     end
 
     private

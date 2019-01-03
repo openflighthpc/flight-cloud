@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -29,6 +29,7 @@ require 'cloudware/exceptions'
 
 require 'cloudware/command'
 require 'cloudware/version'
+require 'cloudware/config'
 
 require 'require_all'
 
@@ -44,7 +45,7 @@ module Cloudware
     extend Commander::UI::AskForClass
     extend Commander::Delegates
 
-    program :name, Cloudware.app_name
+    program :name, Config.app_name
     program :version, Cloudware::VERSION
     program :description, 'Cloud orchestration tool'
     program :help_paging, false
