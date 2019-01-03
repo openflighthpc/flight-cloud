@@ -25,6 +25,7 @@
 #
 
 require 'ostruct'
+require 'tty-config'
 
 require 'active_support/core_ext/module/delegation'
 
@@ -42,23 +43,38 @@ module Cloudware
       delegate_missing_to :cache
     end
 
-    attr_accessor :log_file, :aws, :azure, :providers
-    attr_reader :provider, :default_region, :content_path
-
     def initialize
-      config = Data.load(PATH)
-
-      self.log_file = config[:general][:log_file]
-
-      # Providers
-      self.azure = OpenStruct.new(config[:provider][:azure])
-      self.aws = OpenStruct.new(config[:provider][:aws])
-
-      @default = OpenStruct.new(config[:default])
-      @provider = ENV['CLOUDWARE_PROVIDER']
-      @default_region = config[:provider][provider.to_sym][:default_region]
-
-      @content_path = File.join(Cloudware.root_dir, 'var')
+      @config = TTY::Config.new.tap do |config|
+        config.prepend_path(File.join(Cloudware.root_dir, 'etc'))
+        config.env_prefix = 'cloudware'
+        config.read
+      end
     end
+
+    def log_file
+      config.fetch(:general, :log_file)
+    end
+
+    def provider
+      ENV['CLOUDWARE_PROVIDER']
+    end
+
+    [:azure, :aws].each do |init_provider|
+      define_method(init_provider) do
+        OpenStruct.new(config.fetch(:provider, init_provider))
+      end
+    end
+
+    def default_region
+      config.fetch(:provider, provider, :default_region)
+    end
+
+    def content_path
+      File.join(Cloudware.root_dir, 'var')
+    end
+
+    private
+
+    attr_reader :config
   end
 end
