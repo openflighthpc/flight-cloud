@@ -24,7 +24,6 @@
 # ==============================================================================
 #
 
-
 require 'cloudware/replacement_factory'
 
 RSpec.describe Cloudware::ReplacementFactory do
@@ -111,6 +110,7 @@ RSpec.describe Cloudware::ReplacementFactory do
 
     context 'when the string is missing an =' do
       let(:value) { 'i-am-not-a-key-value-pair' }
+
       it_behaves_like 'an invalid input'
     end
 
@@ -132,11 +132,13 @@ RSpec.describe Cloudware::ReplacementFactory do
 
     context 'with an incorrectly quoted string' do
       let(:value) { '"missing-closing-quote' }
+
       it_behaves_like 'an invalid input'
     end
 
     context 'with a deployment' do
       let(:input_string) { "#{key}=*#{deployment_name}" }
+
       include_context 'parse-param-deployment'
 
       it_behaves_like 'a default replacement'

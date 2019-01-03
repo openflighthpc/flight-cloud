@@ -35,7 +35,7 @@ module Cloudware
       def load(file, default_value: DEFAULT_VALUE)
         data = if file.is_a?(IO)
                  file.read
-               elsif File.exists?(file)
+               elsif File.exist?(file)
                  File.read(file)
                else
                  ''

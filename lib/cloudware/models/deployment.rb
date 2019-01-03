@@ -148,12 +148,12 @@ module Cloudware
       end
 
       def validate_template_exists
-        return if File.exists?(template_path)
+        return if File.exist?(template_path)
         errors.add(:template, "No such template: #{template_path}")
       end
 
       def validate_replacement_tags
-        return unless File.exists?(template_path)
+        return unless File.exist?(template_path)
         template.scan(/%[\w-]*%/).each do |match|
           errors.add(match, 'Was not replaced in the template')
         end

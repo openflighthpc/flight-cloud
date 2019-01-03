@@ -56,7 +56,7 @@ module Cloudware
 
     def build(input_string)
       split_build_string(input_string)
-        .reject { |x| x.nil? }
+        .reject(&:nil?)
         .map { |x| parse(x) }
         .to_h
         .merge(deployment_name: deployment_name)
