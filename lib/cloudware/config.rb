@@ -29,8 +29,6 @@ require 'tty-config'
 
 require 'active_support/core_ext/module/delegation'
 
-require 'cloudware/data'
-
 module Cloudware
   class Config
     PATH = File.join(Cloudware.root_dir, 'etc/config.yml')
