@@ -43,6 +43,9 @@ Security/YAMLLoad:
 Style/ClassAndModuleChildren:
   Enabled: false
 
+Style/RescueStandardError:
+  EnforcedStyle: implicit
+
 # If we need a boolean value, having it actually be a boolean rather than
 # checking if it is nil or not is clearer IMO, and `!!value` is a standard way
 # to get this.
