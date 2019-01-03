@@ -16,3 +16,10 @@ aws:
   default_region:
   access_key_id:
   secret_access_key:
+
+# =============================================================================
+# STATIC PROVIDER
+# The provider can be statically set within the config. This will override
+# the provider set within the binaries (not recommended)
+# =============================================================================
+# provider:

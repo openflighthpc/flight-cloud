@@ -44,11 +44,11 @@ module Cloudware
     end
 
     def initialize
-      @config = TTY::Config.new.tap do |config|
-        config.prepend_path(File.join(Cloudware.root_dir, 'etc'))
-        config.env_prefix = 'cloudware'
-        config.read
-      end
+      @config = TTY::Config.new
+      config.prepend_path(File.join(Cloudware.root_dir, 'etc'))
+      config.env_prefix = 'cloudware'
+      config.set_from_env('provider')
+      config.read
     end
 
     def log_file
@@ -56,7 +56,7 @@ module Cloudware
     end
 
     def provider
-      ENV['CLOUDWARE_PROVIDER']
+      config.fetch(:provider)
     end
 
     [:azure, :aws].each do |init_provider|
