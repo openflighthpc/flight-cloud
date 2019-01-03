@@ -202,6 +202,12 @@ RSpec.describe Cloudware::Models::Deployment do
             context.reload
             expect(context.find_deployment(subject.name)).not_to be_nil
           end
+
+          it 'does delete the deployment if the force flag is provided' do
+            begin subject.destroy(force: true); rescue; end
+            context.reload
+            expect(context.find_deployment(subject.name)).to be_nil
+          end
         end
       end
 

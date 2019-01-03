@@ -72,9 +72,10 @@ module Cloudware
         end
       end
 
-      def destroy
+      def destroy(force: false)
         run_callbacks(:destroy) do
           if errors.blank?
+            delete if force
             run_destroy
           else
             raise ModelValidationError, render_errors_message('destroy')
@@ -122,6 +123,10 @@ module Cloudware
             details: #{Log.path}
           ERROR
         end
+        delete
+      end
+
+      def delete
         context.remove_deployments(self)
       end
 
