@@ -2,6 +2,7 @@
 .vagrant/
 tmp/
 var/
+log/
 etc/config.*
 !etc/config.yml.example
 vendor/

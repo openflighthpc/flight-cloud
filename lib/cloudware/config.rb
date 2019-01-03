@@ -68,7 +68,11 @@ module Cloudware
     end
 
     def log_file
-      config.fetch(:general, :log_file)
+      config.fetch(:log_file) do
+        File.join(self.class.root_dir, 'log', 'cloudware.log').tap do |path|
+          FileUtils.mkdir_p(File.dirname(path))
+        end
+      end
     end
 
     def provider
