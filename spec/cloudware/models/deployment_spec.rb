@@ -191,6 +191,18 @@ RSpec.describe Cloudware::Models::Deployment do
           context.reload
           expect(context.find_deployment(subject.name)).to be_nil
         end
+
+        context 'with an error during the destroy' do
+          before do
+            allow(double_client).to receive(:destroy).and_raise('Some error')
+          end
+
+          it 'is not deleted from the context' do
+            begin subject.destroy; rescue; end
+            context.reload
+            expect(context.find_deployment(subject.name)).not_to be_nil
+          end
+        end
       end
 
       context 'without an existing deployment' do
