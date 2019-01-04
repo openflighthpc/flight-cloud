@@ -39,7 +39,7 @@ require 'require_all'
   'lib/cloudware/models/concerns/**/*.rb',
   'lib/cloudware/models/**/*.rb',
   'lib/cloudware/commands/concerns/**/*.rb',
-  'lib/cloudware/commands/**/*.rb'
+  'lib/cloudware/commands/**/*.rb',
 ].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
 
 module Cloudware
