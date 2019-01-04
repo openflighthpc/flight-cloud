@@ -27,17 +27,20 @@
 require 'commander'
 require 'cloudware/exceptions'
 
+require 'cloudware/config'
 require 'cloudware/command'
 require 'cloudware/version'
 require 'cloudware/config'
 
 require 'require_all'
 
-require_all 'lib/cloudware/models/concerns/**/*.rb'
-require_all 'lib/cloudware/models/**/*.rb'
-
-require_all 'lib/cloudware/commands/concerns/**/*.rb'
-require_all 'lib/cloudware/commands/**/*.rb'
+# Require all the following paths
+[
+  'lib/cloudware/models/concerns/**/*.rb',
+  'lib/cloudware/models/**/*.rb',
+  'lib/cloudware/commands/concerns/**/*.rb',
+  'lib/cloudware/commands/**/*.rb'
+].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
 
 module Cloudware
   class CLI
