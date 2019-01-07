@@ -33,8 +33,14 @@ module Cloudware
 
     class << self
       def load(file, default_value: DEFAULT_VALUE)
-        str = File.exist?(file) ? File.read(file) : ''
-        load_string(str, default_value: default_value)
+        data = if file.is_a?(IO)
+                 file.read
+               elsif File.exists?(file)
+                 File.read(file)
+               else
+                 ''
+               end
+        load_string(data, default_value: default_value)
       end
 
       def load_string(string, default_value: DEFAULT_VALUE)

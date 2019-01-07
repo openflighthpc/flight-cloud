@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,40 @@
 # ==============================================================================
 #
 
-module Cloudware
-  module Models
-    module Concerns
-      module ProviderClient
-        extend Memoist
+require 'cloudware/data'
 
-        delegate :provider, to: Config
+RSpec.describe Cloudware::Data do
+  let(:content) { { key: 'test content' } }
+  let(:path) { '/tmp/test/file' }
 
-        private
+  before { FileUtils.mkdir_p(File.dirname(path)) }
 
-        def provider_client
-          if provider == 'aws'
-            require 'cloudware/providers/aws_interface'
-            mod = Providers::AWSInterface
-          else
-            require 'cloudware/providers/azure_interface'
-            mod = Providers::AzureInterface
-          end
-          mod::Client.new(region)
-        end
-        memoize :provider_client
+  shared_examples 'a data loader' do
+    describe '#load' do
+      it 'loads the content' do
+        File.write(path, YAML.dump(content))
+        expect(described_class.load(file)).to eq(content)
       end
     end
+
+    describe '#dump' do
+      it 'writes the content to the file path' do
+        described_class.dump(file, content)
+        expect(YAML.load_file(path)).to eq(content)
+      end
+    end
+  end
+
+  context 'with a string file path' do
+    let(:file) { path }
+
+    it_behaves_like 'a data loader'
+  end
+
+  context 'with a file point input' do
+    let!(:file) { File.open(path, 'a+') }
+    after { file.close }
+
+    it_behaves_like 'a data loader'
   end
 end

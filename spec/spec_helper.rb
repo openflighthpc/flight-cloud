@@ -52,6 +52,7 @@ RSpec.configure do |config|
     src = File.join(SPEC_DIR, 'fixtures/default-config.yaml')
     FileUtils.mkdir_p(File.dirname(Cloudware::Config::PATH))
     FakeFS::FileSystem.clone(src, Cloudware::Config::PATH)
+    allow_any_instance_of(File).to receive(:flock)
   end
 
   config.after { FakeFS.clear! }

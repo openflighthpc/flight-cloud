@@ -40,7 +40,7 @@ module Cloudware
             deployment.deploy
           end
         ensure
-          context.save
+          context.save_deployments(deployment)
         end
       end
 
@@ -50,7 +50,7 @@ module Cloudware
         Models::Deployment.new(
           template_path: template_path,
           name: name,
-          context: context,
+          region: region,
           replacements: ReplacementFactory.new(context, name)
                                           .build(options.params)
         )

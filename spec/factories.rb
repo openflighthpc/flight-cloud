@@ -33,8 +33,10 @@ FactoryBot.define do
     template_path '/tmp/test-template'
     results {}
     replacements nil
-    association :context, strategy: :build
+    region 'eu-west-1'
   end
 
-  factory :context, class: models::Context
+  factory :context, class: Cloudware::Context do
+    initialize_with { new(region: 'eu-west-1') }
+  end
 end

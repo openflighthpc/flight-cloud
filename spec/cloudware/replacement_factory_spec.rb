@@ -40,7 +40,7 @@ RSpec.describe Cloudware::ReplacementFactory do
       build(:deployment, name: deployment_name, results: deployment_results)
     end
 
-    before { context.with_deployment(deployment) }
+    before { context.save_deployments(deployment) }
   end
 
   subject { described_class.new(context, deployment_name) }

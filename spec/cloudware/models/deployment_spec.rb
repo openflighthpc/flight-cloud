@@ -44,19 +44,20 @@ RSpec.describe Cloudware::Models::Deployment do
     end
   end
 
-  shared_examples 'savable deployment' do
-    it 'saves to the context' do
-      begin subject.deploy; rescue RuntimeError; end
-      expect(context.deployments).to include(subject)
+  shared_examples 'validated deployment' do
+    it 'does not error' do
+      expect do
+        subject.deploy
+      end.not_to raise_error
     end
   end
 
   subject do
-    build(:deployment, replacements: replacements, context: context)
+    build(:deployment, replacements: replacements)
   end
 
   let(:replacements) { nil }
-  let(:context) { build(:context) }
+  let(:context) { Cloudware::Context.new(region: subject.region) }
   let(:double_client) do
     object_double(Cloudware::Providers::Base::Client.new('region'))
   end
@@ -64,11 +65,6 @@ RSpec.describe Cloudware::Models::Deployment do
   # Mock the provider_client
   before do
     allow(subject).to receive(:provider_client).and_return(double_client)
-  end
-
-  it 'does not update the context on build' do
-    deployment = build(:deployment, context: context)
-    expect(context.deployments).not_to include(deployment)
   end
 
   context 'with a replacement hash' do
@@ -107,11 +103,6 @@ RSpec.describe Cloudware::Models::Deployment do
       it 'returns objects with the machine names' do
         expect(subject.machines.map(&:name)).to contain_exactly(*machines)
       end
-
-      xit 'creates objects that back reference the deployment' do
-        machine_deployments = subject.machines.map(&:deployment)
-        expect(machine_deployments.uniq).to contain_exactly(subject)
-      end
     end
   end
 
@@ -138,10 +129,15 @@ RSpec.describe Cloudware::Models::Deployment do
           expect { subject.deploy }.not_to raise_error
         end
 
-        it_behaves_like 'savable deployment'
+        it_behaves_like 'validated deployment'
 
-        context 'without a context' do
-          let(:context) { nil }
+        it 'does not record any deployment errors' do
+          subject.deploy
+          expect(subject.deployment_error).to be_nil
+        end
+
+        context 'without a region' do
+          before { subject.region = nil }
 
           include_examples 'deploy raises ModelValidationError'
         end
@@ -151,17 +147,24 @@ RSpec.describe Cloudware::Models::Deployment do
             build(:deployment, name: subject.name)
           end
 
-          before { context.deployments = [existing_deployment] }
+          before { context.save_deployments(existing_deployment) }
 
           it_behaves_like 'validation error deployment'
         end
 
         context 'with a provider related error' do
+          let(:message) { 'I am an error message' }
+
           before do
-            allow(double_client).to receive(:deploy).and_raise(RuntimeError)
+            allow(double_client).to receive(:deploy).and_raise(RuntimeError, message)
           end
 
-          it_behaves_like 'savable deployment'
+          it_behaves_like 'validated deployment'
+
+          it 'saves the deployment error message' do
+            subject.deploy
+            expect(subject.deployment_error).to eq(message)
+          end
         end
       end
 

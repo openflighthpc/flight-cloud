@@ -49,9 +49,13 @@ module Cloudware
     end
 
     def context
-      Models::Context.new(region: options.region)
+      Context.new(region: options.region)
     end
     memoize :context
+
+    def region
+      options.region || Config.default_region
+    end
 
     private
 

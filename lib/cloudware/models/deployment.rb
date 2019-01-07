@@ -24,10 +24,10 @@
 # ==============================================================================
 #
 
+require 'cloudware/context'
 require 'cloudware/models/concerns/provider_client'
 require 'cloudware/models/application'
 require 'cloudware/models/machine'
-require 'cloudware/models/context'
 require 'pathname'
 
 require 'erb'
@@ -37,14 +37,16 @@ module Cloudware
     class Deployment < Application
       include Concerns::ProviderClient
 
-      SAVE_ATTR = [:template_path, :name, :results, :replacements].freeze
-      attr_accessor(*SAVE_ATTR, :context)
+      SAVE_ATTR = [
+        :template_path, :name, :results, :replacements, :region, :deployment_error
+      ].freeze
+      attr_accessor(*SAVE_ATTR)
 
       define_model_callbacks :deploy
 
       before_deploy :validate_template_exists
       before_deploy :validate_replacement_tags
-      before_deploy :validate_context
+      before_deploy :validate_region
       before_deploy :validate_no_existing_deployment
 
       def template
@@ -73,7 +75,6 @@ TEMPLATE
       end
 
       def destroy
-        context&.remove_deployment(self)
         provider_client.destroy(tag)
       end
 
@@ -91,8 +92,8 @@ TEMPLATE
 
       def run_deploy
         self.results = provider_client.deploy(tag, template)
-      ensure
-        context.with_deployment(self)
+      rescue => e
+        self.deployment_error = e.message
       end
 
       def tag
@@ -115,12 +116,13 @@ TEMPLATE
         end
       end
 
-      def validate_context
-        return if context.is_a? Cloudware::Models::Context
-        errors.add(:context, 'Is not a context model')
+      def validate_region
+        return if region
+        errors.add(:region, 'No region specified')
       end
 
       def validate_no_existing_deployment
+        context = Context.new(region: region)
         return unless context.respond_to?(:find_deployment)
         return unless context.find_deployment(name)
         errors.add(:context, 'The deployment already exists')
