@@ -31,7 +31,11 @@ module Cloudware
   class Log
     class << self
       def cache
-        @cache ||= Logger.new(Config.log_file)
+        @cache ||= Logger.new(self.path)
+      end
+
+      def path
+        Config.log_file
       end
 
       delegate_missing_to :cache

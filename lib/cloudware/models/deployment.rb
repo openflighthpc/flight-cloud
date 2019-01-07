@@ -43,11 +43,14 @@ module Cloudware
       attr_accessor(*SAVE_ATTR)
 
       define_model_callbacks :deploy
+      define_model_callbacks :destroy
 
       before_deploy :validate_template_exists
       before_deploy :validate_replacement_tags
       before_deploy :validate_region
       before_deploy :validate_no_existing_deployment
+
+      before_destroy :validate_existing_deployment
 
       def template
         return raw_template unless replacements
@@ -61,22 +64,19 @@ module Cloudware
           if errors.blank?
             run_deploy
           else
-            msg = ERB.new(<<~TEMPLATE, nil, '-').result(binding).chomp
-              Failed to deploy resources. The following errors have occurred:
-              <% errors.messages.map do |key, messages| -%>
-              <% messages.each do |message| -%>
-              <%= key %>: <%= message %>
-              <% end -%>
-              <% end -%>
-TEMPLATE
-            raise ModelValidationError, msg
+            raise ModelValidationError, render_errors_message('deploy')
           end
         end
       end
 
       def destroy
-        provider_client.destroy(tag)
-        context.remove_deployments(self)
+        run_callbacks(:destroy) do
+          if errors.blank?
+            run_destroy
+          else
+            raise ModelValidationError, render_errors_message('destroy')
+          end
+        end
       end
 
       def machines
@@ -100,12 +100,37 @@ TEMPLATE
         self.results = provider_client.deploy(tag, template)
       rescue => e
         self.deployment_error = e.message
+        Log.error(e.message)
         raise DeploymentError, <<~ERROR.chomp
           An error has occured. Please see for further details:
           `#{Cloudware.app_name} list deployments --verbose`
         ERROR
       ensure
         context.save_deployments(self)
+      end
+
+      def run_destroy
+        begin
+          provider_client.destroy(tag)
+        rescue => e
+          Log.error(e.message)
+          raise DeploymentError, <<~ERROR.chomp
+            An has error occured when destroying '#{name}'. See logs for full
+            details: #{Log.path}
+          ERROR
+        end
+        context.remove_deployments(self)
+      end
+
+      def render_errors_message(action)
+        ERB.new(<<~TEMPLATE, nil, '-').result(binding).chomp
+          Failed to <%= action %> resources. The following errors have occurred:
+          <% errors.messages.map do |key, messages| -%>
+          <% messages.each do |message| -%>
+          <%= key %>: <%= message %>
+          <% end -%>
+          <% end -%>
+        TEMPLATE
       end
 
       def tag
@@ -135,9 +160,14 @@ TEMPLATE
 
       def validate_no_existing_deployment
         # Reload the context during the validation `context(true)`
-        return unless context(true).respond_to?(:find_deployment)
-        return unless context.find_deployment(name)
+        return unless context(true).find_deployment(name)
         errors.add(:context, 'The deployment already exists')
+      end
+
+      def validate_existing_deployment
+        # Reload the context during the validation `context(true)`
+        return if context(true).find_deployment(name)
+        errors.add(:context, 'The deployment does not exists')
       end
     end
   end

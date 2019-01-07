@@ -150,6 +150,14 @@ RSpec.describe Cloudware::Context do
       expect(subject.find_deployment(other_deployment.name)).to be_nil
     end
 
+    describe '#reload' do
+      it 'loads the other deployment' do
+        other_name = other_deployment.name
+        subject.reload
+        expect(subject.find_deployment(other_name)&.name).to eq(other_name)
+      end
+    end
+
     describe '#save_deployments' do
       let(:new_deployment) do
         build(:deployment, name: 'new_deployment', region: subject.region)

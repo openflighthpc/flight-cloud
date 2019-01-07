@@ -183,6 +183,18 @@ Parameters are substituted as literal strings by default. In the above example,
 all occurrences of `%keyname%` in the template will be replaced with
 `my-aws-key`.
 
+It is possible to pass values containing spaces by quoting the value. Without
+the quotes, the value sections will be interpreted as different inputs.
+For example:
+
+```
+# Bad
+bin/cloud-aws deploy some template --params 'my-key=some string with spaces'
+
+# Good
+bin/cloud-aws deploy some template --params 'my-key="some string with spaces"'
+```
+
 *Deployment Results*: `securitygroup=*my-domain`
 
 In some cases a deployment needs to reference a resource within a previous

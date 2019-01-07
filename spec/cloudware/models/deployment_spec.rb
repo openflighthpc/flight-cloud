@@ -174,5 +174,32 @@ RSpec.describe Cloudware::Models::Deployment do
         it_behaves_like 'validation error deployment'
       end
     end
+
+    describe '#destroy' do
+      let(:template_content) { '' }
+
+      before do
+        allow(double_client).to receive(:deploy)
+        allow(double_client).to receive(:destroy)
+      end
+
+      context 'with an existing deployment' do
+        before { subject.deploy }
+
+        it 'deletes the deployment' do
+          subject.destroy
+          context.reload
+          expect(context.find_deployment(subject.name)).to be_nil
+        end
+      end
+
+      context 'without an existing deployment' do
+        it 'raise ModelValidationError' do
+          expect do
+            subject.destroy
+          end.to raise_error(Cloudware::ModelValidationError)
+        end
+      end
+    end
   end
 end
