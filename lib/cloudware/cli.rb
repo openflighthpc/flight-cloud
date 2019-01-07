@@ -26,7 +26,9 @@
 
 require 'commander'
 require 'cloudware/exceptions'
+
 require 'cloudware/command'
+require 'cloudware/version'
 
 require 'require_all'
 
@@ -42,8 +44,8 @@ module Cloudware
     extend Commander::UI::AskForClass
     extend Commander::Delegates
 
-    program :name, 'flightconnector'
-    program :version, '0.0.1'
+    program :name, File.basename($PROGRAM_NAME)
+    program :version, Cloudware::VERSION
     program :description, 'Cloud orchestration tool'
 
     global_option('--region REGION', 'Specify cloud platform region')
@@ -60,76 +62,80 @@ module Cloudware
     end
 
     def self.cli_syntax(command, args_str = '')
-      s = "flightconnector #{command.name} #{args_str} [options]".squish
-      command.syntax = s
+      command.syntax = <<~SYNTAX.squish
+        #{program(:name)} #{command.name} #{args_str} [options]
+      SYNTAX
     end
 
     command 'deploy' do |c|
-      cli_syntax(c, 'NAME TEMPLATE_PATH')
-      c.summary = 'Deploy new resource(s) from template'
+      cli_syntax(c, 'NAME TEMPLATE')
+      c.summary = 'Deploy new resource(s) define by a template'
       c.description = <<-DESC.strip_heredoc
-        Deploy new resource(s) from the specified TEMPLATE_PATH. This should
+        Deploy new resource(s) from the specified TEMPLATE. This should
         specifiy the absolute path (including extension) to the template.
 
-        The deployment will be given the NAME lable and logged locally. The name
+        The deployment will be given the NAME label and logged locally. The name
         used by the provider will be based off this with minor variations.
 
         The templates also support basic rendering of parameters from the
         command line. This is intended to provide minor tweaks to the templates
         (e.g. IPs or names). Major difference should use separate templates.
-
-        The key value pairs to be rendered are given by the `--param` option.
-        The renderer will replace occurrences of `%REPLACE_KEY%` in the template
-        with the `IDENTIFIER`. By default this is a simple string substitution.
-
-        It is possible to reference keys within previous deployments using the
-        `*` prefix. This will cause `*IDENTIFIER` to be interpreted as a
-        deployment name. In this case, the deployment result corresponding with
-        `OUTPUT_KEY` is used in the sustitution. If `OUTPUT_KEY` is missing,
-        then it is assumed to be the same as `REPLACE_KEY`.
       DESC
       c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
-               String, 'A space separate list of keys to replace'
+               String, 'A space separated list of keys to be replaced'
       action(c, Commands::Deploy)
     end
 
     command 'destroy' do |c|
       cli_syntax(c, 'NAME')
-      c.description = 'Destroy the deployment and related resources'
+      c.summary = 'Destroy a deployment and related resouces'
+      c.description = <<~DESC
+        Removes the deployment NAME and instructs the cloud provider to destroy
+        the related resources.
+      DESC
       action(c, Commands::Destroy)
     end
 
     command 'list' do |c|
       cli_syntax(c)
-      c.description = 'List related subcommands'
+      c.summary = 'List the deployed cloud resources'
       c.sub_command_group = true
     end
 
     command 'list deployments' do |c|
       cli_syntax(c)
-      c.description = 'List all the deployments'
+      c.description = 'List all the previous deployed templates'
       c.hidden = true
       action(c, Commands::Lists::Deployment)
     end
 
     command 'list machines' do |c|
       cli_syntax(c)
-      c.description = 'List all the machines'
+      c.summary = 'List all the previous deployed machines'
+      c.description = <<~DESC
+        List the machines created within a previous deployment. This command
+        does not poll the provider for any information.
+
+        Instead it list the deployment outputs which follow the machine tag
+        format: `<machine-name>TAG<key>`
+      DESC
       c.hidden = true
       action(c, Commands::Lists::Machine)
     end
 
     command 'power' do |c|
       cli_syntax(c)
-      c.description = 'Power related commands'
+      c.description = 'Start or stop machine and check their power status'
       c.sub_command_group = true
     end
 
     def self.shared_power_attr(c)
+      action = c.name.split.last
       cli_attr = 'IDENTIFIER'
       cli_syntax(c, cli_attr)
-      c.option '-g', '--group',
-               "Preform the action over the group specified by #{cli_attr}"
+      c.option '-g', '--group', <<~DESC
+        Preform the '#{action}' action on machine in group '#{cli_attr}'
+      DESC
       c.hidden = true
     end
 
