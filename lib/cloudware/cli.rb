@@ -44,7 +44,7 @@ module Cloudware
     extend Commander::UI::AskForClass
     extend Commander::Delegates
 
-    program :name, File.basename($PROGRAM_NAME)
+    program :name, Cloudware.app_name
     program :version, Cloudware::VERSION
     program :description, 'Cloud orchestration tool'
 
@@ -106,6 +106,7 @@ module Cloudware
       cli_syntax(c)
       c.description = 'List all the previous deployed templates'
       c.hidden = true
+      c.option '-v', '--verbose', 'Show full error messages'
       action(c, Commands::Lists::Deployment)
     end
 

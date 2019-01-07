@@ -36,8 +36,6 @@ module Cloudware
         with_spinner('Destroying resources...', done: 'Done') do
           deployment.destroy
         end
-      ensure
-        context.remove_deployments(deployment)
       end
 
       private

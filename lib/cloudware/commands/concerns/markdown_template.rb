@@ -12,7 +12,7 @@ module Cloudware
         end
 
         def rendered_markdown
-          context.render(self.class::TEMPLATE)
+          context.render(self.class::TEMPLATE, verbose: options.verbose)
         end
       end
     end

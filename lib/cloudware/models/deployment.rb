@@ -76,6 +76,7 @@ TEMPLATE
 
       def destroy
         provider_client.destroy(tag)
+        context.remove_deployments(self)
       end
 
       def machines
@@ -90,10 +91,21 @@ TEMPLATE
 
       private
 
+      def context
+        Context.new(region: region)
+      end
+      memoize :context
+
       def run_deploy
         self.results = provider_client.deploy(tag, template)
       rescue => e
         self.deployment_error = e.message
+        raise DeploymentError, <<~ERROR.chomp
+          An error has occured. Please see for further details:
+          `#{Cloudware.app_name} list deployments --verbose`
+        ERROR
+      ensure
+        context.save_deployments(self)
       end
 
       def tag
@@ -122,8 +134,8 @@ TEMPLATE
       end
 
       def validate_no_existing_deployment
-        context = Context.new(region: region)
-        return unless context.respond_to?(:find_deployment)
+        # Reload the context during the validation `context(true)`
+        return unless context(true).respond_to?(:find_deployment)
         return unless context.find_deployment(name)
         errors.add(:context, 'The deployment already exists')
       end
