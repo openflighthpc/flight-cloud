@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -103,7 +103,7 @@ module Cloudware
         Log.error(e.message)
         raise DeploymentError, <<~ERROR.chomp
           An error has occured. Please see for further details:
-          `#{Cloudware.app_name} list deployments --verbose`
+          `#{Config.app_name} list deployments --verbose`
         ERROR
       ensure
         context.save_deployments(self)

@@ -37,18 +37,6 @@ Cloudware can be configured using the global configuration file - Cloudware
 expects this configuration file to be located at:
 `/opt/cloudware/etc/config.yml`
 
-## Log configuration
-
-In order to set up logging - a file needs to be specified. You may either
-create the file with the correct permissions, or allow Cloudware to create the
-log file for you. Specify the log file location in the configuration file using
-the below example:
-
-```yaml
-general:
-  log_file: '/var/log/cloudware.log'
-```
-
 ## Provider configuration
 
 Provider credentials can be provided either:
@@ -62,17 +50,16 @@ Azure providers in the Cloudware configuration file:
 The default region for each provider is also specified within the config
 
 ```yaml
-provider:
-  azure:
-    default_region: <insert azure region>
-    tenant_id: '<insert your tenant ID here>'
-    subscription_id: '<insert your subscription ID here>'
-    client_secret: '<insert your client secret here>'
-    client_id: '<insert your client ID here>'
-  aws:
-    default_region: <insert aws region>
-    access_key_id: '<insert your access key here>'
-    secret_access_key: '<insert your secret key here>'
+azure:
+  default_region: <insert azure region>
+  tenant_id: '<insert your tenant ID here>'
+  subscription_id: '<insert your subscription ID here>'
+  client_secret: '<insert your client secret here>'
+  client_id: '<insert your client ID here>'
+aws:
+  default_region: <insert aws region>
+  access_key_id: '<insert your access key here>'
+  secret_access_key: '<insert your secret key here>'
 ```
 
 # Configuring Cloud Authentication

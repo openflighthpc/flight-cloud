@@ -27,7 +27,7 @@
 require 'rubygems'
 require 'bundler'
 
-Bundler.setup(:default, :development)
+Bundler.setup(:default, :config, :development)
 require File.join(File.dirname(__FILE__), '../lib/cloudware')
 
 require 'rspec/wait'
@@ -50,11 +50,9 @@ RSpec.configure do |config|
   config.before do
     # Moves the config into place
     src = File.join(SPEC_DIR, 'fixtures/default-config.yaml')
-    FileUtils.mkdir_p(File.dirname(Cloudware::Config::PATH))
-    FakeFS::FileSystem.clone(src, Cloudware::Config::PATH)
-
-    # Create the log directory
-    FileUtils.mkdir_p(File.dirname(Cloudware::Log.path))
+    dst = File.join(Cloudware::Config.root_dir, 'etc', 'config.yaml')
+    FileUtils.mkdir_p(File.dirname(dst))
+    FakeFS::FileSystem.clone(src, dst)
 
     # Stub the `flock` method in the tests as FakeFS doesn't implement it
     allow_any_instance_of(File).to receive(:flock)

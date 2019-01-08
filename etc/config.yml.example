@@ -1,19 +1,57 @@
 # Please fill this file out with your aws and azure keys
 # and renamed: "etc/config.yml"
 
-general:
-  log_file: '/var/log/flightconnector.log'
-
 # Provider credentials
-provider:
-  azure:
-    default_region:
-    tenant_id:
-    subscription_id:
-    client_secret:
-    client_id:
+azure:
+  default_region:
+  tenant_id:
+  subscription_id:
+  client_secret:
+  client_id:
 
-  aws:
-    default_region:
-    access_key_id:
-    secret_access_key:
+aws:
+  default_region:
+  access_key_id:
+  secret_access_key:
+
+# ADVANCED CONFIGURATION (Optional)
+
+# ============================================================================
+# Content Directory
+# By default cloudware stores its content within the <install-dir>/var
+# directory. This can be optionally changed to a different location
+# =============================================================================
+# content_directory:
+
+# =============================================================================
+# LOG FILE
+# By default cloudware log into <install-dir>/log/cloudware.log file. It does
+# not setup log rotations on the file. Cloudware can be configured to log
+# somewhere else with the `log_file` key
+# =============================================================================
+# log_file:
+
+# =============================================================================
+# STATIC PROVIDER
+# The provider can be statically set within the config. This will override
+# the provider set within the binaries (not recommended)
+#
+# NOTE: There is a limited ability to set this with the `CLOUDWARE_PROVIDER`
+# env var if the source code is required directly (but not through bin/*)
+# =============================================================================
+# provider:
+
+# =============================================================================
+# APPNAME
+# The appname is inferred from the filepath that initiated the ruby process.
+# However it can be independently set in the config or with
+# `CLOUDWARE_APP_NAME` env var
+# =============================================================================
+# app_name:
+
+# =============================================================================
+# DEBUG MODE
+# This will turn off the spinner and require the debugging libraries. This can
+# also be set with the `CLOUDWARE_DEBUG` env var
+# =============================================================================
+# debug: true

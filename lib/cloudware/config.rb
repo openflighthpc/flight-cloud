@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -25,40 +25,89 @@
 #
 
 require 'ostruct'
+require 'tty-config'
 
 require 'active_support/core_ext/module/delegation'
 
-require 'cloudware/data'
-
 module Cloudware
   class Config
-    PATH = File.join(Cloudware.root_dir, 'etc/config.yml')
-
     class << self
       def cache
         @cache ||= new
       end
 
+      def root_dir
+        File.expand_path(File.join(__dir__, '..', '..'))
+      end
+
       delegate_missing_to :cache
     end
 
-    attr_accessor :log_file, :aws, :azure, :providers
-    attr_reader :provider, :default_region, :content_path
-
     def initialize
-      config = Data.load(PATH)
+      @config = TTY::Config.new
+      config.prepend_path(File.join(self.class.root_dir, 'etc'))
+      config.env_prefix = 'cloudware'
+      ['provider', 'debug', 'app_name'].each { |x| config.set_from_env(x) }
+      load_config
+    end
 
-      self.log_file = config[:general][:log_file]
+    def log_file
+      config.fetch(:log_file) do
+        File.join(self.class.root_dir, 'log', 'cloudware.log').tap do |path|
+          FileUtils.mkdir_p(File.dirname(path))
+        end
+      end
+    end
 
-      # Providers
-      self.azure = OpenStruct.new(config[:provider][:azure])
-      self.aws = OpenStruct.new(config[:provider][:aws])
+    def provider
+      config.fetch(:provider) do
+        $stderr.puts 'No provider specified'
+        exit 1
+      end
+    end
 
-      @default = OpenStruct.new(config[:default])
-      @provider = ENV['CLOUDWARE_PROVIDER']
-      @default_region = config[:provider][provider.to_sym][:default_region]
+    [:azure, :aws].each do |init_provider|
+      define_method(init_provider) do
+        OpenStruct.new(config.fetch(init_provider))
+      end
+    end
 
-      @content_path = File.join(Cloudware.root_dir, 'var')
+    def default_region
+      config.fetch(provider, :default_region)
+    end
+
+    def content_path
+      config.fetch(:content_directory) do
+        File.join(self.class.root_dir, 'var')
+      end
+    end
+
+    def debug
+      !!config.fetch(:debug)
+    end
+
+    def app_name
+      config.fetch(:app_name) { File.basename($PROGRAM_NAME) }
+    end
+
+    private
+
+    attr_reader :config
+
+    def load_config
+      config.read
+    rescue TTY::Config::ReadError
+      $stderr.puts <<~ERROR.chomp
+        Could not load the config file. Please check that it exists:
+        <install-dir>/etc/config.yaml
+      ERROR
+      exit 1
+    rescue
+      $stderr.puts <<~ERROR.chomp
+        An error occurred when loading the config file:
+        #{config.source_file}
+      ERROR
+      exit 1
     end
   end
 end

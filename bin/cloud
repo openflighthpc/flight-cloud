@@ -1,9 +1,9 @@
+#!/usr/bin/env ruby
 # frozen_string_literal: true
-# vi:syntax=ruby
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -34,11 +34,15 @@ Thread.report_on_exception = false
 require 'rubygems'
 require 'bundler'
 
-if ENV['CLOUDWARE_DEBUG']
-  Bundler.setup(ENV['CLOUDWARE_PROVIDER'], :default, :development)
-  require 'pry'
-  require 'pry-byebug'
-else
-  Bundler.setup(ENV['CLOUDWARE_PROVIDER'], :default)
-end
+# Require the config and associated gems
+Bundler.require(:config)
+require 'cloudware/config'
 
+# Require the development gems
+Bundler.require(:development) if Cloudware::Config.debug
+
+# Setup the load path for remaining gems
+Bundler.setup(:default, Cloudware::Config.provider)
+
+require 'cloudware'
+Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__

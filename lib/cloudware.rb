@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -32,22 +32,6 @@ require 'active_model/errors'
 
 require 'colorize'
 require 'memoist'
-
-module Cloudware
-  class << self
-    def root_dir
-      @root_dir ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))
-    end
-
-    def debug?
-      !!ENV['CLOUDWARE_DEBUG']
-    end
-
-    def app_name
-      File.basename($PROGRAM_NAME)
-    end
-  end
-end
 
 require 'cloudware/config'
 require 'cloudware/cli'
