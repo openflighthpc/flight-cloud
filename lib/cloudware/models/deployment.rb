@@ -25,6 +25,7 @@
 #
 
 require 'cloudware/context'
+require 'cloudware/models/deployment_callbacks'
 require 'cloudware/models/concerns/provider_client'
 require 'cloudware/models/application'
 require 'cloudware/models/machine'
@@ -37,22 +38,13 @@ module Cloudware
   module Models
     class Deployment < Application
       include Concerns::ProviderClient
+      include DeploymentCallbacks
 
       SAVE_ATTR = [
         :template_path, :name, :results, :replacements, :region, :timestamp,
         :deployment_error
       ].freeze
       attr_accessor(*SAVE_ATTR)
-
-      define_model_callbacks :deploy
-      define_model_callbacks :destroy
-
-      before_deploy :validate_template_exists
-      before_deploy :validate_replacement_tags
-      before_deploy :validate_region
-      before_deploy :validate_no_existing_deployment
-
-      before_destroy :validate_existing_deployment
 
       def template
         return raw_template unless replacements
@@ -63,23 +55,20 @@ module Cloudware
 
       def deploy
         run_callbacks(:deploy) do
-          if errors.blank?
-            self.timestamp = Time.now
-            run_deploy
-          else
-            raise ModelValidationError, render_errors_message('deploy')
+          unless errors.blank?
+            raise ModelValidationError, render_errors_message('destroy')
           end
+          run_deploy
         end
       end
 
       def destroy(force: false)
         run_callbacks(:destroy) do
-          if errors.blank?
-            delete if force
-            run_destroy
-          else
+          unless errors.blank?
             raise ModelValidationError, render_errors_message('destroy')
           end
+          delete if force
+          run_destroy
         end
       end
 
@@ -101,6 +90,7 @@ module Cloudware
       memoize :context
 
       def run_deploy
+        self.timestamp = Time.now
         self.results = provider_client.deploy(tag, template)
       rescue => e
         self.deployment_error = e.message
@@ -147,35 +137,6 @@ module Cloudware
 
       def raw_template
         File.read(template_path)
-      end
-
-      def validate_template_exists
-        return if File.exists?(template_path)
-        errors.add(:template, "No such template: #{template_path}")
-      end
-
-      def validate_replacement_tags
-        return unless File.exists?(template_path)
-        template.scan(/%[\w-]*%/).each do |match|
-          errors.add(match, 'Was not replaced in the template')
-        end
-      end
-
-      def validate_region
-        return if region
-        errors.add(:region, 'No region specified')
-      end
-
-      def validate_no_existing_deployment
-        # Reload the context during the validation `context(true)`
-        return unless context(true).find_deployment(name)
-        errors.add(:context, 'The deployment already exists')
-      end
-
-      def validate_existing_deployment
-        # Reload the context during the validation `context(true)`
-        return if context(true).find_deployment(name)
-        errors.add(:context, 'The deployment does not exists')
       end
     end
   end

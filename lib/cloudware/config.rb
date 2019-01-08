@@ -61,7 +61,7 @@ module Cloudware
 
     def provider
       config.fetch(:provider) do
-        $stderr.puts 'No provider specified'
+        warn 'No provider specified'
         exit 1
       end
     end
@@ -97,13 +97,21 @@ module Cloudware
     def load_config
       config.read
     rescue TTY::Config::ReadError
-      $stderr.puts <<~ERROR.chomp
+      missing_config_error
+    rescue
+      invalid_config_error
+    end
+
+    def missing_config_error
+      warn <<~ERROR.chomp
         Could not load the config file. Please check that it exists:
         <install-dir>/etc/config.yaml
       ERROR
       exit 1
-    rescue
-      $stderr.puts <<~ERROR.chomp
+    end
+
+    def invalid_config_error
+      warn <<~ERROR.chomp
         An error occurred when loading the config file:
         #{config.source_file}
       ERROR

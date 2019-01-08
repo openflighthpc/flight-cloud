@@ -56,6 +56,7 @@ RSpec.describe Cloudware::Data do
 
   context 'with a file point input' do
     let!(:file) { File.open(path, 'a+') }
+
     after { file.close }
 
     it_behaves_like 'a data loader'

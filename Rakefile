@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 ENV['CLOUDWARE_DEBUG'] = 'true'
 require_relative 'lib/cloudware.rb'
 

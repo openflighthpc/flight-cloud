@@ -14,8 +14,8 @@ gem 'tty-spinner'
 gem 'tty-table'
 
 group :config do
-  gem 'tty-config'
   gem 'activesupport'
+  gem 'tty-config'
 end
 
 group :aws do

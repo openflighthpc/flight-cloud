@@ -31,7 +31,7 @@ module Cloudware
   class Log
     class << self
       def cache
-        @cache ||= Logger.new(self.path)
+        @cache ||= Logger.new(path)
       end
 
       def path

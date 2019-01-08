@@ -74,7 +74,7 @@ RSpec.describe Cloudware::Context do
       context 'with a completely new deployment' do
         let(:new_deployment) { build(:deployment, name: 'new') }
 
-        it 'it saves the new deployment to the end of the stack' do
+        it 'saves the new deployment to the end of the stack' do
           expect(new_context.deployments.length).to eq(2)
           expect(new_context.deployments.last.name).to eq(new_deployment.name)
         end
@@ -165,6 +165,7 @@ RSpec.describe Cloudware::Context do
       let(:all_names) do
         [new_deployment, initial_deployment, other_deployment].map(&:name)
       end
+
       before { subject.save_deployments(new_deployment) }
 
       it 'contains the initial, new, and other deployments' do
