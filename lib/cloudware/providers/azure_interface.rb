@@ -31,8 +31,6 @@ require 'cloudware/providers/base'
 module Cloudware
   module Providers
     module AzureInterface
-      MGMT_CLASS = Azure::Resources::Profiles::Latest::Mgmt
-
       class Credentials < Base::Credentials
         def self.build
           {
@@ -86,11 +84,15 @@ module Cloudware
         end
 
         def compute_client
-          MGMT_CLASS::Client.new(credentials)
+          # NOTE: This is a different client then below
+          klass = Azure::Compute::Profiles::Latest::Mgmt::Client
+          klass.new(credentials)
         end
       end
 
       class Client < Base::Client
+        MGMT_CLASS = Azure::Resources::Profiles::Latest::Mgmt
+
         def deploy(name, template)
           group = create_resource_group(name)
           deployment = build_deployment(template)
