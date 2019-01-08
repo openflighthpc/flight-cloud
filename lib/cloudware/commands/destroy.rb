@@ -34,7 +34,7 @@ module Cloudware
       def run
         @name = argv[0]
         with_spinner('Destroying resources...', done: 'Done') do
-          deployment.destroy
+          deployment.destroy(force: options.force)
         end
       end
 
