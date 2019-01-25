@@ -20,6 +20,7 @@
 # For more information on the Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
+initial_env=$(env)
 alces_INSTALL_DIR="${alces_INSTALL_DIR:-/opt/flight/tools}"
 alces_VERSION="${alces_VERSION:-2019.1.0.rc6}"
 
@@ -41,9 +42,16 @@ SCRIPT_BASE=$(basename $SCRIPT_PATH)
 
 if [[ $SCRIPT_BASE != "scripts" ]] ; then 
     CLONE=true
+    CHECKOUT=true
 else
     CLONE=""
     alces_INSTALL_DIR=$SCRIPT_PARENT_PATH
+    # Check if alces_VERSION was specified on CLI
+    if echo "$initial_env" |grep -q '^alces_FLIGHT' ; then
+        CHECKOUT=true
+    else
+        CHECKOUT=""
+    fi
 fi
 
 # Create install dir
@@ -55,8 +63,10 @@ if [ ! -z $CLONE ] ; then
     git clone https://github.com/alces-software/cloudware
 fi
 
-cd cloudware
-git checkout $alces_VERSION
+if [ ! -z $CHECKOUT ] ; then
+    cd cloudware
+    git checkout $alces_VERSION
+fi
 
 # Install dependencies
 flexec bundle install --path=vendor --without development test
