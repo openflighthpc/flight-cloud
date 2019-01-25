@@ -62,10 +62,12 @@ git checkout $alces_VERSION
 flexec bundle install --path=vendor --without development test
 
 # Setup command file
-cat << EOF > /opt/flight/libexec/commands/cloud
+for platform in aws azure ; do
+
+cat << EOF > /opt/flight/libexec/commands/cloud-$platform
 : '
-: NAME: cloudware
-: SYNOPSIS: Provider-agnostic cloud deployment tool
+: NAME: cloud-$platform
+: SYNOPSIS: Cloud deployment tools for $platform
 : VERSION: $alces_VERSION
 : '
 #==============================================================================
@@ -90,5 +92,7 @@ cat << EOF > /opt/flight/libexec/commands/cloud
 # https://github.com/alces-software/cloudware
 #==============================================================================
 cd $alces_INSTALL_DIR/cloudware/
-flexec ruby bin/cloud "\$@"
+flexec ruby bin/cloud-$platform "\$@"
 EOF
+
+done
