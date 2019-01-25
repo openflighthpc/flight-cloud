@@ -26,14 +26,6 @@ curl https://raw.githubusercontent.com/alces-software/cloudware/master/scripts/i
 curl https://raw.githubusercontent.com/alces-software/cloudware/master/scripts/install |alces_INSTALL_DIR=/my/install/path/ alces_VERSION=dev-release /bin/bash
 ```
 
-- Now logout and in again or source `/etc/profile.d/alces-flight.sh`
-
-- Cloudware can now be run as follows
-
-```
-flight cloud
-```
-
 ### Local Installation
 
 Instead of depending on an upstream location, Cloudware can be installed from a local copy of the repository in the following manner.
@@ -51,6 +43,24 @@ bash scripts/install
 ```
 
 *Note: Local installations will use the currently checked out branch instead of using the latest release. To override this do `alces_VERSION=branchname bash scripts/install`.*
+
+### Post Installation
+
+- Now logout and in again or source `/etc/profile.d/alces-flight.sh`
+
+- Cloudware can now be run as follows
+
+```
+flight cloud-aws
+```
+
+- Alternatively, a sandbox environment for Cloudware can be entered as follows
+
+```
+flight shell cloud-aws
+```
+
+*Note: The Cloudware tool is broken into separate commands for each cloud provider. The above use `cloud-aws` as an example but `cloud-azure` is also available.*
 
 ## Installing from Git
 
@@ -70,3 +80,4 @@ other location:
 ```
 export PATH=$PATH:/opt/cloudware/bin
 ```
+
