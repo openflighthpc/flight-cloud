@@ -50,6 +50,8 @@ yum install https://s3-eu-west-1.amazonaws.com/alces-flight/rpms/flight-core-0.1
 bash scripts/install
 ```
 
+*Note: Local installations will use the currently checked out branch instead of using the latest release. To override this do `alces_VERSION=branchname bash scripts/install`.*
+
 ## Installing from Git
 
 Cloudware requires a recent version of `ruby` (2.5.1+) and `bundler`. The
