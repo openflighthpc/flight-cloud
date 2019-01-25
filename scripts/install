@@ -102,7 +102,7 @@ cat << EOF > /opt/flight/libexec/commands/cloud-$platform
 # https://github.com/alces-software/cloudware
 #==============================================================================
 cd $alces_INSTALL_DIR/cloudware/
-flexec ruby bin/cloud-$platform "\$@"
+flexec bundle exec bin/cloud-$platform "\$@"
 EOF
 
 done
