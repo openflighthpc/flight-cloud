@@ -63,8 +63,9 @@ if [ ! -z $CLONE ] ; then
     git clone https://github.com/alces-software/cloudware
 fi
 
+cd cloudware
+
 if [ ! -z $CHECKOUT ] ; then
-    cd cloudware
     git checkout $alces_VERSION
 fi
 
