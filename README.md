@@ -14,22 +14,7 @@
 
 # Installation
 
-Cloudware requires a recent version of `ruby` (2.5.1+) and `bundler`. The
-following will install from source using `git`:
-
-```
-cd /opt
-git clone https://github.com/alces-software/cloudware.git
-cd cloudware
-bundle install
-
-```
-
-Then add the binaries onto the `PATH` using your `.bashrc` file or appropriate
-other location:
-```
-export PATH=$PATH:/opt/cloudware/bin
-```
+For installation instructions see INSTALL.md
 
 # Configuring Cloudware
 
