@@ -47,7 +47,7 @@ else
     CLONE=""
     alces_INSTALL_DIR=$SCRIPT_PARENT_PATH
     # Check if alces_VERSION was specified on CLI
-    if echo "$initial_env" |grep -q '^alces_FLIGHT' ; then
+    if echo "$initial_env" |grep -q '^alces_VERSION' ; then
         CHECKOUT=true
     else
         CHECKOUT=""
