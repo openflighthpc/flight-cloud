@@ -24,42 +24,16 @@
 # ==============================================================================
 #
 
-require 'cloudware/spinner'
-require 'cloudware/log'
+require 'cloudware/config'
+require 'flight_config/updater'
+require 'active_support/core_ext/module/delegation'
 
 module Cloudware
-  class Command
-    extend Memoist
-    include WithSpinner
+  class CommandConfig
+    include FlightConfig::Updater
 
-    def initialize(argv, options)
-      @__config__ = CommandConfig.load
-      @argv = argv.freeze
-      @options = OpenStruct.new(options.__hash__)
-    end
+    delegate_missing_to Config
 
-    def run!
-      run
-    rescue Exception => e
-      Log.fatal(e.message)
-      raise e
-    end
-
-    def run
-      raise NotImplementedError
-    end
-
-    def context
-      Context.new(region: options.region)
-    end
-    memoize :context
-
-    def region
-      options.region || Config.default_region
-    end
-
-    private
-
-    attr_reader :argv, :options, :__config__
   end
 end
+
