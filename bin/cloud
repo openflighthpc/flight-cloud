@@ -34,15 +34,22 @@ Thread.report_on_exception = false
 require 'rubygems'
 require 'bundler'
 
-# Require the config and associated gems
-Bundler.require(:config)
-require 'cloudware/config'
+# Catch any config errors during the require/setup
+begin
+  # Require the config and associated gems
+  Bundler.require(:config)
+  require 'cloudware/config'
 
-# Require the development gems
-Bundler.require(:development) if Cloudware::Config.debug
+  # Require the development gems
+  Bundler.require(:development) if Cloudware::Config.debug
 
-# Setup the load path for remaining gems
-Bundler.setup(:default, Cloudware::Config.provider)
+  # Setup the load path for remaining gems
+  Bundler.setup(:default, Cloudware::Config.provider)
 
-require 'cloudware'
+  require 'cloudware'
+rescue Cloudware::ConfigError => e
+  $stderr.puts e.message
+  exit 1
+end
+
 Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__

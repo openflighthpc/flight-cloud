@@ -26,8 +26,9 @@
 
 require 'ostruct'
 require 'flight_config/loader'
-
 require 'active_support/core_ext/module/delegation'
+
+require 'cloudware/exceptions'
 
 module Cloudware
   class Config
@@ -44,6 +45,9 @@ module Cloudware
     def initialize
       __data__.env_prefix = 'cloudware'
       ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
+
+      # Ensures the providers credentials have been loaded
+      public_send(provider)
     end
 
     def path
@@ -64,19 +68,31 @@ module Cloudware
 
     def provider
       __data__.fetch(:provider) do
-        warn 'No provider specified'
-        exit 1
+        raise ConfigError, 'No provider specified'
       end
     end
 
     [:azure, :aws].each do |init_provider|
       define_method(init_provider) do
-        OpenStruct.new(__data__.fetch(init_provider))
+        provider_data = __data__.fetch(init_provider) do
+          raise ConfigError, <<~ERROR.chomp
+            The config is missing the credentials for: #{init_provider}
+            Please see the example config file for details:
+            #{path}.example
+          ERROR
+        end
+        OpenStruct.new(provider_data)
       end
     end
 
     def default_region
-      __data__.fetch(provider, :default_region)
+      __data__.fetch(provider, :default_region) do
+        raise ConfigError, <<~ERROR.chomp
+          The 'default_region' has not been set in the config
+          Please see the example config file for details:
+          #{path}.example
+        ERROR
+      end
     end
 
     def content_path

@@ -1,5 +1,5 @@
 # Please fill this file out with your aws and azure keys
-# and renamed: "etc/config.yml"
+# and renamed: "etc/config.yaml"
 
 # Provider credentials
 azure:

@@ -4,6 +4,6 @@ tmp/
 var/
 log/
 etc/config.*
-!etc/config.yml.example
+!etc/config.yaml.example
 vendor/
 .bundle/
