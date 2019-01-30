@@ -33,6 +33,8 @@ module Cloudware
     extend Memoist
     include WithSpinner
 
+    attr_reader :__config__
+
     def initialize(__config__ = nil)
       @__config__ = __config__ || CommandConfig.load
     end
@@ -51,16 +53,12 @@ module Cloudware
     end
 
     def context
-      Context.new(region: options.region)
+      Context.new(region: __config__.region)
     end
     memoize :context
 
     def region
-      options.region || Config.default_region
+      __config.__.region
     end
-
-    private
-
-    attr_reader :__config__
   end
 end

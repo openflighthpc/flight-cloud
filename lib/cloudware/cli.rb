@@ -62,8 +62,11 @@ module Cloudware
 
     def self.action(command, klass, method: :run!)
       command.action do |args, options|
+        hash = options.__hash__
         begin
-          klass.new.public_send(method, *args, **options.__hash__)
+          cmd = klass.new
+          cmd.__config__.region = hash.delete(:region)
+          cmd.public_send(method, *args, **hash)
         rescue Exception => e
           Log.fatal(e.message)
           raise e

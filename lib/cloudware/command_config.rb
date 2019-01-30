@@ -44,6 +44,14 @@ module Cloudware
     def current_cluster=(cluster)
       __data__.set(:current_cluster, value: cluster)
     end
+
+    def region
+      @region ||= Config.default_region
+    end
+
+    def region=(region)
+      @region = region
+    end
   end
 end
 
