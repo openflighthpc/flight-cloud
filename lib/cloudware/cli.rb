@@ -60,9 +60,9 @@ module Cloudware
     # Display the help if there is no input arguments
     ARGV.push '--help' if ARGV.empty?
 
-    def self.action(command, klass)
+    def self.action(command, klass, method: :run!)
       command.action do |args, options|
-        klass.new(args, options).run!
+        klass.new(args, options).public_send(method)
       end
     end
 
