@@ -80,6 +80,8 @@ module Cloudware
     end
 
     def self.cli_syntax(command, args_str = '')
+      command.hidden = true if command.name.split.length > 1
+      command.sub_command_group = true
       command.syntax = <<~SYNTAX.squish
         #{program(:name)} #{command.name} #{args_str} [options]
       SYNTAX
@@ -88,13 +90,11 @@ module Cloudware
     command 'cluster' do |c|
       cli_syntax(c)
       c.summary = 'Manage the current cluster selection'
-      c.sub_command_group = true
     end
 
     command 'cluster switch' do |c|
       cli_syntax(c, 'CLUSTER')
       c.summary = 'Change the current cluster to CLUSTER'
-      c.hidden = true
       action(c, Commands::Cluster, method: :switch)
     end
 
@@ -131,7 +131,6 @@ module Cloudware
     command 'list' do |c|
       cli_syntax(c)
       c.summary = 'List the deployed cloud resources'
-      c.sub_command_group = true
     end
 
     list_clusters_proc = proc do |c|
@@ -140,7 +139,6 @@ module Cloudware
       c.description = <<~DESC
         Shows a list of clusters that have been previously deployed to
       DESC
-      c.hidden = true
       action(c, Commands::Cluster, method: :list)
     end
 
@@ -150,7 +148,6 @@ module Cloudware
     command 'list deployments' do |c|
       cli_syntax(c)
       c.description = 'List all the previous deployed templates'
-      c.hidden = true
       c.option '-v', '--verbose', 'Show full error messages'
       action(c, Commands::Lists::Deployment)
     end
@@ -165,14 +162,12 @@ module Cloudware
         Instead it list the deployment outputs which follow the machine tag
         format: `<machine-name>TAG<key>`
       DESC
-      c.hidden = true
       action(c, Commands::Lists::Machine)
     end
 
     command 'power' do |c|
       cli_syntax(c)
       c.description = 'Start or stop machine and check their power status'
-      c.sub_command_group = true
     end
 
     def self.shared_power_attr(c)
@@ -182,7 +177,6 @@ module Cloudware
       c.option '-g', '--group', <<~DESC
         Preform the '#{action}' action on machine in group '#{cli_attr}'
       DESC
-      c.hidden = true
     end
 
     command 'power status' do |c|

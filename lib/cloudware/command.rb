@@ -58,7 +58,7 @@ module Cloudware
     memoize :context
 
     def region
-      __config.__.region
+      __config__.region
     end
   end
 end
