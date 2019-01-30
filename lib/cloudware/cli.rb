@@ -134,6 +134,19 @@ module Cloudware
       c.sub_command_group = true
     end
 
+    list_clusters_proc = proc do |c|
+      cli_syntax(c)
+      c.summary = 'Show the current and available clusters'
+      c.description = <<~DESC
+        Shows a list of clusters that have been previously deployed to
+      DESC
+      c.hidden = true
+      action(c, Commands::Cluster, method: :list)
+    end
+
+    command('list clusters', &list_clusters_proc)
+    command('cluster list', &list_clusters_proc)
+
     command 'list deployments' do |c|
       cli_syntax(c)
       c.description = 'List all the previous deployed templates'

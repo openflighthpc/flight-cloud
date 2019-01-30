@@ -27,10 +27,27 @@
 module Cloudware
   module Commands
     class Cluster < Command
+      LIST_TEMPLATE = <<~ERB
+        <% clusters.each do |cluster| -%>
+        <%   current = __config__.current_cluster == cluster -%>
+        <%=  current ? '*' : ' ' %> <%= cluster %>
+        <% end -%>
+      ERB
+
       def switch(cluster)
         @__config__ = CommandConfig.update do |conf|
           conf.current_cluster = cluster
         end
+      end
+
+      def list
+        puts ERB.new(LIST_TEMPLATE, nil, '-').result(binding)
+      end
+
+      private
+
+      def clusters
+        []
       end
     end
   end
