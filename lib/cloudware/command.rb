@@ -26,23 +26,24 @@
 
 require 'cloudware/spinner'
 require 'cloudware/log'
+require 'cloudware/command_config'
 
 module Cloudware
   class Command
     extend Memoist
     include WithSpinner
 
-    def initialize(argv, options)
-      @__config__ = CommandConfig.load
-      @argv = argv.freeze
-      @options = OpenStruct.new(options.__hash__)
+    def initialize(__config__ = nil)
+      @__config__ = __config__ || CommandConfig.load
     end
 
-    def run!
+    def run!(*argv, **options)
+      class << self
+        attr_reader :argv, :options
+      end
+      @argv = argv.freeze
+      @options = OpenStruct.new(options)
       run
-    rescue Exception => e
-      Log.fatal(e.message)
-      raise e
     end
 
     def run
@@ -60,6 +61,6 @@ module Cloudware
 
     private
 
-    attr_reader :argv, :options, :__config__
+    attr_reader :__config__
   end
 end

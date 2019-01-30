@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/alces-software/flight_config
-  revision: e3135c14acb6599f4bc3d13ffea955a943d40e31
+  revision: de4d05a03aa3aec791cc1429da346cda84b38527
   specs:
     flight_config (0.1.0)
       tty-config
@@ -84,7 +84,6 @@ GEM
       equatable (~> 0.5.0)
       tty-color (~> 0.4.0)
     powerpack (0.1.1)
-    pp (0.1.1)
     pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
@@ -169,7 +168,6 @@ DEPENDENCIES
   ipaddr
   memoist
   parallel
-  pp
   pry
   pry-byebug
   require_all

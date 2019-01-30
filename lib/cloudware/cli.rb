@@ -62,7 +62,12 @@ module Cloudware
 
     def self.action(command, klass, method: :run!)
       command.action do |args, options|
-        klass.new(args, options).public_send(method)
+        begin
+          klass.new.public_send(method, *args, **options.__hash__)
+        rescue Exception => e
+          Log.fatal(e.message)
+          raise e
+        end
       end
     end
 

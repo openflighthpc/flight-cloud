@@ -25,7 +25,6 @@
 #
 
 require 'cloudware/config'
-require 'flight_config/updater'
 require 'active_support/core_ext/module/delegation'
 
 module Cloudware
