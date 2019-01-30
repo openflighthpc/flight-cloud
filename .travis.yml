@@ -5,7 +5,7 @@ rvm:
  - 2.4.1
 sudo: required
 install:
-  - cp ./etc/config.yml.example ./etc/config.yml
+  - cp ./etc/config.yaml.example ./etc/config.yaml
   - sed -i 's#/var/log#/tmp#g' ./etc/config.yml
   - touch /tmp/flightconnector.log
   - bundle install
