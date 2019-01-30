@@ -25,7 +25,7 @@
 #
 
 require 'ostruct'
-require 'flight_config/loader'
+require 'flight_config'
 require 'active_support/core_ext/module/delegation'
 
 require 'cloudware/exceptions'
