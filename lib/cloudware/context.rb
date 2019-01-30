@@ -29,8 +29,8 @@ module Cloudware
     attr_reader :region, :deployments
     delegate :provider, to: Config
 
-    def initialize(region: nil)
-      @region = region || Config.default_region
+    def initialize(region:)
+      @region = region
       update_deployments
     end
 
