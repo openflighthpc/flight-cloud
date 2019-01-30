@@ -5,6 +5,13 @@ GIT
     commander (4.4.4.pre.alces2)
       highline (~> 1.7.2)
 
+GIT
+  remote: https://github.com/alces-software/flight_config
+  revision: e3135c14acb6599f4bc3d13ffea955a943d40e31
+  specs:
+    flight_config (0.1.0)
+      tty-config
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -117,7 +124,7 @@ GEM
     thread_safe (0.3.6)
     timeliness (0.3.8)
     tty-color (0.4.3)
-    tty-config (0.3.0)
+    tty-config (0.3.1)
     tty-cursor (0.6.0)
     tty-markdown (0.4.0)
       kramdown (~> 1.16.2)
@@ -157,6 +164,7 @@ DEPENDENCIES
   commander!
   factory_bot
   fakefs
+  flight_config!
   ipaddr
   memoist
   parallel
@@ -167,7 +175,6 @@ DEPENDENCIES
   rspec-wait
   rubocop (~> 0.52.1)
   rubocop-rspec
-  tty-config
   tty-markdown
   tty-spinner
   tty-table

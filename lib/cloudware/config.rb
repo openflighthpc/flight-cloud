@@ -25,7 +25,7 @@
 #
 
 require 'ostruct'
-require 'tty-config'
+require 'flight_config/loader'
 
 require 'active_support/core_ext/module/delegation'
 
