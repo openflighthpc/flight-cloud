@@ -31,24 +31,27 @@ require 'active_support/core_ext/module/delegation'
 
 module Cloudware
   class Config
+    include FlightConfig::Loader
+
     class << self
       def cache
-        @cache ||= new
-      end
-
-      def root_dir
-        File.expand_path(File.join(__dir__, '..', '..'))
+        @cache ||= self.load
       end
 
       delegate_missing_to :cache
     end
 
     def initialize
-      @__data__ = TTY::Config.new
-      __data__.prepend_path(File.join(self.class.root_dir, 'etc'))
       __data__.env_prefix = 'cloudware'
       ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
-      load_config
+    end
+
+    def path
+      File.join(root_dir, 'etc/config.yaml')
+    end
+
+    def root_dir
+      File.expand_path(File.join(__dir__, '..', '..'))
     end
 
     def log_file
@@ -88,34 +91,6 @@ module Cloudware
 
     def app_name
       __data__.fetch(:app_name) { File.basename($PROGRAM_NAME) }
-    end
-
-    private
-
-    attr_reader :__data__
-
-    def load_config
-      __data__.read
-    rescue TTY::Config::ReadError
-      missing_config_error
-    rescue
-      invalid_config_error
-    end
-
-    def missing_config_error
-      warn <<~ERROR.chomp
-        Could not load the config file. Please check that it exists:
-        <install-dir>/etc/config.yaml
-      ERROR
-      exit 1
-    end
-
-    def invalid_config_error
-      warn <<~ERROR.chomp
-        An error occurred when loading the config file:
-        #{__data__.source_file}
-      ERROR
-      exit 1
     end
   end
 end
