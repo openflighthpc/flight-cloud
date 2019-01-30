@@ -44,15 +44,15 @@ module Cloudware
     end
 
     def initialize
-      @config = TTY::Config.new
-      config.prepend_path(File.join(self.class.root_dir, 'etc'))
-      config.env_prefix = 'cloudware'
-      ['provider', 'debug', 'app_name'].each { |x| config.set_from_env(x) }
+      @__data__ = TTY::Config.new
+      __data__.prepend_path(File.join(self.class.root_dir, 'etc'))
+      __data__.env_prefix = 'cloudware'
+      ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
       load_config
     end
 
     def log_file
-      config.fetch(:log_file) do
+      __data__.fetch(:log_file) do
         File.join(self.class.root_dir, 'log', 'cloudware.log').tap do |path|
           FileUtils.mkdir_p(File.dirname(path))
         end
@@ -60,7 +60,7 @@ module Cloudware
     end
 
     def provider
-      config.fetch(:provider) do
+      __data__.fetch(:provider) do
         warn 'No provider specified'
         exit 1
       end
@@ -68,34 +68,34 @@ module Cloudware
 
     [:azure, :aws].each do |init_provider|
       define_method(init_provider) do
-        OpenStruct.new(config.fetch(init_provider))
+        OpenStruct.new(__data__.fetch(init_provider))
       end
     end
 
     def default_region
-      config.fetch(provider, :default_region)
+      __data__.fetch(provider, :default_region)
     end
 
     def content_path
-      config.fetch(:content_directory) do
+      __data__.fetch(:content_directory) do
         File.join(self.class.root_dir, 'var')
       end
     end
 
     def debug
-      !!config.fetch(:debug)
+      !!__data__.fetch(:debug)
     end
 
     def app_name
-      config.fetch(:app_name) { File.basename($PROGRAM_NAME) }
+      __data__.fetch(:app_name) { File.basename($PROGRAM_NAME) }
     end
 
     private
 
-    attr_reader :config
+    attr_reader :__data__
 
     def load_config
-      config.read
+      __data__.read
     rescue TTY::Config::ReadError
       missing_config_error
     rescue
@@ -113,7 +113,7 @@ module Cloudware
     def invalid_config_error
       warn <<~ERROR.chomp
         An error occurred when loading the config file:
-        #{config.source_file}
+        #{__data__.source_file}
       ERROR
       exit 1
     end
