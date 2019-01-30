@@ -1,0 +1,13 @@
+azure:                        # Requirement for cloud-azure
+  default_region:   # [VALUE] : Requirement for cloud-azure
+  tenant_id:        # [VALUE] : Requirement for cloud-azure
+  subscription_id:  # [VALUE] : Requirement for cloud-azure
+  client_secret:    # [VALUE] : Requirement for cloud-azure
+  client_id:        # [VALUE] : Requirement for cloud-azure
+
+aws:                            # Requirement for cloud-aws
+  default_region:     # [VALUE] : Requirement for cloud-aws
+  access_key_id:      # [VALUE] : Requirement for cloud-aws
+  secret_access_key:  # [VALUE] : Requirement for cloud-aws
+
+log_file: /tmp/travis.log
