@@ -34,6 +34,17 @@ module Cloudware
 
     delegate_missing_to Config
 
+    def path
+      File.join(content_path, 'etc/config.yaml')
+    end
+
+    def current_cluster
+      __data__.fetch(:current_cluster) { 'default' }
+    end
+
+    def current_cluster=(cluster)
+      __data__.set(:current_cluster, value: cluster)
+    end
   end
 end
 
