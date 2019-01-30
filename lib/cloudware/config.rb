@@ -45,9 +45,6 @@ module Cloudware
     def initialize
       __data__.env_prefix = 'cloudware'
       ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
-
-      # Ensures the providers credentials have been loaded
-      public_send(provider)
     end
 
     def path

@@ -41,7 +41,13 @@ begin
   require 'cloudware/config'
 
   # Require the development gems
-  Bundler.require(:development) if Cloudware::Config.debug
+  if Cloudware::Config.debug
+    # `pry` needs to be required in a specific order so it doesn't clash with `pp`
+    Bundler.setup(:development)
+    require 'pp'
+    require 'pry'
+    require 'pry-byebug'
+  end
 
   # Setup the load path for remaining gems
   Bundler.setup(:default, Cloudware::Config.provider)
