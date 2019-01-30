@@ -63,10 +63,15 @@ module Cloudware
     def self.action(command, klass, method: :run!)
       command.action do |args, options|
         hash = options.__hash__
+        hash.delete(:trace)
         begin
           cmd = klass.new
           cmd.__config__.region = hash.delete(:region)
-          cmd.public_send(method, *args, **hash)
+          if hash.empty?
+            cmd.public_send(method, *args)
+          else
+            cmd.public_send(method, *args, **hash)
+          end
         rescue Exception => e
           Log.fatal(e.message)
           raise e
@@ -78,6 +83,19 @@ module Cloudware
       command.syntax = <<~SYNTAX.squish
         #{program(:name)} #{command.name} #{args_str} [options]
       SYNTAX
+    end
+
+    command 'cluster' do |c|
+      cli_syntax(c)
+      c.summary = 'Manage the current cluster selection'
+      c.sub_command_group = true
+    end
+
+    command 'cluster switch' do |c|
+      cli_syntax(c, 'CLUSTER')
+      c.summary = 'Change the current cluster to CLUSTER'
+      c.hidden = true
+      action(c, Commands::Cluster, method: :switch)
     end
 
     command 'deploy' do |c|
