@@ -29,7 +29,7 @@ require 'cloudware/cluster'
 module Cloudware
   module Commands
     class ClusterCmd < Command
-      LIST_TEMPLATE = <<~ERB
+      LIST_CLUSTERS = <<~ERB
         <% unless clusters.include?(__config__.current_cluster) -%>
         * <%= __config__.current_cluster %>
         <% end -%>
@@ -37,6 +37,9 @@ module Cloudware
         <%   current = __config__.current_cluster == cluster -%>
         <%=  current ? '*' : ' ' %> <%= cluster %>
         <% end -%>
+      ERB
+
+      LIST_TEMPLATES = <<~ERB
       ERB
 
       def switch(cluster)
@@ -47,7 +50,11 @@ module Cloudware
       end
 
       def list
-        puts ERB.new(LIST_TEMPLATE, nil, '-').result(binding)
+        puts _render(LIST_CLUSTERS)
+      end
+
+      def list_templates
+        puts _render(LIST_TEMPLATES)
       end
 
       private

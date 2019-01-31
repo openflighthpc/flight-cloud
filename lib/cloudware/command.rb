@@ -61,5 +61,11 @@ module Cloudware
     def region
       __config__.region
     end
+
+    private
+
+    def _render(template)
+      ERB.new(template, nil, '=').result(binding)
+    end
   end
 end

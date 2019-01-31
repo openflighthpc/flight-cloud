@@ -98,6 +98,16 @@ module Cloudware
       action(c, Commands::ClusterCmd, method: :switch)
     end
 
+    command 'cluster templates' do |c|
+      cli_syntax(c)
+      c.summary = 'Lists the available templates for the cluster'
+      c.description = <<~DESC
+        Lists the templates for a particular cluster. These templates
+        can be used directly with the `deploy` command.
+      DESC
+      action(c, Commands::ClusterCmd, method: :list_templates)
+    end
+
     command 'deploy' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
       c.summary = 'Deploy new resource(s) define by a template'
