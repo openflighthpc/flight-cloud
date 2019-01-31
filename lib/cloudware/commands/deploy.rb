@@ -24,12 +24,12 @@
 # ==============================================================================
 #
 
+require 'cloudware/cluster'
+
 module Cloudware
   module Commands
     class Deploy < Command
-      attr_reader :name, :template_path
-
-      def initialize(*a, **h)
+      def initialize(*a)
         require 'cloudware/models/deployment'
         require 'cloudware/replacement_factory'
         super
@@ -37,13 +37,23 @@ module Cloudware
 
       def run
         @name = argv[0]
-        @template_path = File.expand_path(argv[1])
+        @raw_path = Pathname.new(argv[1])
         with_spinner('Deploying resources...', done: 'Done') do
           deployment.deploy
         end
       end
 
       private
+
+      attr_reader :name, :raw_path
+
+      def template_path
+        if raw_path.absolute?
+          raw_path.to_s
+        else
+          Cluster.load(__config__.current_cluster).template(raw_path.to_s)
+        end
+      end
 
       def deployment
         Models::Deployment.new(
