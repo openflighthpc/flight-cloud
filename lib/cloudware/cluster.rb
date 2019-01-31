@@ -35,7 +35,7 @@ module Cloudware
     end
 
     def directory
-      Config.content(identifier)
+      Config.content('clusters', identifier)
     end
 
     def path

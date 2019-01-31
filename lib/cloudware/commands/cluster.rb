@@ -24,9 +24,11 @@
 # ==============================================================================
 #
 
+require 'cloudware/cluster'
+
 module Cloudware
   module Commands
-    class Cluster < Command
+    class ClusterCmd < Command
       LIST_TEMPLATE = <<~ERB
         <% clusters.each do |cluster| -%>
         <%   current = __config__.current_cluster == cluster -%>
@@ -47,7 +49,8 @@ module Cloudware
       private
 
       def clusters
-        []
+        Dir.glob(Cluster.new('*').directory)
+           .map { |p| File.basename(p) }
       end
     end
   end
