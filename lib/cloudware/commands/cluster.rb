@@ -40,6 +40,7 @@ module Cloudware
         @__config__ = CommandConfig.update do |conf|
           conf.current_cluster = cluster
         end
+        list
       end
 
       def list
@@ -51,6 +52,7 @@ module Cloudware
       def clusters
         Dir.glob(Cluster.new('*').directory)
            .map { |p| File.basename(p) }
+           .sort
       end
     end
   end
