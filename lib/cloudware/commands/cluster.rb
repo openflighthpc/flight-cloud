@@ -54,7 +54,13 @@ module Cloudware
       end
 
       def list_templates
-        puts _render(LIST_TEMPLATES)
+        glob_path = Cluster.load(__config__.current_cluster).template('**/*')
+        templates = Dir.glob(glob_path).sort
+        if templates.empty?
+          $stderr.puts 'No templates found'
+        else
+          puts templates
+        end
       end
 
       private

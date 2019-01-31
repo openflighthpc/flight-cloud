@@ -65,7 +65,7 @@ module Cloudware
     private
 
     def _render(template)
-      ERB.new(template, nil, '=').result(binding)
+      ERB.new(template, nil, '-').result(binding)
     end
   end
 end
