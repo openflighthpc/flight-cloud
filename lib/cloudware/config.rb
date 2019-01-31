@@ -92,6 +92,10 @@ module Cloudware
       end
     end
 
+    def content(*paths)
+      File.join(content_path, *paths)
+    end
+
     def content_path
       __data__.fetch(:content_directory) do
         File.join(self.class.root_dir, 'var')
