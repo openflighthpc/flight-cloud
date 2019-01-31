@@ -27,6 +27,9 @@
 module Cloudware
   class Context
     attr_reader :region, :deployments
+
+    # TODO: Try and remove the provider as `Config.content_path` is now provider
+    # specific
     delegate :provider, to: Config
 
     def initialize(region:)
@@ -125,7 +128,6 @@ module Cloudware
       File.join(
         Config.content_path,
         'contexts',
-        provider,
         "#{region}.yaml"
       ).tap { |p| FileUtils.mkdir_p(File.dirname(p)) }
     end
