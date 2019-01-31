@@ -30,6 +30,9 @@ module Cloudware
   module Commands
     class ClusterCmd < Command
       LIST_TEMPLATE = <<~ERB
+        <% unless clusters.include?(__config__.current_cluster) -%>
+        * <%= __config__.current_cluster %>
+        <% end -%>
         <% clusters.each do |cluster| -%>
         <%   current = __config__.current_cluster == cluster -%>
         <%=  current ? '*' : ' ' %> <%= cluster %>
