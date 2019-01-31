@@ -48,8 +48,6 @@ module Cloudware
     program :description, 'Cloud orchestration tool'
     program :help_paging, false
 
-    global_option('--region REGION', 'Specify cloud platform region')
-
     suppress_trace_class UserError
 
     # Display the help if there is no input arguments
@@ -62,7 +60,6 @@ module Cloudware
         hash.delete(:trace)
         begin
           cmd = klass.new
-          cmd.__config__.region = hash.delete(:region)
           if hash.empty?
             cmd.public_send(method, *args)
           else
