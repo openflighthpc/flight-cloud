@@ -69,6 +69,10 @@ module Cloudware
       end
     end
 
+    def template_ext
+      provider == 'azure' ? '.json' : '.yaml'
+    end
+
     [:azure, :aws].each do |init_provider|
       define_method(init_provider) do
         provider_data = __data__.fetch(init_provider) do

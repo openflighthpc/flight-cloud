@@ -42,8 +42,9 @@ module Cloudware
       File.join(directory, 'etc/config.yaml')
     end
 
-    def template(*parts)
-      File.join(directory, 'templates', *parts)
+    def template(*parts, ext: true)
+      path = File.join(directory, 'templates', *parts)
+      ext ? "#{path}#{Config.template_ext}" : path
     end
 
     def region

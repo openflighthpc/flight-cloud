@@ -25,6 +25,7 @@
 #
 
 require 'cloudware/cluster'
+require 'pathname'
 
 module Cloudware
   module Commands
@@ -54,12 +55,16 @@ module Cloudware
       end
 
       def list_templates
-        glob_path = Cluster.load(__config__.current_cluster).template('**/*')
-        templates = Dir.glob(glob_path).sort
+        cluster = Cluster.load(__config__.current_cluster)
+        templates = Dir.glob(cluster.template('**/*')).sort
         if templates.empty?
           $stderr.puts 'No templates found'
         else
-          puts templates
+          base = Pathname.new(cluster.template(ext: false))
+          templates.each do |path|
+            puts Pathname.new(path).relative_path_from(base).to_s
+                         .chomp("#{Config.template_ext}")
+          end
         end
       end
 
