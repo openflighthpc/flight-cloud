@@ -25,19 +25,14 @@
 #
 
 require 'commander'
-require 'cloudware/exceptions'
 
-require 'cloudware/config'
 require 'cloudware/command'
 require 'cloudware/version'
-require 'cloudware/config'
 
 require 'require_all'
 
 # Require all the following paths
 [
-  'lib/cloudware/models/concerns/**/*.rb',
-  'lib/cloudware/models/**/*.rb',
   'lib/cloudware/commands/concerns/**/*.rb',
   'lib/cloudware/commands/**/*.rb',
 ].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
@@ -62,6 +57,7 @@ module Cloudware
 
     def self.action(command, klass, method: :run!)
       command.action do |args, options|
+        delayed_require
         hash = options.__hash__
         hash.delete(:trace)
         begin
@@ -85,6 +81,13 @@ module Cloudware
       command.syntax = <<~SYNTAX.squish
         #{program(:name)} #{command.name} #{args_str} [options]
       SYNTAX
+    end
+
+    def self.delayed_require
+      [
+        'lib/cloudware/models/concerns/**/*.rb',
+        'lib/cloudware/models/**/*.rb',
+      ].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
     end
 
     command 'cluster' do |c|

@@ -26,12 +26,6 @@
 
 # ActiveSupport modules
 require 'active_support/core_ext/string'
-require 'active_support/core_ext/array'
-require 'active_model'
-require 'active_model/errors'
-
-require 'colorize'
-require 'memoist'
 
 require 'cloudware/config'
 require 'cloudware/cli'

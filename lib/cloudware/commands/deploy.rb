@@ -24,13 +24,16 @@
 # ==============================================================================
 #
 
-require 'cloudware/models/deployment'
-require 'cloudware/replacement_factory'
-
 module Cloudware
   module Commands
     class Deploy < Command
       attr_reader :name, :template_path
+
+      def initialize(*a, **h)
+        require 'cloudware/models/deployment'
+        require 'cloudware/replacement_factory'
+        super
+      end
 
       def run
         @name = argv[0]

@@ -27,6 +27,7 @@
 require 'cloudware/spinner'
 require 'cloudware/log'
 require 'cloudware/command_config'
+require 'memoist'
 
 module Cloudware
   class Command

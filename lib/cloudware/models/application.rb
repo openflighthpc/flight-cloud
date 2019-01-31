@@ -24,6 +24,9 @@
 # ==============================================================================
 #
 
+require 'active_model'
+require 'active_model/errors'
+
 module Cloudware
   module Models
     class Application
