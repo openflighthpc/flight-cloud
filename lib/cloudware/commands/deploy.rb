@@ -59,7 +59,6 @@ module Cloudware
         Models::Deployment.new(
           template_path: template_path,
           name: name,
-          region: region,
           cluster: __config__.current_cluster,
           replacements: ReplacementFactory.new(context, name)
                                           .build(options.params)

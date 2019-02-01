@@ -139,8 +139,8 @@ RSpec.describe Cloudware::Models::Deployment do
           expect(subject.deployment_error).to be_nil
         end
 
-        context 'without a region' do
-          before { subject.region = nil }
+        context 'without a cluster' do
+          before { subject.cluster = nil }
 
           include_examples 'deploy raises ModelValidationError'
         end

@@ -41,7 +41,7 @@ module Cloudware
       include DeploymentCallbacks
 
       SAVE_ATTR = [
-        :template_path, :name, :results, :replacements, :region, :timestamp,
+        :template_path, :name, :results, :replacements, :timestamp,
         :deployment_error, :cluster
       ].freeze
       attr_accessor(*SAVE_ATTR)
@@ -80,6 +80,12 @@ module Cloudware
         SAVE_ATTR.each_with_object({}) do |key, memo|
           memo[key] = send(key)
         end
+      end
+
+      def region
+        # Protect the load from a `nil` cluster. There is a separate validation
+        # for nil clusters
+        Cluster.load(cluster.to_s).region
       end
 
       private

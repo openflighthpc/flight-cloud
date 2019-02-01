@@ -34,7 +34,7 @@ module Cloudware
 
           before_deploy :validate_template_exists
           before_deploy :validate_replacement_tags
-          before_deploy :validate_region
+          before_deploy :validate_cluster
           before_deploy :validate_no_existing_deployment
 
           before_destroy :validate_existing_deployment
@@ -55,9 +55,9 @@ module Cloudware
         end
       end
 
-      def validate_region
-        return if region
-        errors.add(:region, 'No region specified')
+      def validate_cluster
+        return if cluster
+        errors.add(:cluster, 'No cluster specified')
       end
 
       def validate_no_existing_deployment

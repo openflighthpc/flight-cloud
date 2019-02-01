@@ -162,7 +162,7 @@ RSpec.describe Cloudware::Context do
 
     describe '#save_deployments' do
       let(:new_deployment) do
-        build(:deployment, name: 'new_deployment', region: subject.region)
+        build(:deployment, name: 'new_deployment', cluster: Cloudware::CommandConfig.new.current_cluster)
       end
       let(:all_names) do
         [new_deployment, initial_deployment, other_deployment].map(&:name)

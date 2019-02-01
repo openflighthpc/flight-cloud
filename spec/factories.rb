@@ -32,7 +32,7 @@ FactoryBot.define do
     template_path '/tmp/test-template'
     results {}
     replacements nil
-    region 'eu-west-1'
+    cluster 'test-deployment-cluster'
   end
 
   factory :context, class: Cloudware::Context do
