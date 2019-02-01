@@ -48,7 +48,7 @@ module Cloudware
     end
 
     def template(*parts, ext: true)
-      path = File.join(directory, 'templates', *parts)
+      path = join('lib', 'templates', *parts)
       ext ? "#{path}#{Config.template_ext}" : path
     end
 

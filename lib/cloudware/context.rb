@@ -131,7 +131,7 @@ module Cloudware
     end
 
     def path
-      Cluster.load(cluster).join('contexts.yaml')
+      Cluster.load(cluster).join('var/contexts.yaml')
              .tap { |p| FileUtils.mkdir_p(File.dirname(p)) }
     end
   end
