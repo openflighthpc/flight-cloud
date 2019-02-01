@@ -26,14 +26,15 @@
 
 module Cloudware
   class Context
-    attr_reader :region, :deployments
+    attr_reader :region, :deployments, :cluster
 
     # TODO: Try and remove the provider as `Config.content_path` is now provider
     # specific
     delegate :provider, to: Config
 
-    def initialize(region:)
+    def initialize(region:, cluster:)
       @region = region
+      @cluster = cluster
       update_deployments
     end
 

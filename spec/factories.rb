@@ -36,6 +36,8 @@ FactoryBot.define do
   end
 
   factory :context, class: Cloudware::Context do
-    initialize_with { new(region: 'eu-west-1') }
+    initialize_with do
+      new(region: 'eu-west-1', cluster: 'test-cluster')
+    end
   end
 end
