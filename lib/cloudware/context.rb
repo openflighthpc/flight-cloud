@@ -131,11 +131,8 @@ module Cloudware
     end
 
     def path
-      File.join(
-        Config.content_path,
-        'contexts',
-        "#{region}.yaml"
-      ).tap { |p| FileUtils.mkdir_p(File.dirname(p)) }
+      Cluster.load(cluster).join('contexts.yaml')
+             .tap { |p| FileUtils.mkdir_p(File.dirname(p)) }
     end
   end
 end
