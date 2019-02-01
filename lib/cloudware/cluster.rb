@@ -53,7 +53,7 @@ module Cloudware
     end
 
     def region
-      Config.default_region
+      __data__.fetch(:region) { Config.default_region }
     end
   end
 end
