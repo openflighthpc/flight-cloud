@@ -91,7 +91,7 @@ module Cloudware
       private
 
       def context
-        Context.new(region: region, cluster: cluster)
+        Context.new(cluster: cluster)
       end
       memoize :context
 
