@@ -42,7 +42,7 @@ module Cloudware
 
       SAVE_ATTR = [
         :template_path, :name, :results, :replacements, :region, :timestamp,
-        :deployment_error
+        :deployment_error, :cluster
       ].freeze
       attr_accessor(*SAVE_ATTR)
 
@@ -85,7 +85,7 @@ module Cloudware
       private
 
       def context
-        Context.new(region: region, cluster: 'dev-cluster')
+        Context.new(region: region, cluster: cluster)
       end
       memoize :context
 
