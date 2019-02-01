@@ -81,10 +81,7 @@ module Cloudware
     end
 
     def self.delayed_require
-      [
-        'lib/cloudware/models/concerns/**/*.rb',
-        'lib/cloudware/models/**/*.rb',
-      ].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
+      require 'cloudware/models'
     end
 
     command 'cluster' do |c|

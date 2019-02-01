@@ -24,6 +24,7 @@
 # ==============================================================================
 #
 
+require 'cloudware/models'
 require 'cloudware/providers/base'
 
 RSpec.describe Cloudware::Models::Deployment do
