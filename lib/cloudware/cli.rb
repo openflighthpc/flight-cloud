@@ -95,7 +95,7 @@ module Cloudware
       action(c, Commands::ClusterCmd, method: :switch)
     end
 
-    command 'cluster templates' do |c|
+    cluster_templates = proc do |c|
       cli_syntax(c)
       c.summary = 'Lists the available templates for the cluster'
       c.description = <<~DESC
@@ -104,6 +104,9 @@ module Cloudware
       DESC
       action(c, Commands::ClusterCmd, method: :list_templates)
     end
+
+    command 'cluster templates', &cluster_templates
+    command 'list templates', &cluster_templates
 
     command 'deploy' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
