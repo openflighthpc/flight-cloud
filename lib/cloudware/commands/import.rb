@@ -25,13 +25,28 @@
 #
 
 require 'pathname'
+require 'zip'
 
 module Cloudware
   module Commands
     class Import < Command
       def run!(raw_path)
-        path = Pathname.new(raw_path).expand_path.sub_ext('.zip').to_s
-        target = Cluster.load(__config__.current_cluster).template(ext: false)
+        zip_path = Pathname.new(raw_path).expand_path.sub_ext('.zip').to_s
+        cluster = Cluster.load(__config__.current_cluster)
+        Zip::File.open(zip_path) do |zip|
+          zip.glob('aws/**/*').reject(&:directory?).each do |file|
+            dst = Pathname.new(file.name)
+                          .sub(/\Aaws\//, '')
+                          .expand_path(cluster.template(ext: false))
+                          .tap { |p| p.dirname.mkpath }
+            if dst.exist?
+              $stderr.puts "Skipping, file already exists: #{dst}"
+            else
+              file.extract(dst)
+              puts "Imported: #{dst}"
+            end
+          end
+        end
       end
     end
   end
