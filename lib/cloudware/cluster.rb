@@ -34,8 +34,13 @@ module Cloudware
       @identifier = identifier
     end
 
+    def join(*paths)
+      Config.content('clusters', identifier, *paths)
+    end
+
+    # Deprecated! Use `join` instead
     def directory
-      Config.content('clusters', identifier)
+      join()
     end
 
     def path
