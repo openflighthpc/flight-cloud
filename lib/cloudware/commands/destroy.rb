@@ -29,7 +29,7 @@ module Cloudware
     class Destroy < Command
       attr_reader :name
 
-      def initialize(*a, **h)
+      def initialize(*a)
         require 'cloudware/models/deployment'
         super
       end
