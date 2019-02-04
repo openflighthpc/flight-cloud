@@ -1,22 +1,29 @@
-# Please fill this file out with your aws and azure keys
-# and renamed: "etc/config.yml"
+# =============================================================================
+# GETTING STARTED
+# Please COPY this file into place, please leave this example as a reference.
+#
+# cp etc/config.yaml.example etc/config.yaml
+#
+# Only the credentials for the installed providers are required. See comments
+# for details.
+# =============================================================================
 
 # Provider credentials
-azure:
-  default_region:
-  tenant_id:
-  subscription_id:
-  client_secret:
-  client_id:
+azure:                        # Requirement for cloud-azure
+  default_region:   # [VALUE] : Requirement for cloud-azure
+  tenant_id:        # [VALUE] : Requirement for cloud-azure
+  subscription_id:  # [VALUE] : Requirement for cloud-azure
+  client_secret:    # [VALUE] : Requirement for cloud-azure
+  client_id:        # [VALUE] : Requirement for cloud-azure
 
-aws:
-  default_region:
-  access_key_id:
-  secret_access_key:
+aws:                            # Requirement for cloud-aws
+  default_region:     # [VALUE] : Requirement for cloud-aws
+  access_key_id:      # [VALUE] : Requirement for cloud-aws
+  secret_access_key:  # [VALUE] : Requirement for cloud-aws
 
 # ADVANCED CONFIGURATION (Optional)
-
-# ============================================================================
+# =============================================================================
+# and renamed: "etc/config.yaml"
 # Content Directory
 # By default cloudware stores its content within the <install-dir>/var
 # directory. This can be optionally changed to a different location

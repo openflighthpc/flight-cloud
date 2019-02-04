@@ -2,9 +2,25 @@
 # frozen_string_literal: true
 
 ENV['CLOUDWARE_DEBUG'] = 'true'
-require_relative 'lib/cloudware.rb'
 
-task :console do
+task :setup do
+  ENV['BUNDLE_GEMFILE'] = File.join(__dir__, 'Gemfile')
+
+  require 'rubygems'
+  require 'bundler'
+
+  Bundler.setup(:development)
+  require 'pp'
+  require 'pry'
+  require 'pry-byebug'
+
+  Bundler.setup(:default, :config, :aws, :azure)
+
+  $LOAD_PATH.unshift(File.join(__dir__, 'lib'))
+  require 'cloudware'
+end
+
+task console: :setup do
   Pry::REPL.start({})
 end
 

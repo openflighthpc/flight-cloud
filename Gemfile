@@ -15,7 +15,7 @@ gem 'tty-table'
 
 group :config do
   gem 'activesupport'
-  gem 'tty-config'
+  gem 'flight_config', git: 'https://github.com/alces-software/flight_config'
 end
 
 group :aws do

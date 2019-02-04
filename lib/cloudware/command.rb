@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -26,22 +26,27 @@
 
 require 'cloudware/spinner'
 require 'cloudware/log'
+require 'cloudware/command_config'
+require 'memoist'
 
 module Cloudware
   class Command
     extend Memoist
     include WithSpinner
 
-    def initialize(argv, options)
-      @argv = argv.freeze
-      @options = OpenStruct.new(options.__hash__)
+    attr_reader :__config__
+
+    def initialize(__config__ = nil)
+      @__config__ = __config__ || CommandConfig.load
     end
 
-    def run!
+    def run!(*argv, **options)
+      class << self
+        attr_reader :argv, :options
+      end
+      @argv = argv.freeze
+      @options = OpenStruct.new(options)
       run
-    rescue Exception => e
-      Log.fatal(e.message)
-      raise e
     end
 
     def run
@@ -49,16 +54,12 @@ module Cloudware
     end
 
     def context
-      Context.new(region: options.region)
+      Context.new(region: __config__.region)
     end
     memoize :context
 
     def region
-      options.region || Config.default_region
+      __config__.region
     end
-
-    private
-
-    attr_reader :argv, :options
   end
 end

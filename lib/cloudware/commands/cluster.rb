@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,24 +24,30 @@
 # ==============================================================================
 #
 
-require 'active_model'
-require 'active_model/errors'
-
 module Cloudware
-  module Models
-    class Application
-      class << self
-        alias_method 'build', 'new'
+  module Commands
+    class Cluster < Command
+      LIST_TEMPLATE = <<~ERB
+        <% clusters.each do |cluster| -%>
+        <%   current = __config__.current_cluster == cluster -%>
+        <%=  current ? '*' : ' ' %> <%= cluster %>
+        <% end -%>
+      ERB
+
+      def switch(cluster)
+        @__config__ = CommandConfig.update do |conf|
+          conf.current_cluster = cluster
+        end
       end
 
-      include ActiveModel::Model
-      extend Memoist
+      def list
+        puts ERB.new(LIST_TEMPLATE, nil, '-').result(binding)
+      end
 
-      def initialize(*_a, **parameters)
-        @errors = ActiveModel::Errors.new(self)
-        parameters.each do |key, value|
-          public_send("#{key}=", value)
-        end
+      private
+
+      def clusters
+        []
       end
     end
   end

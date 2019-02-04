@@ -25,19 +25,14 @@
 #
 
 require 'commander'
-require 'cloudware/exceptions'
 
-require 'cloudware/config'
 require 'cloudware/command'
 require 'cloudware/version'
-require 'cloudware/config'
 
 require 'require_all'
 
 # Require all the following paths
 [
-  'lib/cloudware/models/concerns/**/*.rb',
-  'lib/cloudware/models/**/*.rb',
   'lib/cloudware/commands/concerns/**/*.rb',
   'lib/cloudware/commands/**/*.rb',
 ].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
@@ -60,16 +55,50 @@ module Cloudware
     # Display the help if there is no input arguments
     ARGV.push '--help' if ARGV.empty?
 
-    def self.action(command, klass)
+    def self.action(command, klass, method: :run!)
       command.action do |args, options|
-        klass.new(args, options).run!
+        delayed_require
+        hash = options.__hash__
+        hash.delete(:trace)
+        begin
+          cmd = klass.new
+          cmd.__config__.region = hash.delete(:region)
+          if hash.empty?
+            cmd.public_send(method, *args)
+          else
+            cmd.public_send(method, *args, **hash)
+          end
+        rescue Exception => e
+          Log.fatal(e.message)
+          raise e
+        end
       end
     end
 
     def self.cli_syntax(command, args_str = '')
+      command.hidden = true if command.name.split.length > 1
+      command.sub_command_group = true
       command.syntax = <<~SYNTAX.squish
         #{program(:name)} #{command.name} #{args_str} [options]
       SYNTAX
+    end
+
+    def self.delayed_require
+      [
+        'lib/cloudware/models/concerns/**/*.rb',
+        'lib/cloudware/models/**/*.rb',
+      ].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
+    end
+
+    command 'cluster' do |c|
+      cli_syntax(c)
+      c.summary = 'Manage the current cluster selection'
+    end
+
+    command 'cluster switch' do |c|
+      cli_syntax(c, 'CLUSTER')
+      c.summary = 'Change the current cluster to CLUSTER'
+      action(c, Commands::Cluster, method: :switch)
     end
 
     command 'deploy' do |c|
@@ -105,13 +134,23 @@ module Cloudware
     command 'list' do |c|
       cli_syntax(c)
       c.summary = 'List the deployed cloud resources'
-      c.sub_command_group = true
     end
+
+    list_clusters_proc = proc do |c|
+      cli_syntax(c)
+      c.summary = 'Show the current and available clusters'
+      c.description = <<~DESC
+        Shows a list of clusters that have been previously deployed to
+      DESC
+      action(c, Commands::Cluster, method: :list)
+    end
+
+    command('list clusters', &list_clusters_proc)
+    command('cluster list', &list_clusters_proc)
 
     command 'list deployments' do |c|
       cli_syntax(c)
       c.description = 'List all the previous deployed templates'
-      c.hidden = true
       c.option '-v', '--verbose', 'Show full error messages'
       action(c, Commands::Lists::Deployment)
     end
@@ -126,14 +165,12 @@ module Cloudware
         Instead it list the deployment outputs which follow the machine tag
         format: `<machine-name>TAG<key>`
       DESC
-      c.hidden = true
       action(c, Commands::Lists::Machine)
     end
 
     command 'power' do |c|
       cli_syntax(c)
       c.description = 'Start or stop machine and check their power status'
-      c.sub_command_group = true
     end
 
     def self.shared_power_attr(c)
@@ -143,7 +180,6 @@ module Cloudware
       c.option '-g', '--group', <<~DESC
         Preform the '#{action}' action on machine in group '#{cli_attr}'
       DESC
-      c.hidden = true
     end
 
     command 'power status' do |c|

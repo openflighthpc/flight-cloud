@@ -25,34 +25,38 @@
 #
 
 require 'ostruct'
-require 'tty-config'
-
+require 'flight_config'
 require 'active_support/core_ext/module/delegation'
+
+require 'cloudware/exceptions'
 
 module Cloudware
   class Config
+    include FlightConfig::Loader
+
     class << self
       def cache
-        @cache ||= new
-      end
-
-      def root_dir
-        File.expand_path(File.join(__dir__, '..', '..'))
+        @cache ||= self.load
       end
 
       delegate_missing_to :cache
     end
 
     def initialize
-      @config = TTY::Config.new
-      config.prepend_path(File.join(self.class.root_dir, 'etc'))
-      config.env_prefix = 'cloudware'
-      ['provider', 'debug', 'app_name'].each { |x| config.set_from_env(x) }
-      load_config
+      __data__.env_prefix = 'cloudware'
+      ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
+    end
+
+    def path
+      File.join(root_dir, 'etc/config.yaml')
+    end
+
+    def root_dir
+      File.expand_path(File.join(__dir__, '..', '..'))
     end
 
     def log_file
-      config.fetch(:log_file) do
+      __data__.fetch(:log_file) do
         File.join(self.class.root_dir, 'log', 'cloudware.log').tap do |path|
           FileUtils.mkdir_p(File.dirname(path))
         end
@@ -60,62 +64,46 @@ module Cloudware
     end
 
     def provider
-      config.fetch(:provider) do
-        warn 'No provider specified'
-        exit 1
+      __data__.fetch(:provider) do
+        raise ConfigError, 'No provider specified'
       end
     end
 
     [:azure, :aws].each do |init_provider|
       define_method(init_provider) do
-        OpenStruct.new(config.fetch(init_provider))
+        provider_data = __data__.fetch(init_provider) do
+          raise ConfigError, <<~ERROR.chomp
+            The config is missing the credentials for: #{init_provider}
+            Please see the example config file for details:
+            #{path}.example
+          ERROR
+        end
+        OpenStruct.new(provider_data)
       end
     end
 
     def default_region
-      config.fetch(provider, :default_region)
+      __data__.fetch(provider, :default_region) do
+        raise ConfigError, <<~ERROR.chomp
+          The 'default_region' has not been set in the config
+          Please see the example config file for details:
+          #{path}.example
+        ERROR
+      end
     end
 
     def content_path
-      config.fetch(:content_directory) do
+      __data__.fetch(:content_directory) do
         File.join(self.class.root_dir, 'var')
       end
     end
 
     def debug
-      !!config.fetch(:debug)
+      !!__data__.fetch(:debug)
     end
 
     def app_name
-      config.fetch(:app_name) { File.basename($PROGRAM_NAME) }
-    end
-
-    private
-
-    attr_reader :config
-
-    def load_config
-      config.read
-    rescue TTY::Config::ReadError
-      missing_config_error
-    rescue
-      invalid_config_error
-    end
-
-    def missing_config_error
-      warn <<~ERROR.chomp
-        Could not load the config file. Please check that it exists:
-        <install-dir>/etc/config.yaml
-      ERROR
-      exit 1
-    end
-
-    def invalid_config_error
-      warn <<~ERROR.chomp
-        An error occurred when loading the config file:
-        #{config.source_file}
-      ERROR
-      exit 1
+      __data__.fetch(:app_name) { File.basename($PROGRAM_NAME) }
     end
   end
 end

@@ -24,12 +24,15 @@
 # ==============================================================================
 #
 
-require 'cloudware/models/deployment'
-
 module Cloudware
   module Commands
     class Destroy < Command
       attr_reader :name
+
+      def initialize(*a, **h)
+        require 'cloudware/models/deployment'
+        super
+      end
 
       def run
         @name = argv[0]

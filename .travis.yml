@@ -5,9 +5,8 @@ rvm:
  - 2.4.1
 sudo: required
 install:
-  - cp ./etc/config.yml.example ./etc/config.yml
-  - sed -i 's#/var/log#/tmp#g' ./etc/config.yml
-  - touch /tmp/flightconnector.log
+  - cp ./etc/config.yaml.travis ./etc/config.yaml
+  - touch /tmp/travis.log
   - bundle install
 script:
   - export CLOUDWARE_PROVIDER=aws

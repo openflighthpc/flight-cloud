@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,25 +24,34 @@
 # ==============================================================================
 #
 
-require 'active_model'
-require 'active_model/errors'
+require 'cloudware/config'
+require 'active_support/core_ext/module/delegation'
 
 module Cloudware
-  module Models
-    class Application
-      class << self
-        alias_method 'build', 'new'
-      end
+  class CommandConfig
+    include FlightConfig::Updater
 
-      include ActiveModel::Model
-      extend Memoist
+    delegate_missing_to Config
 
-      def initialize(*_a, **parameters)
-        @errors = ActiveModel::Errors.new(self)
-        parameters.each do |key, value|
-          public_send("#{key}=", value)
-        end
-      end
+    def path
+      File.join(content_path, 'etc/config.yaml')
+    end
+
+    def current_cluster
+      __data__.fetch(:current_cluster) { 'default' }
+    end
+
+    def current_cluster=(cluster)
+      __data__.set(:current_cluster, value: cluster)
+    end
+
+    def region
+      @region ||= Config.default_region
+    end
+
+    def region=(region)
+      @region = region
     end
   end
 end
+
