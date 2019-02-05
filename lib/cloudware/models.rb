@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,18 +24,10 @@
 # ==============================================================================
 #
 
-FactoryBot.define do
-  models = Cloudware::Models
+require 'require_all'
 
-  factory :deployment, class: models::Deployment do
-    name 'test-deployment'
-    template_path '/tmp/test-template'
-    results {}
-    replacements nil
-    cluster 'test-deployment-cluster'
-  end
+[
+  'lib/cloudware/models/concerns/**/*.rb',
+  'lib/cloudware/models/**/*.rb',
+].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
 
-  factory :context, class: Cloudware::Context do
-    initialize_with { new(cluster: 'test-cluster') }
-  end
-end

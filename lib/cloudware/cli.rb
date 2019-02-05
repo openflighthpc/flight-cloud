@@ -48,8 +48,6 @@ module Cloudware
     program :description, 'Cloud orchestration tool'
     program :help_paging, false
 
-    global_option('--region REGION', 'Specify cloud platform region')
-
     suppress_trace_class UserError
 
     # Display the help if there is no input arguments
@@ -62,7 +60,6 @@ module Cloudware
         hash.delete(:trace)
         begin
           cmd = klass.new
-          cmd.__config__.region = hash.delete(:region)
           if hash.empty?
             cmd.public_send(method, *args)
           else
@@ -84,10 +81,7 @@ module Cloudware
     end
 
     def self.delayed_require
-      [
-        'lib/cloudware/models/concerns/**/*.rb',
-        'lib/cloudware/models/**/*.rb',
-      ].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
+      require 'cloudware/models'
     end
 
     command 'cluster' do |c|
@@ -98,15 +92,29 @@ module Cloudware
     command 'cluster switch' do |c|
       cli_syntax(c, 'CLUSTER')
       c.summary = 'Change the current cluster to CLUSTER'
-      action(c, Commands::Cluster, method: :switch)
+      action(c, Commands::ClusterCmd, method: :switch)
     end
+
+    cluster_templates = proc do |c|
+      cli_syntax(c)
+      c.summary = 'Lists the available templates for the cluster'
+      c.description = <<~DESC
+        Lists the templates for a particular cluster. These templates
+        can be used directly with the `deploy` command.
+      DESC
+      action(c, Commands::ClusterCmd, method: :list_templates)
+    end
+
+    command 'cluster templates', &cluster_templates
+    command 'list templates', &cluster_templates
 
     command 'deploy' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
       c.summary = 'Deploy new resource(s) define by a template'
       c.description = <<-DESC.strip_heredoc
-        Deploy new resource(s) from the specified TEMPLATE. This should
-        specifiy the absolute path (including extension) to the template.
+        Deploy new resource(s) from the specified TEMPLATE. The TEMPLATE can
+        either be a cluster template (see #{Config.app_name} cluster templates).
+        Alternatively, an absolute path (including extension) can be used.
 
         The deployment will be given the NAME label and logged locally. The name
         used by the provider will be based off this with minor variations.
@@ -131,6 +139,20 @@ module Cloudware
       action(c, Commands::Destroy)
     end
 
+    command 'import' do |c|
+      cli_syntax(c, 'ZIP_PATH')
+      c.summary = 'Add templates to the cluster'
+      c.description = <<~DESC.split("\n\n").map(&:squish).join("\n")
+        Imports the '#{Config.provider}' templates into the internal cache. The
+        ZIP_PATH must be a zip file containing an '#{Config.provider}'
+        directory.\n\n
+
+        These templates can then be used to deploy resource using:\n
+        #{Config.app_name} deploy foo template
+      DESC
+      action(c, Commands::Import)
+    end
+
     command 'list' do |c|
       cli_syntax(c)
       c.summary = 'List the deployed cloud resources'
@@ -142,7 +164,7 @@ module Cloudware
       c.description = <<~DESC
         Shows a list of clusters that have been previously deployed to
       DESC
-      action(c, Commands::Cluster, method: :list)
+      action(c, Commands::ClusterCmd, method: :list)
     end
 
     command('list clusters', &list_clusters_proc)

@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,18 +24,30 @@
 # ==============================================================================
 #
 
-FactoryBot.define do
-  models = Cloudware::Models
+require 'pathname'
+require 'zip'
 
-  factory :deployment, class: models::Deployment do
-    name 'test-deployment'
-    template_path '/tmp/test-template'
-    results {}
-    replacements nil
-    cluster 'test-deployment-cluster'
-  end
-
-  factory :context, class: Cloudware::Context do
-    initialize_with { new(cluster: 'test-cluster') }
+module Cloudware
+  module Commands
+    class Import < Command
+      def run!(raw_path)
+        zip_path = Pathname.new(raw_path).expand_path.sub_ext('.zip').to_s
+        cluster = Cluster.load(__config__.current_cluster)
+        Zip::File.open(zip_path) do |zip|
+          zip.glob('aws/**/*').reject(&:directory?).each do |file|
+            dst = Pathname.new(file.name)
+                          .sub(/\Aaws\//, '')
+                          .expand_path(cluster.template(ext: false))
+                          .tap { |p| p.dirname.mkpath }
+            if dst.exist?
+              $stderr.puts "Skipping, file already exists: #{dst}"
+            else
+              file.extract(dst)
+              puts "Imported: #{dst}"
+            end
+          end
+        end
+      end
+    end
   end
 end

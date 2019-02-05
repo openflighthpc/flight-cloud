@@ -69,6 +69,10 @@ module Cloudware
       end
     end
 
+    def template_ext
+      provider == 'azure' ? '.json' : '.yaml'
+    end
+
     [:azure, :aws].each do |init_provider|
       define_method(init_provider) do
         provider_data = __data__.fetch(init_provider) do
@@ -92,10 +96,15 @@ module Cloudware
       end
     end
 
+    def content(*paths)
+      File.join(content_path, *paths)
+    end
+
     def content_path
-      __data__.fetch(:content_directory) do
+      base = __data__.fetch(:content_directory) do
         File.join(self.class.root_dir, 'var')
       end
+      File.join(base, provider)
     end
 
     def debug

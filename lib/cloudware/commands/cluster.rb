@@ -24,30 +24,56 @@
 # ==============================================================================
 #
 
+require 'cloudware/cluster'
+require 'pathname'
+
 module Cloudware
   module Commands
-    class Cluster < Command
-      LIST_TEMPLATE = <<~ERB
+    class ClusterCmd < Command
+      LIST_CLUSTERS = <<~ERB
+        <% unless clusters.include?(__config__.current_cluster) -%>
+        * <%= __config__.current_cluster %>
+        <% end -%>
         <% clusters.each do |cluster| -%>
         <%   current = __config__.current_cluster == cluster -%>
         <%=  current ? '*' : ' ' %> <%= cluster %>
         <% end -%>
       ERB
 
+      LIST_TEMPLATES = <<~ERB
+      ERB
+
       def switch(cluster)
         @__config__ = CommandConfig.update do |conf|
           conf.current_cluster = cluster
         end
+        list
       end
 
       def list
-        puts ERB.new(LIST_TEMPLATE, nil, '-').result(binding)
+        puts _render(LIST_CLUSTERS)
+      end
+
+      def list_templates
+        cluster = Cluster.load(__config__.current_cluster)
+        templates = Dir.glob(cluster.template('**/*')).sort
+        if templates.empty?
+          $stderr.puts 'No templates found'
+        else
+          base = Pathname.new(cluster.template(ext: false))
+          templates.each do |path|
+            puts Pathname.new(path).relative_path_from(base).to_s
+                         .chomp("#{Config.template_ext}")
+          end
+        end
       end
 
       private
 
       def clusters
-        []
+        Dir.glob(Cluster.new('*').directory)
+           .map { |p| File.basename(p) }
+           .sort
       end
     end
   end

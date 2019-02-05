@@ -26,11 +26,14 @@
 
 module Cloudware
   class Context
-    attr_reader :region, :deployments
+    attr_reader :deployments, :cluster
+
+    # TODO: Try and remove the provider as `Config.content_path` is now provider
+    # specific
     delegate :provider, to: Config
 
-    def initialize(region:)
-      @region = region
+    def initialize(cluster:)
+      @cluster = cluster
       update_deployments
     end
 
@@ -68,6 +71,12 @@ module Cloudware
 
     def reload
       update_deployments
+    end
+
+    def region
+      # Protect `Cluster` from the `nil` cluster. This weird state would
+      # be picked up by `Deployment` validation
+      Cluster.load(cluster.to_s).region
     end
 
     private
@@ -122,12 +131,8 @@ module Cloudware
     end
 
     def path
-      File.join(
-        Config.content_path,
-        'contexts',
-        provider,
-        "#{region}.yaml"
-      ).tap { |p| FileUtils.mkdir_p(File.dirname(p)) }
+      Cluster.load(cluster).join('var/contexts.yaml')
+             .tap { |p| FileUtils.mkdir_p(File.dirname(p)) }
     end
   end
 end

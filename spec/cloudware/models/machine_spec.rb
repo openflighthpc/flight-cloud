@@ -24,6 +24,8 @@
 # ==============================================================================
 #
 
+require 'cloudware/models'
+
 RSpec.describe Cloudware::Models::Machine do
   subject { described_class.new(name: machine_name, context: context) }
 

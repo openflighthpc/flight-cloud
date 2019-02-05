@@ -54,12 +54,18 @@ module Cloudware
     end
 
     def context
-      Context.new(region: __config__.region)
+      Context.new(cluster: __config__.current_cluster)
     end
     memoize :context
 
     def region
       __config__.region
+    end
+
+    private
+
+    def _render(template)
+      ERB.new(template, nil, '-').result(binding)
     end
   end
 end

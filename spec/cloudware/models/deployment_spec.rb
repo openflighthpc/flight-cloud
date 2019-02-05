@@ -24,6 +24,7 @@
 # ==============================================================================
 #
 
+require 'cloudware/models'
 require 'cloudware/providers/base'
 
 RSpec.describe Cloudware::Models::Deployment do
@@ -47,7 +48,7 @@ RSpec.describe Cloudware::Models::Deployment do
   shared_examples 'validated deployment' do
     it 'saves the deployment' do
       begin subject.deploy; rescue; end
-      context = Cloudware::Context.new(region: subject.region)
+      context = Cloudware::Context.new(cluster: subject.cluster)
       expect(context.find_deployment(subject.name)&.name).to eq(subject.name)
     end
   end
@@ -57,7 +58,9 @@ RSpec.describe Cloudware::Models::Deployment do
   end
 
   let(:replacements) { nil }
-  let(:context) { Cloudware::Context.new(region: subject.region) }
+  let(:context) do
+    Cloudware::Context.new(cluster: subject.cluster)
+  end
   let(:double_client) do
     object_double(Cloudware::Providers::Base::Client.new('region'))
   end
@@ -136,8 +139,8 @@ RSpec.describe Cloudware::Models::Deployment do
           expect(subject.deployment_error).to be_nil
         end
 
-        context 'without a region' do
-          before { subject.region = nil }
+        context 'without a cluster' do
+          before { subject.cluster = nil }
 
           include_examples 'deploy raises ModelValidationError'
         end

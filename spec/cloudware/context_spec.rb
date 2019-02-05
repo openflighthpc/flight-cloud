@@ -138,7 +138,9 @@ RSpec.describe Cloudware::Context do
     let(:other_deployment) do
       build(:deployment, name: 'other-deployment')
     end
-    let(:other_context) { described_class.new(region: subject.region) }
+    let(:other_context) do
+      described_class.new(region: subject.region, cluster: Cloudware::CommandConfig.new.current_cluster)
+    end
 
     # Ensure the other context/deployment are created after the subject
     before do
@@ -160,7 +162,7 @@ RSpec.describe Cloudware::Context do
 
     describe '#save_deployments' do
       let(:new_deployment) do
-        build(:deployment, name: 'new_deployment', region: subject.region)
+        build(:deployment, name: 'new_deployment', cluster: Cloudware::CommandConfig.new.current_cluster)
       end
       let(:all_names) do
         [new_deployment, initial_deployment, other_deployment].map(&:name)

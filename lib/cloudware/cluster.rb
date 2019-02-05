@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,18 +24,36 @@
 # ==============================================================================
 #
 
-FactoryBot.define do
-  models = Cloudware::Models
+module Cloudware
+  class Cluster
+    include FlightConfig::Loader
 
-  factory :deployment, class: models::Deployment do
-    name 'test-deployment'
-    template_path '/tmp/test-template'
-    results {}
-    replacements nil
-    cluster 'test-deployment-cluster'
-  end
+    attr_reader :identifier
 
-  factory :context, class: Cloudware::Context do
-    initialize_with { new(cluster: 'test-cluster') }
+    def initialize(identifier)
+      @identifier = identifier
+    end
+
+    def join(*paths)
+      Config.content('clusters', identifier, *paths)
+    end
+
+    # Deprecated! Use `join` instead
+    def directory
+      join()
+    end
+
+    def path
+      File.join(directory, 'etc/config.yaml')
+    end
+
+    def template(*parts, ext: true)
+      path = join('lib', 'templates', *parts)
+      ext ? "#{path}#{Config.template_ext}" : path
+    end
+
+    def region
+      __data__.fetch(:region) { Config.default_region }
+    end
   end
 end
