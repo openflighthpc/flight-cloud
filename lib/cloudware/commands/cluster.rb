@@ -55,6 +55,7 @@ module Cloudware
       end
 
       def list_templates
+        list = ListTemplates.build(__config__.current_cluster)
         cluster = Cluster.load(__config__.current_cluster)
         templates = Dir.glob(cluster.template('**/*')).sort
         if templates.empty?
@@ -69,6 +70,12 @@ module Cloudware
       end
 
       private
+
+      ListTemplates = Struct.new(:cluster) do
+        def self.build(cluster_name)
+          new(Cluster.load(cluster_name))
+        end
+      end
 
       def clusters
         Dir.glob(Cluster.new('*').directory)
