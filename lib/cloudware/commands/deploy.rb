@@ -35,11 +35,30 @@ module Cloudware
         super
       end
 
-      def run
-        @name = argv[0]
-        @raw_path = Pathname.new(argv[1])
+      def run!(name, raw_path, params: nil)
+        path = build_template_list.human_paths[raw_path] || ''
+        puts "Deploying: #{path}"
         with_spinner('Deploying resources...', done: 'Done') do
-          deployment.deploy
+          Models::Deployment.new(
+            template_path: path,
+            name: name,
+            cluster: __config__.current_cluster,
+            replacements: ReplacementFactory.new(context, name)
+                                            .build(params)
+          ).deploy
+        end
+      end
+
+      def list_templates(verbose: false)
+        list = build_template_list
+        if list.templates.empty?
+          $stderr.puts 'No templates found'
+        else
+          list.human_paths.each do |human_path, abs_path|
+            print human_path
+            print " => #{abs_path}" if verbose
+            puts
+          end
         end
       end
 
@@ -47,24 +66,46 @@ module Cloudware
 
       attr_reader :name, :raw_path
 
-      def template_path
-        return raw_path if raw_path.absolute?
-        cluster = Cluster.load(__config__.current_cluster)
-        path = cluster.template(raw_path)
-        nested_path = cluster.template(raw_path, path.basename, ext: false)
-        return nested_path if !path.file? && nested_path.file?
-        path
+      def build_template_list
+        ListTemplates.build(__config__.current_cluster)
       end
 
-      def deployment
-        puts "Deploying: #{template_path}"
-        Models::Deployment.new(
-          template_path: template_path,
-          name: name,
-          cluster: __config__.current_cluster,
-          replacements: ReplacementFactory.new(context, name)
-                                          .build(options.params)
-        )
+      ListTemplates = Struct.new(:cluster) do
+        include Enumerable
+
+        delegate :each, to: :templates
+
+        def self.build(cluster_name)
+          new(Cluster.load(cluster_name))
+        end
+
+        def base
+          cluster.template(ext: false)
+        end
+
+        ##
+        # These represent the valid template CLI inputs
+        #
+        def human_paths
+          templates.map do |template|
+            name = template.basename.sub_ext('')
+            dir_name = template.dirname.basename
+            alternate = template.dirname.dirname.join(template.basename)
+
+            # Detect shorthand enabled templates
+            shorthand = (name == dir_name && !alternate.file?)
+            relative = template.dirname.relative_path_from(base)
+
+            human_path = shorthand ? relative : File.join(relative, name)
+            [human_path.to_s, template]
+          end.to_h
+        end
+
+        def templates
+          @templates ||= Dir.glob(cluster.template('**/*'))
+                            .sort
+                            .map { |p| Pathname.new(p) }
+        end
       end
     end
   end

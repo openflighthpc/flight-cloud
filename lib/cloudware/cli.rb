@@ -107,7 +107,7 @@ module Cloudware
         verbose option to see the full template paths
       DESC
       c.option '--verbose', 'Show the shorthand mappigns'
-      action(c, Commands::ClusterCmd, method: :list_templates)
+      action(c, Commands::Deploy, method: :list_templates)
     end
 
     command 'cluster templates', &cluster_templates
