@@ -57,12 +57,11 @@ module Cloudware
       def list_templates
         list = ListTemplates.build(__config__.current_cluster)
         cluster = Cluster.load(__config__.current_cluster)
-        templates = Dir.glob(cluster.template('**/*')).sort
-        if templates.empty?
+        if list.templates.empty?
           $stderr.puts 'No templates found'
         else
           base = Pathname.new(cluster.template(ext: false))
-          templates.each do |path|
+          list.each do |path|
             puts Pathname.new(path).relative_path_from(base).to_s
                          .chomp("#{Config.template_ext}")
           end
@@ -72,8 +71,16 @@ module Cloudware
       private
 
       ListTemplates = Struct.new(:cluster) do
+        include Enumerable
+
+        delegate :each, to: :templates
+
         def self.build(cluster_name)
           new(Cluster.load(cluster_name))
+        end
+
+        def templates
+          @templates ||= Dir.glob(cluster.template('**/*')).sort
         end
       end
 
