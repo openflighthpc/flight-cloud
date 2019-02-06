@@ -84,9 +84,21 @@ module Cloudware
       require 'cloudware/models'
     end
 
+    def self.add_command(name, *args)
+      command name do |c|
+        cli_syntax(c, *args)
+        yield c
+      end
+    end
+
     command 'cluster' do |c|
       cli_syntax(c)
       c.summary = 'Manage the current cluster selection'
+    end
+
+    add_command 'cluster init', 'CLUSTER' do |c|
+      c.summary = 'Create a new cluster'
+      action(c, Commands::ClusterCommand, method: :init)
     end
 
     command 'cluster switch' do |c|

@@ -41,11 +41,10 @@ module Cloudware
         <% end -%>
       ERB
 
-      def switch(cluster)
-        error_if_missing(cluster, action: 'switch')
-        @__config__ = CommandConfig.update do |conf|
-          conf.current_cluster = cluster
-        end
+      def init(cluster)
+        error_if_exists(cluster, action: 'create')
+        FileUtils.mkdir_p Cluster.load(cluster).path
+        update_cluster(cluster)
         list
       end
 
@@ -53,12 +52,31 @@ module Cloudware
         puts _render(LIST_CLUSTERS)
       end
 
+      def switch(cluster)
+        error_if_missing(cluster, action: 'switch')
+        update_cluster(cluster)
+        list
+      end
+
       private
+
+      def update_cluster(new_cluster)
+        @__config__ = CommandConfig.update do |conf|
+          conf.current_cluster = new_cluster
+        end
+      end
 
       def load_clusters
         Dir.glob(Cluster.new('*').join)
            .map { |p| File.basename(p) }
            .sort
+      end
+
+      def error_if_exists(cluster, action:)
+        return unless load_clusters.include?(cluster)
+        raise InvalidInput, <<~ERROR.chomp
+          Failed to #{action} cluster. '#{cluster}' already exists
+        ERROR
       end
 
       def error_if_missing(cluster, action:)
