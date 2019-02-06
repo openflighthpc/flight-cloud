@@ -53,11 +53,13 @@ module Cloudware
         list = build_template_list
         if list.templates.empty?
           $stderr.puts 'No templates found'
-        else
+        elsif verbose
           list.human_paths.each do |human_path, abs_path|
-            print human_path
-            print " => #{abs_path}" if verbose
-            puts
+            puts "#{human_path} => #{abs_path}"
+          end
+        else
+          list.shorthand_paths.each do |human_path, _|
+            puts human_path
           end
         end
       end
@@ -100,12 +102,22 @@ module Cloudware
             # Adds the shorthand path (if available)
             # The directory must not have a sibling template of the same name
             if (name == directory.basename) && !directory_file.file?
-              memo[directory.relative_path_from(base)] = template
+              memo[directory.relative_path_from(base).to_s] = template
             end
 
             # Adds the standard path
-            memo[long_name.relative_path_from(base)] = template
+            memo[long_name.relative_path_from(base).to_s] = template
           end
+        end
+
+        def shorthand_paths
+          human_paths.each_with_object({}) do |(name, path), memo|
+            if memo.key?(path)
+              memo[path] = name if memo[path].length > name.length
+            else
+              memo[path] = name
+            end
+          end.map { |v, k| [k, v] }.to_h
         end
 
         def templates
