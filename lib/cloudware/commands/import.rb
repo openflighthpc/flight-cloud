@@ -33,7 +33,7 @@ module Cloudware
       def run!(raw_path)
         zip_path = Pathname.new(raw_path).expand_path.sub_ext('.zip').to_s
         cluster = Cluster.load(__config__.current_cluster)
-        Zip::File.open(zip_path) do |zip|
+        ZipImporter.extract(zip_path) do |zip|
           zip.glob('aws/**/*').reject(&:directory?).each do |file|
             dst = Pathname.new(file.name)
                           .sub(/\Aaws\//, '')
@@ -47,6 +47,18 @@ module Cloudware
             end
           end
         end
+      end
+
+      private
+
+      ZipImporter = Struct.new(:zip_file) do
+        def self.extract(path)
+          Zip::File.open(path) do |f|
+            yield new(f) if block_given?
+          end
+        end
+
+        delegate_missing_to :zip_file
       end
     end
   end
