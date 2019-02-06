@@ -36,7 +36,7 @@ module Cloudware
       end
 
       def run!(name, raw_path, params: nil)
-        path = build_template_list.human_paths[raw_path] || ''
+        path = resolve_template(raw_path)
         puts "Deploying: #{path}"
         with_spinner('Deploying resources...', done: 'Done') do
           Models::Deployment.new(
@@ -66,6 +66,10 @@ module Cloudware
 
       attr_reader :name, :raw_path
 
+      def resolve_template(template)
+        build_template_list.human_paths[template] || ''
+      end
+
       def build_template_list
         ListTemplates.build(__config__.current_cluster)
       end
@@ -87,18 +91,21 @@ module Cloudware
         # These represent the valid template CLI inputs
         #
         def human_paths
-          templates.map do |template|
-            name = template.basename.sub_ext('')
-            dir_name = template.dirname.basename
-            alternate = template.dirname.dirname.join(template.basename)
+          templates.each_with_object({}) do |template, memo|
+            long_name = template.sub_ext('')
+            name = long_name.basename
+            directory = long_name.dirname
+            directory_file = directory.sub_ext(template.extname)
 
-            # Detect shorthand enabled templates
-            shorthand = (name == dir_name && !alternate.file?)
-            relative = template.dirname.relative_path_from(base)
+            # Adds the shorthand path (if available)
+            # The directory must not have a sibling template of the same name
+            if (name == directory.basename) && !directory_file.file?
+              memo[directory.relative_path_from(base)] = template
+            end
 
-            human_path = shorthand ? relative : File.join(relative, name)
-            [human_path.to_s, template]
-          end.to_h
+            # Adds the standard path
+            memo[long_name.relative_path_from(base)] = template
+          end
         end
 
         def templates
