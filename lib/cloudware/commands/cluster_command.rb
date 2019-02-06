@@ -40,9 +40,6 @@ module Cloudware
         <% end -%>
       ERB
 
-      LIST_TEMPLATES = <<~ERB
-      ERB
-
       def switch(cluster)
         @__config__ = CommandConfig.update do |conf|
           conf.current_cluster = cluster
