@@ -56,15 +56,10 @@ module Cloudware
 
       def list_templates
         list = ListTemplates.build(__config__.current_cluster)
-        cluster = Cluster.load(__config__.current_cluster)
         if list.templates.empty?
           $stderr.puts 'No templates found'
         else
-          base = Pathname.new(cluster.template(ext: false))
-          list.each do |path|
-            puts Pathname.new(path).relative_path_from(base).to_s
-                         .chomp("#{Config.template_ext}")
-          end
+          puts list.human_paths
         end
       end
 
@@ -79,8 +74,23 @@ module Cloudware
           new(Cluster.load(cluster_name))
         end
 
+        def base
+          cluster.template(ext: false)
+        end
+
+        ##
+        # These represent the valid template CLI inputs
+        #
+        def human_paths
+          templates.map do |path|
+            path.relative_path_from(base).sub_ext('')
+          end
+        end
+
         def templates
-          @templates ||= Dir.glob(cluster.template('**/*')).sort
+          @templates ||= Dir.glob(cluster.template('**/*'))
+                            .sort
+                            .map { |p| Pathname.new(p) }
         end
       end
 
