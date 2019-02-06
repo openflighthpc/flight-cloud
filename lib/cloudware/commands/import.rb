@@ -32,33 +32,41 @@ module Cloudware
     class Import < Command
       def run!(raw_path)
         zip_path = Pathname.new(raw_path).expand_path.sub_ext('.zip').to_s
-        cluster = Cluster.load(__config__.current_cluster)
         ZipImporter.extract(zip_path) do |zip|
-          zip.glob('aws/**/*').reject(&:directory?).each do |file|
-            dst = Pathname.new(file.name)
-                          .sub(/\Aaws\//, '')
-                          .expand_path(cluster.template(ext: false))
-                          .tap { |p| p.dirname.mkpath }
-            if dst.exist?
-              $stderr.puts "Skipping, file already exists: #{dst}"
-            else
-              file.extract(dst)
-              puts "Imported: #{dst}"
-            end
-          end
+          zip.copy_templates(__config__.current_cluster)
         end
       end
 
       private
 
       ZipImporter = Struct.new(:zip_file) do
+        delegate_missing_to :zip_file
+
         def self.extract(path)
           Zip::File.open(path) do |f|
             yield new(f) if block_given?
           end
         end
 
-        delegate_missing_to :zip_file
+        def copy_templates(cluster)
+          cluster = Cluster.load(cluster)
+          templates.each do |zip_src|
+            dst = Pathname.new(zip_src.name).sub(/\Aaws\//, '')
+                          .expand_path(cluster.template(ext: false))
+            dst.dirname.mkpath
+            if dst.exist?
+              $stderr.puts "Skipping, file already exists: #{dst}"
+            else
+              extract(dst)
+              puts "Imported: #{dst}"
+            end
+          end
+        end
+
+        def templates
+          glob_path = 'aws/{domain,{group,node}/*}/platform/templates/**/*'
+          glob(glob_path).reject(&:directory?)
+        end
       end
     end
   end
