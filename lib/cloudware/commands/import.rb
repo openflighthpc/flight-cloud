@@ -48,11 +48,16 @@ module Cloudware
           end
         end
 
+        def self.dst_template_path(src, base)
+          Pathname.new(src)
+                  .sub(/\Aaws\//, '')
+                  .expand_path(base)
+        end
+
         def copy_templates(cluster)
-          cluster = Cluster.load(cluster)
+          base = Cluster.load(cluster).template(ext: false)
           templates.each do |zip_src|
-            dst = Pathname.new(zip_src.name).sub(/\Aaws\//, '')
-                          .expand_path(cluster.template(ext: false))
+            dst = self.class.dst_template_path(zip_src.name, base)
             dst.dirname.mkpath
             if dst.exist?
               $stderr.puts "Skipping, file already exists: #{dst}"
