@@ -59,7 +59,9 @@ module Cloudware
         if list.templates.empty?
           $stderr.puts 'No templates found'
         else
-          puts list.human_paths
+          list.human_paths.each do |path, shorthand|
+            puts shorthand || path
+          end
         end
       end
 
@@ -89,12 +91,10 @@ module Cloudware
             relative_base = template.dirname.relative_path_from(base)
 
             # Detect shorthand enabled templates
-            if name == dir_name && !alternate.file?
-              "#{relative_base} => #{relative_base}/#{name}"
-            else
-              "#{relative_base}/#{name}"
-            end
-          end
+            shorthand = (name == dir_name && !alternate.file?)
+
+            [File.join(relative_base, name), shorthand ? relative_base : nil]
+          end.to_h
         end
 
         def templates
