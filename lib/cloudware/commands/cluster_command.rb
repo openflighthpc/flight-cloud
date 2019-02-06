@@ -42,6 +42,7 @@ module Cloudware
       ERB
 
       def switch(cluster)
+        error_if_missing(cluster, action: 'switch')
         @__config__ = CommandConfig.update do |conf|
           conf.current_cluster = cluster
         end
@@ -58,6 +59,13 @@ module Cloudware
         Dir.glob(Cluster.new('*').join)
            .map { |p| File.basename(p) }
            .sort
+      end
+
+      def error_if_missing(cluster, action:)
+        return if load_clusters.include?(cluster)
+        raise InvalidInput, <<~ERROR.chomp
+          Failed to #{action} cluster. '#{cluster}' doesn't exist
+        ERROR
       end
     end
   end
