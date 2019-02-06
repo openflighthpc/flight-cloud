@@ -40,6 +40,8 @@ module Cloudware
       private
 
       ZipImporter = Struct.new(:zip_file) do
+        TEMPLATE_GLOB = 'aws/{domain,{group,node}/*}/platform/templates/**/*'
+
         delegate_missing_to :zip_file
 
         def self.extract(path)
@@ -62,15 +64,14 @@ module Cloudware
             if dst.exist?
               $stderr.puts "Skipping, file already exists: #{dst}"
             else
-              extract(dst)
+              zip_src.extract(dst)
               puts "Imported: #{dst}"
             end
           end
         end
 
         def templates
-          glob_path = 'aws/{domain,{group,node}/*}/platform/templates/**/*'
-          glob(glob_path).reject(&:directory?)
+          glob(TEMPLATE_GLOB).reject(&:directory?)
         end
       end
     end
