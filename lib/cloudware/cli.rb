@@ -92,7 +92,7 @@ module Cloudware
     command 'cluster switch' do |c|
       cli_syntax(c, 'CLUSTER')
       c.summary = 'Change the current cluster to CLUSTER'
-      action(c, Commands::ClusterCmd, method: :switch)
+      action(c, Commands::ClusterCommand, method: :switch)
     end
 
     cluster_templates = proc do |c|
@@ -168,7 +168,7 @@ module Cloudware
       c.description = <<~DESC
         Shows a list of clusters that have been previously deployed to
       DESC
-      action(c, Commands::ClusterCmd, method: :list)
+      action(c, Commands::ClusterCommand, method: :list)
     end
 
     command('list clusters', &list_clusters_proc)

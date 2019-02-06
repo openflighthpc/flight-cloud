@@ -29,7 +29,7 @@ require 'pathname'
 
 module Cloudware
   module Commands
-    class ClusterCmd < Command
+    class ClusterCommand < Command
       LIST_CLUSTERS = <<~ERB
         <% unless clusters.include?(__config__.current_cluster) -%>
         * <%= __config__.current_cluster %>
