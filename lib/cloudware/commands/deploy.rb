@@ -48,14 +48,16 @@ module Cloudware
       attr_reader :name, :raw_path
 
       def template_path
-        if raw_path.absolute?
-          raw_path.to_s
-        else
-          Cluster.load(__config__.current_cluster).template(raw_path.to_s)
-        end
+        return raw_path if raw_path.absolute?
+        cluster = Cluster.load(__config__.current_cluster)
+        path = cluster.template(raw_path)
+        nested_path = cluster.template(raw_path, path.basename, ext: false)
+        return nested_path if !path.file? && nested_path.file?
+        path
       end
 
       def deployment
+        puts "Deploying: #{template_path}"
         Models::Deployment.new(
           template_path: template_path,
           name: name,

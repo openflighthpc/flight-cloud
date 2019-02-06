@@ -113,8 +113,7 @@ module Cloudware
       c.summary = 'Deploy new resource(s) define by a template'
       c.description = <<-DESC.strip_heredoc
         Deploy new resource(s) from the specified TEMPLATE. The TEMPLATE can
-        either be a cluster template (see #{Config.app_name} cluster templates).
-        Alternatively, an absolute path (including extension) can be used.
+        either be a cluster template or an absolute path.
 
         The deployment will be given the NAME label and logged locally. The name
         used by the provider will be based off this with minor variations.
