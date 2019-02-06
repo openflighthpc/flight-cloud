@@ -31,6 +31,7 @@ module Cloudware
   module Commands
     class ClusterCommand < Command
       LIST_CLUSTERS = <<~ERB
+        <% clusters = load_clusters -%>
         <% unless clusters.include?(__config__.current_cluster) -%>
         * <%= __config__.current_cluster %>
         <% end -%>
@@ -53,8 +54,8 @@ module Cloudware
 
       private
 
-      def clusters
-        Dir.glob(Cluster.new('*').directory)
+      def load_clusters
+        Dir.glob(Cluster.new('*').join)
            .map { |p| File.basename(p) }
            .sort
       end
