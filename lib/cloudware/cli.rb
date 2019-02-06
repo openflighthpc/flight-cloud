@@ -102,10 +102,11 @@ module Cloudware
         Lists the templates for a particular cluster. These templates
         can be used directly with the `deploy` command.
 
-        A shorthand is available when the template name matches its
-        directory. If the tempate path is unambiguous, then the
-        directory name maybe used with the deploy command.
+        By default the template name is not required if it can be
+        unambiguously determined from the directory name. Use the
+        verbose option to see the full template paths
       DESC
+      c.option '--verbose', 'Show the shorthand mappigns'
       action(c, Commands::ClusterCmd, method: :list_templates)
     end
 
