@@ -82,8 +82,18 @@ module Cloudware
         # These represent the valid template CLI inputs
         #
         def human_paths
-          templates.map do |path|
-            path.relative_path_from(base).sub_ext('')
+          templates.map do |template|
+            name = template.basename.sub_ext('')
+            dir_name = template.dirname.basename
+            alternate = template.dirname.dirname.join(template.basename)
+            relative_base = template.dirname.relative_path_from(base)
+
+            # Detect shorthand enabled templates
+            if name == dir_name && !alternate.file?
+              "#{relative_base} => #{relative_base}/#{name}"
+            else
+              "#{relative_base}/#{name}"
+            end
           end
         end
 

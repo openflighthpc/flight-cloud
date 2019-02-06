@@ -101,6 +101,10 @@ module Cloudware
       c.description = <<~DESC
         Lists the templates for a particular cluster. These templates
         can be used directly with the `deploy` command.
+
+        A shorthand is available when the template name matches its
+        directory. If the tempate path is unambiguous, then the
+        directory name maybe used with the deploy command.
       DESC
       action(c, Commands::ClusterCmd, method: :list_templates)
     end
