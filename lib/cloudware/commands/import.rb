@@ -40,7 +40,10 @@ module Cloudware
       private
 
       ZipImporter = Struct.new(:zip_file) do
-        TEMPLATE_GLOB = 'aws/{domain,{group,node}/*}/platform/templates/**/*'
+        SECTION = /(domain|(group|node)\/[^\/]*)/
+        TEMPLATE_REMOVE = /#{Config.provider}\/#{SECTION}\/platform\/templates/
+        TEMPLATE_REPLACE = /(?<=#{Config.provider}\/)#{SECTION}/
+        TEMPLATE_GLOB = "#{Config.provider}/{domain,{group,node}/*}/platform/templates/**/*"
 
         delegate_missing_to :zip_file
 
@@ -50,9 +53,14 @@ module Cloudware
           end
         end
 
+        ##
+        # Strip the root provider directory and the `platform/templates`
+        # sub directory from the destination path
+        #
         def self.dst_template_path(src, base)
+          replace = src.match(TEMPLATE_REPLACE)[0]
           Pathname.new(src)
-                  .sub(/\Aaws\//, '')
+                  .sub(/#{TEMPLATE_REMOVE}/, replace)
                   .expand_path(base)
         end
 
