@@ -50,8 +50,12 @@ module Cloudware
 
     suppress_trace_class UserError
 
-    # Display the help if there is no input arguments
-    ARGV.push '--help' if ARGV.empty?
+    def self.run!
+      # Display the help if there is no input arguments
+      ARGV.push '--help' if ARGV.empty?
+      Log.info "Run (CLI): #{ARGV.join(' ')}"
+      super
+    end
 
     def self.action(command, klass, method: :run!)
       command.action do |args, options|
