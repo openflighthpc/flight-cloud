@@ -30,6 +30,14 @@ FactoryBot.define do
   models = Cloudware::Models
 
   factory :deployment, class: models::Deployment do
+    initialize_with do
+      new(attributes.delete(:cluster), attributes.delete(:name)).tap do |model|
+        attributes.each do |key, value|
+          model.public_send(:"#{key}=", value)
+        end
+      end
+    end
+
     name 'test-deployment'
     template_path '/tmp/test-template'
     results {}

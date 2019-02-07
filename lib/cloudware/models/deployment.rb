@@ -40,11 +40,33 @@ module Cloudware
       include Concerns::ProviderClient
       include DeploymentCallbacks
 
+      include FlightConfig::Updater
+
       SAVE_ATTR = [
         :template_path, :name, :results, :replacements, :timestamp,
         :deployment_error, :cluster
       ].freeze
-      attr_accessor(*SAVE_ATTR)
+
+      SAVE_ATTR.each do |method|
+        define_method(method) { __data__.fetch(method) }
+        define_method(:"#{method}=") do |v|
+          if v.nil?
+            __data__.delete(method)
+          else
+            __data__.set(method, value: v)
+          end
+        end
+      end
+
+      def initialize(cluster, name, **_h)
+        self.cluster = cluster
+        self.name = name
+        super
+      end
+
+      def path
+        Cluster.load(cluster).join('var/deployments', name)
+      end
 
       def template
         return raw_template unless replacements

@@ -85,7 +85,7 @@ module Cloudware
       def self.load_deployments(file)
         file.rewind
         Data.load(file, default_value: []).map do |data|
-          Models::Deployment.new(**data)
+          Models::Deployment.new(data[:cluster], data[:name], **data)
         end
       end
 
