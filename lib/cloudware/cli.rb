@@ -50,8 +50,12 @@ module Cloudware
 
     suppress_trace_class UserError
 
-    # Display the help if there is no input arguments
-    ARGV.push '--help' if ARGV.empty?
+    def self.run!
+      # Display the help if there is no input arguments
+      ARGV.push '--help' if ARGV.empty?
+      Log.info "Run (CLI): #{ARGV.join(' ')}"
+      super
+    end
 
     def self.action(command, klass, method: :run!)
       command.action do |args, options|
@@ -84,20 +88,21 @@ module Cloudware
       require 'cloudware/models'
     end
 
-    def self.add_command(name, *args)
-      command name do |c|
-        cli_syntax(c, *args)
-        yield c
-      end
-    end
-
     command 'cluster' do |c|
       cli_syntax(c)
       c.summary = 'Manage the current cluster selection'
     end
 
-    add_command 'cluster init', 'CLUSTER' do |c|
+    command 'cluster init' do |c|
+      cli_syntax(c, 'CLUSTER')
       c.summary = 'Create a new cluster'
+      c.description = <<~DESC
+        Create a new cluster that can be identified by CLUSTER. The cluster
+        must not already exist. Use the `--import` option to import templates
+        into your new cluster. See `#{Config.app_name} import` for further
+        details.
+      DESC
+      c.option '--import PATH', String, 'Specify a zip file to import'
       action(c, Commands::ClusterCommand, method: :init)
     end
 
@@ -106,24 +111,6 @@ module Cloudware
       c.summary = 'Change the current cluster to CLUSTER'
       action(c, Commands::ClusterCommand, method: :switch)
     end
-
-    cluster_templates = proc do |c|
-      cli_syntax(c)
-      c.summary = 'Lists the available templates for the cluster'
-      c.description = <<~DESC
-        Lists the templates for a particular cluster. These templates
-        can be used directly with the `deploy` command.
-
-        By default the template name is not required if it can be
-        unambiguously determined from the directory name. Use the
-        verbose option to see the full template paths
-      DESC
-      c.option '--verbose', 'Show the shorthand mappigns'
-      action(c, Commands::Deploy, method: :list_templates)
-    end
-
-    command 'cluster templates', &cluster_templates
-    command 'list templates', &cluster_templates
 
     command 'deploy' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
@@ -204,6 +191,21 @@ module Cloudware
         format: `<machine-name>TAG<key>`
       DESC
       action(c, Commands::Lists::Machine)
+    end
+
+    command 'list templates' do |c|
+      cli_syntax(c)
+      c.summary = 'Lists the available templates for the cluster'
+      c.description = <<~DESC
+        Lists the templates for a particular cluster. These templates
+        can be used directly with the `deploy` command.
+
+        By default the template name is not required if it can be
+        unambiguously determined from the directory name. Use the
+        verbose option to see the full template paths
+      DESC
+      c.option '--verbose', 'Show the shorthand mappings'
+      action(c, Commands::Deploy, method: :list_templates)
     end
 
     command 'power' do |c|

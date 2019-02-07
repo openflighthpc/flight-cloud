@@ -57,7 +57,7 @@ module Cloudware
 
     def log_file
       __data__.fetch(:log_file) do
-        File.join(self.class.root_dir, 'log', 'cloudware.log').tap do |path|
+        File.join(self.class.root_dir, 'log', "#{provider}.log").tap do |path|
           FileUtils.mkdir_p(File.dirname(path))
         end
       end
