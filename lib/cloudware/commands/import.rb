@@ -32,20 +32,54 @@ module Cloudware
     class Import < Command
       def run!(raw_path)
         zip_path = Pathname.new(raw_path).expand_path.sub_ext('.zip').to_s
-        cluster = Cluster.load(__config__.current_cluster)
-        Zip::File.open(zip_path) do |zip|
-          zip.glob('aws/**/*').reject(&:directory?).each do |file|
-            dst = Pathname.new(file.name)
-                          .sub(/\Aaws\//, '')
-                          .expand_path(cluster.template(ext: false))
-                          .tap { |p| p.dirname.mkpath }
+        ZipImporter.extract(zip_path) do |zip|
+          zip.copy_templates(__config__.current_cluster)
+        end
+      end
+
+      private
+
+      ZipImporter = Struct.new(:zip_file) do
+        SECTION = /(domain|(group|node)\/[^\/]*)/
+        TEMPLATE_REMOVE = /#{Config.provider}\/#{SECTION}\/platform\/templates/
+        TEMPLATE_REPLACE = /(?<=#{Config.provider}\/)#{SECTION}/
+        TEMPLATE_GLOB = "#{Config.provider}/{domain,{group,node}/*}/platform/templates/**/*"
+
+        delegate_missing_to :zip_file
+
+        def self.extract(path)
+          Zip::File.open(path) do |f|
+            yield new(f) if block_given?
+          end
+        end
+
+        ##
+        # Strip the root provider directory and the `platform/templates`
+        # sub directory from the destination path
+        #
+        def self.dst_template_path(src, base)
+          replace = src.match(TEMPLATE_REPLACE)[0]
+          Pathname.new(src)
+                  .sub(/#{TEMPLATE_REMOVE}/, replace)
+                  .expand_path(base)
+        end
+
+        def copy_templates(cluster)
+          base = Cluster.load(cluster).template(ext: false)
+          templates.each do |zip_src|
+            dst = self.class.dst_template_path(zip_src.name, base)
+            dst.dirname.mkpath
             if dst.exist?
               $stderr.puts "Skipping, file already exists: #{dst}"
             else
-              file.extract(dst)
+              zip_src.extract(dst)
               puts "Imported: #{dst}"
             end
           end
+        end
+
+        def templates
+          glob(TEMPLATE_GLOB).reject(&:directory?)
         end
       end
     end

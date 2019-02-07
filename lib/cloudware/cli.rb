@@ -84,15 +84,27 @@ module Cloudware
       require 'cloudware/models'
     end
 
+    def self.add_command(name, *args)
+      command name do |c|
+        cli_syntax(c, *args)
+        yield c
+      end
+    end
+
     command 'cluster' do |c|
       cli_syntax(c)
       c.summary = 'Manage the current cluster selection'
     end
 
+    add_command 'cluster init', 'CLUSTER' do |c|
+      c.summary = 'Create a new cluster'
+      action(c, Commands::ClusterCommand, method: :init)
+    end
+
     command 'cluster switch' do |c|
       cli_syntax(c, 'CLUSTER')
       c.summary = 'Change the current cluster to CLUSTER'
-      action(c, Commands::ClusterCmd, method: :switch)
+      action(c, Commands::ClusterCommand, method: :switch)
     end
 
     cluster_templates = proc do |c|
@@ -101,8 +113,13 @@ module Cloudware
       c.description = <<~DESC
         Lists the templates for a particular cluster. These templates
         can be used directly with the `deploy` command.
+
+        By default the template name is not required if it can be
+        unambiguously determined from the directory name. Use the
+        verbose option to see the full template paths
       DESC
-      action(c, Commands::ClusterCmd, method: :list_templates)
+      c.option '--verbose', 'Show the shorthand mappigns'
+      action(c, Commands::Deploy, method: :list_templates)
     end
 
     command 'cluster templates', &cluster_templates
@@ -113,8 +130,7 @@ module Cloudware
       c.summary = 'Deploy new resource(s) define by a template'
       c.description = <<-DESC.strip_heredoc
         Deploy new resource(s) from the specified TEMPLATE. The TEMPLATE can
-        either be a cluster template (see #{Config.app_name} cluster templates).
-        Alternatively, an absolute path (including extension) can be used.
+        either be a cluster template or an absolute path.
 
         The deployment will be given the NAME label and logged locally. The name
         used by the provider will be based off this with minor variations.
@@ -164,7 +180,7 @@ module Cloudware
       c.description = <<~DESC
         Shows a list of clusters that have been previously deployed to
       DESC
-      action(c, Commands::ClusterCmd, method: :list)
+      action(c, Commands::ClusterCommand, method: :list)
     end
 
     command('list clusters', &list_clusters_proc)

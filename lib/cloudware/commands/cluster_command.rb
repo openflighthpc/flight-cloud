@@ -29,8 +29,9 @@ require 'pathname'
 
 module Cloudware
   module Commands
-    class ClusterCmd < Command
+    class ClusterCommand < Command
       LIST_CLUSTERS = <<~ERB
+        <% clusters = load_clusters -%>
         <% unless clusters.include?(__config__.current_cluster) -%>
         * <%= __config__.current_cluster %>
         <% end -%>
@@ -40,13 +41,10 @@ module Cloudware
         <% end -%>
       ERB
 
-      LIST_TEMPLATES = <<~ERB
-      ERB
-
-      def switch(cluster)
-        @__config__ = CommandConfig.update do |conf|
-          conf.current_cluster = cluster
-        end
+      def init(cluster)
+        error_if_exists(cluster, action: 'create')
+        FileUtils.mkdir_p Cluster.load(cluster).path
+        update_cluster(cluster)
         list
       end
 
@@ -54,26 +52,38 @@ module Cloudware
         puts _render(LIST_CLUSTERS)
       end
 
-      def list_templates
-        cluster = Cluster.load(__config__.current_cluster)
-        templates = Dir.glob(cluster.template('**/*')).sort
-        if templates.empty?
-          $stderr.puts 'No templates found'
-        else
-          base = Pathname.new(cluster.template(ext: false))
-          templates.each do |path|
-            puts Pathname.new(path).relative_path_from(base).to_s
-                         .chomp("#{Config.template_ext}")
-          end
-        end
+      def switch(cluster)
+        error_if_missing(cluster, action: 'switch')
+        update_cluster(cluster)
+        list
       end
 
       private
 
-      def clusters
-        Dir.glob(Cluster.new('*').directory)
+      def update_cluster(new_cluster)
+        @__config__ = CommandConfig.update do |conf|
+          conf.current_cluster = new_cluster
+        end
+      end
+
+      def load_clusters
+        Dir.glob(Cluster.new('*').join)
            .map { |p| File.basename(p) }
            .sort
+      end
+
+      def error_if_exists(cluster, action:)
+        return unless load_clusters.include?(cluster)
+        raise InvalidInput, <<~ERROR.chomp
+          Failed to #{action} cluster. '#{cluster}' already exists
+        ERROR
+      end
+
+      def error_if_missing(cluster, action:)
+        return if load_clusters.include?(cluster)
+        raise InvalidInput, <<~ERROR.chomp
+          Failed to #{action} cluster. '#{cluster}' doesn't exist
+        ERROR
       end
     end
   end

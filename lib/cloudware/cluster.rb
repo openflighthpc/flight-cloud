@@ -35,7 +35,7 @@ module Cloudware
     end
 
     def join(*paths)
-      Config.content('clusters', identifier, *paths)
+      Pathname.new(Config.content('clusters', identifier, *paths))
     end
 
     # Deprecated! Use `join` instead
@@ -49,7 +49,7 @@ module Cloudware
 
     def template(*parts, ext: true)
       path = join('lib', 'templates', *parts)
-      ext ? "#{path}#{Config.template_ext}" : path
+      ext ? path.sub_ext(Config.template_ext) : path
     end
 
     def region
