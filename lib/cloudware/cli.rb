@@ -107,24 +107,6 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :switch)
     end
 
-    cluster_templates = proc do |c|
-      cli_syntax(c)
-      c.summary = 'Lists the available templates for the cluster'
-      c.description = <<~DESC
-        Lists the templates for a particular cluster. These templates
-        can be used directly with the `deploy` command.
-
-        By default the template name is not required if it can be
-        unambiguously determined from the directory name. Use the
-        verbose option to see the full template paths
-      DESC
-      c.option '--verbose', 'Show the shorthand mappigns'
-      action(c, Commands::Deploy, method: :list_templates)
-    end
-
-    command 'cluster templates', &cluster_templates
-    command 'list templates', &cluster_templates
-
     command 'deploy' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
       c.summary = 'Deploy new resource(s) define by a template'
@@ -204,6 +186,21 @@ module Cloudware
         format: `<machine-name>TAG<key>`
       DESC
       action(c, Commands::Lists::Machine)
+    end
+
+    command 'list templates' do |c|
+      cli_syntax(c)
+      c.summary = 'Lists the available templates for the cluster'
+      c.description = <<~DESC
+        Lists the templates for a particular cluster. These templates
+        can be used directly with the `deploy` command.
+
+        By default the template name is not required if it can be
+        unambiguously determined from the directory name. Use the
+        verbose option to see the full template paths
+      DESC
+      c.option '--verbose', 'Show the shorthand mappings'
+      action(c, Commands::Deploy, method: :list_templates)
     end
 
     command 'power' do |c|
