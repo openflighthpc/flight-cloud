@@ -25,6 +25,7 @@
 #
 
 require 'cloudware/cluster'
+require 'cloudware/commands/import'
 require 'pathname'
 
 module Cloudware
@@ -41,11 +42,12 @@ module Cloudware
         <% end -%>
       ERB
 
-      def init(cluster)
+      def init(cluster, import: nil)
         error_if_exists(cluster, action: 'create')
-        FileUtils.mkdir_p Cluster.load(cluster).path
         update_cluster(cluster)
-        list
+        FileUtils.mkdir_p FileUtils.dirname(Cluster.load(cluster).path)
+        Import.new(__config__).run!(import) if import
+        puts "Created cluster: #{cluster}"
       end
 
       def list

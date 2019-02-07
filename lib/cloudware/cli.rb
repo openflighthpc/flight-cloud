@@ -84,20 +84,21 @@ module Cloudware
       require 'cloudware/models'
     end
 
-    def self.add_command(name, *args)
-      command name do |c|
-        cli_syntax(c, *args)
-        yield c
-      end
-    end
-
     command 'cluster' do |c|
       cli_syntax(c)
       c.summary = 'Manage the current cluster selection'
     end
 
-    add_command 'cluster init', 'CLUSTER' do |c|
+    command 'cluster init' do |c|
+      cli_syntax(c, 'CLUSTER')
       c.summary = 'Create a new cluster'
+      c.description = <<~DESC
+        Create a new cluster that can be identified by CLUSTER. The cluster
+        must not already exist. Use the `--import` option to import templates
+        into your new cluster. See `#{Config.app_name} import` for further
+        details.
+      DESC
+      c.option '--import PATH', String, 'Specify a zip file to import'
       action(c, Commands::ClusterCommand, method: :init)
     end
 
