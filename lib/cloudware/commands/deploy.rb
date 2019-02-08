@@ -38,20 +38,20 @@ module Cloudware
       def run!(name, raw_path, params: nil)
         cluster = __config__.current_cluster
         path = resolve_template(raw_path)
-        puts "Deploying: #{path}"
-        with_spinner('Deploying resources...', done: 'Done') do
-          deployment = Models::Deployment.create(cluster, name) do |d|
+        deployment = Models::Deployment.create(cluster, name) do |d|
+          puts "Deploying: #{path}"
+          with_spinner('Deploying resources...', done: 'Done') do
             d.template_path = path
             d.replacements = ReplacementFactory.new(context, name)
                                                .build(params)
             d.deploy
           end
-          return unless deployment.deployment_error
-          raise DeploymentError, <<~ERROR.chomp
-             An error has occured. Please see for further details:
-            `#{Config.app_name} list deployments --verbose`
-          ERROR
         end
+        return unless deployment.deployment_error
+        raise DeploymentError, <<~ERROR.chomp
+           An error has occured. Please see for further details:
+          `#{Config.app_name} list deployments --verbose`
+        ERROR
       rescue FlightConfig::CreateError => e
         new_e = e.exception <<~ERROR.chomp
           Cowardly refusing to re-deploy '#{name}'
