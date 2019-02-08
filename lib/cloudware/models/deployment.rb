@@ -89,7 +89,6 @@ module Cloudware
           unless errors.blank?
             raise ModelValidationError, render_errors_message('destroy')
           end
-          delete if force
           run_destroy
         end
       end
@@ -123,22 +122,15 @@ module Cloudware
       rescue => e
         self.deployment_error = e.message
         Log.error(e.message)
-      ensure
-        context.save_deployments(self)
       end
 
       def run_destroy
         begin
           provider_client.destroy(tag)
-          delete
         rescue => e
           self.deployment_error = e.message
           Log.error(e.message)
         end
-      end
-
-      def delete
-        context.remove_deployments(self)
       end
 
       def render_errors_message(action)
