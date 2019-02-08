@@ -48,7 +48,7 @@ module Cloudware
     program :description, 'Cloud orchestration tool'
     program :help_paging, false
 
-    suppress_trace_class UserError
+    silent_trace!
 
     def self.run!
       # Display the help if there is no input arguments
