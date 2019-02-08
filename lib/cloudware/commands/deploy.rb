@@ -40,7 +40,7 @@ module Cloudware
         path = resolve_template(raw_path)
         puts "Deploying: #{path}"
         with_spinner('Deploying resources...', done: 'Done') do
-          deployment = Models::Deployment.update(cluster, name) do |d|
+          deployment = Models::Deployment.create(cluster, name) do |d|
             d.template_path = path
             d.replacements = ReplacementFactory.new(context, name)
                                                .build(params)
