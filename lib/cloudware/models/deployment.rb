@@ -65,7 +65,7 @@ module Cloudware
       end
 
       def path
-        Cluster.load(cluster).join('var/deployments', name)
+        Cluster.load(cluster).join('var/deployments', name + '.yaml')
       end
 
       def template

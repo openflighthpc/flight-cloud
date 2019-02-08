@@ -36,14 +36,16 @@ module Cloudware
       end
 
       def run!(name, raw_path, params: nil)
+        cluster = __config__.current_cluster
         path = resolve_template(raw_path)
         puts "Deploying: #{path}"
         with_spinner('Deploying resources...', done: 'Done') do
-          Models::Deployment.new(__config__.current_cluster, name,
-            template_path: path,
-            replacements: ReplacementFactory.new(context, name)
-                                            .build(params)
-          ).deploy
+          Models::Deployment.update(cluster, name) do |d|
+            d.template_path = path
+            d.replacements = ReplacementFactory.new(context, name)
+                                               .build(params)
+            d.deploy
+          end
         end
       end
 
