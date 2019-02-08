@@ -58,6 +58,11 @@ module Cloudware
         end
       end
 
+      # Ensure the template is a string not `Pathname`
+      def template_path=(path)
+        __data__.set(:template_path, value: path.to_s)
+      end
+
       def initialize(cluster, name, **_h)
         self.cluster = cluster
         self.name = name
@@ -117,7 +122,7 @@ module Cloudware
       memoize :context
 
       def run_deploy
-        self.timestamp = Time.now
+        self.timestamp = Time.now.to_s
         self.results = provider_client.deploy(tag, template)
       rescue => e
         self.deployment_error = e.message
