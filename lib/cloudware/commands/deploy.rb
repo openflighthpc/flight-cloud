@@ -52,6 +52,12 @@ module Cloudware
             `#{Config.app_name} list deployments --verbose`
           ERROR
         end
+      rescue FlightConfig::CreateError => e
+        new_e = e.exception <<~ERROR.chomp
+          Cowardly refusing to re-deploy '#{name}'
+        ERROR
+        new_e.set_backtrace(e.backtrace)
+        raise new_e
       end
 
       def list_templates(verbose: false)
