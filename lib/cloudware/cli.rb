@@ -78,7 +78,6 @@ module Cloudware
 
     def self.cli_syntax(command, args_str = '')
       command.hidden = true if command.name.split.length > 1
-      command.sub_command_group = true
       command.syntax = <<~SYNTAX.squish
         #{program(:name)} #{command.name} #{args_str} [options]
       SYNTAX
@@ -90,6 +89,7 @@ module Cloudware
 
     command 'cluster' do |c|
       cli_syntax(c)
+      c.sub_command_group = true
       c.summary = 'Manage the current cluster selection'
     end
 
@@ -158,6 +158,7 @@ module Cloudware
 
     command 'list' do |c|
       cli_syntax(c)
+      c.sub_command_group = true
       c.summary = 'List the deployed cloud resources'
     end
 
@@ -210,6 +211,7 @@ module Cloudware
 
     command 'power' do |c|
       cli_syntax(c)
+      c.sub_command_group = true
       c.description = 'Start or stop machine and check their power status'
     end
 
