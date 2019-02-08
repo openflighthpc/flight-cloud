@@ -24,6 +24,8 @@
 # ==============================================================================
 #
 
+require 'cloudware/models'
+
 FactoryBot.define do
   models = Cloudware::Models
 
