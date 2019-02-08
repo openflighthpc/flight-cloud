@@ -28,6 +28,7 @@ require 'rubygems'
 require 'bundler'
 
 Bundler.setup(:default, :config, :development)
+ENV['CLOUDWARE_PROVIDER'] = 'aws'
 require File.join(File.dirname(__FILE__), '../lib/cloudware')
 
 require 'rspec/wait'
@@ -38,7 +39,6 @@ require 'fakefs/spec_helpers'
 require 'factory_bot'
 
 SPEC_DIR = __dir__
-ENV['CLOUDWARE_PROVIDER'] = 'aws'
 
 RSpec.configure do |config|
   config.include FakeFS::SpecHelpers::All
