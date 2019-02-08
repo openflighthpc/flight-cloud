@@ -123,10 +123,6 @@ module Cloudware
       rescue => e
         self.deployment_error = e.message
         Log.error(e.message)
-        raise DeploymentError, <<~ERROR.chomp
-          An error has occured. Please see for further details:
-          `#{Config.app_name} list deployments --verbose`
-        ERROR
       ensure
         context.save_deployments(self)
       end
@@ -134,14 +130,11 @@ module Cloudware
       def run_destroy
         begin
           provider_client.destroy(tag)
+          delete
         rescue => e
+          self.deployment_error = e.message
           Log.error(e.message)
-          raise DeploymentError, <<~ERROR.chomp
-            An has error occured when destroying '#{name}'. See logs for full
-            details: #{Log.path}
-          ERROR
         end
-        delete
       end
 
       def delete
