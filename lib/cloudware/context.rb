@@ -24,6 +24,7 @@
 # ==============================================================================
 #
 
+
 module Cloudware
   class Context
     attr_reader :deployments, :cluster
@@ -34,7 +35,10 @@ module Cloudware
 
     def initialize(cluster:)
       @cluster = cluster
-      update_deployments
+    end
+
+    def deployments
+      Models::Deployments.read(cluster)
     end
 
     def machines
@@ -49,15 +53,14 @@ module Cloudware
     end
 
     def remove_deployments(*delete_deployments)
-      update_deployments do
-        delete_names = delete_deployments.map(&:name)
-        deployments.delete_if { |d| delete_names.include?(d.name) }
+      deployments.each do |deployment|
+        FileUtils.rm_f deployment.path
       end
     end
 
     def save_deployments(*deployments)
-      update_deployments do
-        deployments.each { |deployment| add_deployment(deployment) }
+      deployments.each do |deployment|
+        FlightConfig::Core.write(deployment)
       end
     end
 
@@ -70,69 +73,12 @@ module Cloudware
     end
 
     def reload
-      update_deployments
     end
 
     def region
       # Protect `Cluster` from the `nil` cluster. This weird state would
       # be picked up by `Deployment` validation
       Cluster.load(cluster.to_s).region
-    end
-
-    private
-
-    class Updater
-      def self.load_deployments(file)
-        file.rewind
-        Data.load(file, default_value: []).map do |data|
-          Models::Deployment.new(data[:cluster], data[:name], **data)
-        end
-      end
-
-      def self.save_deployments(file, deployments)
-        file.truncate(0)
-        save_data = deployments.map(&:to_h)
-        Data.dump(file, save_data)
-      end
-    end
-
-    def update_deployments
-      with_file_lock do |file|
-        @deployments = Updater.load_deployments(file)
-        if block_given?
-          yield
-          Updater.save_deployments(file, deployments)
-        end
-      end
-    end
-
-    def updater
-      @updater ||= Updater.new(self)
-    end
-
-    def add_deployment(deployment)
-      existing_index = deployments.find_index do |cur_deployment|
-        cur_deployment.name == deployment.name
-      end
-      if existing_index
-        deployments[existing_index] = deployment
-      else
-        deployments.push(deployment)
-      end
-    end
-
-    def with_file_lock
-      file = File.new(path, 'a+')
-      file.flock(File::LOCK_EX)
-      yield file
-    ensure
-      file&.flock(File::LOCK_UN)
-      file&.close
-    end
-
-    def path
-      Cluster.load(cluster || '').join('var/contexts.yaml')
-             .tap { |p| FileUtils.mkdir_p(File.dirname(p)) }
     end
   end
 end

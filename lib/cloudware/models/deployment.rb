@@ -49,8 +49,8 @@ module Cloudware
       end
 
       SAVE_ATTR = [
-        :template_path, :name, :results, :replacements, :timestamp,
-        :deployment_error, :cluster
+        :template_path, :name, :results, :replacements,
+        :deployment_error, :cluster, :epoch_time
       ].freeze
 
       SAVE_ATTR.each do |method|
@@ -64,13 +64,14 @@ module Cloudware
         end
       end
 
+
       # Ensure the template is a string not `Pathname`
       def template_path=(path)
         __data__.set(:template_path, value: path.to_s)
       end
 
       def path
-        Cluster.load(cluster).join('var/deployments', name + '.yaml')
+        Cluster.load(cluster.to_s).join('var/deployments', name + '.yaml')
       end
 
       def template
@@ -114,6 +115,15 @@ module Cloudware
         Cluster.load(cluster.to_s).region
       end
 
+      def <=>(other)
+        (epoch_time || 0).<=>(other&.epoch_time || 0)
+      end
+
+      def timestamp
+        return if epoch_time.nil?
+        Time.at(epoch_time)
+      end
+
       private
 
       def context
@@ -122,7 +132,7 @@ module Cloudware
       memoize :context
 
       def run_deploy
-        self.timestamp = Time.now.to_s
+        self.epoch_time = Time.now.to_i
         self.results = provider_client.deploy(tag, template)
       rescue => e
         self.deployment_error = e.message

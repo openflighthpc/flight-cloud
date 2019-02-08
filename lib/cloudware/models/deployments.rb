@@ -36,7 +36,7 @@ module Cloudware
            .map { |p| REGEX.match(p) }
            .map do |matches|
           Deployment.read(matches['cluster'], matches['name'])
-        end
+        end.sort
       end
     end
   end
