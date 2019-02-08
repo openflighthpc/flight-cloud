@@ -27,8 +27,11 @@
 require 'cloudware/context'
 
 RSpec.describe Cloudware::Context do
+  let(:cluster) { 'test-cluster' }
+
   subject do
-    build(:context).tap { |c| c.save_deployments(*deployments) }
+    described_class.new(cluster: cluster)
+                   .tap { |c| c.save_deployments(*deployments) }
   end
 
   def new_context
@@ -139,7 +142,7 @@ RSpec.describe Cloudware::Context do
       build(:deployment, name: 'other-deployment')
     end
     let(:other_context) do
-      described_class.new(region: subject.region, cluster: Cloudware::CommandConfig.new.current_cluster)
+      described_class.new(cluster: cluster)
     end
 
     # Ensure the other context/deployment are created after the subject
