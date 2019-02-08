@@ -42,6 +42,12 @@ module Cloudware
 
       include FlightConfig::Updater
 
+      def initialize(cluster, name, **_h)
+        self.cluster = cluster
+        self.name = name
+        super
+      end
+
       SAVE_ATTR = [
         :template_path, :name, :results, :replacements, :timestamp,
         :deployment_error, :cluster
@@ -61,12 +67,6 @@ module Cloudware
       # Ensure the template is a string not `Pathname`
       def template_path=(path)
         __data__.set(:template_path, value: path.to_s)
-      end
-
-      def initialize(cluster, name, **_h)
-        self.cluster = cluster
-        self.name = name
-        super
       end
 
       def path
