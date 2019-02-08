@@ -40,12 +40,17 @@ module Cloudware
         path = resolve_template(raw_path)
         puts "Deploying: #{path}"
         with_spinner('Deploying resources...', done: 'Done') do
-          Models::Deployment.update(cluster, name) do |d|
+          deployment = Models::Deployment.update(cluster, name) do |d|
             d.template_path = path
             d.replacements = ReplacementFactory.new(context, name)
                                                .build(params)
             d.deploy
           end
+          return unless deployment.deployment_error
+          raise DeploymentError, <<~ERROR.chomp
+             An error has occured. Please see for further details:
+            `#{Config.app_name} list deployments --verbose`
+          ERROR
         end
       end
 
