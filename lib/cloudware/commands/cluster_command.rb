@@ -45,7 +45,7 @@ module Cloudware
       def init(cluster, import: nil)
         error_if_exists(cluster, action: 'create')
         update_cluster(cluster)
-        FileUtils.mkdir_p FileUtils.dirname(Cluster.load(cluster).path)
+        FileUtils.mkdir_p File.dirname(Cluster.load(cluster).path)
         Import.new(__config__).run!(import) if import
         puts "Created cluster: #{cluster}"
       end
