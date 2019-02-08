@@ -28,15 +28,22 @@ require 'cloudware/models/deployment'
 
 module Cloudware
   module Models
-    class Deployments
+    class Deployments < DelegateClass(Array)
       REGEX = /#{Deployment.new('(?<cluster>.*)', '(?<name>.*)').path}/
 
       def self.read(cluster)
-        Dir.glob(Deployment.new(cluster, '*').path)
-           .map { |p| REGEX.match(p) }
-           .map do |matches|
+        d = Dir.glob(Deployment.new(cluster, '*').path)
+               .map { |p| REGEX.match(p) }
+               .map do |matches|
           Deployment.read(matches['cluster'], matches['name'])
         end.sort
+        new(d)
+      end
+
+      def results
+        map(&:results).each_with_object({}) do |results, memo|
+          memo.merge!(results || {})
+        end
       end
     end
   end
