@@ -40,6 +40,16 @@ require 'factory_bot'
 
 SPEC_DIR = __dir__
 
+module FakeFS
+  class Pathname
+    def to_str
+      self.to_s
+    end
+
+    delegate_missing_to :to_str
+  end
+end
+
 RSpec.configure do |config|
   config.include FakeFS::SpecHelpers::All
   config.include FactoryBot::Syntax::Methods
