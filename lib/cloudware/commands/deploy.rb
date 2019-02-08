@@ -63,7 +63,7 @@ module Cloudware
       def list_templates(verbose: false)
         list = build_template_list
         if list.templates.empty?
-          $stderr.puts 'No templates found'
+          raise UserError, 'No templates found'
         elsif verbose
           list.human_paths.each do |human_path, abs_path|
             puts "#{human_path} => #{abs_path}"
