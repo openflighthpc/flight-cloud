@@ -144,6 +144,7 @@ module Cloudware
         rescue => e
           self.deployment_error = e.message
           Log.error(e.message)
+          return false
         end
       end
 
