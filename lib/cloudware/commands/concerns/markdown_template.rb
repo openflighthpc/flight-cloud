@@ -8,8 +8,8 @@ module Cloudware
     module Concerns
       module MarkdownTemplate
         RenderCluster = Struct.new(:cluster_identifier) do
-          delegate :deployments, to: :cluster
           delegate :machines, to: :deployments
+          delegate_missing_to :cluster
 
           def cluster
             @cluster ||= Cluster.read(cluster_identifier)
