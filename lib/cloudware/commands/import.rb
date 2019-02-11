@@ -43,7 +43,7 @@ module Cloudware
         SECTION = /(domain|(group|node)\/[^\/]*)/
         TEMPLATE_REMOVE = /#{Config.provider}\/#{SECTION}\/platform/
         TEMPLATE_REPLACE = /(?<=#{Config.provider}\/)#{SECTION}/
-        TEMPLATE_GLOB = "#{Config.provider}/{domain,{group,node}/*}/platform/**/*"
+        TEMPLATE_GLOB = "#{Config.provider}/{domain,{group,node}/*}/platform/**/*#{Config.template_ext}"
 
         delegate_missing_to :zip_file
 
