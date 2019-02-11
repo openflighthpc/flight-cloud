@@ -41,9 +41,9 @@ module Cloudware
 
       ZipImporter = Struct.new(:zip_file) do
         SECTION = /(domain|(group|node)\/[^\/]*)/
-        TEMPLATE_REMOVE = /#{Config.provider}\/#{SECTION}\/platform\/templates/
+        TEMPLATE_REMOVE = /#{Config.provider}\/#{SECTION}\/platform/
         TEMPLATE_REPLACE = /(?<=#{Config.provider}\/)#{SECTION}/
-        TEMPLATE_GLOB = "#{Config.provider}/{domain,{group,node}/*}/platform/templates/**/*"
+        TEMPLATE_GLOB = "#{Config.provider}/{domain,{group,node}/*}/platform/**/*#{Config.template_ext}"
 
         delegate_missing_to :zip_file
 
@@ -54,7 +54,7 @@ module Cloudware
         end
 
         ##
-        # Strip the root provider directory and the `platform/templates`
+        # Strip the root provider directory and the `platform`
         # sub directory from the destination path
         #
         def self.dst_template_path(src, base)
