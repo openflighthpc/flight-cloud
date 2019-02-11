@@ -61,14 +61,14 @@ module Cloudware
       end
 
       def validate_no_existing_deployment
-        # Reload the context during the validation `context(true)`
-        return unless context(true).find_deployment(name)
+        deployments = Models::Deployments.read(cluster)
+        return unless deployments.find_by_name(name)
         errors.add(:context, 'The deployment already exists')
       end
 
       def validate_existing_deployment
-        # Reload the context during the validation `context(true)`
-        return if context(true).find_deployment(name)
+        deployments = Models::Deployments.read(cluster)
+        return if deployments.find_by_name(name)
         errors.add(:context, 'The deployment does not exists')
       end
     end

@@ -41,9 +41,6 @@ RSpec.describe Cloudware::Models::Deployment do
   end
 
   let(:replacements) { nil }
-  let(:context) do
-    Cloudware::Context.new(cluster: subject.cluster)
-  end
   let(:double_client) do
     object_double(Cloudware::Providers::Base::Client.new('region'))
   end
@@ -108,11 +105,11 @@ RSpec.describe Cloudware::Models::Deployment do
         end
 
         context 'with an existing deployment' do
-          let(:existing_deployment) do
-            build(:deployment, name: subject.name)
+          let!(:existing_deployment) do
+            build(:deployment, name: subject.name).tap do |d|
+              FlightConfig::Core.write(d)
+            end
           end
-
-          before { context.save_deployments(existing_deployment) }
 
           it_behaves_like 'deploy raises ModelValidationError'
         end
@@ -143,8 +140,8 @@ RSpec.describe Cloudware::Models::Deployment do
 
           it 'does delete the deployment if the force flag is provided' do
             begin subject.destroy(force: true); rescue; end
-            context.reload
-            expect(context.find_deployment(subject.name)).to be_nil
+            deployments = Cloudware::Models::Deployments.read(subject.cluster)
+            expect(deployments.find_by_name(subject.name)).to be_nil
           end
         end
       end

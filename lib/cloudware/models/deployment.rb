@@ -24,7 +24,6 @@
 # ==============================================================================
 #
 
-require 'cloudware/context'
 require 'cloudware/models/deployment_callbacks'
 require 'cloudware/models/concerns/provider_client'
 require 'cloudware/models/application'
@@ -124,11 +123,6 @@ module Cloudware
       end
 
       private
-
-      def context
-        Context.new(cluster: cluster)
-      end
-      memoize :context
 
       def run_deploy
         self.epoch_time = Time.now.to_i

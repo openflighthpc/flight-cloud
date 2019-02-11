@@ -44,8 +44,4 @@ FactoryBot.define do
     replacements nil
     cluster 'test-deployment-cluster'
   end
-
-  factory :context, class: Cloudware::Context do
-    initialize_with { new(cluster: 'test-cluster') }
-  end
 end
