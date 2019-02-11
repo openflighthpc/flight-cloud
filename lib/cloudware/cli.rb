@@ -63,13 +63,17 @@ module Cloudware
         hash = options.__hash__
         hash.delete(:trace)
         begin
-          cmd = klass.new
-          if hash.empty?
-            cmd.public_send(method, *args)
-          else
-            cmd.public_send(method, *args, **hash)
+          begin
+            cmd = klass.new
+            if hash.empty?
+              cmd.public_send(method, *args)
+            else
+              cmd.public_send(method, *args, **hash)
+            end
+          rescue Interrupt
+            raise RuntimeError, 'Received Interrupt!'
           end
-        rescue Exception => e
+        rescue StandardError => e
           Log.fatal(e.message)
           raise e
         end
