@@ -73,25 +73,6 @@ RSpec.describe Cloudware::Models::Deployment do
     end
   end
 
-  context 'with machine ids' do
-    let(:machines) { ['node1', 'node2'] }
-    let(:results) do
-      machines.each_with_object({}) do |name, memo|
-        tag_suffix = Cloudware::Models::Machine::PROVIDER_ID_FLAG
-        tag = Cloudware::Models::Machine.tag_generator(name, tag_suffix)
-        memo[tag] = "#{name}-id"
-      end
-    end
-
-    before { allow(subject).to receive(:results).and_return(results) }
-
-    describe '#machines' do
-      it 'returns objects with the machine names' do
-        expect(subject.machines.map(&:name)).to contain_exactly(*machines)
-      end
-    end
-  end
-
   context 'without a template' do
     describe '#deploy' do
       include_examples 'deploy raises ModelValidationError'

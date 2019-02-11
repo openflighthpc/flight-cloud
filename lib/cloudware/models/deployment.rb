@@ -102,10 +102,6 @@ module Cloudware
         end
       end
 
-      def machines
-        Machine.build_from_context(self)
-      end
-
       def to_h
         SAVE_ATTR.each_with_object({}) do |key, memo|
           memo[key] = send(key)
