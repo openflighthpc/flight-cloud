@@ -35,17 +35,6 @@ module Cloudware
           'TAG'
         end
 
-        def build_from_context(context)
-          (context.results || {})
-            .keys
-            .map { |k| name_from_tag(k) }
-            .uniq
-            .reject(&:nil?)
-            .map do |name|
-            new(name: name, context: context)
-          end
-        end
-
         #
         # Extracts the models name from a tag
         #

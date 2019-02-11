@@ -42,7 +42,7 @@ module Cloudware
     end
 
     def machines
-      Models::Machine.build_from_context(self)
+      deployments.machines
     end
 
     def results
@@ -70,6 +70,7 @@ module Cloudware
     end
 
     def reload
+      # :noop:
     end
 
     def region

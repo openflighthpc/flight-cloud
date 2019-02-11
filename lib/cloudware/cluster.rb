@@ -28,6 +28,8 @@ module Cloudware
   class Cluster
     include FlightConfig::Loader
 
+    delegate :provider, to: Config
+
     attr_reader :identifier
 
     def initialize(identifier)

@@ -43,10 +43,12 @@ module Cloudware
 
         def machines
           if options.group
-            Models::Machine.build_from_context(context)
-                           .select { |m| m.groups.include?(identifier) }
+            Cluster.load(__config__.current_cluster)
+                   .deployments
+                   .machines
+                   .select { |m| m.groups.include?(identifier) }
           else
-            [Models::Machine.new(name: identifier, context: context)]
+            [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
           end
         end
       end
