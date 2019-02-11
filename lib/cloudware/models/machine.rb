@@ -78,9 +78,14 @@ module Cloudware
       GROUPS_TAG = 'groups'
 
       delegate :status, :off, :on, to: :machine_client
-      delegate :region, :provider, to: :context
+      delegate :region, :provider, to: :cluster
 
-      attr_accessor :name, :context
+      attr_accessor :name, :cluster
+
+      def initialize(cluster:, name:)
+        @cluster = Cluster.read(cluster)
+        super(name: name)
+      end
 
       def provider_id
         fetch_result(PROVIDER_ID_FLAG) do |long_tag|
@@ -96,7 +101,7 @@ module Cloudware
       end
 
       def tags
-        (context.results || {}).each_with_object({}) do |(key, value), memo|
+        (cluster.deployments.results || {}).each_with_object({}) do |(key, value), memo|
           next unless (tag = extract_tag(key))
           memo[tag] = value
         end
@@ -128,7 +133,7 @@ module Cloudware
 
       def fetch_result(short_tag, default: nil)
         long_tag = tag_generator(short_tag)
-        result = (context.results || {})[long_tag]
+        result = (cluster.deployments.results || {})[long_tag]
         return result unless result.nil?
         return default unless default.nil?
         yield long_tag if block_given?

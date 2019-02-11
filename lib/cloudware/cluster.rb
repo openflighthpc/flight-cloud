@@ -55,5 +55,9 @@ module Cloudware
     def region
       __data__.fetch(:region) { Config.default_region }
     end
+
+    def deployments
+      Models::Deployments.read(identifier)
+    end
   end
 end
