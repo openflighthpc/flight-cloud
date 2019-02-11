@@ -36,21 +36,16 @@ module Cloudware
 
       def run
         @name = argv[0]
-        with_spinner('Destroying resources...', done: 'Done') do
-          deployment.destroy(force: options.force)
-        end
-      end
-
-      private
-
-      def deployment
-        context.find_deployment(name).tap do |deployment|
-          if deployment.nil?
-            raise InvalidInput, <<~ERROR.chomp
-              Could not find deployment '#{name}'
-            ERROR
+        cluster = __config__.current_cluster
+        deployment = Models::Deployment.delete(cluster, name) do |d|
+          with_spinner('Destroying resources...', done: 'Done') do
+            d.destroy(force: options.force)
           end
         end
+        return unless deployment.nil?
+        raise InvalidInput, <<~ERROR.chomp
+            Could not find deployment '#{name}'
+        ERROR
       end
     end
   end
