@@ -45,6 +45,10 @@ module Cloudware
           memo.merge!(results || {})
         end
       end
+
+      def find_by_name(name)
+        find { |deployment| deployment.name == name }
+      end
     end
   end
 end

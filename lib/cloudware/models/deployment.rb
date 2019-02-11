@@ -64,6 +64,9 @@ module Cloudware
         end
       end
 
+      def results
+        __data__.fetch(:results, default: {}).deep_symbolize_keys
+      end
 
       # Ensure the template is a string not `Pathname`
       def template_path=(path)

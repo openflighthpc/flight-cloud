@@ -42,7 +42,7 @@ module Cloudware
           puts "Deploying: #{path}"
           with_spinner('Deploying resources...', done: 'Done') do
             d.template_path = path
-            d.replacements = ReplacementFactory.new(context, name)
+            d.replacements = ReplacementFactory.new(cluster, name)
                                                .build(params)
             d.deploy
           end

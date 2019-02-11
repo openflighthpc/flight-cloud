@@ -36,16 +36,16 @@ RSpec.describe Cloudware::ReplacementFactory do
     end
     let(:deployment_name) { 'my-deployment' }
     let(:deployment) do
-      build(:deployment, name: deployment_name, results: deployment_results)
+      build(:deployment, cluster: cluster, name: deployment_name, results: deployment_results)
     end
 
-    before { context.save_deployments(deployment) }
+    before { FlightConfig::Core.write(deployment) }
   end
 
-  subject { described_class.new(context, deployment_name) }
+  subject { described_class.new(cluster, deployment_name) }
 
+  let(:cluster) { 'test-cluster' }
   let(:deployment_name) { 'my-deployment-name' }
-  let(:context) { build(:context) }
   let(:key) { :my_key }
 
   describe '#parse_key_pair' do
