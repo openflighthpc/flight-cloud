@@ -46,11 +46,6 @@ module Cloudware
       join('etc/config.yaml')
     end
 
-    def template(*parts, ext: true)
-      path = join('lib', 'templates', *parts)
-      ext ? path.sub_ext(Config.template_ext) : path
-    end
-
     def region
       __data__.fetch(:region) { Config.default_region }
     end

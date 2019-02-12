@@ -96,8 +96,16 @@ module Cloudware
           new(Cluster.load(cluster_name))
         end
 
+        def template_path(*parts, ext: true)
+          path = RootDir.content_cluster(cluster.identifier,
+                                         'lib/templates',
+                                         *parts)
+          path = Pathname.new(path)
+          ext ? path.sub_ext(Config.template_ext) : path
+        end
+
         def base
-          cluster.template(ext: false)
+          template_path(ext: false)
         end
 
         ##
@@ -132,7 +140,7 @@ module Cloudware
         end
 
         def templates
-          @templates ||= Dir.glob(cluster.template('**/*'))
+          @templates ||= Dir.glob(template_path('**/*'))
                             .sort
                             .map { |p| Pathname.new(p) }
         end

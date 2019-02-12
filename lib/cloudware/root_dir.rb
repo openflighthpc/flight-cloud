@@ -39,7 +39,7 @@ require 'cloudware/config'
 module Cloudware
   class RootDir
     def self.content(*a)
-      File.join(Config.content_path, Config.provider, *a)
+      File.join(Config.content_path, *a)
     end
 
     def self.content_cluster(cluster, *a)
