@@ -35,15 +35,29 @@ require 'cloudware/config'
 #
 # When adding a new path, make sure name maps to the arguments!
 #
+# NOTE: Optional: [last_named_argument]
+# The last named argument to these methods should be optional, so calling it
+# without arguments gives the directory. e.g.
+#
+# content_cluster()             => .../clusters
+# content_cluster('my-cluster)  => .../clusters/my-cluster
+#
+# It is however required for all dependent method calls. e.g:
+# content_cluster_template(cluster, [template])
+#
 
 module Cloudware
   class RootDir
-    def self.content(*a)
-      File.join(Config.content_path, *a)
+    def self.content(*parts)
+      File.join(Config.content_path, *parts)
     end
 
-    def self.content_cluster(cluster, *a)
-      content('clusters', cluster, *a)
+    def self.content_cluster(*a) # [cluster]
+      content('clusters', *a)
+    end
+
+    def self.content_cluster_template(cluster, *a) # [template]
+      content_cluster(cluster, 'lib/templates', *a)
     end
   end
 end

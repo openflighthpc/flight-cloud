@@ -93,9 +93,7 @@ module Cloudware
         delegate :each, to: :templates
 
         def template_path(*parts, ext: true)
-          path = RootDir.content_cluster(cluster,
-                                         'lib/templates',
-                                         *parts)
+          path = RootDir.content_cluster_template(cluster, *parts)
           path = Pathname.new(path)
           ext ? path.sub_ext(Config.template_ext) : path
         end
