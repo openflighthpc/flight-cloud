@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,44 +24,26 @@
 # ==============================================================================
 #
 
-require 'cloudware/root_paths'
+require 'cloudware/config'
+
+#
+# NOTE: To future maintainer!
+#
+# Please keep this file as lean as possible. It is design to contain the root
+# path definition between different types of files. It should not contain the
+# path definition for an individual file.
+#
+# When adding a new path, make sure name maps to the arguments!
+#
 
 module Cloudware
-  class Cluster
-    include FlightConfig::Loader
-
-    delegate :provider, to: Config
-
-    attr_reader :identifier
-
-    def initialize(identifier)
-      @identifier = identifier
+  class RootPaths
+    def self.join(*a)
+      File.join(Config.content_path, Config.provider, *a)
     end
 
-    def join(*paths)
-      Pathname.new(Config.content('clusters', identifier, *paths))
-    end
-
-    # Deprecated! Use `join` instead
-    def directory
-      join()
-    end
-
-    def path
-      RootPaths.cluster('etc/config.yaml')
-    end
-
-    def template(*parts, ext: true)
-      path = join('lib', 'templates', *parts)
-      ext ? path.sub_ext(Config.template_ext) : path
-    end
-
-    def region
-      __data__.fetch(:region) { Config.default_region }
-    end
-
-    def deployments
-      Models::Deployments.read(identifier)
+    def self.cluster(cluster, *a)
+      join('clusters', cluster, *a)
     end
   end
 end

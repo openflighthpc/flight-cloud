@@ -28,6 +28,8 @@ require 'cloudware/models/deployment_callbacks'
 require 'cloudware/models/concerns/provider_client'
 require 'cloudware/models/application'
 require 'cloudware/models/machine'
+require 'cloudware/root_paths'
+
 require 'pathname'
 require 'time'
 
@@ -73,7 +75,7 @@ module Cloudware
       end
 
       def path
-        Cluster.load(cluster.to_s).join('var/deployments', name + '.yaml')
+        RootPaths.cluster(cluster.to_s, 'var/deployments', name + '.yaml')
       end
 
       def template
