@@ -69,7 +69,7 @@ module Cloudware
       end
 
       def read_clusters
-        Dir.glob(Cluster.new('*').join)
+        Dir.glob(Cluster.new('*').path)
            .map { |p| File.basename(p) }
            .sort
       end
