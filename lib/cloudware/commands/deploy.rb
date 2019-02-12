@@ -84,7 +84,7 @@ module Cloudware
       end
 
       def build_template_list
-        ListTemplates.build(__config__.current_cluster)
+        ListTemplates.new(__config__.current_cluster)
       end
 
       ListTemplates = Struct.new(:cluster) do
@@ -92,12 +92,8 @@ module Cloudware
 
         delegate :each, to: :templates
 
-        def self.build(cluster_name)
-          new(Cluster.load(cluster_name))
-        end
-
         def template_path(*parts, ext: true)
-          path = RootDir.content_cluster(cluster.identifier,
+          path = RootDir.content_cluster(cluster,
                                          'lib/templates',
                                          *parts)
           path = Pathname.new(path)
