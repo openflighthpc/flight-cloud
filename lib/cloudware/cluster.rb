@@ -38,12 +38,8 @@ module Cloudware
       @identifier = identifier
     end
 
-    def join(*paths)
-      Pathname.new(RootDir.content_cluster(identifier, *paths))
-    end
-
     def path
-      join('etc/config.yaml')
+      RootDir.content_cluster(identifier, 'etc/config.yaml')
     end
 
     def region
