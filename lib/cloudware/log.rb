@@ -41,4 +41,7 @@ module Cloudware
       delegate_missing_to :instance
     end
   end
+
+  Config.cache
+  FlightConfig.logger = Log
 end
