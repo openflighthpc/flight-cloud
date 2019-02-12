@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'cloudware/models/deployments'
 require 'tty-color'
 require 'tty-markdown'
 
@@ -13,6 +14,10 @@ module Cloudware
 
           def cluster
             @cluster ||= Cluster.read(cluster_identifier)
+          end
+
+          def deployments
+            @deployments ||= Models::Deployments.read(cluster_identifier)
           end
 
           def render(template, verbose: false)
