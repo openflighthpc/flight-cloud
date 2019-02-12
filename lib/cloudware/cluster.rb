@@ -24,7 +24,7 @@
 # ==============================================================================
 #
 
-require 'cloudware/root_paths'
+require 'cloudware/root_dir'
 
 module Cloudware
   class Cluster
@@ -39,16 +39,11 @@ module Cloudware
     end
 
     def join(*paths)
-      Pathname.new(Config.content('clusters', identifier, *paths))
-    end
-
-    # Deprecated! Use `join` instead
-    def directory
-      join()
+      Pathname.new(RootDir.content_cluster(identifier, *paths))
     end
 
     def path
-      RootPaths.cluster('etc/config.yaml')
+      join('etc/config.yaml')
     end
 
     def template(*parts, ext: true)

@@ -37,13 +37,13 @@ require 'cloudware/config'
 #
 
 module Cloudware
-  class RootPaths
-    def self.join(*a)
+  class RootDir
+    def self.content(*a)
       File.join(Config.content_path, Config.provider, *a)
     end
 
-    def self.cluster(cluster, *a)
-      join('clusters', cluster, *a)
+    def self.content_cluster(cluster, *a)
+      content('clusters', cluster, *a)
     end
   end
 end
