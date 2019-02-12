@@ -37,7 +37,7 @@ module Cloudware
     attr_reader :__config__
 
     def initialize(__config__ = nil)
-      @__config__ = __config__ || CommandConfig.load
+      @__config__ = __config__ || CommandConfig.read
     end
 
     def run!(*argv, **options)

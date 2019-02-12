@@ -43,7 +43,7 @@ module Cloudware
 
         def machines
           if options.group
-            Cluster.load(__config__.current_cluster)
+            Cluster.read(__config__.current_cluster)
                    .deployments
                    .machines
                    .select { |m| m.groups.include?(identifier) }

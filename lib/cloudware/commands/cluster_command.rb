@@ -32,7 +32,7 @@ module Cloudware
   module Commands
     class ClusterCommand < Command
       LIST_CLUSTERS = <<~ERB
-        <% clusters = load_clusters -%>
+        <% clusters = read_clusters -%>
         <% unless clusters.include?(__config__.current_cluster) -%>
         * <%= __config__.current_cluster %>
         <% end -%>
@@ -45,7 +45,7 @@ module Cloudware
       def init(cluster, import: nil)
         error_if_exists(cluster, action: 'create')
         update_cluster(cluster)
-        FileUtils.mkdir_p File.dirname(Cluster.load(cluster).path)
+        FileUtils.mkdir_p File.dirname(Cluster.read(cluster).path)
         Import.new(__config__).run!(import) if import
         puts "Created cluster: #{cluster}"
       end
@@ -68,21 +68,21 @@ module Cloudware
         end
       end
 
-      def load_clusters
+      def read_clusters
         Dir.glob(Cluster.new('*').join)
            .map { |p| File.basename(p) }
            .sort
       end
 
       def error_if_exists(cluster, action:)
-        return unless load_clusters.include?(cluster)
+        return unless read_clusters.include?(cluster)
         raise InvalidInput, <<~ERROR.chomp
           Failed to #{action} cluster. '#{cluster}' already exists
         ERROR
       end
 
       def error_if_missing(cluster, action:)
-        return if load_clusters.include?(cluster)
+        return if read_clusters.include?(cluster)
         raise InvalidInput, <<~ERROR.chomp
           Failed to #{action} cluster. '#{cluster}' doesn't exist
         ERROR

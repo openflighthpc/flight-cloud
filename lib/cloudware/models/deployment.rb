@@ -110,9 +110,9 @@ module Cloudware
       end
 
       def region
-        # Protect the load from a `nil` cluster. There is a separate validation
+        # Protect the read from a `nil` cluster. There is a separate validation
         # for nil clusters
-        Cluster.load(cluster.to_s).region
+        Cluster.read(cluster.to_s).region
       end
 
       def <=>(other)
