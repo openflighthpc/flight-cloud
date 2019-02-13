@@ -33,11 +33,14 @@ module Cloudware
 
       def self.read(cluster)
         d = Dir.glob(Deployment.new(cluster, '*').path)
-               .map { |p| REGEX.match(p) }
-               .map do |matches|
-          Deployment.read(matches['cluster'], matches['name'])
-        end.sort
+               .map { |p| read_match(REGEX.match(p)) }
         new(d)
+      end
+
+      private_class_method
+
+      def self.read_match(match)
+        Deployment.read(match['cluster'], match['name'])
       end
 
       def results
