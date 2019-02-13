@@ -64,7 +64,8 @@ module Cloudware
         cluster = __config__.current_cluster
         deployment = Models::Deployment.read(cluster, name)
         unless deployment.template_path
-          deployment.template_path = resolve_template(template)
+          path = resolve_template(template, error_missing: true)
+          deployment.template_path = path
           deployment.replacements = ReplacementFactory.new(cluster, name)
                                                       .build(params)
         end
@@ -88,8 +89,11 @@ module Cloudware
 
       private
 
-      def resolve_template(template)
-        build_template_list.human_paths[template] || ''
+      def resolve_template(template, error_missing: false)
+        path = build_template_list.human_paths[template]
+        return path if path
+        return '' unless error_missing
+        raise InvalidInput, 'Could not resolve template path'
       end
 
       def build_template_list
