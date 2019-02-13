@@ -42,8 +42,10 @@ task :profile do
   profiler = Pilfer::Profiler.new(reporter)
 
   $LOAD_PATH << File.join(__dir__, 'lib')
+  ARGV = []
   profiler.profile('require') do
     require 'cloudware'
+    Cloudware::CLI.run!
   end
 
   io.rewind
