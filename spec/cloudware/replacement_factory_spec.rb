@@ -122,6 +122,14 @@ RSpec.describe Cloudware::ReplacementFactory do
       it_behaves_like 'a literal key value replacement'
     end
 
+    context 'with a multi {key1,key2}=value string' do
+      let(:value) { 'my-value' }
+      let(:input_string) { "other_key,#{key}=#{value}" }
+
+      it_behaves_like 'a default replacement'
+      it_behaves_like 'a literal key value replacement'
+    end
+
     context 'when the value contains a correctly quoted space' do
       let(:value) { 'some string with spaces' }
       let(:input_string) { "#{key}='#{value}'" }

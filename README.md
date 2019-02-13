@@ -187,6 +187,11 @@ If a however a different domain was used which returned the key as
 case, the key can be translated by:
 `securitygroup=*my-other-domain.othersecuritygroup`
 
+*Deployment Results (Advanced Cont.):* `key1,key2=*my-domain`
+
+This will replace `key1` and `key2` from `my-domain`. It is equivalent to:
+`'key1=*my-domain key2=*my-domain`
+
 ### Native Provider Parameters
 Both `aws` and `azure` natively support parameters within the templates.
 However in order to provide a generalised mechanism, these native parameters
