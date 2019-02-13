@@ -29,10 +29,9 @@ require 'cloudware/cluster'
 module Cloudware
   module Commands
     class Deploy < Command
-      def initialize(*a)
-        require 'cloudware/models/deployment'
-        require 'cloudware/replacement_factory'
+      def self.delayed_require
         super
+        require 'cloudware/replacement_factory'
       end
 
       def run!(name, raw_path, params: nil)
