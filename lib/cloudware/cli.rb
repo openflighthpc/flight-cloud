@@ -60,7 +60,6 @@ module Cloudware
 
     def self.action(command, klass, method: :run!)
       command.action do |args, options|
-        delayed_require
         hash = options.__hash__
         hash.delete(:trace)
         begin
@@ -86,10 +85,6 @@ module Cloudware
       command.syntax = <<~SYNTAX.squish
         #{program(:name)} #{command.name} #{args_str} [options]
       SYNTAX
-    end
-
-    def self.delayed_require
-      require 'cloudware/models'
     end
 
     command 'cluster' do |c|

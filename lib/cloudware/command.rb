@@ -34,9 +34,16 @@ module Cloudware
     extend Memoist
     include WithSpinner
 
+    # Override this method to delay requiring libraries until the command is
+    # called. Remember to `super`
+    def self.delayed_require
+      require 'cloudware/models'
+    end
+
     attr_reader :__config__
 
     def initialize(__config__ = nil)
+      self.class.delayed_require
       @__config__ = __config__ || CommandConfig.read
     end
 
