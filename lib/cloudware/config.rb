@@ -56,11 +56,10 @@ module Cloudware
     end
 
     def log_file
-      __data__.fetch(:log_file) do
-        File.join(self.class.root_dir, 'log', "#{provider}.log").tap do |path|
-          FileUtils.mkdir_p(File.dirname(path))
-        end
+      dir = __data__.fetch(:log_directory) do
+        File.join(self.class.root_dir, 'log').tap { |d| FileUtils.mkdir_p(d) }
       end
+      File.join(dir, provider + '.log')
     end
 
     def provider

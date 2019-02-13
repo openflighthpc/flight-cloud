@@ -27,6 +27,7 @@
 require 'commander'
 
 require 'cloudware/command'
+require 'cloudware/log'
 require 'cloudware/version'
 
 require 'require_all'

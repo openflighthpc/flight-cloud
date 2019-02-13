@@ -65,7 +65,7 @@ module Cloudware
         end
 
         def copy_templates(cluster)
-          base = Cluster.load(cluster).template(ext: false)
+          base = RootDir.content_cluster_template(cluster)
           templates.each do |zip_src|
             dst = self.class.dst_template_path(zip_src.name, base)
             dst.dirname.mkpath

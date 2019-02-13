@@ -28,6 +28,8 @@ require 'cloudware/models/deployment_callbacks'
 require 'cloudware/models/concerns/provider_client'
 require 'cloudware/models/application'
 require 'cloudware/models/machine'
+require 'cloudware/root_dir'
+
 require 'pathname'
 require 'time'
 
@@ -63,6 +65,11 @@ module Cloudware
         end
       end
 
+      def random_tag
+        __data__.set_if_empty(:random_tag, value: rand(1000000))
+        __data__.fetch(:random_tag)
+      end
+
       def results
         __data__.fetch(:results, default: {}).deep_symbolize_keys
       end
@@ -73,7 +80,7 @@ module Cloudware
       end
 
       def path
-        Cluster.load(cluster.to_s).join('var/deployments', name + '.yaml')
+        RootDir.content_cluster(cluster.to_s, 'var/deployments', name + '.yaml')
       end
 
       def template
@@ -108,9 +115,9 @@ module Cloudware
       end
 
       def region
-        # Protect the load from a `nil` cluster. There is a separate validation
+        # Protect the read from a `nil` cluster. There is a separate validation
         # for nil clusters
-        Cluster.load(cluster.to_s).region
+        Cluster.read(cluster.to_s).region
       end
 
       def <=>(other)
@@ -120,6 +127,10 @@ module Cloudware
       def timestamp
         return if epoch_time.nil?
         Time.at(epoch_time)
+      end
+
+      def tag
+        "cloudware-#{name}-#{random_tag}"
       end
 
       private
@@ -151,10 +162,6 @@ module Cloudware
           <% end -%>
           <% end -%>
         TEMPLATE
-      end
-
-      def tag
-        "cloudware-deploy-#{name}"
       end
 
       def raw_template

@@ -24,6 +24,8 @@
 # ==============================================================================
 #
 
+require 'cloudware/root_dir'
+
 module Cloudware
   class Cluster
     include FlightConfig::Loader
@@ -36,22 +38,8 @@ module Cloudware
       @identifier = identifier
     end
 
-    def join(*paths)
-      Pathname.new(Config.content('clusters', identifier, *paths))
-    end
-
-    # Deprecated! Use `join` instead
-    def directory
-      join()
-    end
-
     def path
-      File.join(directory, 'etc/config.yaml')
-    end
-
-    def template(*parts, ext: true)
-      path = join('lib', 'templates', *parts)
-      ext ? path.sub_ext(Config.template_ext) : path
+      RootDir.content_cluster(identifier, 'etc/config.yaml')
     end
 
     def region

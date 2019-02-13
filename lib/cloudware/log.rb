@@ -30,15 +30,18 @@ require 'logger'
 module Cloudware
   class Log
     class << self
-      def cache
-        @cache ||= Logger.new(path)
+      def instance
+        @instance ||= Logger.new(path)
       end
 
       def path
         Config.log_file
       end
 
-      delegate_missing_to :cache
+      delegate_missing_to :instance
     end
   end
+
+  Config.cache
+  FlightConfig.logger = Log
 end
