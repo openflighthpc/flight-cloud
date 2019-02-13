@@ -136,6 +136,9 @@ module Cloudware
       rescue => e
         self.deployment_error = e.message
         Log.error(e.message)
+      rescue Interrupt
+        self.deployment_error = 'Received Interrupt!'
+        Log.error "Received SIGINT whilst deploying: #{name}"
       end
 
       def run_destroy
