@@ -23,7 +23,6 @@ aws:                            # Requirement for cloud-aws
 
 # ADVANCED CONFIGURATION (Optional)
 # =============================================================================
-# and renamed: "etc/config.yaml"
 # Content Directory
 # By default cloudware stores its content within the <install-dir>/var
 # directory. This can be optionally changed to a different location
@@ -32,11 +31,11 @@ aws:                            # Requirement for cloud-aws
 
 # =============================================================================
 # LOG FILE
-# By default cloudware log into <install-dir>/log/cloudware.log file. It does
+# By default cloudware log into <install-dir>/log directory. It does
 # not setup log rotations on the file. Cloudware can be configured to log
 # somewhere else with the `log_file` key
 # =============================================================================
-# log_file:
+# log_directory:
 
 # =============================================================================
 # STATIC PROVIDER
