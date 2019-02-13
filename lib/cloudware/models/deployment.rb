@@ -65,11 +65,6 @@ module Cloudware
         end
       end
 
-      def random_tag
-        __data__.set_if_empty(:random_tag, value: rand(1000000))
-        __data__.fetch(:random_tag)
-      end
-
       def results
         __data__.fetch(:results, default: {}).deep_symbolize_keys
       end
@@ -130,7 +125,7 @@ module Cloudware
       end
 
       def tag
-        "cloudware-#{name}-#{random_tag}"
+        "cloudware-deploy-#{name}"
       end
 
       private
