@@ -142,13 +142,11 @@ module Cloudware
       end
 
       def run_destroy
-        begin
-          provider_client.destroy(tag)
-        rescue => e
-          self.deployment_error = e.message
-          Log.error(e.message)
-          return false
-        end
+        provider_client.destroy(tag)
+      rescue => e
+        self.deployment_error = e.message
+        Log.error(e.message)
+        return false
       end
 
       def render_errors_message(action)
