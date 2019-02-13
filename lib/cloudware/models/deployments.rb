@@ -33,14 +33,19 @@ module Cloudware
 
       def self.read(cluster)
         d = Dir.glob(Deployment.new(cluster, '*').path)
-               .map { |p| read_match(REGEX.match(p)) }
+               .map { |p| read_path(p) }
+               .reject(&:nil?)
         new(d)
       end
 
       private_class_method
 
-      def self.read_match(match)
+      def self.read_path(path)
+        match = REGEX.match(path)
         Deployment.read(match['cluster'], match['name'])
+      rescue FlightConfig::ResourceBusy
+        Log.warn("ResourceBusy, skipping: #{path}")
+        return nil
       end
 
       def results

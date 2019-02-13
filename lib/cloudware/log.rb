@@ -38,6 +38,10 @@ module Cloudware
         Config.log_file
       end
 
+      def warn(msg)
+        super
+      end
+
       delegate_missing_to :instance
     end
   end
