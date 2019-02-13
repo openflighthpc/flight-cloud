@@ -248,15 +248,15 @@ module Cloudware
     end
 
     command 'render' do |c|
-      cli_syntax(c, 'NAME')
-      c.summary = 'Render a template for an existing or new deployment'
+      cli_syntax(c, 'NAME [TEMPLATE]')
+      c.summary = 'Return the template for an existing or new deployment'
       c.description = <<~DESC
         Renders the template for the `NAME` deployment. Existing deployments
-        will always render the saved template path and replacements.
+        will always render the saved template and replacements.
 
-        If the template does not exist, the `--template` and `--params`
+        If the deployment does not exist, the `TEMPLATE` and `--params`
         options are used instead. See the 'deploy' command for valid inputs
-        for these options.
+        for these inputs.
       DESC
       c.option '-t', '--template PATH', String, <<~DESC
         Template path for a new deployment

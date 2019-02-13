@@ -60,7 +60,7 @@ module Cloudware
         raise new_e
       end
 
-      def render(name, template: nil, params: nil)
+      def render(name, template = nil, params: nil)
         cluster = __config__.current_cluster
         deployment = Models::Deployment.read(cluster, name)
         unless deployment.template_path
