@@ -32,3 +32,20 @@ task :spin do
   end
   puts result
 end
+
+task :profile do
+  Bundler.setup(:development)
+  require 'pilfer'
+
+  io = StringIO.new
+  reporter = Pilfer::Logger.new(io)
+  profiler = Pilfer::Profiler.new(reporter)
+
+  $LOAD_PATH << File.join(__dir__, 'lib')
+  profiler.profile('require') do
+    require 'cloudware'
+  end
+
+  io.rewind
+  puts io.read
+end
