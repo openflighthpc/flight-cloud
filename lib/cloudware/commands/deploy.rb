@@ -60,6 +60,17 @@ module Cloudware
         raise new_e
       end
 
+      def render(name, template: nil, params: nil)
+        cluster = __config__.current_cluster
+        deployment = Models::Deployment.read(cluster, name)
+        unless deployment.template_path
+          deployment.template_path = resolve_template(template)
+          deployment.replacements = ReplacementFactory.new(cluster, name)
+                                                      .build(params)
+        end
+        puts deployment.template
+      end
+
       def list_templates(verbose: false)
         list = build_template_list
         if list.templates.empty?
@@ -76,8 +87,6 @@ module Cloudware
       end
 
       private
-
-      attr_reader :name, :raw_path
 
       def resolve_template(template)
         build_template_list.human_paths[template] || ''

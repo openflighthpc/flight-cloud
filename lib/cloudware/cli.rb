@@ -246,5 +246,25 @@ module Cloudware
       c.description = 'Turn the machine on'
       action(c, Commands::Powers::On)
     end
+
+    command 'render' do |c|
+      cli_syntax(c, 'NAME')
+      c.summary = 'Render a template for an existing or new deployment'
+      c.description = <<~DESC
+        Renders the template for the `NAME` deployment. Existing deployments
+        will always render the saved template path and replacements.
+
+        If the template does not exist, the `--template` and `--params`
+        options are used instead. See the 'deploy' command for valid inputs
+        for these options.
+      DESC
+      c.option '-t', '--template PATH', String, <<~DESC
+        Template path for a new deployment
+      DESC
+      c.option '--params STRING', String, <<~DESC
+        Values to be replaced for a new deployment
+      DESC
+      action(c, Commands::Deploy, method: :render)
+    end
   end
 end
