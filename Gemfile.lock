@@ -118,6 +118,7 @@ GEM
       unicode-display_width (~> 1.0, >= 1.0.1)
     rubocop-rspec (1.23.0)
       rubocop (>= 0.52.1)
+    ruby-prof (0.17.0)
     ruby-progressbar (1.9.0)
     rubyzip (1.2.2)
     strings (0.1.1)
@@ -178,6 +179,7 @@ DEPENDENCIES
   rspec-wait
   rubocop (~> 0.52.1)
   rubocop-rspec
+  ruby-prof
   rubyzip
   tty-markdown
   tty-spinner

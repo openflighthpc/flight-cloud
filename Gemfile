@@ -39,4 +39,5 @@ group :development do
   gem 'rspec-wait'
   gem 'rubocop', '~> 0.52.1', require: false
   gem 'rubocop-rspec'
+  gem 'ruby-prof'
 end
