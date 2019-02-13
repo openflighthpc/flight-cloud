@@ -8,6 +8,10 @@
 # for details.
 # =============================================================================
 
+# The deployments name on the provider will be appended with this tag. This
+# should be unique for this install of cloudware
+append_tag: # REQUIRED
+
 # Provider credentials
 azure:                        # Requirement for cloud-azure
   default_region:   # [VALUE] : Requirement for cloud-azure

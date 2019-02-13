@@ -125,7 +125,7 @@ module Cloudware
       end
 
       def tag
-        "cloudware-deploy-#{name}"
+        "cloudware-#{name}-#{Config.append_tag}"
       end
 
       private
