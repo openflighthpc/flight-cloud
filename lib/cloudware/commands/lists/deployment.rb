@@ -45,6 +45,7 @@ module Cloudware
           <% end -%>
           *Creation Date*: <%= deployment.timestamp %>
           *Template*: <%= deployment.template_path %>
+          *Provider Tag*: <%= deployment.tag %>
 
           ## Results
           <% if deployment.results.nil? || deployment.results.empty? -%>

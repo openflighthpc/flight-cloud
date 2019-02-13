@@ -129,6 +129,10 @@ module Cloudware
         Time.at(epoch_time)
       end
 
+      def tag
+        "cloudware-#{name}-#{random_tag}"
+      end
+
       private
 
       def run_deploy
@@ -158,10 +162,6 @@ module Cloudware
           <% end -%>
           <% end -%>
         TEMPLATE
-      end
-
-      def tag
-        "cloudware-#{name}-#{random_tag}"
       end
 
       def raw_template
