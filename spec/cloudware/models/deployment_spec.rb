@@ -36,31 +36,11 @@ RSpec.describe Cloudware::Models::Deployment do
     end
   end
 
-  shared_examples 'validation error deployment' do
-    include_examples 'deploy raises ModelValidationError'
-
-    it 'does not save to the context' do
-      begin subject.deploy; rescue RuntimeError; end
-      expect(context.deployments).not_to include(subject)
-    end
-  end
-
-  shared_examples 'validated deployment' do
-    it 'saves the deployment' do
-      begin subject.deploy; rescue; end
-      context = Cloudware::Context.new(cluster: subject.cluster)
-      expect(context.find_deployment(subject.name)&.name).to eq(subject.name)
-    end
-  end
-
   subject do
     build(:deployment, replacements: replacements)
   end
 
   let(:replacements) { nil }
-  let(:context) do
-    Cloudware::Context.new(cluster: subject.cluster)
-  end
   let(:double_client) do
     object_double(Cloudware::Providers::Base::Client.new('region'))
   end
@@ -90,25 +70,6 @@ RSpec.describe Cloudware::Models::Deployment do
     end
   end
 
-  context 'with machine ids' do
-    let(:machines) { ['node1', 'node2'] }
-    let(:results) do
-      machines.each_with_object({}) do |name, memo|
-        tag_suffix = Cloudware::Models::Machine::PROVIDER_ID_FLAG
-        tag = Cloudware::Models::Machine.tag_generator(name, tag_suffix)
-        memo[tag] = "#{name}-id"
-      end
-    end
-
-    before { allow(subject).to receive(:results).and_return(results) }
-
-    describe '#machines' do
-      it 'returns objects with the machine names' do
-        expect(subject.machines.map(&:name)).to contain_exactly(*machines)
-      end
-    end
-  end
-
   context 'without a template' do
     describe '#deploy' do
       include_examples 'deploy raises ModelValidationError'
@@ -132,8 +93,6 @@ RSpec.describe Cloudware::Models::Deployment do
           expect { subject.deploy }.not_to raise_error
         end
 
-        it_behaves_like 'validated deployment'
-
         it 'does not record any deployment errors' do
           subject.deploy
           expect(subject.deployment_error).to be_nil
@@ -144,37 +103,12 @@ RSpec.describe Cloudware::Models::Deployment do
 
           include_examples 'deploy raises ModelValidationError'
         end
-
-        context 'with an existing deployment' do
-          let(:existing_deployment) do
-            build(:deployment, name: subject.name)
-          end
-
-          before { context.save_deployments(existing_deployment) }
-
-          it_behaves_like 'validation error deployment'
-        end
-
-        context 'with a provider related error' do
-          let(:message) { 'I am an error message' }
-
-          before do
-            allow(double_client).to receive(:deploy).and_raise(RuntimeError, message)
-          end
-
-          it_behaves_like 'validated deployment'
-
-          it 'saves the deployment error message' do
-            expect { subject.deploy }.to raise_error RuntimeError
-            expect(subject.deployment_error).to eq(message)
-          end
-        end
       end
 
       context 'with a replacement tag' do
         let(:template_content) { '%unreplaced-tag%' }
 
-        it_behaves_like 'validation error deployment'
+        it_behaves_like 'deploy raises ModelValidationError'
       end
     end
 
@@ -189,36 +123,16 @@ RSpec.describe Cloudware::Models::Deployment do
       context 'with an existing deployment' do
         before { subject.deploy }
 
-        it 'deletes the deployment' do
-          subject.destroy
-          context.reload
-          expect(context.find_deployment(subject.name)).to be_nil
-        end
-
         context 'with an error during the destroy' do
           before do
             allow(double_client).to receive(:destroy).and_raise('Some error')
           end
 
-          it 'is not deleted from the context' do
-            begin subject.destroy; rescue; end
-            context.reload
-            expect(context.find_deployment(subject.name)).not_to be_nil
-          end
-
           it 'does delete the deployment if the force flag is provided' do
             begin subject.destroy(force: true); rescue; end
-            context.reload
-            expect(context.find_deployment(subject.name)).to be_nil
+            deployments = Cloudware::Models::Deployments.read(subject.cluster)
+            expect(deployments.find_by_name(subject.name)).to be_nil
           end
-        end
-      end
-
-      context 'without an existing deployment' do
-        it 'raise ModelValidationError' do
-          expect do
-            subject.destroy
-          end.to raise_error(Cloudware::ModelValidationError)
         end
       end
     end

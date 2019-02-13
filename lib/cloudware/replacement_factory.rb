@@ -28,10 +28,10 @@ require 'shellwords'
 
 module Cloudware
   class ReplacementFactory
-    attr_reader :context, :deployment_name
+    attr_reader :deployments, :deployment_name
 
-    def initialize(context, deployment_name)
-      @context = context
+    def initialize(cluster, deployment_name)
+      @deployments = Models::Deployments.read(cluster)
       @deployment_name = deployment_name
     end
 
@@ -47,7 +47,7 @@ module Cloudware
       if value[0] == '*'
         name = /(?<=\A\*)[^\.]*/.match(value).to_s
         other_key = /(?<=\.).*/.match(value).to_s.to_sym
-        results = context.find_deployment(name)&.results || {}
+        results = deployments.find_by_name(name)&.results || {}
         results[other_key.empty? ? key : other_key].to_s
       else
         value.to_s

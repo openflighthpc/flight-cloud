@@ -38,33 +38,18 @@ module Cloudware
     def run(done_message = '')
       results = nil
       thr = Thread.new { results = yield }
+      tty_spinner.spin
       until thr.join(SPIN_DELAY)
-        update_foreground_status if (count % CHECK_SPIN).zero?
-        tty_spinner.spin if spin?
+        tty_spinner.spin unless Config.debug
       end
       results
     ensure
-      tty_spinner.stop(done_message) if spin?
+      tty_spinner.stop(done_message)
     end
 
     private
 
     attr_reader :tty_spinner
-    attr_accessor :foreground
-
-    def count
-      @count ||= -1
-      @count += 1
-    end
-
-    def update_foreground_status
-      status = `ps -o stat= -p #{Process.pid}`
-      self.foreground = /.*\+.*/.match?(status)
-    end
-
-    def spin?
-      foreground && !Config.debug
-    end
   end
 
   module WithSpinner

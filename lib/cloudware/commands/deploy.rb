@@ -36,23 +36,34 @@ module Cloudware
       end
 
       def run!(name, raw_path, params: nil)
+        cluster = __config__.current_cluster
         path = resolve_template(raw_path)
-        puts "Deploying: #{path}"
-        with_spinner('Deploying resources...', done: 'Done') do
-          Models::Deployment.new(
-            template_path: path,
-            name: name,
-            cluster: __config__.current_cluster,
-            replacements: ReplacementFactory.new(context, name)
-                                            .build(params)
-          ).deploy
+        replacements = ReplacementFactory.new(cluster, name).build(params)
+        deployment = Models::Deployment.create(cluster, name) do |d|
+          puts "Deploying: #{path}"
+          with_spinner('Deploying resources...', done: 'Done') do
+            d.template_path = path
+            d.replacements = replacements
+            d.deploy
+          end
         end
+        return unless deployment.deployment_error
+        raise DeploymentError, <<~ERROR.chomp
+           An error has occured. Please see for further details:
+          `#{Config.app_name} list deployments --verbose`
+        ERROR
+      rescue FlightConfig::CreateError => e
+        new_e = e.exception <<~ERROR.chomp
+          Cowardly refusing to re-deploy '#{name}'
+        ERROR
+        new_e.set_backtrace(e.backtrace)
+        raise new_e
       end
 
       def list_templates(verbose: false)
         list = build_template_list
         if list.templates.empty?
-          $stderr.puts 'No templates found'
+          raise UserError, 'No templates found'
         elsif verbose
           list.human_paths.each do |human_path, abs_path|
             puts "#{human_path} => #{abs_path}"

@@ -28,6 +28,8 @@ module Cloudware
   class Cluster
     include FlightConfig::Loader
 
+    delegate :provider, to: Config
+
     attr_reader :identifier
 
     def initialize(identifier)
@@ -54,6 +56,10 @@ module Cloudware
 
     def region
       __data__.fetch(:region) { Config.default_region }
+    end
+
+    def deployments
+      Models::Deployments.read(identifier)
     end
   end
 end

@@ -27,15 +27,14 @@
 require 'cloudware/models'
 
 RSpec.describe Cloudware::Models::Machine do
-  subject { described_class.new(name: machine_name, context: context) }
+  subject { described_class.new(name: machine_name, cluster: deployment.cluster) }
 
   let(:machine_name) { 'test' }
-  let(:context) do
-    build(:context).tap { |c| c.save_deployments(deployment) }
-  end
 
   context 'with a blank deployment' do
-    let(:deployment) { build(:deployment) }
+    let!(:deployment) do
+      build(:deployment).tap { |d| FlightConfig::Core.write(d) }
+    end
 
     describe '#provider_id' do
       it 'errors' do
@@ -64,7 +63,11 @@ RSpec.describe Cloudware::Models::Machine do
         [described_class.tag_generator(machine_name, key), value]
       end.to_h.merge(random_other_key: 'value')
     end
-    let(:deployment) { build(:deployment, results: deployment_results) }
+    let(:deployment) do
+      build(:deployment, results: deployment_results).tap do |d|
+        FlightConfig::Core.write(d)
+      end
+    end
 
     describe('#tags') do
       it 'returns the machine results without the tag prefix' do

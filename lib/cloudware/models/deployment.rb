@@ -24,7 +24,6 @@
 # ==============================================================================
 #
 
-require 'cloudware/context'
 require 'cloudware/models/deployment_callbacks'
 require 'cloudware/models/concerns/provider_client'
 require 'cloudware/models/application'
@@ -40,11 +39,42 @@ module Cloudware
       include Concerns::ProviderClient
       include DeploymentCallbacks
 
+      include FlightConfig::Updater
+
+      def initialize(cluster, name, **_h)
+        self.cluster = cluster
+        self.name = name
+        super
+      end
+
       SAVE_ATTR = [
-        :template_path, :name, :results, :replacements, :timestamp,
-        :deployment_error, :cluster
+        :template_path, :name, :results, :replacements,
+        :deployment_error, :cluster, :epoch_time
       ].freeze
-      attr_accessor(*SAVE_ATTR)
+
+      SAVE_ATTR.each do |method|
+        define_method(method) { __data__.fetch(method) }
+        define_method(:"#{method}=") do |v|
+          if v.nil?
+            __data__.delete(method)
+          else
+            __data__.set(method, value: v)
+          end
+        end
+      end
+
+      def results
+        __data__.fetch(:results, default: {}).deep_symbolize_keys
+      end
+
+      # Ensure the template is a string not `Pathname`
+      def template_path=(path)
+        __data__.set(:template_path, value: path.to_s)
+      end
+
+      def path
+        Cluster.load(cluster.to_s).join('var/deployments', name + '.yaml')
+      end
 
       def template
         return raw_template unless replacements
@@ -67,13 +97,8 @@ module Cloudware
           unless errors.blank?
             raise ModelValidationError, render_errors_message('destroy')
           end
-          delete if force
           run_destroy
         end
-      end
-
-      def machines
-        Machine.build_from_context(self)
       end
 
       def to_h
@@ -88,42 +113,33 @@ module Cloudware
         Cluster.load(cluster.to_s).region
       end
 
+      def <=>(other)
+        (epoch_time || 0).<=>(other&.epoch_time || 0)
+      end
+
+      def timestamp
+        return if epoch_time.nil?
+        Time.at(epoch_time)
+      end
+
       private
 
-      def context
-        Context.new(cluster: cluster)
-      end
-      memoize :context
-
       def run_deploy
-        self.timestamp = Time.now
+        self.epoch_time = Time.now.to_i
         self.results = provider_client.deploy(tag, template)
       rescue => e
         self.deployment_error = e.message
         Log.error(e.message)
-        raise DeploymentError, <<~ERROR.chomp
-          An error has occured. Please see for further details:
-          `#{Config.app_name} list deployments --verbose`
-        ERROR
-      ensure
-        context.save_deployments(self)
       end
 
       def run_destroy
         begin
           provider_client.destroy(tag)
         rescue => e
+          self.deployment_error = e.message
           Log.error(e.message)
-          raise DeploymentError, <<~ERROR.chomp
-            An has error occured when destroying '#{name}'. See logs for full
-            details: #{Log.path}
-          ERROR
+          return false
         end
-        delete
-      end
-
-      def delete
-        context.remove_deployments(self)
       end
 
       def render_errors_message(action)

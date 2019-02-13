@@ -1,13 +1,13 @@
 GIT
   remote: https://github.com/alces-software/commander
-  revision: 4090e181cf280f228543e35ad21af219a6d2f626
+  revision: 6e5b37ea4eb0ecb8a56a478f58ff4e97d591d805
   specs:
     commander (4.4.4.pre.alces2)
       highline (~> 1.7.2)
 
 GIT
   remote: https://github.com/alces-software/flight_config
-  revision: de4d05a03aa3aec791cc1429da346cda84b38527
+  revision: 800db4549fa5c8e78c45c86bc0122c3f73b3be8c
   specs:
     flight_config (0.1.0)
       tty-config

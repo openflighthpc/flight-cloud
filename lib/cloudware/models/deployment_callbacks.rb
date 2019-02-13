@@ -35,9 +35,6 @@ module Cloudware
           before_deploy :validate_template_exists
           before_deploy :validate_replacement_tags
           before_deploy :validate_cluster
-          before_deploy :validate_no_existing_deployment
-
-          before_destroy :validate_existing_deployment
         end
       end
 
@@ -58,18 +55,6 @@ module Cloudware
       def validate_cluster
         return if cluster
         errors.add(:cluster, 'No cluster specified')
-      end
-
-      def validate_no_existing_deployment
-        # Reload the context during the validation `context(true)`
-        return unless context(true).find_deployment(name)
-        errors.add(:context, 'The deployment already exists')
-      end
-
-      def validate_existing_deployment
-        # Reload the context during the validation `context(true)`
-        return if context(true).find_deployment(name)
-        errors.add(:context, 'The deployment does not exists')
       end
     end
   end

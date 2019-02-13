@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,43 +24,39 @@
 # ==============================================================================
 #
 
-require 'cloudware/spinner'
-require 'cloudware/log'
-require 'cloudware/command_config'
-require 'memoist'
+require 'cloudware/models/deployment'
 
 module Cloudware
-  class Command
-    extend Memoist
-    include WithSpinner
+  module Models
+    class Deployments < DelegateClass(Array)
+      REGEX = /#{Deployment.new('(?<cluster>.*)', '(?<name>.*)').path}/
 
-    attr_reader :__config__
-
-    def initialize(__config__ = nil)
-      @__config__ = __config__ || CommandConfig.load
-    end
-
-    def run!(*argv, **options)
-      class << self
-        attr_reader :argv, :options
+      def self.read(cluster)
+        d = Dir.glob(Deployment.new(cluster, '*').path)
+               .map { |p| REGEX.match(p) }
+               .map do |matches|
+          Deployment.read(matches['cluster'], matches['name'])
+        end.sort
+        new(d)
       end
-      @argv = argv.freeze
-      @options = OpenStruct.new(options)
-      run
-    end
 
-    def run
-      raise NotImplementedError
-    end
+      def results
+        map(&:results).each_with_object({}) do |results, memo|
+          memo.merge!(results || {})
+        end
+      end
 
-    def region
-      __config__.region
-    end
+      def find_by_name(name)
+        find { |deployment| deployment.name == name }
+      end
 
-    private
-
-    def _render(template)
-      ERB.new(template, nil, '-').result(binding)
+      def machines
+        results.keys
+               .map { |k| Models::Machine.name_from_tag(k) }
+               .uniq
+               .reject(&:nil?)
+               .map { |n| Models::Machine.new(name: n, cluster: first.cluster) }
+      end
     end
   end
 end
