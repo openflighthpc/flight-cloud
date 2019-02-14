@@ -28,58 +28,17 @@ module Cloudware
   module Commands
     module Lists
       class Deployment < Command
-        TEMPLATE = <<~ERB
-          # Deployment: '<%= name %>'
-          <% if deployment_error -%>
-          *ERROR*: An error occured whilst deploying this template
-          <% unless verbose -%>
-          Please use `--verbose` for further details
-          <% end -%>
-
-          <% end -%>
-          *Creation Date*: <%= timestamp %>
-          *Template*: <%= template_path %>
-          *Provider Tag*: <%= tag %>
-
-          ## Results
-          <% if results.nil? || results.empty? -%>
-          No deployment results
-          <% else -%>
-          <% results.each do |key, value| -%>
-          - *<%= key %>*: <%= value %>
-          <% end -%>
-          <% end -%>
-
-          <% if replacements -%>
-          ## Replacements
-          <% replacements.each do |key, value| -%>
-          - *<%= key %>*: <%= value %>
-          <% end -%>
-
-          <% end -%>
-          <% if verbose && deployment_error -%>
-          ## Error
-          *NOTE:* This is `<%= provider %>'s` raw error message
-          Refer to their documentation for further details
-
-          ```
-          <%= deployment_error %>
-          ```
-
-          <% end -%>
-        ERB
-
         def self.delayed_require
           super
-          require 'cloudware/templater'
+          require 'cloudware/templaters/deployment_templater'
         end
 
         def run!(verbose: false)
           deployments = Models::Deployments.read(__config__.current_cluster)
           return puts 'No Deployments found' if deployments.empty?
-          deployments.each do |deployment|
-            puts Templater.new(deployment)
-                          .render_markdown(TEMPLATE, verbose: verbose)
+          deployments.each do |d|
+            puts Templaters::DeploymentTemplater.new(d, verbose: verbose)
+                                                .render_info
           end
         end
       end
