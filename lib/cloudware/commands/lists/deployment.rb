@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -29,56 +29,57 @@ module Cloudware
     module Lists
       class Deployment < Command
         TEMPLATE = <<~ERB
-          # Deployment: '<%= deployment.name %>'
-          <% if deployment.deployment_error -%>
+          # Deployment: '<%= name %>'
+          <% if deployment_error -%>
           *ERROR*: An error occured whilst deploying this template
           <% unless verbose -%>
           Please use `--verbose` for further details
           <% end -%>
 
           <% end -%>
-          *Creation Date*: <%= deployment.timestamp %>
-          *Template*: <%= deployment.template_path %>
-          *Provider Tag*: <%= deployment.tag %>
+          *Creation Date*: <%= timestamp %>
+          *Template*: <%= template_path %>
+          *Provider Tag*: <%= tag %>
 
           ## Results
-          <% if deployment.results.nil? || deployment.results.empty? -%>
+          <% if results.nil? || results.empty? -%>
           No deployment results
           <% else -%>
-          <% deployment.results.each do |key, value| -%>
+          <% results.each do |key, value| -%>
           - *<%= key %>*: <%= value %>
           <% end -%>
           <% end -%>
 
-          <% if deployment.replacements -%>
+          <% if replacements -%>
           ## Replacements
-          <% deployment.replacements.each do |key, value| -%>
+          <% replacements.each do |key, value| -%>
           - *<%= key %>*: <%= value %>
           <% end -%>
 
           <% end -%>
-          <% if verbose && deployment.deployment_error -%>
+          <% if verbose && deployment_error -%>
           ## Error
           *NOTE:* This is `<%= provider %>'s` raw error message
           Refer to their documentation for further details
 
           ```
-          <%= deployment.deployment_error %>
+          <%= deployment_error %>
           ```
 
           <% end -%>
         ERB
 
         def self.delayed_require
-          require 'tty-markdown'
-          require 'cloudware/models/deployments'
+          super
+          require 'cloudware/templater'
         end
 
         def run!(verbose: false)
           deployments = Models::Deployments.read(__config__.current_cluster)
           return puts 'No Deployments found' if deployments.empty?
           deployments.each do |deployment|
-            puts TTY::Markdown.parse(ERB.new(TEMPLATE, nil, '-').result(binding))
+            puts Templater.new(deployment)
+                          .render_markdown(TEMPLATE, verbose: verbose)
           end
         end
       end
