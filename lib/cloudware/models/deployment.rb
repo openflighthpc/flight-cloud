@@ -42,6 +42,7 @@ module Cloudware
       include DeploymentCallbacks
 
       include FlightConfig::Updater
+      include FlightConfig::Deleter
 
       def initialize(cluster, name, **_h)
         self.cluster = cluster
