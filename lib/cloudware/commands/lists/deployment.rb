@@ -28,13 +28,7 @@ module Cloudware
   module Commands
     module Lists
       class Deployment < Command
-        include Concerns::MarkdownTemplate
-
         TEMPLATE = <<~ERB
-          <% if deployments.empty? -%>
-          No deployments found
-          <% end -%>
-          <% deployments.each do |deployment| -%>
           # Deployment: '<%= deployment.name %>'
           <% if deployment.deployment_error -%>
           *ERROR*: An error occured whilst deploying this template
@@ -73,8 +67,20 @@ module Cloudware
           ```
 
           <% end -%>
-          <% end -%>
         ERB
+
+        def self.delayed_require
+          require 'tty-markdown'
+          require 'cloudware/models/deployments'
+        end
+
+        def run!(verbose: false)
+          deployments = Models::Deployments.read(__config__.current_cluster)
+          return puts 'No Deployments found' if deployments.empty?
+          deployments.each do |deployment|
+            puts TTY::Markdown.parse(ERB.new(TEMPLATE, nil, '-').result(binding))
+          end
+        end
       end
     end
   end
