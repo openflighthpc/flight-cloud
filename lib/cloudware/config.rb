@@ -33,6 +33,7 @@ require 'cloudware/exceptions'
 module Cloudware
   class Config
     include FlightConfig::Loader
+    allow_missing_read
 
     class << self
       def cache

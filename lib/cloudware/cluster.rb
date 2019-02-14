@@ -29,6 +29,7 @@ require 'cloudware/root_dir'
 module Cloudware
   class Cluster
     include FlightConfig::Loader
+    allow_missing_read
 
     delegate :provider, to: Config
 

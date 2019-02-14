@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/alces-software/flight_config
-  revision: 770cd15de6dfde4971ddc541548187c4b92f599d
+  revision: 6710c22291f1733ae029a2898993b3ab77a9787b
   specs:
     flight_config (0.1.0)
       tty-config

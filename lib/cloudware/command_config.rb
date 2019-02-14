@@ -30,6 +30,7 @@ require 'active_support/core_ext/module/delegation'
 module Cloudware
   class CommandConfig
     include FlightConfig::Updater
+    allow_missing_read
 
     delegate_missing_to Config
 

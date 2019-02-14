@@ -53,7 +53,7 @@ begin
   Bundler.setup(:config, :default, Cloudware::Config.provider)
 
   require 'cloudware'
-rescue Cloudware::ConfigError => e
+rescue => e
   $stderr.puts e.message
   exit 1
 end
