@@ -56,11 +56,13 @@ module Cloudware
           <% end -%>
           <% end -%>
 
+          <% if deployment.replacements -%>
           ## Replacements
           <% deployment.replacements.each do |key, value| -%>
           - *<%= key %>*: <%= value %>
           <% end -%>
 
+          <% end -%>
           <% if verbose && deployment.deployment_error -%>
           ## Error
           *NOTE:* This is `<%= provider %>'s` raw error message
