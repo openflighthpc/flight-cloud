@@ -88,7 +88,7 @@ module Cloudware
       def deploy
         run_callbacks(:deploy) do
           unless errors.blank?
-            raise ModelValidationError, render_errors_message('destroy')
+            raise ModelValidationError, render_errors_message('deploy')
           end
           run_deploy
         end
