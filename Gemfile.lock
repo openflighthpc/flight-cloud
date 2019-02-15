@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/alces-software/flight_config
-  revision: 209772e1110e5c18f2d1156b44dd0295ab82f178
+  revision: 6710c22291f1733ae029a2898993b3ab77a9787b
   specs:
     flight_config (0.1.0)
       tty-config
@@ -43,6 +43,7 @@ GEM
     coderay (1.1.2)
     colorize (0.8.1)
     concurrent-ruby (1.0.5)
+    debugger-ruby_core_source (1.3.8)
     diff-lcs (1.3)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
@@ -84,6 +85,8 @@ GEM
     pastel (0.7.2)
       equatable (~> 0.5.0)
       tty-color (~> 0.4.0)
+    pilfer (1.0.2)
+      rblineprof (~> 0.3.2)
     powerpack (0.1.1)
     pry (0.12.2)
       coderay (~> 1.1.0)
@@ -92,6 +95,9 @@ GEM
       byebug (~> 10.0)
       pry (~> 0.10)
     rainbow (3.0.0)
+    rake (12.3.2)
+    rblineprof (0.3.7)
+      debugger-ruby_core_source (~> 1.3)
     require_all (2.0.0)
     rouge (3.1.1)
     rspec (3.7.0)
@@ -171,8 +177,10 @@ DEPENDENCIES
   ipaddr
   memoist
   parallel
+  pilfer
   pry
   pry-byebug
+  rake
   require_all
   rspec
   rspec-wait

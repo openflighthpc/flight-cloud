@@ -42,6 +42,7 @@ module Cloudware
       include DeploymentCallbacks
 
       include FlightConfig::Updater
+      include FlightConfig::Deleter
 
       def initialize(cluster, name, **_h)
         self.cluster = cluster
@@ -63,11 +64,6 @@ module Cloudware
             __data__.set(method, value: v)
           end
         end
-      end
-
-      def random_tag
-        __data__.set_if_empty(:random_tag, value: rand(1000000))
-        __data__.fetch(:random_tag)
       end
 
       def results
@@ -93,7 +89,7 @@ module Cloudware
       def deploy
         run_callbacks(:deploy) do
           unless errors.blank?
-            raise ModelValidationError, render_errors_message('destroy')
+            raise ModelValidationError, render_errors_message('deploy')
           end
           run_deploy
         end
@@ -130,7 +126,7 @@ module Cloudware
       end
 
       def tag
-        "cloudware-#{name}-#{random_tag}"
+        "cloudware-#{name}-#{Config.append_tag}"
       end
 
       private
@@ -141,16 +137,17 @@ module Cloudware
       rescue => e
         self.deployment_error = e.message
         Log.error(e.message)
+      rescue Interrupt
+        self.deployment_error = 'Received Interrupt!'
+        Log.error "Received SIGINT whilst deploying: #{name}"
       end
 
       def run_destroy
-        begin
-          provider_client.destroy(tag)
-        rescue => e
-          self.deployment_error = e.message
-          Log.error(e.message)
-          return false
-        end
+        provider_client.destroy(tag)
+      rescue => e
+        self.deployment_error = e.message
+        Log.error(e.message)
+        return false
       end
 
       def render_errors_message(action)

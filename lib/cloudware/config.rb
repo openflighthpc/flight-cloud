@@ -33,6 +33,7 @@ require 'cloudware/exceptions'
 module Cloudware
   class Config
     include FlightConfig::Loader
+    allow_missing_read
 
     class << self
       def cache
@@ -65,6 +66,15 @@ module Cloudware
     def provider
       __data__.fetch(:provider) do
         raise ConfigError, 'No provider specified'
+      end
+    end
+
+    def append_tag
+      __data__.fetch(:append_tag) do
+        raise ConfigError, <<~ERROR.chomp
+          Missing 'append_tag' for provider names. See example config:
+          #{path}.example
+        ERROR
       end
     end
 

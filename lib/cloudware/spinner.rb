@@ -28,21 +28,14 @@ require 'tty-spinner'
 
 module Cloudware
   class Spinner
-    CHECK_SPIN = 10
-    SPIN_DELAY = 0.1
-
     def initialize(message, **k)
       @tty_spinner = TTY::Spinner.new(message, **k)
     end
 
     def run(done_message = '')
-      results = nil
-      thr = Thread.new { results = yield }
-      tty_spinner.spin
-      until thr.join(SPIN_DELAY)
-        tty_spinner.spin unless Config.debug
-      end
-      results
+      tty_spinner.spin      # Always spin once
+      tty_spinner.auto_spin unless Config.debug
+      yield if block_given?
     ensure
       tty_spinner.stop(done_message)
     end

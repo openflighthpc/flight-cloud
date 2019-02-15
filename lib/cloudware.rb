@@ -24,8 +24,8 @@
 # ==============================================================================
 #
 
-# ActiveSupport modules
-require 'active_support/core_ext/string'
+require 'active_support/core_ext/string/strip'
+require 'active_support/core_ext/string/filters'
 
 require 'cloudware/config'
 require 'cloudware/cli'

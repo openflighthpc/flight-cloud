@@ -1,13 +1,23 @@
 # frozen_string_literal: true
 
-require 'cloudware/models/deployments'
 require 'tty-color'
-require 'tty-markdown'
 
 module Cloudware
   module Commands
     module Concerns
       module MarkdownTemplate
+        def self.included(base)
+          base.extend(ClassMethods)
+        end
+
+        module ClassMethods
+          def delayed_require
+            super
+            require 'cloudware/models/deployments'
+            require 'tty-markdown'
+          end
+        end
+
         RenderCluster = Struct.new(:cluster_identifier) do
           delegate :machines, to: :deployments
           delegate_missing_to :cluster

@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,19 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
+require 'tty-markdown'
 
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
+  class Templater < SimpleDelegator
+    def render(template, **kwargs)
+      bind = kwargs.each_with_object(binding) do |(key, value), scope|
+        scope.local_variable_set(key, value)
       end
+      ERB.new(template, nil, '-').result(bind)
+    end
 
-      def path
-        Config.log_file
-      end
-
-      def warn(msg)
-        super
-      end
-
-      delegate_missing_to :instance
+    def render_markdown(template, **kwargs)
+      TTY::Markdown.parse(render(template, **kwargs))
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

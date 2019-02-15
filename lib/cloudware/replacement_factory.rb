@@ -57,7 +57,7 @@ module Cloudware
     def build(input_string)
       split_build_string(input_string)
         .reject(&:nil?)
-        .map { |x| parse(x) }
+        .reduce({}) { |memo, str| memo.merge(parse(str)) }
         .to_h
         .merge(deployment_name: deployment_name)
     end
@@ -71,8 +71,10 @@ module Cloudware
           '#{component_string}' does not form a key value pair
         ERROR
       end
-      key, value = components
-      [key.to_sym, parse_key_pair(key.to_sym, value)]
+      keys, value = components
+      keys.split(',').map do |key|
+        [key.to_sym, parse_key_pair(key.to_sym, value)]
+      end.to_h
     end
 
     def split_build_string(string)

@@ -64,6 +64,8 @@ RSpec.configure do |config|
     FileUtils.mkdir_p(File.dirname(dst))
     FakeFS::FileSystem.clone(src, dst)
 
+    FileUtils.mkdir_p(File.dirname(Cloudware::Config.log_file))
+
     # Stub the `flock` method in the tests as FakeFS doesn't implement it
     allow_any_instance_of(File).to receive(:flock)
   end

@@ -37,7 +37,7 @@ require 'bundler'
 # Catch any config errors during the require/setup
 begin
   # Require the config and associated gems
-  Bundler.require(:config)
+  Bundler.setup(:config)
   require 'cloudware/config'
 
   # Require the development gems
@@ -50,10 +50,10 @@ begin
   end
 
   # Setup the load path for remaining gems
-  Bundler.setup(:default, Cloudware::Config.provider)
+  Bundler.setup(:config, :default, Cloudware::Config.provider)
 
   require 'cloudware'
-rescue Cloudware::ConfigError => e
+rescue => e
   $stderr.puts e.message
   exit 1
 end

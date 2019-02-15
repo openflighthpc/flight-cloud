@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -28,51 +28,19 @@ module Cloudware
   module Commands
     module Lists
       class Deployment < Command
-        include Concerns::MarkdownTemplate
+        def self.delayed_require
+          super
+          require 'cloudware/templaters/deployment_templater'
+        end
 
-        TEMPLATE = <<~ERB
-          <% if deployments.empty? -%>
-          No deployments found
-          <% end -%>
-          <% deployments.each do |deployment| -%>
-          # Deployment: '<%= deployment.name %>'
-          <% if deployment.deployment_error -%>
-          *ERROR*: An error occured whilst deploying this template
-          <% unless verbose -%>
-          Please use `--verbose` for further details
-          <% end -%>
-
-          <% end -%>
-          *Creation Date*: <%= deployment.timestamp %>
-          *Template*: <%= deployment.template_path %>
-          *Provider Tag*: <%= deployment.tag %>
-
-          ## Results
-          <% if deployment.results.nil? || deployment.results.empty? -%>
-          No deployment results
-          <% else -%>
-          <% deployment.results.each do |key, value| -%>
-          - *<%= key %>*: <%= value %>
-          <% end -%>
-          <% end -%>
-
-          ## Replacements
-          <% deployment.replacements.each do |key, value| -%>
-          - *<%= key %>*: <%= value %>
-          <% end -%>
-
-          <% if verbose && deployment.deployment_error -%>
-          ## Error
-          *NOTE:* This is `<%= provider %>'s` raw error message
-          Refer to their documentation for further details
-
-          ```
-          <%= deployment.deployment_error %>
-          ```
-
-          <% end -%>
-          <% end -%>
-        ERB
+        def run!(verbose: false)
+          deployments = Models::Deployments.read(__config__.current_cluster)
+          return puts 'No Deployments found' if deployments.empty?
+          deployments.each do |d|
+            puts Templaters::DeploymentTemplater.new(d, verbose: verbose)
+                                                .render_info
+          end
+        end
       end
     end
   end

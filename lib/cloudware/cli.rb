@@ -60,7 +60,6 @@ module Cloudware
 
     def self.action(command, klass, method: :run!)
       command.action do |args, options|
-        delayed_require
         hash = options.__hash__
         hash.delete(:trace)
         begin
@@ -86,10 +85,6 @@ module Cloudware
       command.syntax = <<~SYNTAX.squish
         #{program(:name)} #{command.name} #{args_str} [options]
       SYNTAX
-    end
-
-    def self.delayed_require
-      require 'cloudware/models'
     end
 
     command 'cluster' do |c|
@@ -245,6 +240,26 @@ module Cloudware
       shared_power_attr(c)
       c.description = 'Turn the machine on'
       action(c, Commands::Powers::On)
+    end
+
+    command 'render' do |c|
+      cli_syntax(c, 'NAME [TEMPLATE]')
+      c.summary = 'Return the template for an existing or new deployment'
+      c.description = <<~DESC
+        Renders the template for the `NAME` deployment. Existing deployments
+        will always render the saved template and replacements.
+
+        If the deployment does not exist, the `TEMPLATE` and `--params`
+        options are used instead. See the 'deploy' command for valid inputs
+        for these inputs.
+      DESC
+      c.option '-t', '--template PATH', String, <<~DESC
+        Template path for a new deployment
+      DESC
+      c.option '--params STRING', String, <<~DESC
+        Values to be replaced for a new deployment
+      DESC
+      action(c, Commands::Deploy, method: :render)
     end
   end
 end

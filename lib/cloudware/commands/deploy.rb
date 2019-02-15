@@ -29,10 +29,9 @@ require 'cloudware/cluster'
 module Cloudware
   module Commands
     class Deploy < Command
-      def initialize(*a)
-        require 'cloudware/models/deployment'
-        require 'cloudware/replacement_factory'
+      def self.delayed_require
         super
+        require 'cloudware/replacement_factory'
       end
 
       def run!(name, raw_path, params: nil)
@@ -60,6 +59,18 @@ module Cloudware
         raise new_e
       end
 
+      def render(name, template = nil, params: nil)
+        cluster = __config__.current_cluster
+        deployment = Models::Deployment.read(cluster, name)
+        unless deployment.template_path
+          path = resolve_template(template, error_missing: true)
+          deployment.template_path = path
+          deployment.replacements = ReplacementFactory.new(cluster, name)
+                                                      .build(params)
+        end
+        puts deployment.template
+      end
+
       def list_templates(verbose: false)
         list = build_template_list
         if list.templates.empty?
@@ -77,10 +88,11 @@ module Cloudware
 
       private
 
-      attr_reader :name, :raw_path
-
-      def resolve_template(template)
-        build_template_list.human_paths[template] || ''
+      def resolve_template(template, error_missing: false)
+        path = build_template_list.human_paths[template]
+        return path if path
+        return '' unless error_missing
+        raise InvalidInput, 'Could not resolve template path'
       end
 
       def build_template_list

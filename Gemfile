@@ -33,8 +33,10 @@ end
 group :development do
   gem 'factory_bot'
   gem 'fakefs'
+  gem 'pilfer'
   gem 'pry'
   gem 'pry-byebug'
+  gem 'rake'
   gem 'rspec'
   gem 'rspec-wait'
   gem 'rubocop', '~> 0.52.1', require: false
