@@ -63,7 +63,7 @@ module Cloudware
       private
 
       def update_cluster(new_cluster)
-        @__config__ = CommandConfig.update do |conf|
+        @__config__ = CommandConfig.create_or_update do |conf|
           conf.current_cluster = new_cluster
         end
       end
