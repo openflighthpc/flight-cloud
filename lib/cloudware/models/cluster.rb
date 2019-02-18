@@ -30,6 +30,7 @@ module Cloudware
   module Models
     class Cluster
       include FlightConfig::Loader
+      include FlightConfig::Globber
       allow_missing_read
 
       delegate :provider, to: Config

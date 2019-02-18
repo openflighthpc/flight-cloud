@@ -69,9 +69,7 @@ module Cloudware
       end
 
       def read_clusters
-        Dir.glob(Models::Cluster.new('*').path)
-           .map { |p| File.basename(p) }
-           .sort
+        Models::Cluster.glob_read('*').map { |c| c.identifier }
       end
 
       def error_if_exists(cluster, action:)
