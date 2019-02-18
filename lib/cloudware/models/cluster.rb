@@ -31,7 +31,6 @@ module Cloudware
     class Cluster
       include FlightConfig::Updater
       include FlightConfig::Globber
-      allow_missing_read
 
       delegate :provider, to: Config
 
