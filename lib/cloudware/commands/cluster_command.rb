@@ -42,12 +42,11 @@ module Cloudware
         <% end -%>
       ERB
 
-      def init(cluster, import: nil)
-        error_if_exists(cluster, action: 'create')
-        update_cluster(cluster)
-        FileUtils.mkdir_p File.dirname(Models::Cluster.read(cluster).path)
+      def init(identifier, import: nil)
+        new_cluster = Models::Cluster.create(identifier)
+        update_cluster(new_cluster.identifier)
         Import.new(__config__).run!(import) if import
-        puts "Created cluster: #{cluster}"
+        puts "Created cluster: #{new_cluster.identifier}"
       end
 
       def list

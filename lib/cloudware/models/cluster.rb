@@ -29,7 +29,7 @@ require 'cloudware/root_dir'
 module Cloudware
   module Models
     class Cluster
-      include FlightConfig::Loader
+      include FlightConfig::Updater
       include FlightConfig::Globber
       allow_missing_read
 
