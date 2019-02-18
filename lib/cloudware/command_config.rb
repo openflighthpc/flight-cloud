@@ -39,7 +39,11 @@ module Cloudware
     end
 
     def current_cluster
-      __data__.fetch(:current_cluster) { 'default' }
+      __data__.fetch(:current_cluster) do
+        path = Models::Cluster.new('default').path
+        return 'default' if File.exists?(path)
+        Models::Cluster.create('default').identifier
+      end
     end
 
     def current_cluster=(cluster)
