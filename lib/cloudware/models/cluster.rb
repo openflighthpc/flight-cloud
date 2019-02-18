@@ -27,28 +27,30 @@
 require 'cloudware/root_dir'
 
 module Cloudware
-  class Cluster
-    include FlightConfig::Loader
-    allow_missing_read
+  module Models
+    class Cluster
+      include FlightConfig::Loader
+      allow_missing_read
 
-    delegate :provider, to: Config
+      delegate :provider, to: Config
 
-    attr_reader :identifier
+      attr_reader :identifier
 
-    def initialize(identifier)
-      @identifier = identifier
-    end
+      def initialize(identifier)
+        @identifier = identifier
+      end
 
-    def path
-      RootDir.content_cluster(identifier, 'etc/config.yaml')
-    end
+      def path
+        RootDir.content_cluster(identifier, 'etc/config.yaml')
+      end
 
-    def region
-      __data__.fetch(:region) { Config.default_region }
-    end
+      def region
+        __data__.fetch(:region) { Config.default_region }
+      end
 
-    def deployments
-      Models::Deployments.read(identifier)
+      def deployments
+        Models::Deployments.read(identifier)
+      end
     end
   end
 end

@@ -114,7 +114,7 @@ module Cloudware
       def region
         # Protect the read from a `nil` cluster. There is a separate validation
         # for nil clusters
-        Cluster.read(cluster.to_s).region
+        Models::Cluster.read(cluster.to_s).region
       end
 
       def <=>(other)

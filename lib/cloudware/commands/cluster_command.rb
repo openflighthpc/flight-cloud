@@ -24,7 +24,7 @@
 # ==============================================================================
 #
 
-require 'cloudware/cluster'
+require 'cloudware/models/cluster'
 require 'cloudware/commands/import'
 require 'pathname'
 
@@ -45,7 +45,7 @@ module Cloudware
       def init(cluster, import: nil)
         error_if_exists(cluster, action: 'create')
         update_cluster(cluster)
-        FileUtils.mkdir_p File.dirname(Cluster.read(cluster).path)
+        FileUtils.mkdir_p File.dirname(Models::Cluster.read(cluster).path)
         Import.new(__config__).run!(import) if import
         puts "Created cluster: #{cluster}"
       end
@@ -69,7 +69,7 @@ module Cloudware
       end
 
       def read_clusters
-        Dir.glob(Cluster.new('*').path)
+        Dir.glob(Models::Cluster.new('*').path)
            .map { |p| File.basename(p) }
            .sort
       end
