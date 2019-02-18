@@ -72,7 +72,6 @@ module Cloudware
     def prefix_tag
       __data__.fetch(:prefix_tag, default: 'cloudware-shared')
     end
-    alias :append_tag :prefix_tag
 
     def template_ext
       provider == 'azure' ? '.json' : '.yaml'

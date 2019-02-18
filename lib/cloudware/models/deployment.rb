@@ -67,6 +67,12 @@ module Cloudware
         end
       end
 
+      def cluster_config
+        # Protect the read from a `nil` cluster. There is a separate validation
+        # for nil clusters
+        @cluster_config ||= Models::Cluster.read(cluster.to_s)
+      end
+
       def results
         __data__.fetch(:results, default: {}).deep_symbolize_keys
       end
@@ -112,9 +118,7 @@ module Cloudware
       end
 
       def region
-        # Protect the read from a `nil` cluster. There is a separate validation
-        # for nil clusters
-        Models::Cluster.read(cluster.to_s).region
+        cluster_config.region
       end
 
       def <=>(other)
@@ -127,7 +131,7 @@ module Cloudware
       end
 
       def tag
-        "cloudware-#{name}-#{Config.append_tag}"
+        "#{Config.prefix_tag}-#{name}-#{cluster_config.tag}"
       end
 
       private
