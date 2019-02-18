@@ -58,7 +58,7 @@ module Cloudware
 
       def tag
         __data__.fetch(:tag) do
-          SecureRandom.hex(5).tap { |id| __data__.set(:id, value: id) }
+          SecureRandom.hex(5).tap { |id| __data__.set(:tag, value: id) }
         end
       end
 
