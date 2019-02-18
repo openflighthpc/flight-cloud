@@ -11,4 +11,4 @@ aws:                            # Requirement for cloud-aws
   secret_access_key:  # [VALUE] : Requirement for cloud-aws
 
 log_file: /tmp/travis.log
-append_tag: travis
+prefix_tag: travis-cloud

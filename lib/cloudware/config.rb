@@ -69,14 +69,10 @@ module Cloudware
       end
     end
 
-    def append_tag
-      __data__.fetch(:append_tag) do
-        raise ConfigError, <<~ERROR.chomp
-          Missing 'append_tag' for provider names. See example config:
-          #{path}.example
-        ERROR
-      end
+    def prefix_tag
+      __data__.fetch(:prefix_tag, default: 'cloudware-shared')
     end
+    alias :append_tag :prefix_tag
 
     def template_ext
       provider == 'azure' ? '.json' : '.yaml'
