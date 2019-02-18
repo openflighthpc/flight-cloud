@@ -43,6 +43,7 @@ module Cloudware
 
       include FlightConfig::Updater
       include FlightConfig::Deleter
+      include FlightConfig::Globber
 
       def initialize(cluster, name, **_h)
         self.cluster = cluster
