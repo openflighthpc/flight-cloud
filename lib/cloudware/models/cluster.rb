@@ -25,12 +25,20 @@
 #
 
 require 'cloudware/root_dir'
+require 'securerandom'
 
 module Cloudware
   module Models
     class Cluster
       include FlightConfig::Updater
       include FlightConfig::Globber
+
+      def self.create(cluster)
+        super(cluster) do |config|
+          # Ensure the tag has been assigned
+          config.tag
+        end
+      end
 
       delegate :provider, to: Config
 
@@ -46,6 +54,12 @@ module Cloudware
 
       def region
         __data__.fetch(:region) { Config.default_region }
+      end
+
+      def tag
+        __data__.fetch(:tag) do
+          SecureRandom.hex(5).tap { |id| __data__.set(:id, value: id) }
+        end
       end
 
       def deployments
