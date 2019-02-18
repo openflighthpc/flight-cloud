@@ -7,9 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/alces-software/flight_config
-  revision: 6710c22291f1733ae029a2898993b3ab77a9787b
+  revision: 72c041c6e39b681c3d9b3be07893e58ff12dc5f8
   specs:
     flight_config (0.1.0)
+      ice_nine
       tty-config
 
 GEM
@@ -62,6 +63,7 @@ GEM
       domain_name (~> 0.5)
     i18n (1.0.1)
       concurrent-ruby (~> 1.0)
+    ice_nine (0.11.2)
     ipaddr (1.2.0)
     jmespath (1.3.1)
     kramdown (1.16.2)
