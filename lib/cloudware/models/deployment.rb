@@ -48,7 +48,6 @@ module Cloudware
       def initialize(cluster, name, **_h)
         self.cluster = cluster
         self.name = name
-        super
       end
 
       SAVE_ATTR = [

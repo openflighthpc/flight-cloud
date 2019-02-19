@@ -34,8 +34,11 @@ FactoryBot.define do
       new(
         attributes.delete(:cluster),
         attributes.delete(:name),
-        **attributes
-      )
+      ).tap do |deployment|
+        attributes.each do |key, value|
+          deployment.send("#{key}=", value)
+        end
+      end
     end
 
     name 'test-deployment'
