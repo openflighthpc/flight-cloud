@@ -150,6 +150,7 @@ module Cloudware
 
       def run_destroy
         provider_client.destroy(tag)
+        true
       rescue => e
         self.deployment_error = e.message
         Log.error(e.message)
