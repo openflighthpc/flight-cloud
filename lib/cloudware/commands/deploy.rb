@@ -59,7 +59,7 @@ module Cloudware
 
       def render(name, template = nil, params: nil)
         cluster = __config__.current_cluster
-        deployment = Models::Deployment.read(cluster, name)
+        deployment = Models::Deployment.read_or_new(cluster, name)
         unless deployment.template_path
           path = resolve_template(template, error_missing: true)
           deployment.template_path = path

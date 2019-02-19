@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/alces-software/flight_config
-  revision: 2b8d77c5010cc96aa4c8b0058a0309cb1cbd3adf
+  revision: 0a0137d42fd5d6122e56b827c400bafa93b82520
   specs:
     flight_config (0.1.0)
       fakefs
