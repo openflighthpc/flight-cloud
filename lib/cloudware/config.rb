@@ -41,11 +41,13 @@ module Cloudware
       end
 
       delegate_missing_to :cache
-    end
 
-    def initialize
-      __data__.env_prefix = 'cloudware'
-      ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
+      def new__data__
+        super.tap do |__data__|
+          __data__.env_prefix = 'cloudware'
+          ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
+        end
+      end
     end
 
     def path
