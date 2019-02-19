@@ -33,7 +33,10 @@ RSpec.describe Cloudware::Models::Machine do
 
   context 'with a blank deployment' do
     let!(:deployment) do
-      build(:deployment).tap { |d| FlightConfig::Core.write(d) }
+      build(:deployment).tap do |d|
+        FlightConfig::Core.write(d)
+        Cloudware::Models::Cluster.create(d.cluster)
+      end
     end
 
     describe '#provider_id' do
