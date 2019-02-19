@@ -31,11 +31,12 @@ FactoryBot.define do
 
   factory :deployment, class: models::Deployment do
     initialize_with do
+      attr = attributes.dup
       new(
-        attributes.delete(:cluster),
-        attributes.delete(:name),
+        attr.delete(:cluster),
+        attr.delete(:name),
       ).tap do |deployment|
-        attributes.each do |key, value|
+        attr.each do |key, value|
           deployment.send("#{key}=", value)
         end
       end

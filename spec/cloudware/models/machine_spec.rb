@@ -69,6 +69,7 @@ RSpec.describe Cloudware::Models::Machine do
     let(:deployment) do
       build(:deployment, results: deployment_results).tap do |d|
         FlightConfig::Core.write(d)
+        Cloudware::Models::Cluster.create(d.cluster)
       end
     end
 

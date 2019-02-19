@@ -45,14 +45,16 @@ module Cloudware
       include FlightConfig::Deleter
       include FlightConfig::Globber
 
+      attr_reader :cluster, :name
+
       def initialize(cluster, name, **_h)
-        self.cluster = cluster
-        self.name = name
+        @cluster = cluster
+        @name = name
       end
 
       SAVE_ATTR = [
-        :template_path, :name, :results, :replacements,
-        :deployment_error, :cluster, :epoch_time
+        :template_path, :results, :replacements,
+        :deployment_error, :epoch_time
       ].freeze
 
       SAVE_ATTR.each do |method|

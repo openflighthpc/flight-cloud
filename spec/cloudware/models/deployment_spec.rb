@@ -101,7 +101,9 @@ RSpec.describe Cloudware::Models::Deployment do
         end
 
         context 'without a cluster' do
-          before { subject.cluster = nil }
+          before do
+            allow(subject).to receive(:cluster).and_return(nil)
+          end
 
           include_examples 'deploy raises ModelValidationError'
         end
