@@ -48,6 +48,10 @@ module Cloudware
         @identifier = identifier
       end
 
+      def __data__initialize(data)
+        data.set(:tag, value: SecureRandom.hex(5))
+      end
+
       def path
         RootDir.content_cluster(identifier, 'etc/config.yaml')
       end
@@ -57,9 +61,7 @@ module Cloudware
       end
 
       def tag
-        __data__.fetch(:tag) do
-          SecureRandom.hex(5).tap { |id| __data__.set(:tag, value: id) }
-        end
+        __data__.fetch(:tag)
       end
 
       def deployments
