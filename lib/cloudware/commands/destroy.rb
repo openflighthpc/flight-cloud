@@ -36,16 +36,9 @@ module Cloudware
 
       def run
         @name = argv[0]
-        cluster = __config__.current_cluster
-        deployment = Models::Deployment.delete(cluster, name) do |d|
-          with_spinner('Destroying resources...', done: 'Done') do
-            d.destroy(force: options.force)
-          end
+        with_spinner('Destroying resources...', done: 'Done') do
+          Models::Deployment.delete!(__config__.current_cluster, name)
         end
-        return unless deployment.nil?
-        raise InvalidInput, <<~ERROR.chomp
-            Could not find deployment '#{name}'
-        ERROR
       end
     end
   end

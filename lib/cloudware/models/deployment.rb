@@ -53,14 +53,28 @@ module Cloudware
           dep.validate_or_error('create')
         end
       rescue FlightConfig::CreateError => e
-        raise e.exception "Cowardly refusing to recreate '#{name}"
+        raise e.exception "Cowardly refusing to recreate '#{name}'"
       end
 
       def self.deploy!(*a)
-        update(*a) do |dep|
-          dep.validate_or_error('deploy')
-          dep.deploy
+        reraise_missing_file do
+          update(*a) do |dep|
+            dep.validate_or_error('deploy')
+            dep.deploy
+          end
         end
+      end
+
+      def self.delete!(*a)
+        reraise_missing_file { delete(*a, &:destroy) }
+      end
+
+      private_class_method
+
+      def self.reraise_missing_file
+        yield if block_given?
+      rescue FlightConfig::MissingFile => e
+        raise e.exception "The deployment does not exist"
       end
 
       attr_reader :cluster, :name
@@ -124,8 +138,12 @@ module Cloudware
       end
 
       def destroy(force: false)
-        validate_or_error('destroy')
-        run_destroy
+        provider_client.destroy(tag)
+        true
+      rescue => e
+        self.deployment_error = e.message
+        Log.error(e.message)
+        return false
       end
 
       def to_h
@@ -159,15 +177,6 @@ module Cloudware
       end
 
       private
-
-      def run_destroy
-        provider_client.destroy(tag)
-        true
-      rescue => e
-        self.deployment_error = e.message
-        Log.error(e.message)
-        return false
-      end
 
       def render_errors_message(action)
         ERB.new(<<~TEMPLATE, nil, '-').result(binding).chomp
