@@ -40,6 +40,14 @@ module Cloudware
           Models::Deployment.destroy!(__config__.current_cluster, name)
         end
       end
+
+      def delete(name, force: false)
+        if force
+          Models::Deployment.delete(__config__.current_cluster, name)
+        else
+          Models::Deployment.delete!(__config__.current_cluster, name)
+        end
+      end
     end
   end
 end

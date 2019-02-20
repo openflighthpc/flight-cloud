@@ -69,6 +69,17 @@ module Cloudware
         reraise_missing_file { update(*a, &:destroy) }
       end
 
+      def self.delete!(*a)
+        reraise_missing_file do
+          delete(*a) do |dep|
+            next true unless dep.deployed
+            raise DeploymentError, <<~ERROR.chomp
+              Can not delete a currently running deployment
+            ERROR
+          end
+        end
+      end
+
       private_class_method
 
       def self.reraise_missing_file

@@ -133,9 +133,23 @@ module Cloudware
 
     command 'destroy' do |c|
       cli_syntax(c, 'NAME')
-      c.summary = 'Destroy the remote infrastructure created by a deployment'
-      c.option '--force', 'Force delete the deployment from the context'
+      c.summary = 'Stop a running deployment'
       action(c, Commands::Destroy)
+    end
+
+    command 'delete' do |c|
+      cli_syntax(c, 'NAME')
+      c.summary = 'Remove the deployments configuration file'
+      c.description = <<~DESC
+        Deletes the confiuration file for the deployment NAME. This action
+        will error if the resources are currently running. The resources can
+        be stop using the 'destroy' command.
+
+        The configuration of a currently running deployment can be deleted
+        using the '--force' flag. This will not destroy the remote resources
+      DESC
+      c.option '--force', 'Delete the deployment regardless if running'
+      action(c, Commands::Destroy, method: :delete)
     end
 
     command 'import' do |c|
