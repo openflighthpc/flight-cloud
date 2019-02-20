@@ -43,7 +43,7 @@ module Cloudware
       ERB
 
       def init(identifier, import: nil)
-        new_cluster = Models::Cluster.create(identifier)
+        new_cluster = Models::Cluster.create!(identifier)
         update_cluster(new_cluster.identifier)
         Import.new(__config__).run!(import) if import
         puts "Created cluster: #{new_cluster.identifier}"

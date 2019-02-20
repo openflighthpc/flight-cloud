@@ -48,6 +48,13 @@ module Cloudware
 
       attr_reader :cluster, :name
 
+      # Override create to always write the file into a basic state
+      def self.create!(*a)
+        create(*a) do |dep|
+          dep.validate_or_error('create')
+        end
+      end
+
       def initialize(cluster, name, **_h)
         @cluster = cluster
         @name = name
@@ -96,18 +103,12 @@ module Cloudware
       end
 
       def deploy
-        validate
-        unless errors.blank?
-          raise ModelValidationError, render_errors_message('deploy')
-        end
+        validate_or_error('deploy')
         run_deploy
       end
 
       def destroy(force: false)
-        validate
-        unless errors.blank?
-          raise ModelValidationError, render_errors_message('destroy')
-        end
+        validate_or_error('destroy')
         run_destroy
       end
 
@@ -132,6 +133,13 @@ module Cloudware
 
       def tag
         "#{Config.prefix_tag}-#{name}-#{cluster_config.tag}"
+      end
+
+      def validate_or_error(action)
+        validate
+        unless errors.blank?
+          raise ModelValidationError, render_errors_message(action)
+        end
       end
 
       private

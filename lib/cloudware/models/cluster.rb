@@ -33,8 +33,8 @@ module Cloudware
       include FlightConfig::Updater
       include FlightConfig::Globber
 
-      def self.create(cluster)
-        super(cluster) do |config|
+      def self.create!(cluster)
+        create(cluster) do |config|
           # Ensure the tag has been assigned
           config.tag
         end
