@@ -46,14 +46,24 @@ module Cloudware
       include FlightConfig::Deleter
       include FlightConfig::Globber
 
-      attr_reader :cluster, :name
-
-      # Override create to always write the file into a basic state
-      def self.create!(*a)
+      def self.create!(*a, template:, replacements:)
         create(*a) do |dep|
+          dep.template_path = template
+          dep.replacements = replacements
           dep.validate_or_error('create')
         end
+      rescue FlightConfig::CreateError => e
+        raise e.exception "Cowardly refusing to recreate '#{name}"
       end
+
+      def self.deploy!(*a)
+        update(*a) do |dep|
+          dep.validate_or_error('deploy')
+          dep.deploy
+        end
+      end
+
+      attr_reader :cluster, :name
 
       def initialize(cluster, name, **_h)
         @cluster = cluster
@@ -103,8 +113,14 @@ module Cloudware
       end
 
       def deploy
-        validate_or_error('deploy')
-        run_deploy
+        self.epoch_time = Time.now.to_i
+        self.results = provider_client.deploy(tag, template)
+      rescue => e
+        self.deployment_error = e.message
+        Log.error(e.message)
+      rescue Interrupt
+        self.deployment_error = 'Received Interrupt!'
+        Log.error "Received SIGINT whilst deploying: #{name}"
       end
 
       def destroy(force: false)
@@ -143,17 +159,6 @@ module Cloudware
       end
 
       private
-
-      def run_deploy
-        self.epoch_time = Time.now.to_i
-        self.results = provider_client.deploy(tag, template)
-      rescue => e
-        self.deployment_error = e.message
-        Log.error(e.message)
-      rescue Interrupt
-        self.deployment_error = 'Received Interrupt!'
-        Log.error "Received SIGINT whilst deploying: #{name}"
-      end
 
       def run_destroy
         provider_client.destroy(tag)
