@@ -133,11 +133,7 @@ module Cloudware
 
     command 'destroy' do |c|
       cli_syntax(c, 'NAME')
-      c.summary = 'Destroy a deployment and related resouces'
-      c.description = <<~DESC
-        Removes the deployment NAME and instructs the cloud provider to destroy
-        the related resources.
-      DESC
+      c.summary = 'Destroy the remote infrastructure created by a deployment'
       c.option '--force', 'Force delete the deployment from the context'
       action(c, Commands::Destroy)
     end

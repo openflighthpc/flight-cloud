@@ -37,7 +37,7 @@ module Cloudware
       def run
         @name = argv[0]
         with_spinner('Destroying resources...', done: 'Done') do
-          Models::Deployment.delete!(__config__.current_cluster, name)
+          Models::Deployment.destroy!(__config__.current_cluster, name)
         end
       end
     end

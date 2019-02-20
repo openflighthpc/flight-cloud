@@ -65,8 +65,8 @@ module Cloudware
         end
       end
 
-      def self.delete!(*a)
-        reraise_missing_file { delete(*a, &:destroy) }
+      def self.destroy!(*a)
+        reraise_missing_file { update(*a, &:destroy) }
       end
 
       private_class_method
@@ -85,7 +85,7 @@ module Cloudware
       end
 
       SAVE_ATTR = [
-        :template_path, :results, :replacements,
+        :template_path, :results, :replacements, :deployed,
         :deployment_error, :epoch_time
       ].freeze
 
@@ -127,6 +127,7 @@ module Cloudware
       end
 
       def deploy
+        self.deployed = true
         self.epoch_time = Time.now.to_i
         self.results = provider_client.deploy(tag, template)
       rescue => e
@@ -139,6 +140,7 @@ module Cloudware
 
       def destroy(force: false)
         provider_client.destroy(tag)
+        self.deployed = false
         true
       rescue => e
         self.deployment_error = e.message
