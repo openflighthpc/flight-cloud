@@ -37,7 +37,8 @@ require 'erb'
 
 module Cloudware
   module Models
-    class Deployment < Application
+    class Deployment
+      include ActiveModel::Validations
       include Concerns::ProviderClient
       include DeploymentCallbacks
 
@@ -95,21 +96,19 @@ module Cloudware
       end
 
       def deploy
-        run_callbacks(:deploy) do
-          unless errors.blank?
-            raise ModelValidationError, render_errors_message('deploy')
-          end
-          run_deploy
+        validate
+        unless errors.blank?
+          raise ModelValidationError, render_errors_message('deploy')
         end
+        run_deploy
       end
 
       def destroy(force: false)
-        run_callbacks(:destroy) do
-          unless errors.blank?
-            raise ModelValidationError, render_errors_message('destroy')
-          end
-          run_destroy
+        validate
+        unless errors.blank?
+          raise ModelValidationError, render_errors_message('destroy')
         end
+        run_destroy
       end
 
       def to_h
