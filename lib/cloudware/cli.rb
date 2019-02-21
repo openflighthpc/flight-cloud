@@ -188,6 +188,7 @@ module Cloudware
     command 'list deployments' do |c|
       cli_syntax(c)
       c.description = 'List all the previous deployed templates'
+      c.option '-a', '--all', 'Include offline deployments'
       c.option '-v', '--verbose', 'Show full error messages'
       action(c, Commands::Lists::Deployment)
     end

@@ -47,6 +47,7 @@ module Cloudware
 
           <% end -%>
           *Creation Date*: <%= timestamp %>
+          *Status*: <%= deployed ? 'Running' : 'Offline' %>
           *Template*: <%= template_path %>
           *Provider Tag*: <%= tag %>
 

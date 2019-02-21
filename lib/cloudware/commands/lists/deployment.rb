@@ -33,8 +33,9 @@ module Cloudware
           require 'cloudware/templaters/deployment_templater'
         end
 
-        def run!(verbose: false)
+        def run!(verbose: false, all: false)
           deployments = Models::Deployments.read(__config__.current_cluster)
+          deployments = deployments.select(&:deployed) unless all
           return puts 'No Deployments found' if deployments.empty?
           deployments.each do |d|
             puts Templaters::DeploymentTemplater.new(d, verbose: verbose)
