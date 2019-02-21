@@ -53,7 +53,7 @@ module Cloudware
           dep.validate_or_error('create')
         end
       rescue FlightConfig::CreateError => e
-        raise e.exception "Cowardly refusing to recreate '#{name}'"
+        raise e.exception "Cowardly refusing to recreate '#{dep.name}'"
       end
 
       def self.deploy!(*a)
