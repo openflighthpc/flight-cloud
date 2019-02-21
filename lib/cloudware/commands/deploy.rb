@@ -33,16 +33,10 @@ module Cloudware
       end
 
       def run!(name, raw_path, params: nil)
-        cluster = __config__.current_cluster
-        replacements = ReplacementFactory.new(cluster, name).build(params)
-        created_dep = Models::Deployment.create!(
-          cluster, name,
-          template: resolve_template(raw_path),
-          replacements: replacements
-        )
+        created_dep = create_deployment(name, raw_path, params: params)
         puts "Deploying: #{created_dep.path}"
         with_spinner('Deploying resources...', done: 'Done') do
-          dep = Models::Deployment.deploy!(cluster, name)
+          dep = Models::Deployment.deploy!(__config__.current_cluster, name)
           return unless dep.deployment_error
           raise DeploymentError, <<~ERROR.chomp
              An error has occured. Please see for further details:
@@ -79,6 +73,16 @@ module Cloudware
       end
 
       private
+
+      def create_deployment(name, raw_path, params: nil)
+        replacements = ReplacementFactory.new(__config__.current_cluster, name)
+                                         .build(params)
+        Models::Deployment.create!(
+          __config__.current_cluster, name,
+          template: resolve_template(raw_path),
+          replacements: replacements
+        )
+      end
 
       def resolve_template(template, error_missing: false)
         path = build_template_list.human_paths[template]

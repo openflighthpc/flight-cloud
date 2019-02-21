@@ -113,11 +113,12 @@ module Cloudware
     end
 
     command 'deploy' do |c|
-      cli_syntax(c, 'NAME TEMPLATE')
+      cli_syntax(c, 'NAME [TEMPLATE]')
       c.summary = 'Deploy new resource(s) define by a template'
       c.description = <<-DESC.strip_heredoc
         Deploy new resource(s) from the specified TEMPLATE. The TEMPLATE can
-        either be a cluster template or an absolute path.
+        either be a cluster template or an absolute path. The TEMPLATE should
+        not be included when redeploying existing resources.
 
         The deployment will be given the NAME label and logged locally. The name
         used by the provider will be based off this with minor variations.
