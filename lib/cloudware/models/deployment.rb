@@ -161,6 +161,10 @@ module Cloudware
         self.deployment_error = e.message
         Log.error(e.message)
         return false
+      rescue Interrupt
+        self.deployment_error = 'Received Interrupt!'
+        Log.error(e.message)
+        return false
       end
 
       def to_h

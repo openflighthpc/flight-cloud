@@ -112,6 +112,12 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :switch)
     end
 
+    command 'cluster delete' do |c|
+      cli_syntax(c, 'CLUSTER')
+      c.summary = 'Destroys the deployments and deletes the cluster'
+      action(c, Commands::ClusterCommand, method: :delete)
+    end
+
     command 'deploy' do |c|
       cli_syntax(c, 'NAME [TEMPLATE]')
       c.summary = 'Deploy new resource(s) define by a template'
