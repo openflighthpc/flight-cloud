@@ -32,9 +32,13 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def run!(name, raw_path, params: nil)
-        created_dep = create_deployment(name, raw_path, params: params)
-        puts "Deploying: #{created_dep.path}"
+      def run!(name, raw_path = nil, params: nil)
+        cur_dep = if raw_path
+          create_deployment(name, raw_path, params: params)
+        else
+          Models::Deployment.read(__config__.current_cluster, name)
+        end
+        puts "Deploying: #{cur_dep.path}"
         with_spinner('Deploying resources...', done: 'Done') do
           dep = Models::Deployment.deploy!(__config__.current_cluster, name)
           return unless dep.deployment_error
