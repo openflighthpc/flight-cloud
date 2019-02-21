@@ -24,7 +24,7 @@
 # ==============================================================================
 #
 
-require 'cloudware/cluster'
+require 'cloudware/models/cluster'
 require 'cloudware/commands/import'
 require 'pathname'
 
@@ -42,12 +42,11 @@ module Cloudware
         <% end -%>
       ERB
 
-      def init(cluster, import: nil)
-        error_if_exists(cluster, action: 'create')
-        update_cluster(cluster)
-        FileUtils.mkdir_p File.dirname(Cluster.read(cluster).path)
+      def init(identifier, import: nil)
+        new_cluster = Models::Cluster.create(identifier)
+        update_cluster(new_cluster.identifier)
         Import.new(__config__).run!(import) if import
-        puts "Created cluster: #{cluster}"
+        puts "Created cluster: #{new_cluster.identifier}"
       end
 
       def list
@@ -63,15 +62,13 @@ module Cloudware
       private
 
       def update_cluster(new_cluster)
-        @__config__ = CommandConfig.update do |conf|
+        @__config__ = CommandConfig.create_or_update do |conf|
           conf.current_cluster = new_cluster
         end
       end
 
       def read_clusters
-        Dir.glob(Cluster.new('*').path)
-           .map { |p| File.basename(p) }
-           .sort
+        Models::Cluster.glob_read('*').map { |c| c.identifier }
       end
 
       def error_if_exists(cluster, action:)

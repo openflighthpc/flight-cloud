@@ -36,13 +36,6 @@ module Cloudware
 
       include ActiveModel::Model
       extend Memoist
-
-      def initialize(*_a, **parameters)
-        @errors = ActiveModel::Errors.new(self)
-        parameters.each do |key, value|
-          public_send("#{key}=", value)
-        end
-      end
     end
   end
 end

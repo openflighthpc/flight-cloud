@@ -7,9 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/alces-software/flight_config
-  revision: 6710c22291f1733ae029a2898993b3ab77a9787b
+  revision: 2b8d77c5010cc96aa4c8b0058a0309cb1cbd3adf
   specs:
     flight_config (0.1.0)
+      fakefs
       tty-config
 
 GEM
@@ -50,7 +51,7 @@ GEM
     equatable (0.5.0)
     factory_bot (4.8.2)
       activesupport (>= 3.0.0)
-    fakefs (0.18.0)
+    fakefs (0.19.2)
     faraday (0.13.1)
       multipart-post (>= 1.2, < 3)
     faraday-cookie_jar (0.0.6)
@@ -192,4 +193,4 @@ DEPENDENCIES
   tty-table
 
 BUNDLED WITH
-   1.16.2
+   1.16.6

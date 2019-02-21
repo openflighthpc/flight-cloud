@@ -29,23 +29,8 @@ require 'cloudware/models/deployment'
 module Cloudware
   module Models
     class Deployments < DelegateClass(Array)
-      REGEX = /#{Deployment.new('(?<cluster>.*)', '(?<name>.*)').path}/
-
       def self.read(cluster)
-        d = Dir.glob(Deployment.new(cluster, '*').path)
-               .map { |p| read_path(p) }
-               .reject(&:nil?)
-        new(d)
-      end
-
-      private_class_method
-
-      def self.read_path(path)
-        match = REGEX.match(path)
-        Deployment.read(match['cluster'], match['name'])
-      rescue FlightConfig::ResourceBusy
-        Log.warn("ResourceBusy, skipping: #{path}")
-        return nil
+        new(Deployment.glob_read(cluster, '*'))
       end
 
       def results

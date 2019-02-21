@@ -43,16 +43,18 @@ module Cloudware
 
       include FlightConfig::Updater
       include FlightConfig::Deleter
+      include FlightConfig::Globber
+
+      attr_reader :cluster, :name
 
       def initialize(cluster, name, **_h)
-        self.cluster = cluster
-        self.name = name
-        super
+        @cluster = cluster
+        @name = name
       end
 
       SAVE_ATTR = [
-        :template_path, :name, :results, :replacements,
-        :deployment_error, :cluster, :epoch_time
+        :template_path, :results, :replacements,
+        :deployment_error, :epoch_time
       ].freeze
 
       SAVE_ATTR.each do |method|
@@ -64,6 +66,12 @@ module Cloudware
             __data__.set(method, value: v)
           end
         end
+      end
+
+      def cluster_config
+        # Protect the read from a `nil` cluster. There is a separate validation
+        # for nil clusters
+        @cluster_config ||= Models::Cluster.read(cluster.to_s)
       end
 
       def results
@@ -111,9 +119,7 @@ module Cloudware
       end
 
       def region
-        # Protect the read from a `nil` cluster. There is a separate validation
-        # for nil clusters
-        Cluster.read(cluster.to_s).region
+        cluster_config.region
       end
 
       def <=>(other)
@@ -126,7 +132,7 @@ module Cloudware
       end
 
       def tag
-        "cloudware-#{name}-#{Config.append_tag}"
+        "#{Config.prefix_tag}-#{name}-#{cluster_config.tag}"
       end
 
       private
@@ -144,6 +150,7 @@ module Cloudware
 
       def run_destroy
         provider_client.destroy(tag)
+        true
       rescue => e
         self.deployment_error = e.message
         Log.error(e.message)

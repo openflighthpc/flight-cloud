@@ -41,11 +41,13 @@ module Cloudware
       end
 
       delegate_missing_to :cache
-    end
 
-    def initialize
-      __data__.env_prefix = 'cloudware'
-      ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
+      def new__data__
+        super.tap do |__data__|
+          __data__.env_prefix = 'cloudware'
+          ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
+        end
+      end
     end
 
     def path
@@ -69,13 +71,8 @@ module Cloudware
       end
     end
 
-    def append_tag
-      __data__.fetch(:append_tag) do
-        raise ConfigError, <<~ERROR.chomp
-          Missing 'append_tag' for provider names. See example config:
-          #{path}.example
-        ERROR
-      end
+    def prefix_tag
+      __data__.fetch(:prefix_tag, default: 'cloudware-shared')
     end
 
     def template_ext

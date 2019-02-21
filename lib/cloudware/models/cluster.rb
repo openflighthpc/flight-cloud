@@ -25,30 +25,48 @@
 #
 
 require 'cloudware/root_dir'
+require 'securerandom'
 
 module Cloudware
-  class Cluster
-    include FlightConfig::Loader
-    allow_missing_read
+  module Models
+    class Cluster
+      include FlightConfig::Updater
+      include FlightConfig::Globber
 
-    delegate :provider, to: Config
+      def self.create(cluster)
+        super(cluster) do |config|
+          # Ensure the tag has been assigned
+          config.tag
+        end
+      end
 
-    attr_reader :identifier
+      delegate :provider, to: Config
 
-    def initialize(identifier)
-      @identifier = identifier
-    end
+      attr_reader :identifier
 
-    def path
-      RootDir.content_cluster(identifier, 'etc/config.yaml')
-    end
+      def initialize(identifier)
+        @identifier = identifier
+      end
 
-    def region
-      __data__.fetch(:region) { Config.default_region }
-    end
+      def __data__initialize(data)
+        data.set(:tag, value: SecureRandom.hex(5))
+      end
 
-    def deployments
-      Models::Deployments.read(identifier)
+      def path
+        RootDir.content_cluster(identifier, 'etc/config.yaml')
+      end
+
+      def region
+        __data__.fetch(:region) { Config.default_region }
+      end
+
+      def tag
+        __data__.fetch(:tag)
+      end
+
+      def deployments
+        Models::Deployments.read(identifier)
+      end
     end
   end
 end

@@ -8,9 +8,11 @@
 # for details.
 # =============================================================================
 
-# The deployments name on the provider will be appended with this tag. This
-# should be unique for this install of cloudware
-append_tag: # REQUIRED
+# Prefix Tag:
+# The names given to remote resources will be prefixed with this tag. It should
+# be used to distinguish these cloud resources from anything else deployed on
+# your account.
+prefix_tag: # [STRONGLY RECOMMENDED] : Should be unique
 
 # Provider credentials
 azure:                        # Requirement for cloud-azure

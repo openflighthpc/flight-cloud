@@ -37,7 +37,9 @@ RSpec.describe Cloudware::Models::Deployment do
   end
 
   subject do
-    build(:deployment, replacements: replacements)
+    build(:deployment, replacements: replacements).tap do |deployment|
+      Cloudware::Models::Cluster.create_or_update(deployment.cluster)
+    end
   end
 
   let(:replacements) { nil }
@@ -99,7 +101,9 @@ RSpec.describe Cloudware::Models::Deployment do
         end
 
         context 'without a cluster' do
-          before { subject.cluster = nil }
+          before do
+            allow(subject).to receive(:cluster).and_return(nil)
+          end
 
           include_examples 'deploy raises ModelValidationError'
         end

@@ -24,8 +24,6 @@
 # ==============================================================================
 #
 
-require 'cloudware/cluster'
-
 module Cloudware
   module Commands
     class Deploy < Command
