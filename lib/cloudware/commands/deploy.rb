@@ -38,6 +38,7 @@ module Cloudware
         else
           Models::Deployment.read(__config__.current_cluster, name)
         end
+        raise_if_deployed(cur_dep)
         puts "Deploying: #{cur_dep.path}"
         with_spinner('Deploying resources...', done: 'Done') do
           dep = Models::Deployment.deploy!(__config__.current_cluster, name)
@@ -86,6 +87,12 @@ module Cloudware
           template: resolve_template(raw_path),
           replacements: replacements
         )
+      end
+
+      def raise_if_deployed(dep)
+        return unless dep.deployed
+        raise InvalidInput, "'#{dep.name}' is already running"
+        ERROR
       end
 
       def resolve_template(template, error_missing: false)
