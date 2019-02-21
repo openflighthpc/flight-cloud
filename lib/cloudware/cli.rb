@@ -122,16 +122,22 @@ module Cloudware
       cli_syntax(c, 'NAME [TEMPLATE]')
       c.summary = 'Deploy new resource(s) define by a template'
       c.description = <<-DESC.strip_heredoc
-        Deploy new resource(s) from the specified TEMPLATE. The TEMPLATE can
-        either be a cluster template or an absolute path. The TEMPLATE should
-        not be included when redeploying existing resources.
+        When called with a single argument, it will deploy a currently existing
+        deployment: NAME. This will result in an error if the deployment does
+        not exist or is currently in a deployed state.
 
-        The deployment will be given the NAME label and logged locally. The name
-        used by the provider will be based off this with minor variations.
+        Calling it with a second argument will try and create a nem deployment
+        called NAME with the specified TEMPLATE. The TEMPLATE references the
+        internal template which have been imported. Alternatively it can be
+        an absolute path to a template file.
+
+        In either case, the template is read and sent to the provider. The
+        template is read each time it is re-deployed. Be careful not to delete
+        or modify it.
 
         The templates also support basic rendering of parameters from the
         command line. This is intended to provide minor tweaks to the templates
-        (e.g. IPs or names). Major difference should use separate templates.
+        (e.g. IPs or names).
       DESC
       c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
                String, 'A space separated list of keys to be replaced'
