@@ -36,7 +36,7 @@ module Cloudware
         cur_dep = if raw_path
           create_deployment(name, raw_path, params: params)
         else
-          Models::Deployment.read(__config__.current_cluster, name)
+          Models::Deployment.read!(__config__.current_cluster, name)
         end
         raise_if_deployed(cur_dep)
         puts "Deploying: #{cur_dep.path}"

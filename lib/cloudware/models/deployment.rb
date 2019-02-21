@@ -46,6 +46,10 @@ module Cloudware
       include FlightConfig::Deleter
       include FlightConfig::Globber
 
+      def self.read!(*a)
+        reraise_missing_file { read(*a) }
+      end
+
       def self.create!(*a, template:, replacements:)
         create(*a) do |dep|
           dep.template_path = template
@@ -53,7 +57,7 @@ module Cloudware
           dep.validate_or_error('create')
         end
       rescue FlightConfig::CreateError => e
-        raise e.exception "Cowardly refusing to recreate '#{dep.name}'"
+        raise e.exception "Cowardly refusing to recreate the deployment"
       end
 
       def self.deploy!(*a)
