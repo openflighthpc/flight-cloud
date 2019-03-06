@@ -42,8 +42,13 @@ module Cloudware
         <% end -%>
       ERB
 
+      def initialize(*_a)
+        require 'parallel'
+        super
+      end
+
       def init(identifier, import: nil)
-        new_cluster = Models::Cluster.create(identifier)
+        new_cluster = Models::Cluster.create!(identifier)
         update_cluster(new_cluster.identifier)
         Import.new(__config__).run!(import) if import
         puts "Created cluster: #{new_cluster.identifier}"
@@ -57,6 +62,21 @@ module Cloudware
         error_if_missing(cluster, action: 'switch')
         update_cluster(cluster)
         list
+      end
+
+      def delete(cluster)
+        error_if_current_cluster(cluster)
+        deps = Models::Deployments.read(cluster)
+        with_spinner 'Deleting cluster (this may take some time)...'
+          Parallel.each(deps, in_threads: 5) do |dep|
+            Models::Deployment.destroy!(cluster, dep.name)
+            Models::Deployment.delete!(cluster, dep.name)
+          end
+        if Models::Deployments.read(cluster).empty?
+          FileUtils.rm_rf RootDir.content_cluster(cluster)
+        else
+          raise CloudwareError, 'Failed to delete the cluster'
+        end
       end
 
       private
@@ -82,6 +102,13 @@ module Cloudware
         return if read_clusters.include?(cluster)
         raise InvalidInput, <<~ERROR.chomp
           Failed to #{action} cluster. '#{cluster}' doesn't exist
+        ERROR
+      end
+
+      def error_if_current_cluster(cluster)
+        return unless cluster == __config__.current_cluster
+        raise InvalidInput, <<~ERROR.chomp
+          Can not delete the current cluster
         ERROR
       end
     end

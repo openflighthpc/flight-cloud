@@ -28,14 +28,6 @@ require 'cloudware/models'
 require 'cloudware/providers/base'
 
 RSpec.describe Cloudware::Models::Deployment do
-  shared_examples 'deploy raises ModelValidationError' do
-    it 'raises ModelValidationError' do
-      expect do
-        subject.deploy
-      end.to raise_error(Cloudware::ModelValidationError)
-    end
-  end
-
   subject do
     build(:deployment, replacements: replacements).tap do |deployment|
       Cloudware::Models::Cluster.create_or_update(deployment.cluster)
@@ -72,12 +64,6 @@ RSpec.describe Cloudware::Models::Deployment do
     end
   end
 
-  context 'without a template' do
-    describe '#deploy' do
-      include_examples 'deploy raises ModelValidationError'
-    end
-  end
-
   context 'with an existing template' do
     before do
       path = subject.send(:template_path)
@@ -99,20 +85,6 @@ RSpec.describe Cloudware::Models::Deployment do
           subject.deploy
           expect(subject.deployment_error).to be_nil
         end
-
-        context 'without a cluster' do
-          before do
-            allow(subject).to receive(:cluster).and_return(nil)
-          end
-
-          include_examples 'deploy raises ModelValidationError'
-        end
-      end
-
-      context 'with a replacement tag' do
-        let(:template_content) { '%unreplaced-tag%' }
-
-        it_behaves_like 'deploy raises ModelValidationError'
       end
     end
 

@@ -32,34 +32,27 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def run!(name, raw_path, params: nil)
-        cluster = __config__.current_cluster
-        path = resolve_template(raw_path)
-        replacements = ReplacementFactory.new(cluster, name).build(params)
-        deployment = Models::Deployment.create(cluster, name) do |d|
-          puts "Deploying: #{path}"
-          with_spinner('Deploying resources...', done: 'Done') do
-            d.template_path = path
-            d.replacements = replacements
-            d.deploy
-          end
+      def run!(name, raw_path = nil, params: nil)
+        cur_dep = if raw_path
+          create_deployment(name, raw_path, params: params)
+        else
+          Models::Deployment.read!(__config__.current_cluster, name)
         end
-        return unless deployment.deployment_error
-        raise DeploymentError, <<~ERROR.chomp
-           An error has occured. Please see for further details:
-          `#{Config.app_name} list deployments --verbose`
-        ERROR
-      rescue FlightConfig::CreateError => e
-        new_e = e.exception <<~ERROR.chomp
-          Cowardly refusing to re-deploy '#{name}'
-        ERROR
-        new_e.set_backtrace(e.backtrace)
-        raise new_e
+        raise_if_deployed(cur_dep)
+        puts "Deploying: #{cur_dep.path}"
+        with_spinner('Deploying resources...', done: 'Done') do
+          dep = Models::Deployment.deploy!(__config__.current_cluster, name)
+          return unless dep.deployment_error
+          raise DeploymentError, <<~ERROR.chomp
+             An error has occured. Please see for further details:
+            `#{Config.app_name} list deployments --verbose`
+          ERROR
+        end
       end
 
       def render(name, template = nil, params: nil)
         cluster = __config__.current_cluster
-        deployment = Models::Deployment.read(cluster, name)
+        deployment = Models::Deployment.read_or_new(cluster, name)
         unless deployment.template_path
           path = resolve_template(template, error_missing: true)
           deployment.template_path = path
@@ -85,6 +78,22 @@ module Cloudware
       end
 
       private
+
+      def create_deployment(name, raw_path, params: nil)
+        replacements = ReplacementFactory.new(__config__.current_cluster, name)
+                                         .build(params)
+        Models::Deployment.create!(
+          __config__.current_cluster, name,
+          template: resolve_template(raw_path),
+          replacements: replacements
+        )
+      end
+
+      def raise_if_deployed(dep)
+        return unless dep.deployed
+        raise InvalidInput, "'#{dep.name}' is already running"
+        ERROR
+      end
 
       def resolve_template(template, error_missing: false)
         path = build_template_list.human_paths[template]

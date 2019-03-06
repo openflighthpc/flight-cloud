@@ -37,13 +37,60 @@ require 'erb'
 
 module Cloudware
   module Models
-    class Deployment < Application
+    class Deployment
+      include ActiveModel::Validations
       include Concerns::ProviderClient
       include DeploymentCallbacks
 
       include FlightConfig::Updater
       include FlightConfig::Deleter
       include FlightConfig::Globber
+
+      def self.read!(*a)
+        reraise_missing_file { read(*a) }
+      end
+
+      def self.create!(*a, template:, replacements:)
+        create(*a) do |dep|
+          dep.template_path = template
+          dep.replacements = replacements
+          dep.validate_or_error('create')
+        end
+      rescue FlightConfig::CreateError => e
+        raise e.exception "Cowardly refusing to recreate the deployment"
+      end
+
+      def self.deploy!(*a)
+        reraise_missing_file do
+          update(*a) do |dep|
+            dep.validate_or_error('deploy')
+            dep.deploy
+          end
+        end
+      end
+
+      def self.destroy!(*a)
+        reraise_missing_file { update(*a, &:destroy) }
+      end
+
+      def self.delete!(*a)
+        reraise_missing_file do
+          delete(*a) do |dep|
+            next true unless dep.deployed
+            raise DeploymentError, <<~ERROR.chomp
+              Can not delete a currently running deployment
+            ERROR
+          end
+        end
+      end
+
+      private_class_method
+
+      def self.reraise_missing_file
+        yield if block_given?
+      rescue FlightConfig::MissingFile => e
+        raise e.exception "The deployment does not exist"
+      end
 
       attr_reader :cluster, :name
 
@@ -53,7 +100,7 @@ module Cloudware
       end
 
       SAVE_ATTR = [
-        :template_path, :results, :replacements,
+        :template_path, :results, :replacements, :deployed,
         :deployment_error, :epoch_time
       ].freeze
 
@@ -95,21 +142,29 @@ module Cloudware
       end
 
       def deploy
-        run_callbacks(:deploy) do
-          unless errors.blank?
-            raise ModelValidationError, render_errors_message('deploy')
-          end
-          run_deploy
-        end
+        self.deployed = true
+        self.epoch_time = Time.now.to_i
+        self.results = provider_client.deploy(tag, template)
+      rescue => e
+        self.deployment_error = e.message
+        Log.error(e.message)
+      rescue Interrupt
+        self.deployment_error = 'Received Interrupt!'
+        Log.error "Received SIGINT whilst deploying: #{name}"
       end
 
       def destroy(force: false)
-        run_callbacks(:destroy) do
-          unless errors.blank?
-            raise ModelValidationError, render_errors_message('destroy')
-          end
-          run_destroy
-        end
+        provider_client.destroy(tag)
+        self.deployed = false
+        true
+      rescue => e
+        self.deployment_error = e.message
+        Log.error(e.message)
+        return false
+      rescue Interrupt
+        self.deployment_error = 'Received Interrupt!'
+        Log.error(e.message)
+        return false
       end
 
       def to_h
@@ -135,27 +190,14 @@ module Cloudware
         "#{Config.prefix_tag}-#{name}-#{cluster_config.tag}"
       end
 
+      def validate_or_error(action)
+        validate
+        unless errors.blank?
+          raise ModelValidationError, render_errors_message(action)
+        end
+      end
+
       private
-
-      def run_deploy
-        self.epoch_time = Time.now.to_i
-        self.results = provider_client.deploy(tag, template)
-      rescue => e
-        self.deployment_error = e.message
-        Log.error(e.message)
-      rescue Interrupt
-        self.deployment_error = 'Received Interrupt!'
-        Log.error "Received SIGINT whilst deploying: #{name}"
-      end
-
-      def run_destroy
-        provider_client.destroy(tag)
-        true
-      rescue => e
-        self.deployment_error = e.message
-        Log.error(e.message)
-        return false
-      end
 
       def render_errors_message(action)
         ERB.new(<<~TEMPLATE, nil, '-').result(binding).chomp

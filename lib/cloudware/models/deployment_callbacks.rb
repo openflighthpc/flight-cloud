@@ -28,13 +28,10 @@ module Cloudware
   module Models
     module DeploymentCallbacks
       def self.included(base)
-        base.class_eval do
-          define_model_callbacks :deploy
-          define_model_callbacks :destroy
-
-          before_deploy :validate_template_exists
-          before_deploy :validate_replacement_tags
-          before_deploy :validate_cluster
+        base.class_exec do
+          validate :validate_template_exists
+          validate :validate_replacement_tags
+          validate :validate_cluster
         end
       end
 
