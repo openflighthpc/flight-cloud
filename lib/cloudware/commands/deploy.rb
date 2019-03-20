@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -23,6 +23,8 @@
 # https://github.com/alces-software/cloudware
 # ==============================================================================
 #
+
+require 'cloudware/list_templates'
 
 module Cloudware
   module Commands
@@ -104,59 +106,6 @@ module Cloudware
 
       def build_template_list
         ListTemplates.new(__config__.current_cluster)
-      end
-
-      ListTemplates = Struct.new(:cluster) do
-        include Enumerable
-
-        delegate :each, to: :templates
-
-        def template_path(*parts, ext: true)
-          path = RootDir.content_cluster_template(cluster, *parts)
-          path = Pathname.new(path)
-          ext ? path.sub_ext(Config.template_ext) : path
-        end
-
-        def base
-          template_path(ext: false)
-        end
-
-        ##
-        # These represent the valid template CLI inputs
-        #
-        def human_paths
-          templates.each_with_object({}) do |template, memo|
-            long_name = template.sub_ext('')
-            name = long_name.basename
-            directory = long_name.dirname
-            directory_file = directory.sub_ext(template.extname)
-
-            # Adds the shorthand path (if available)
-            # The directory must not have a sibling template of the same name
-            if (name == directory.basename) && !directory_file.file?
-              memo[directory.relative_path_from(base).to_s] = template
-            end
-
-            # Adds the standard path
-            memo[long_name.relative_path_from(base).to_s] = template
-          end
-        end
-
-        def shorthand_paths
-          human_paths.each_with_object({}) do |(name, path), memo|
-            if memo.key?(path)
-              memo[path] = name if memo[path].length > name.length
-            else
-              memo[path] = name
-            end
-          end.map { |v, k| [k, v] }.to_h
-        end
-
-        def templates
-          @templates ||= Dir.glob(template_path('**/*'))
-                            .sort
-                            .map { |p| Pathname.new(p) }
-        end
       end
     end
   end
