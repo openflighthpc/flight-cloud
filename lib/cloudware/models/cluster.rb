@@ -56,6 +56,10 @@ module Cloudware
         RootDir.content_cluster(identifier, 'etc/config.yaml')
       end
 
+      def templates
+        @templates ||= ListTemplates.new(identifier)
+      end
+
       def region
         __data__.fetch(:region) { Config.default_region }
       end

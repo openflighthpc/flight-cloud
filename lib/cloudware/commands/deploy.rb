@@ -65,8 +65,7 @@ module Cloudware
       end
 
       def list_templates(verbose: false)
-        list = build_template_list
-        if list.templates.empty?
+        if __config__.current_cluster.templates.empty?
           raise UserError, 'No templates found'
         elsif verbose
           list.human_paths.each do |human_path, abs_path|
@@ -98,14 +97,12 @@ module Cloudware
       end
 
       def resolve_template(template, error_missing: false)
-        path = build_template_list.human_paths[template]
+        path = Models::Cluster.load(__config__.current_cluster)
+                              .templates
+                              .human_paths[template]
         return path if path
         return '' unless error_missing
         raise InvalidInput, 'Could not resolve template path'
-      end
-
-      def build_template_list
-        ListTemplates.new(__config__.current_cluster)
       end
     end
   end
