@@ -52,7 +52,11 @@ module Cloudware
 
       def self.create!(*a, template:, replacements:)
         create(*a) do |dep|
-          dep.template_path = template
+          dep.template_path = if Pathname.new(template).absolute?
+            template
+          else
+            dep.cluster_config.templates.resolve_human_path(template)
+          end
           dep.replacements = replacements
           dep.validate_or_error('create')
         end

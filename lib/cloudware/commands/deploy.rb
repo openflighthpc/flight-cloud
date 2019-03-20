@@ -85,7 +85,7 @@ module Cloudware
                                          .build(params)
         Models::Deployment.create!(
           __config__.current_cluster, name,
-          template: resolve_template(raw_path),
+          template: raw_path,
           replacements: replacements
         )
       end
@@ -94,15 +94,6 @@ module Cloudware
         return unless dep.deployed
         raise InvalidInput, "'#{dep.name}' is already running"
         ERROR
-      end
-
-      def resolve_template(template, error_missing: false)
-        path = Models::Cluster.load(__config__.current_cluster)
-                              .templates
-                              .resolve_human_path(template)
-        return path if path
-        return '' unless error_missing
-        raise InvalidInput, 'Could not resolve template path'
       end
     end
   end
