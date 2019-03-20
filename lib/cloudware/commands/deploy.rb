@@ -99,7 +99,7 @@ module Cloudware
       def resolve_template(template, error_missing: false)
         path = Models::Cluster.load(__config__.current_cluster)
                               .templates
-                              .human_paths[template]
+                              .resolve_human_path(template)
         return path if path
         return '' unless error_missing
         raise InvalidInput, 'Could not resolve template path'

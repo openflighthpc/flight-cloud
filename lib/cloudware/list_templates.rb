@@ -41,6 +41,13 @@ module Cloudware
     end
 
     ##
+    # Resolves CLI inputs to a absolute path
+    #
+    def resolve_human_path(relative)
+      human_paths[relative]
+    end
+
+    ##
     # These represent the valid template CLI inputs
     #
     def human_paths
