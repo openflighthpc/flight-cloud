@@ -65,16 +65,17 @@ module Cloudware
       end
 
       def list_templates(verbose: false)
-        if __config__.current_cluster.templates.empty?
-          raise UserError, 'No templates found'
-        elsif verbose
+        list = Models::Cluster.load(__config__.current_cluster).templates
+        if verbose && list.any?
           list.human_paths.each do |human_path, abs_path|
             puts "#{human_path} => #{abs_path}"
           end
-        else
+        elsif list.any?
           list.shorthand_paths.each do |human_path, _|
             puts human_path
           end
+        else
+          raise UserError, 'No templates found'
         end
       end
 
