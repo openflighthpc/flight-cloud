@@ -39,7 +39,11 @@ module Cloudware
 
       def validate_template_exists
         return if File.exist?(template_path)
-        errors.add(:template, "No such template: #{template_path}")
+        if template_path.empty?
+          errors.add(:template, 'Failed to resolve the template')
+        else
+          errors.add(:template, "No such template: #{template_path}")
+        end
       end
 
       def validate_replacement_tags
