@@ -24,28 +24,16 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
+  # Base errors for all further errors to inherit from
+  class CloudwareError < RuntimeError; end
+  class UserError < CloudwareError; end
+  class InternalError < CloudwareError; end
 
-      def path
-        Config.log_file
-      end
-
-      def warn(msg)
-        super
-      end
-
-      delegate_missing_to :instance
-    end
-  end
-
-  Config.cache
-  FlightConfig.logger = Log
+  # Other errors
+  class ConfigError < CloudwareError; end
+  class InvalidInput < UserError; end
+  class ModelValidationError < UserError; end
+  class InvalidAzureRequest < UserError; end
+  class DeploymentError < UserError; end
 end

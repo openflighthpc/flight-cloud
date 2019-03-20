@@ -1,8 +1,29 @@
+GIT
+  remote: https://github.com/alces-software/commander
+  revision: 6e5b37ea4eb0ecb8a56a478f58ff4e97d591d805
+  specs:
+    commander (4.4.4.pre.alces2)
+      highline (~> 1.7.2)
+
+GIT
+  remote: https://github.com/alces-software/flight_config
+  revision: 0a0137d42fd5d6122e56b827c400bafa93b82520
+  specs:
+    flight_config (0.1.0)
+      fakefs
+      tty-config
+
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.5.2)
-      public_suffix (>= 2.0.2, < 4.0)
+    activemodel (5.2.0)
+      activesupport (= 5.2.0)
+    activesupport (5.2.0)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 0.7, < 2)
+      minitest (~> 5.1)
+      tzinfo (~> 1.1)
+    ast (2.4.0)
     aws-partitions (1.37.0)
     aws-sdk-cloudformation (1.2.0)
       aws-sdk-core (~> 3)
@@ -17,62 +38,37 @@ GEM
     aws-sigv4 (1.0.2)
     azure_mgmt_compute (0.15.1)
       ms_rest_azure (~> 0.9.0)
-    azure_mgmt_network (0.15.1)
-      ms_rest_azure (~> 0.9.0)
     azure_mgmt_resources (0.15.1)
       ms_rest_azure (~> 0.9.0)
+    byebug (10.0.2)
+    coderay (1.1.2)
     colorize (0.8.1)
-    commander (4.4.3)
-      highline (~> 1.7.2)
     concurrent-ruby (1.0.5)
-    declarative (0.0.10)
-    declarative-option (0.1.0)
+    debugger-ruby_core_source (1.3.8)
     diff-lcs (1.3)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
+    equatable (0.5.0)
+    factory_bot (4.8.2)
+      activesupport (>= 3.0.0)
+    fakefs (0.19.2)
     faraday (0.13.1)
       multipart-post (>= 1.2, < 3)
     faraday-cookie_jar (0.0.6)
       faraday (>= 0.7.4)
       http-cookie (~> 1.0.0)
-    google-api-client (0.14.5)
-      addressable (~> 2.5, >= 2.5.1)
-      googleauth (~> 0.5)
-      httpclient (>= 2.8.1, < 3.0)
-      mime-types (~> 3.0)
-      representable (~> 3.0)
-      retriable (>= 2.0, < 4.0)
-    google-cloud-core (1.0.0)
-      google-cloud-env (~> 1.0)
-      googleauth (~> 0.5.1)
-    google-cloud-env (1.0.1)
-      faraday (~> 0.11)
-    google-cloud-resource_manager (0.27.0)
-      google-api-client (~> 0.14.0)
-      google-cloud-core (~> 1.0)
-    googleauth (0.5.3)
-      faraday (~> 0.12)
-      jwt (~> 1.4)
-      logging (~> 2.0)
-      memoist (~> 0.12)
-      multi_json (~> 1.11)
-      os (~> 0.9)
-      signet (~> 0.7)
-    highline (1.7.8)
+    hashie (3.6.0)
+    highline (1.7.10)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
-    httpclient (2.8.3)
+    i18n (1.0.1)
+      concurrent-ruby (~> 1.0)
     ipaddr (1.2.0)
     jmespath (1.3.1)
-    jwt (1.5.6)
-    little-plugger (1.1.4)
-    logging (2.2.2)
-      little-plugger (~> 1.1)
-      multi_json (~> 1.10)
+    kramdown (1.16.2)
     memoist (0.16.0)
-    mime-types (3.1)
-      mime-types-data (~> 3.2015)
-    mime-types-data (3.2016.0521)
+    method_source (0.9.2)
+    minitest (5.11.3)
     ms_rest (0.7.2)
       concurrent-ruby (~> 1.0)
       faraday (~> 0.9)
@@ -82,15 +78,29 @@ GEM
       faraday (~> 0.9)
       faraday-cookie_jar (~> 0.0.6)
       ms_rest (~> 0.7.0)
-    multi_json (1.12.2)
     multipart-post (2.0.0)
-    os (0.9.6)
-    public_suffix (3.0.1)
-    representable (3.0.4)
-      declarative (< 0.1.0)
-      declarative-option (< 0.2.0)
-      uber (< 0.2.0)
-    retriable (3.1.1)
+    necromancer (0.4.0)
+    parallel (1.12.1)
+    parser (2.5.1.0)
+      ast (~> 2.4.0)
+    pastel (0.7.2)
+      equatable (~> 0.5.0)
+      tty-color (~> 0.4.0)
+    pilfer (1.0.2)
+      rblineprof (~> 0.3.2)
+    powerpack (0.1.1)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
+    pry-byebug (3.6.0)
+      byebug (~> 10.0)
+      pry (~> 0.10)
+    rainbow (3.0.0)
+    rake (12.3.2)
+    rblineprof (0.3.7)
+      debugger-ruby_core_source (~> 1.3)
+    require_all (2.0.0)
+    rouge (3.1.1)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
       rspec-expectations (~> 3.7.0)
@@ -106,39 +116,81 @@ GEM
     rspec-support (3.7.0)
     rspec-wait (0.0.9)
       rspec (>= 3, < 4)
-    signet (0.8.1)
-      addressable (~> 2.3)
-      faraday (~> 0.9)
-      jwt (>= 1.5, < 3.0)
-      multi_json (~> 1.10)
-    terminal-table (1.8.0)
-      unicode-display_width (~> 1.1, >= 1.1.1)
+    rubocop (0.52.1)
+      parallel (~> 1.10)
+      parser (>= 2.4.0.2, < 3.0)
+      powerpack (~> 0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (~> 1.0, >= 1.0.1)
+    rubocop-rspec (1.23.0)
+      rubocop (>= 0.52.1)
+    ruby-progressbar (1.9.0)
+    rubyzip (1.2.2)
+    strings (0.1.1)
+      unicode-display_width (~> 1.3.0)
+      unicode_utils (~> 1.4.0)
+    thread_safe (0.3.6)
     timeliness (0.3.8)
-    uber (0.1.0)
+    tty-color (0.4.3)
+    tty-config (0.3.1)
+    tty-cursor (0.6.0)
+    tty-markdown (0.4.0)
+      kramdown (~> 1.16.2)
+      pastel (~> 0.7.2)
+      rouge (~> 3.1.0)
+      strings (~> 0.1.0)
+      tty-color (~> 0.4.2)
+      tty-screen (~> 0.6.4)
+    tty-screen (0.6.5)
+    tty-spinner (0.9.0)
+      tty-cursor (~> 0.6.0)
+    tty-table (0.10.0)
+      equatable (~> 0.5.0)
+      necromancer (~> 0.4.0)
+      pastel (~> 0.7.2)
+      strings (~> 0.1.0)
+      tty-screen (~> 0.6.4)
+    tzinfo (1.2.5)
+      thread_safe (~> 0.1)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.4)
-    unicode-display_width (1.3.0)
-    whirly (0.2.6)
-      unicode-display_width (~> 1.1)
+    unicode-display_width (1.3.3)
+    unicode_utils (1.4.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  activemodel
+  activesupport
   aws-sdk-cloudformation
   aws-sdk-ec2
   azure_mgmt_compute
-  azure_mgmt_network
   azure_mgmt_resources
   colorize
-  commander
-  google-cloud-resource_manager
+  commander!
+  factory_bot
+  fakefs
+  flight_config!
+  hashie
   ipaddr
+  memoist
+  parallel
+  pilfer
+  pry
+  pry-byebug
+  rake
+  require_all
   rspec
   rspec-wait
-  terminal-table
-  whirly
+  rubocop (~> 0.52.1)
+  rubocop-rspec
+  rubyzip
+  tty-markdown
+  tty-spinner
+  tty-table
 
 BUNDLED WITH
-   1.16.0
+   1.16.6

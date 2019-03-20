@@ -24,28 +24,67 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
+  module Providers
+    module Base
+      module HasCredentials
+        def credentials
+          self.class.parent::Credentials.build
+        end
       end
 
-      def path
-        Config.log_file
+      class Credentials
+        def self.build
+          raise NotImplementedError
+        end
       end
 
-      def warn(msg)
-        super
+      class Machine
+        extend Memoist
+        include HasCredentials
+
+        attr_reader :machine_id, :region
+
+        def initialize(machine_id, region)
+          @machine_id = machine_id
+          @region = region
+        end
+
+        def status
+          raise NotImplementedError
+        end
+
+        def off
+          raise NotImplementedError
+        end
+
+        def on
+          raise NotImplementedError
+        end
       end
 
-      delegate_missing_to :instance
+      class Client
+        extend Memoist
+        include HasCredentials
+
+        attr_reader :region
+
+        def initialize(region)
+          @region = region
+        end
+
+        def deploy(_tag, _template)
+          raise NotImplementedError
+        end
+
+        def destroy(_tag)
+          raise NotImplementedError
+        end
+
+        def machine(id)
+          self.class.parent::Machine.new(id, region)
+        end
+      end
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

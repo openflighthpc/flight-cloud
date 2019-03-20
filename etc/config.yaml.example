@@ -1,0 +1,69 @@
+# =============================================================================
+# GETTING STARTED
+# Please COPY this file into place, please leave this example as a reference.
+#
+# cp etc/config.yaml.example etc/config.yaml
+#
+# Only the credentials for the installed providers are required. See comments
+# for details.
+# =============================================================================
+
+# Prefix Tag:
+# The names given to remote resources will be prefixed with this tag. It should
+# be used to distinguish these cloud resources from anything else deployed on
+# your account.
+prefix_tag: # [STRONGLY RECOMMENDED] : Should be unique
+
+# Provider credentials
+azure:                        # Requirement for cloud-azure
+  default_region:   # [VALUE] : Requirement for cloud-azure
+  tenant_id:        # [VALUE] : Requirement for cloud-azure
+  subscription_id:  # [VALUE] : Requirement for cloud-azure
+  client_secret:    # [VALUE] : Requirement for cloud-azure
+  client_id:        # [VALUE] : Requirement for cloud-azure
+
+aws:                            # Requirement for cloud-aws
+  default_region:     # [VALUE] : Requirement for cloud-aws
+  access_key_id:      # [VALUE] : Requirement for cloud-aws
+  secret_access_key:  # [VALUE] : Requirement for cloud-aws
+
+# ADVANCED CONFIGURATION (Optional)
+# =============================================================================
+# Content Directory
+# By default cloudware stores its content within the <install-dir>/var
+# directory. This can be optionally changed to a different location
+# =============================================================================
+# content_directory:
+
+# =============================================================================
+# LOG FILE
+# By default cloudware log into <install-dir>/log directory. It does
+# not setup log rotations on the file. Cloudware can be configured to log
+# somewhere else with the `log_file` key
+# =============================================================================
+# log_directory:
+
+# =============================================================================
+# STATIC PROVIDER
+# The provider can be statically set within the config. This will override
+# the provider set within the binaries (not recommended)
+#
+# NOTE: There is a limited ability to set this with the `CLOUDWARE_PROVIDER`
+# env var if the source code is required directly (but not through bin/*)
+# =============================================================================
+# provider:
+
+# =============================================================================
+# APPNAME
+# The appname is inferred from the filepath that initiated the ruby process.
+# However it can be independently set in the config or with
+# `CLOUDWARE_APP_NAME` env var
+# =============================================================================
+# app_name:
+
+# =============================================================================
+# DEBUG MODE
+# This will turn off the spinner and require the debugging libraries. This can
+# also be set with the `CLOUDWARE_DEBUG` env var
+# =============================================================================
+# debug: true

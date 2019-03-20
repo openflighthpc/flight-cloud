@@ -24,9 +24,40 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/string/strip'
-require 'active_support/core_ext/string/filters'
-
 require 'cloudware/config'
-require 'cloudware/cli'
-require 'cloudware/data'
+
+#
+# NOTE: To future maintainer!
+#
+# Please keep this file as lean as possible. It is design to contain the root
+# path definition between different types of files. It should not contain the
+# path definition for an individual file.
+#
+# When adding a new path, make sure name maps to the arguments!
+#
+# NOTE: Optional: [last_named_argument]
+# The last named argument to these methods should be optional, so calling it
+# without arguments gives the directory. e.g.
+#
+# content_cluster()             => .../clusters
+# content_cluster('my-cluster)  => .../clusters/my-cluster
+#
+# It is however required for all dependent method calls. e.g:
+# content_cluster_template(cluster, [template])
+#
+
+module Cloudware
+  class RootDir
+    def self.content(*parts)
+      File.join(Config.content_path, *parts)
+    end
+
+    def self.content_cluster(*a) # [cluster]
+      content('clusters', *a)
+    end
+
+    def self.content_cluster_template(cluster, *a) # [template]
+      content_cluster(cluster, 'lib/templates', *a)
+    end
+  end
+end

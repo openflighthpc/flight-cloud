@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,32 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
+require 'cloudware/models/deployment'
 
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
+  module Models
+    class Deployments < DelegateClass(Array)
+      def self.read(cluster)
+        new(Deployment.glob_read(cluster, '*'))
       end
 
-      def path
-        Config.log_file
+      def results
+        map(&:results).each_with_object({}) do |results, memo|
+          memo.merge!(results || {})
+        end
       end
 
-      def warn(msg)
-        super
+      def find_by_name(name)
+        find { |deployment| deployment.name == name }
       end
 
-      delegate_missing_to :instance
+      def machines
+        results.keys
+               .map { |k| Models::Machine.name_from_tag(k) }
+               .uniq
+               .reject(&:nil?)
+               .map { |n| Models::Machine.new(name: n, cluster: first.cluster) }
+      end
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

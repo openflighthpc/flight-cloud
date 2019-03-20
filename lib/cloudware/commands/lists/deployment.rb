@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,25 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
+  module Commands
+    module Lists
+      class Deployment < Command
+        def self.delayed_require
+          super
+          require 'cloudware/templaters/deployment_templater'
+        end
 
-      def path
-        Config.log_file
+        def run!(verbose: false, all: false)
+          deployments = Models::Deployments.read(__config__.current_cluster)
+          deployments = deployments.select(&:deployed) unless all
+          return puts 'No Deployments found' if deployments.empty?
+          deployments.each do |d|
+            puts Templaters::DeploymentTemplater.new(d, verbose: verbose)
+                                                .render_info
+          end
+        end
       end
-
-      def warn(msg)
-        super
-      end
-
-      delegate_missing_to :instance
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

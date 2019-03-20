@@ -24,28 +24,25 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
+  module Commands
+    module Lists
+      class Machine < Command
+        include Concerns::MarkdownTemplate
 
-      def path
-        Config.log_file
-      end
+        TEMPLATE = <<~ERB
+          <% if machines.empty? -%>
+          No machines found
+          <% end -%>
+          <% machines.each do |machine| -%>
+          # Machine: '<%= machine.name %>'
+          <% machine.tags.each do |key, value| -%>
+          - *<%= key %>*: <%= value %>
+          <% end -%>
 
-      def warn(msg)
-        super
+          <% end -%>
+        ERB
       end
-
-      delegate_missing_to :instance
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

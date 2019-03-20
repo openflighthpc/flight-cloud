@@ -1,8 +1,8 @@
-# frozen_string_literal: true
+#!/bin/bash
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,7 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
-module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
-
-      def path
-        Config.log_file
-      end
-
-      def warn(msg)
-        super
-      end
-
-      delegate_missing_to :instance
-    end
-  end
-
-  Config.cache
-  FlightConfig.logger = Log
-end
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+export CLOUDWARE_PROVIDER=azure
+export CLOUDWARE_APP_NAME=cloud-azure
+exec $DIR/cloud "$@"

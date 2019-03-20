@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,53 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
+require 'cloudware/root_dir'
+require 'securerandom'
 
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
+  module Models
+    class Cluster
+      include FlightConfig::Updater
+      include FlightConfig::Globber
+
+      def self.create!(cluster)
+        create(cluster) do |config|
+          # Ensure the tag has been assigned
+          config.tag
+        end
+      end
+
+      delegate :provider, to: Config
+
+      attr_reader :identifier
+
+      def initialize(identifier)
+        @identifier = identifier
+      end
+
+      def __data__initialize(data)
+        data.set(:tag, value: SecureRandom.hex(5))
       end
 
       def path
-        Config.log_file
+        RootDir.content_cluster(identifier, 'etc/config.yaml')
       end
 
-      def warn(msg)
-        super
+      def templates
+        @templates ||= ListTemplates.new(identifier)
       end
 
-      delegate_missing_to :instance
+      def region
+        __data__.fetch(:region) { Config.default_region }
+      end
+
+      def tag
+        __data__.fetch(:tag)
+      end
+
+      def deployments
+        Models::Deployments.read(identifier)
+      end
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

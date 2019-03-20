@@ -24,28 +24,15 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
+  module Commands
+    module Powers
+      class On < Power
+        def run_power_command(machine)
+          puts "Turning #{machine.name} on"
+          machine.on
+        end
       end
-
-      def path
-        Config.log_file
-      end
-
-      def warn(msg)
-        super
-      end
-
-      delegate_missing_to :instance
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

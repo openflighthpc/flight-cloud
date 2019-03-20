@@ -1,0 +1,8 @@
+azure:
+  tenant_id:
+  subscription_id:
+  client_secret:
+  client_id:
+aws:
+  access_key_id:
+  secret_access_key:

@@ -24,28 +24,18 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
+require 'active_model'
+require 'active_model/errors'
 
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
+  module Models
+    class Application
+      class << self
+        alias_method 'build', 'new'
       end
 
-      def path
-        Config.log_file
-      end
-
-      def warn(msg)
-        super
-      end
-
-      delegate_missing_to :instance
+      include ActiveModel::Model
+      extend Memoist
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

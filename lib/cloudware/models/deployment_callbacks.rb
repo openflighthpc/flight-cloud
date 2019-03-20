@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,39 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
+  module Models
+    module DeploymentCallbacks
+      def self.included(base)
+        base.class_exec do
+          validate :validate_template_exists
+          validate :validate_replacement_tags
+          validate :validate_cluster
+        end
       end
 
-      def path
-        Config.log_file
+      private
+
+      def validate_template_exists
+        return if File.exist?(template_path)
+        if template_path.empty?
+          errors.add(:template, 'Failed to resolve the template')
+        else
+          errors.add(:template, "No such template: #{template_path}")
+        end
       end
 
-      def warn(msg)
-        super
+      def validate_replacement_tags
+        return unless File.exist?(template_path)
+        template.scan(/%[\w-]*%/).each do |match|
+          errors.add(match, 'Was not replaced in the template')
+        end
       end
 
-      delegate_missing_to :instance
+      def validate_cluster
+        return if cluster
+        errors.add(:cluster, 'No cluster specified')
+      end
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

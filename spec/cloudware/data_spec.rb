@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,41 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
+require 'cloudware/data'
 
-module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
+RSpec.describe Cloudware::Data do
+  let(:content) { { key: 'test content' } }
+  let(:path) { '/tmp/test/file' }
+
+  before { FileUtils.mkdir_p(File.dirname(path)) }
+
+  shared_examples 'a data loader' do
+    describe '#load' do
+      it 'loads the content' do
+        File.write(path, YAML.dump(content))
+        expect(described_class.load(file)).to eq(content)
       end
+    end
 
-      def path
-        Config.log_file
+    describe '#dump' do
+      it 'writes the content to the file path' do
+        described_class.dump(file, content)
+        expect(YAML.load_file(path)).to eq(content)
       end
-
-      def warn(msg)
-        super
-      end
-
-      delegate_missing_to :instance
     end
   end
 
-  Config.cache
-  FlightConfig.logger = Log
+  context 'with a string file path' do
+    let(:file) { path }
+
+    it_behaves_like 'a data loader'
+  end
+
+  context 'with a file point input' do
+    let!(:file) { File.open(path, 'a+') }
+
+    after { file.close }
+
+    it_behaves_like 'a data loader'
+  end
 end

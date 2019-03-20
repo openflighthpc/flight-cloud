@@ -1,15 +1,15 @@
 #!/bin/bash
 #==============================================================================
-# Copyright (C) 2007-2015 Stephen F. Norledge and Alces Software Ltd.
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd.
 #
-# This file/package is part of Alces Cloudware.
+# This file/package is part of Cloudware.
 #
-# Alces Cloudware is free software: you can redistribute it and/or
+# Cloudware is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License
 # as published by the Free Software Foundation, either version 3 of
 # the License, or (at your option) any later version.
 #
-# Alces Cloudware is distributed in the hope that it will be useful,
+# Cloudware is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Affero General Public License for more details.
@@ -17,108 +17,93 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this package.  If not, see <http://www.gnu.org/licenses/>.
 #
-# For more information on the Alces Cloudware, please visit:
+# For more information on the Cloudware, please visit:
 # https://github.com/alces-software/cloudware
 #==============================================================================
-source=$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)
-dep_source="fresh"
-target=/opt/cloudware
-log_file=/var/log/cloudware.log
-os=$1
-source $source/scripts/lib/ui.functions.sh
-source $source/scripts/lib/fetch.functions.sh
-source $source/scripts/lib/install.functions.sh
-source "${source}/scripts/os/${os}.sh"
-deps="ruby bundler components"
+initial_env=$(env)
+alces_INSTALL_DIR="${alces_INSTALL_DIR:-/opt/flight/tools}"
+alces_VERSION="${alces_VERSION:-2019.1.0.rc6}"
 
-cat <<EOF
-[33m===============================================================================
- STARTING INSTALLATION
-===============================================================================[0m
+#==============================================================================
+# DON'T EDIT ANYTHING UNDER HERE
+#==============================================================================
+
+# Check for Flight Core
+if [ ! -x /opt/flight/bin/bundle ]; then
+    echo "Unable to install; no Flight Core environment was found."
+    exit 1
+fi
+
+
+# Detect whether script is being curled or run locally from within `scripts` directory
+SCRIPT_PARENT_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+SCRIPT_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+SCRIPT_BASE=$(basename $SCRIPT_PATH)
+
+if [[ $SCRIPT_BASE != "scripts" ]] ; then 
+    CLONE=true
+    CHECKOUT=true
+else
+    CLONE=""
+    alces_INSTALL_DIR=$SCRIPT_PARENT_PATH
+    # Check if alces_VERSION was specified on CLI
+    if echo "$initial_env" |grep -q '^alces_VERSION' ; then
+        CHECKOUT=true
+    else
+        CHECKOUT=""
+    fi
+fi
+
+# Create install dir
+mkdir -p $alces_INSTALL_DIR
+cd $alces_INSTALL_DIR
+
+if [ ! -z $CLONE ] ; then
+    # Install tool
+    git clone https://github.com/alces-software/cloudware
+fi
+
+cd cloudware
+
+if [ ! -z $CHECKOUT ] ; then
+    git checkout $alces_VERSION
+fi
+
+# Install dependencies
+flexec bundle install --path=vendor --without development test
+
+# Setup command file
+for platform in aws azure ; do
+
+cat << EOF > /opt/flight/libexec/commands/cloud-$platform
+: '
+: NAME: cloud-$platform
+: SYNOPSIS: Cloud deployment tools for $platform
+: VERSION: $alces_VERSION
+: '
+#==============================================================================
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd.
+#
+# This file/package is part of Cloudware.
+#
+# Cloudware is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License
+# as published by the Free Software Foundation, either version 3 of
+# the License, or (at your option) any later version.
+#
+# Cloudware is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this package.  If not, see <http://www.gnu.org/licenses/>.
+#
+# For more information on the Cloudware, please visit:
+# https://github.com/alces-software/cloudware
+#==============================================================================
+cd $alces_INSTALL_DIR/cloudware/
+flexec bundle exec bin/cloud-$platform "\$@"
 EOF
 
-mkdir -p ${source}/tmp/log ${source}/tmp/src ${source}/tmp/build
-dep_logs="${source}/tmp/log"
-dep_build="${source}/tmp/build"
-dep_src="${source}/tmp/src"
-
-title 'Configuring system'
-doing 'Creating required directories'
-mkdir -p ${target}
-mkdir -p ${target}/etc
-cp -R "${source}/"{Gemfile,Gemfile.lock,bin,lib,providers} "${target}"
-say_done $?
-
-doing 'Creating example configuration file'
-if [[ ! -f $target/etc/config.yml ]]; then
-  cat << EOF > $target/etc/config.yml
----
-general:
-  log_file: '/var/log/cloudware.log'
-
-provider:
-  aws:
-    access_key_id: ''
-    secret_access_key: ''
-  azure:
-    tenant_id: ''
-    subscription_id: ''
-    client_secret: ''
-    client_id: ''
-EOF
-fi
-say_done $?
-doing 'Creating log file'
-if [[ ! -f $log_file ]]; then
-  touch $log_file
-  chmod 644 $log_file
-fi
-say_done $?
-
-title 'Installing prerequisites'
-doing 'Base'
-install_base_prerequisites &> "${dep_logs}/base-prereeqs.log"
-say_done $?
-
-for dep in ${deps}; do
-  source "${source}/scripts/dependencies/${dep}.sh"
-  if ! detect_${dep}; then
-    fetch_${dep}
-    install_${dep}
-  fi
 done
-
-title 'Configuring profile'
-doing 'Adding Ruby to $PATH'
-echo "PATH=\"\${PATH}:${target}/opt/ruby/bin\"" > /etc/profile.d/cloudware.sh
-PATH="${PATH}:${target}/opt/ruby/bin"
-say_done $?
-doing 'Adding Cloudware to $PATH'
-echo "PATH=\"\${PATH}:${target}/bin\"" >> /etc/profile.d/cloudware.sh
-PATH="${PATH}:${target}/bin"
-say_done $?
-doing 'Adding $CLOUDWARE_CONFIG to environment'
-cat << EOF >> /etc/profile.d/cloudware.sh
-if [ -f \$HOME/.cloudware.yml ] ; then
-    export CLOUDWARE_CONFIG=\$HOME/.cloudware.yml
-fi
-EOF
-say_done $?
-
-cat <<EOF
-[33m
-===============================================================================
- INSTALLATION COMPLETE
-===============================================================================
-[0m[1m
-Global profile scripts have been installed in:
-
-    - /etc/profile.d/cloudware.sh
-
-Please login again, or manually run the following:
-
-    $ source /etc/profile.d/cloudware.sh
-
-Execute 'cloudware --help' for further information.
-[0m
-EOF

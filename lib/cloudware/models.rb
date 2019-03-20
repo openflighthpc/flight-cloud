@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,10 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
+require 'require_all'
 
-module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
+[
+  'lib/cloudware/models/concerns/**/*.rb',
+  'lib/cloudware/models/**/*.rb',
+].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
 
-      def path
-        Config.log_file
-      end
-
-      def warn(msg)
-        super
-      end
-
-      delegate_missing_to :instance
-    end
-  end
-
-  Config.cache
-  FlightConfig.logger = Log
-end

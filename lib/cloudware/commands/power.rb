@@ -24,28 +24,33 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
+  module Commands
+    module Powers
+      class Power < Command
+        attr_reader :identifier
 
-      def path
-        Config.log_file
-      end
+        def run
+          @identifier = argv[0]
+          machines.each { |m| run_power_command(m) }
+        end
 
-      def warn(msg)
-        super
-      end
+        def run_power_command(_machine)
+          raise NotImplementedError
+        end
 
-      delegate_missing_to :instance
+        private
+
+        def machines
+          if options.group
+            Deployments.read(__config__.current_cluster)
+                       .machines
+                       .select { |m| m.groups.include?(identifier) }
+          else
+            [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
+          end
+        end
+      end
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

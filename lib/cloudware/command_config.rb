@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,39 @@
 # ==============================================================================
 #
 
+require 'cloudware/config'
 require 'active_support/core_ext/module/delegation'
-require 'logger'
 
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
+  class CommandConfig
+    include FlightConfig::Updater
+    allow_missing_read
 
-      def path
-        Config.log_file
-      end
+    delegate_missing_to Config
 
-      def warn(msg)
-        super
-      end
+    def path
+      File.join(content_path, 'etc/config.yaml')
+    end
 
-      delegate_missing_to :instance
+    def current_cluster
+      __data__.fetch(:current_cluster) do
+        path = Models::Cluster.new('default').path
+        return 'default' if File.exists?(path)
+        Models::Cluster.create('default').identifier
+      end
+    end
+
+    def current_cluster=(cluster)
+      __data__.set(:current_cluster, value: cluster)
+    end
+
+    def region
+      @region ||= Config.default_region
+    end
+
+    def region=(region)
+      @region = region
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end
+

@@ -1,2 +1,10 @@
 *.swp
 .vagrant/
+tmp/
+var/
+log/
+etc/config.*
+!etc/config.yaml.example
+!etc/config.yaml.travis
+vendor/
+.bundle/

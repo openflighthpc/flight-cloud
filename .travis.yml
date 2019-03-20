@@ -1,0 +1,13 @@
+
+language: ruby
+dist: trusty
+rvm:
+ - 2.4.1
+sudo: required
+install:
+  - cp ./etc/config.yaml.travis ./etc/config.yaml
+  - touch /tmp/travis.log
+  - bundle install
+script:
+  - export CLOUDWARE_PROVIDER=aws
+  - rspec

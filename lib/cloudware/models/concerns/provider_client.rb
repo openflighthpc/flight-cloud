@@ -24,28 +24,28 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
+  module Models
+    module Concerns
+      module ProviderClient
+        extend Memoist
 
-      def path
-        Config.log_file
-      end
+        delegate :provider, to: Config
 
-      def warn(msg)
-        super
-      end
+        private
 
-      delegate_missing_to :instance
+        def provider_client
+          if provider == 'aws'
+            require 'cloudware/providers/aws_interface'
+            mod = Providers::AWSInterface
+          else
+            require 'cloudware/providers/azure_interface'
+            mod = Providers::AzureInterface
+          end
+          mod::Client.new(region)
+        end
+        memoize :provider_client
+      end
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

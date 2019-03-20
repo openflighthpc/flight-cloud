@@ -1,0 +1,118 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "myclustermynodepubIP",
+      "apiVersion": "2017-03-01",
+      "tags": {
+        "Name": "%deployment_name%",
+        "alcescluster": "%deployment_name%"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "idleTimeoutInMinutes": 30,
+        "dnsSettings": {
+          "domainNameLabel": "%deployment_name%"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "myclustermynodenetwork1interface",
+      "apiVersion": "2017-03-01",
+      "tags": {
+        "Name": "%deployment_name%",
+        "alcescluster": "%deployment_name%"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "ipConfigurations": [{
+          "name": "myclustermynodenetwork1ip",
+          "properties": {
+            "privateIPAllocationMethod": "Dynamic",
+            "publicIPAddress": {
+              "id": "[resourceId('Microsoft.Network/publicIpAddresses', 'myclustermynodepubIP')]"
+            },
+            "subnet": {
+              "id": "%network1SubnetID%"
+            }
+          }
+        }],
+        "networkSecurityGroup": {
+          "id": "%securitygroup%"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIpAddresses', 'myclustermynodepubIP')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "myclustermynode",
+      "apiVersion": "2016-04-30-preview",
+      "tags": {
+        "Name": "%deployment_name%",
+        "alcescluster": "%deployment_name%"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "hardwareProfile": {
+	  "vmSize": "Standard_DS3_v2"
+	},
+        "storageProfile": {
+	  "imageReference": {
+            "publisher": "OpenLogic",
+            "offer": "CentOS",
+            "sku": "7.3",
+            "version": "latest"
+	  },
+	  "osDisk": {
+	    "createOption": "fromImage",
+	    "managedDisk": {
+              "storageAccountType": "Premium_LRS"
+	    }
+	  }
+	},
+	"osProfile": {
+          "computerName": "mynode.pri.mycluster.cluster.local",
+          "adminUsername": "alces",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+            "publicKeys": [{
+              "path": "[concat ('/home/alces', '/.ssh/authorized_keys')]",
+              "keyData": "%publicsshkey%"
+              }]
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+          {
+	    "id": "[resourceId('Microsoft.Network/networkInterfaces', 'myclustermynodenetwork1interface')]",
+	    "properties": {
+	      "primary": true
+	    }
+          }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', 'myclustermynodenetwork1interface')]"
+      ]  
+    }
+  ],
+  "outputs": {
+    "%deployment_name%TAGID": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Compute/virtualMachines/', 'myclustermynode')]"
+    },
+    "%deployment_name%TAGIP": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', 'myclustermynodepubIP')).ipAddress]"
+    }
+  }
+}    

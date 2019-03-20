@@ -1,28 +1,42 @@
-#==============================================================================
-# Copyright (C) 2017 Stephen F. Norledge and Alces Software Ltd.
+# frozen_string_literal: true
+
 #
-# This file/package is part of Alces Cloudware.
+# =============================================================================
+# Copyright (C) 2019 Stephen F. Norledge and Alces Software Ltd
 #
-# Alces Cloudware is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation, either version 3 of
-# the License, or (at your option) any later version.
+# This file is part of Alces Cloudware.
+#
+# Alces Cloudware is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
 #
 # Alces Cloudware is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this package.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Affero General Public License
+# along with Alces Cloudware.  If not, see <http://www.gnu.org/licenses/>.
 #
 # For more information on the Alces Cloudware, please visit:
 # https://github.com/alces-software/cloudware
-#==============================================================================
+# ==============================================================================
+#
+
 require 'commander'
-require 'terminal-table'
-require 'colorize'
-require 'whirly'
+
+require 'cloudware/command'
+require 'cloudware/log'
+require 'cloudware/version'
+
+require 'require_all'
+
+# Require all the following paths
+[
+  'lib/cloudware/commands/concerns/**/*.rb',
+  'lib/cloudware/commands/**/*.rb',
+].each { |path| require_all File.join(Cloudware::Config.root_dir, path) }
 
 module Cloudware
   class CLI
@@ -30,390 +44,246 @@ module Cloudware
     extend Commander::UI::AskForClass
     extend Commander::Delegates
 
-    program :name, 'cloudware'
-    program :version, '0.0.1'
+    program :name, Config.app_name
+    program :version, Cloudware::VERSION
     program :description, 'Cloud orchestration tool'
+    program :help_paging, false
 
-    command :'domain create' do |c|
-      c.syntax = 'cloudware domain create [options]'
-      c.description = 'Create a new domain'
-      c.option '--name NAME', String, 'Name of cloud domain'
-      c.option '--networkcidr CIDR', String, 'Entire network CIDR, e.g. 10.0.0.0/16. The prv and mgt subnet must be within this range'
-      c.option '--provider NAME', String, 'Cloud service provider name'
-      c.option '--prvsubnetcidr NAME', String, 'Prv subnet CIDR'
-      c.option '--mgtsubnetcidr NAME', String, 'Mgt subnet CIDR'
-      c.option '--region NAME', String, 'Provider region to create domain in'
-      c.action do |_args, options|
-        begin
-          d = Cloudware::Domain.new
+    silent_trace!
 
-          options.name = ask('Domain identifier: ') if options.name.nil?
-          d.name = options.name.to_s
-
-          options.provider = choose('Provider name?', :aws, :azure, :gcp) if options.provider.nil?
-
-          options.region = ask('Provider region: ') if options.region.nil?
-          d.region = options.region.to_s
-
-          options.networkcidr = ask('Network CIDR: ') if options.networkcidr.nil?
-          d.networkcidr = options.networkcidr.to_s
-
-          options.prvsubnetcidr = ask('Prv subnet CIDR: ') if options.prvsubnetcidr.nil?
-          d.prvsubnetcidr = options.prvsubnetcidr.to_s
-
-          options.mgtsubnetcidr = ask('Mgt subnet CIDR: ') if options.mgtsubnetcidr.nil?
-          d.mgtsubnetcidr = options.mgtsubnetcidr.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Verifying network CIDR is valid'.bold, stop: '[OK]'.green
-          raise("Network CIDR #{options.networkcidr} is not a valid IPV4 address") unless d.valid_cidr?(options.networkcidr.to_s)
-          Whirly.status = 'Verifying prv subnet CIDR is valid'.bold
-          raise("Prv subnet CIDR #{options.prvsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.prvsubnetcidr.to_s)
-          Whirly.status = 'Verifying mgt subnet CIDR is valid'.bold
-          raise("Mgt subnet CIDR #{options.mgtsubnetcidr} is not valid for network cidr #{options.networkcidr}") unless d.is_valid_subnet_cidr?(options.networkcidr.to_s, options.mgtsubnetcidr.to_s)
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Checking domain name is valid'.bold, stop: '[OK]'.green
-          raise("Domain name #{options.name} is not valid") unless d.valid_name?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Checking domain does not already exist'.bold, stop: '[OK]'.green
-          raise("Domain name #{options.name} already exists") if d.exists?
-          d.provider = options.provider.to_s
-          Whirly.status = 'Verifying provider is valid'.bold
-          raise("Provider #{options.provider} does not exist") unless d.valid_provider?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Creating new deployment'.bold, stop: '[OK]'.green
-          d.create
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed while creating domain: #{error.message}")
-          raise error.message
-        end
-      end
+    def self.run!
+      # Display the help if there is no input arguments
+      ARGV.push '--help' if ARGV.empty?
+      Log.info "Run (CLI): #{ARGV.join(' ')}"
+      super
     end
 
-    command :'domain list' do |c|
-      c.syntax = 'cloudware domain list [options]'
-      c.description = 'List created domains'
-      c.option '--provider NAME', String, 'Cloud provider name to filter by'
-      c.option '--region NAME', String, 'Cloud provider region to filter by'
-      c.action do |_args, options|
+    def self.action(command, klass, method: :run!)
+      command.action do |args, options|
+        hash = options.__hash__
+        hash.delete(:trace)
         begin
-          d = Cloudware::Domain.new
-          d.provider = [options.provider] unless options.provider.nil?
-          d.region = options.region.to_s unless options.region.nil?
-          d.name = options.name.to_s unless options.name.nil?
-
-          # Exit if the provider is not in the config list (which verifies details ahead of time)
-          if (Cloudware.config.instance_variable_get(:@providers) & d.provider).empty?
-            raise "The provider #{d.provider.join(',')} is not a valid provider - unknown or missing login details"
-          end
-
-          r = []
-          Whirly.start spinner: 'dots2', status: 'Fetching available domains'.bold, stop: '[OK]'.green
-          raise('No available domains') if d.list.nil?
-          Whirly.stop
-          d.list.each do |k, v|
-            r << [k, v[:network_cidr], v[:prv_subnet_cidr], v[:mgt_subnet_cidr], v[:provider], v[:region]]
-          end
-          table = Terminal::Table.new headings: ['Domain name'.bold,
-                                                 'Network CIDR'.bold,
-                                                 'Prv Subnet CIDR'.bold,
-                                                 'Mgt Subnet CIDR'.bold,
-                                                 'Provider'.bold,
-                                                 'Region'.bold],
-                                      rows: r
-          puts table
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when listing domains: #{error.message}")
-          raise error.message
-        end
-      end
-    end
-
-    command :'domain destroy' do |c|
-      c.syntax = 'cloudware domain destroy [options]'
-      c.description = 'Destroy a machine'
-      c.option '--name NAME', String, 'Domain name'
-      c.action do |_args, options|
-        begin
-          d = Cloudware::Domain.new
-
-          options.name = ask('Domain name: ') if options.name.nil?
-          d.name = options.name.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Checking domain exists'.bold, stop: '[OK]'.green
-          raise("Domain name #{options.name} does not exist") unless d.exists?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: "Destroying domain #{options.name}".bold, stop: '[OK]'.green
-          d.destroy
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed destroying domain: #{error.message}")
-          raise error.message
-        end
-      end
-    end
-
-    command :'machine create' do |c|
-      c.syntax = 'cloudware machine create [options]'
-      c.description = 'Create a new machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain name'
-      c.option '--role NAME', String, 'Machine role to inherit (master or slave)'
-      c.option '--prvip ADDR', String, 'Prv subnet IP address'
-      c.option '--mgtip ADDR', String, 'Mgt subnet IP address'
-      c.option '--type NAME', String, 'Flavour of machine type to deploy, e.g. medium'
-      c.option '--flavour NAME', String, 'Type of machine to deploy, e.g. gpu'
-      c.action do |_args, options|
-        begin
-          options.default flavour: 'compute', type: 'small'
-
-          m = Cloudware::Machine.new
-          d = Cloudware::Domain.new
-
-          m.type = options.type.to_s
-          m.flavour = options.flavour.to_s
-
-          options.name = ask('Machine name: ') if options.name.nil?
-          m.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          m.domain = options.domain.to_s
-          d.name = options.domain.to_s
-
-          options.role = choose('Machine role?', :master, :slave) if options.role.nil?
-          m.role = options.role.to_s
-
-          options.prvip = ask('Prv subnet IP: ') if options.prvip.nil?
-          m.prvip = options.prvip.to_s
-
-          options.mgtip = ask('Mgt subnet IP: ') if options.mgtip.nil?
-          m.mgtip = options.mgtip.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Verifying domain exists'.bold, stop: '[OK]'.green
-          raise("Domain #{options.domain} does not exist") unless m.valid_domain?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Checking machine name is valid'.bold, stop: '[OK]'.green
-          raise("Machine name #{options.name} is not a valid machine name") unless m.validate_name?
-          Whirly.status = 'Verifying prv IP address'.bold
-          raise("Invalid prv IP address #{options.prvip} in subnet #{d.get_item('prv_subnet_cidr')}") unless m.valid_ip?(d.get_item('prv_subnet_cidr').to_s, options.prvip.to_s)
-          Whirly.status = 'Verifying mgt IP address'.bold
-          raise("Invalid mgt IP address #{options.mgtip} in subnet #{d.get_item('mgt_subnet_cidr')}") unless m.valid_ip?(d.get_item('mgt_subnet_cidr').to_s, options.mgtip.to_s)
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: 'Creating new deployment'.bold, stop: '[OK]'.green
-          m.create
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when creating machine: #{error.message}")
-          raise error.message
-        end
-      end
-    end
-
-    command :'machine list' do |c|
-      c.syntax = 'cloudware machine list'
-      c.option '--provider NAME', String, 'Cloud provider to show machines for'
-      c.description = 'List available machines'
-      c.action do |_args, options|
-        begin
-          m = Cloudware::Machine.new
-          m.provider = [options.provider] if ! options.provider.nil? 
-
-          # Exit if the provider is not in the config list (which verifies details ahead of time)
-          if (Cloudware.config.instance_variable_get(:@providers) & m.provider).empty?
-            raise "The provider #{m.provider.join(',')} is not a valid provider - unknown or missing login details"
-          end
-
-          r = []
-          Whirly.start spinner: 'dots2', status: 'Fetching available machines'.bold, stop: '[OK]'.green
-          raise('No available machines') if m.list.nil?
-          Whirly.stop
-          m.list.each do |_k, v|
-            r << [v[:name], v[:domain], v[:role], v[:prv_ip], v[:mgt_ip], v[:type], v[:state]]
-          end
-          table = Terminal::Table.new headings: ['Name'.bold,
-                                                 'Domain'.bold,
-                                                 'Role'.bold,
-                                                 'Prv IP address'.bold,
-                                                 'Mgt IP address'.bold,
-                                                 'Type'.bold,
-                                                 'State'.bold],
-                                      rows: r
-          puts table
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed listing machines: #{error.message}")
-          raise error.message
-        end
-      end
-    end
-
-    command :'machine info' do |c|
-      c.syntax = 'cloudware machine info [options]'
-      c.description = 'List detailed information about a given machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain name'
-      c.option '--output TYPE', String, 'Output type [table]. Default: table'
-      c.action do |_args, options|
-        begin
-          options.default output: 'table'
-          m = Cloudware::Machine.new
-          options.domain = ask('Domain name?') if options.domain.nil?
-          options.name = ask('Machine name?') if options.name.nil?
-          m.name = options.name.to_s
-          m.domain = options.domain.to_s
-
-          case options.output.to_s
-          when 'table'
-            table = Terminal::Table.new do |t|
-              Whirly.start spinner: 'dots2', status: 'Fetching machine info'.bold, stop: '[OK]'.green
-              t.add_row ['Machine name'.bold, m.name]
-              t.add_row ['Domain name'.bold, m.get_item('domain')]
-              t.add_row ['Machine role'.bold, m.get_item('role')]
-              t.add_row ['Prv subnet IP'.bold, m.get_item('prv_ip')]
-              t.add_row ['Mgt subnet IP'.bold, m.get_item('mgt_ip')]
-              t.add_row ['External IP'.bold, m.get_item('ext_ip')]
-              t.add_row ['Machine state'.bold, m.get_item('state')]
-              t.add_row ['Machine type'.bold, m.get_item('type')]
-              t.add_row ['Machine flavour'.bold, m.get_item('flavour')]
-              t.add_row ['Provider'.bold, m.get_item('provider')]
-              Whirly.stop
-              t.style = { all_separators: true }
+          begin
+            cmd = klass.new
+            if hash.empty?
+              cmd.public_send(method, *args)
+            else
+              cmd.public_send(method, *args, **hash)
             end
-            puts table
+          rescue Interrupt
+            raise RuntimeError, 'Received Interrupt!'
           end
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed fetching info for machine: #{error.message}")
-          raise error.message
+        rescue StandardError => e
+          Log.fatal(e.message)
+          raise e
         end
       end
     end
 
-    command :'machine destroy' do |c|
-      c.syntax = 'cloudware machine destroy [options]'
-      c.description = 'Destroy a machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          m = Cloudware::Machine.new
-
-          options.name = ask('Machine name: ') if options.name.nil?
-          m.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          m.domain = options.domain.to_s
-
-          Whirly.start spinner: 'dots2', status: 'Checking machine exists'.bold, stop: '[OK]'.green
-          raise('Machine does not exist') unless m.exists?
-          Whirly.stop
-
-          Whirly.start spinner: 'dots2', status: "Destroying #{options.name} in domain #{options.domain}".bold, stop: '[OK]'.green
-          m.destroy
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed destroying machine: #{error.message}")
-          raise error.message
-        end
-      end
+    def self.cli_syntax(command, args_str = '')
+      command.hidden = true if command.name.split.length > 1
+      command.syntax = <<~SYNTAX.squish
+        #{program(:name)} #{command.name} #{args_str} [options]
+      SYNTAX
     end
 
-    command :'machine power status' do |c|
-      c.syntax = 'cloudware machine power status [options]'
-      c.description = 'Check the power status of a machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          puts "#{options.name}: Power status is #{machine.get_item('state')}"
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when checking machine power status: #{error.message}")
-          raise error.message
-        end
-      end
+    command 'cluster' do |c|
+      cli_syntax(c)
+      c.sub_command_group = true
+      c.summary = 'Manage the current cluster selection'
     end
 
-    command :'machine power on' do |c|
-      c.syntax = 'cloudware machine power on [options]'
-      c.description = 'Turn a machine on'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          Whirly.start spinner: 'dots2', status: "Powering on machine #{options.name}".bold, stop: '[OK]'.green
-          machine.power_on
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when powering on machine: #{error.message}")
-          raise error.message
-        end
-      end
+    command 'cluster init' do |c|
+      cli_syntax(c, 'CLUSTER')
+      c.summary = 'Create a new cluster'
+      c.description = <<~DESC
+        Create a new cluster that can be identified by CLUSTER. The cluster
+        must not already exist. Use the `--import` option to import templates
+        into your new cluster. See `#{Config.app_name} import` for further
+        details.
+      DESC
+      c.option '--import PATH', String, 'Specify a zip file to import'
+      action(c, Commands::ClusterCommand, method: :init)
     end
 
-    command :'machine power off' do |c|
-      c.syntax = 'cloudware machine power off [options]'
-      c.description = 'Turn a machine off'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
-
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
-
-          Whirly.start spinner: 'dots2', status: "Powering off machine #{options.name}".bold, stop: '[OK]'.green
-          machine.power_off
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when powering off machine: #{error.message}")
-          raise error.message
-        end
-      end
+    command 'cluster switch' do |c|
+      cli_syntax(c, 'CLUSTER')
+      c.summary = 'Change the current cluster to CLUSTER'
+      action(c, Commands::ClusterCommand, method: :switch)
     end
 
-    command :'machine rebuild' do |c|
-      c.syntax = 'cloudware machine rebuild [options]'
-      c.description = 'Rebuild a machine'
-      c.option '--name NAME', String, 'Machine name'
-      c.option '--domain NAME', String, 'Domain identifier'
-      c.action do |_args, options|
-        begin
-          machine = Cloudware::Machine.new
-          options.name = ask('Machine name: ') if options.name.nil?
-          machine.name = options.name.to_s
+    command 'cluster delete' do |c|
+      cli_syntax(c, 'CLUSTER')
+      c.summary = 'Destroys the deployments and deletes the cluster'
+      action(c, Commands::ClusterCommand, method: :delete)
+    end
 
-          options.domain = ask('Domain identifier: ') if options.domain.nil?
-          machine.domain = options.domain.to_s
+    command 'deploy' do |c|
+      cli_syntax(c, 'NAME [TEMPLATE]')
+      c.summary = 'Deploy new resource(s) define by a template'
+      c.description = <<-DESC.strip_heredoc
+        When called with a single argument, it will deploy a currently existing
+        deployment: NAME. This will result in an error if the deployment does
+        not exist or is currently in a deployed state.
 
-          Whirly.start spinner: 'dots2', status: "Recreating machine #{options.name}".bold, stop: '[OK]'.green
-          machine.rebuild
-          Whirly.stop
-        rescue RuntimeError => error
-          Cloudware.log.error("Failed when rebuilding machine: #{error.message}")
-          raise error.message
-        end
-      end
+        Calling it with a second argument will try and create a nem deployment
+        called NAME with the specified TEMPLATE. The TEMPLATE references the
+        internal template which have been imported. Alternatively it can be
+        an absolute path to a template file.
+
+        In either case, the template is read and sent to the provider. The
+        template is read each time it is re-deployed. Be careful not to delete
+        or modify it.
+
+        The templates also support basic rendering of parameters from the
+        command line. This is intended to provide minor tweaks to the templates
+        (e.g. IPs or names).
+      DESC
+      c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
+               String, 'A space separated list of keys to be replaced'
+      action(c, Commands::Deploy)
+    end
+
+    command 'destroy' do |c|
+      cli_syntax(c, 'NAME')
+      c.summary = 'Stop a running deployment'
+      action(c, Commands::Destroy)
+    end
+
+    command 'delete' do |c|
+      cli_syntax(c, 'NAME')
+      c.summary = 'Remove the deployments configuration file'
+      c.description = <<~DESC
+        Deletes the confiuration file for the deployment NAME. This action
+        will error if the resources are currently running. The resources can
+        be stop using the 'destroy' command.
+
+        The configuration of a currently running deployment can be deleted
+        using the '--force' flag. This will not destroy the remote resources
+      DESC
+      c.option '--force', 'Delete the deployment regardless if running'
+      action(c, Commands::Destroy, method: :delete)
+    end
+
+    command 'import' do |c|
+      cli_syntax(c, 'ZIP_PATH')
+      c.summary = 'Add templates to the cluster'
+      c.description = <<~DESC.split("\n\n").map(&:squish).join("\n")
+        Imports the '#{Config.provider}' templates into the internal cache. The
+        ZIP_PATH must be a zip file containing an '#{Config.provider}'
+        directory.\n\n
+
+        These templates can then be used to deploy resource using:\n
+        #{Config.app_name} deploy foo template
+      DESC
+      action(c, Commands::Import)
+    end
+
+    command 'list' do |c|
+      cli_syntax(c)
+      c.sub_command_group = true
+      c.summary = 'List the deployed cloud resources'
+    end
+
+    list_clusters_proc = proc do |c|
+      cli_syntax(c)
+      c.summary = 'Show the current and available clusters'
+      c.description = <<~DESC
+        Shows a list of clusters that have been previously deployed to
+      DESC
+      action(c, Commands::ClusterCommand, method: :list)
+    end
+
+    command('list clusters', &list_clusters_proc)
+    command('cluster list', &list_clusters_proc)
+
+    command 'list deployments' do |c|
+      cli_syntax(c)
+      c.description = 'List all the previous deployed templates'
+      c.option '-a', '--all', 'Include offline deployments'
+      c.option '-v', '--verbose', 'Show full error messages'
+      action(c, Commands::Lists::Deployment)
+    end
+
+    command 'list machines' do |c|
+      cli_syntax(c)
+      c.summary = 'List all the previous deployed machines'
+      c.description = <<~DESC
+        List the machines created within a previous deployment. This command
+        does not poll the provider for any information.
+
+        Instead it list the deployment outputs which follow the machine tag
+        format: `<machine-name>TAG<key>`
+      DESC
+      action(c, Commands::Lists::Machine)
+    end
+
+    command 'list templates' do |c|
+      cli_syntax(c)
+      c.summary = 'Lists the available templates for the cluster'
+      c.description = <<~DESC
+        Lists the templates for a particular cluster. These templates
+        can be used directly with the `deploy` command.
+
+        By default the template name is not required if it can be
+        unambiguously determined from the directory name. Use the
+        verbose option to see the full template paths
+      DESC
+      c.option '--verbose', 'Show the shorthand mappings'
+      action(c, Commands::Deploy, method: :list_templates)
+    end
+
+    command 'power' do |c|
+      cli_syntax(c)
+      c.sub_command_group = true
+      c.description = 'Start or stop machine and check their power status'
+    end
+
+    def self.shared_power_attr(c)
+      action = c.name.split.last
+      cli_attr = 'IDENTIFIER'
+      cli_syntax(c, cli_attr)
+      c.option '-g', '--group', <<~DESC
+        Preform the '#{action}' action on machine in group '#{cli_attr}'
+      DESC
+    end
+
+    command 'power status' do |c|
+      shared_power_attr(c)
+      c.description = 'Check the power state of a machine'
+      action(c, Commands::Powers::Status)
+    end
+
+    command 'power off' do |c|
+      shared_power_attr(c)
+      c.description = 'Turn the machine off'
+      action(c, Commands::Powers::Off)
+    end
+
+    command 'power on' do |c|
+      shared_power_attr(c)
+      c.description = 'Turn the machine on'
+      action(c, Commands::Powers::On)
+    end
+
+    command 'render' do |c|
+      cli_syntax(c, 'NAME [TEMPLATE]')
+      c.summary = 'Return the template for an existing or new deployment'
+      c.description = <<~DESC
+        Renders the template for the `NAME` deployment. Existing deployments
+        will always render the saved template and replacements.
+
+        If the deployment does not exist, the `TEMPLATE` and `--params`
+        options are used instead. See the 'deploy' command for valid inputs
+        for these inputs.
+      DESC
+      c.option '-t', '--template PATH', String, <<~DESC
+        Template path for a new deployment
+      DESC
+      c.option '--params STRING', String, <<~DESC
+        Values to be replaced for a new deployment
+      DESC
+      action(c, Commands::Deploy, method: :render)
     end
   end
 end

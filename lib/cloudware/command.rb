@@ -2,7 +2,7 @@
 
 #
 # =============================================================================
-# Copyright (C) 2018 Stephen F. Norledge and Alces Software Ltd
+# Copyright (C) 2019 Stephen F. Norledge and Alces Flight Ltd
 #
 # This file is part of Alces Cloudware.
 #
@@ -24,28 +24,50 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
+require 'cloudware/spinner'
+require 'cloudware/log'
+require 'cloudware/command_config'
+require 'memoist'
 
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
+  class Command
+    extend Memoist
+    include WithSpinner
 
-      def path
-        Config.log_file
-      end
+    # Override this method to delay requiring libraries until the command is
+    # called. Remember to `super`
+    def self.delayed_require
+      require 'cloudware/models'
+    end
 
-      def warn(msg)
-        super
-      end
+    attr_reader :__config__
 
-      delegate_missing_to :instance
+    def initialize(__config__ = nil)
+      self.class.delayed_require
+      @__config__ = __config__ || CommandConfig.read
+    end
+
+    def run!(*argv, **options)
+      class << self
+        attr_reader :argv, :options
+      end
+      @argv = argv.freeze
+      @options = OpenStruct.new(options)
+      run
+    end
+
+    def run
+      raise NotImplementedError
+    end
+
+    def region
+      __config__.region
+    end
+
+    private
+
+    def _render(template)
+      ERB.new(template, nil, '-').result(binding)
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

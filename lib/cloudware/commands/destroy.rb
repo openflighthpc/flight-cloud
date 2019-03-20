@@ -24,28 +24,30 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
+  module Commands
+    class Destroy < Command
+      attr_reader :name
 
-      def path
-        Config.log_file
-      end
-
-      def warn(msg)
+      def initialize(*a)
+        require 'cloudware/models/deployment'
         super
       end
 
-      delegate_missing_to :instance
+      def run
+        @name = argv[0]
+        with_spinner('Destroying resources...', done: 'Done') do
+          Models::Deployment.destroy!(__config__.current_cluster, name)
+        end
+      end
+
+      def delete(name, force: false)
+        if force
+          Models::Deployment.delete(__config__.current_cluster, name)
+        else
+          Models::Deployment.delete!(__config__.current_cluster, name)
+        end
+      end
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end

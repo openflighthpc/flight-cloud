@@ -1,16 +1,44 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
-gem 'aws-sdk-cloudformation'
-gem 'aws-sdk-ec2'
-gem 'azure_mgmt_compute'
-gem 'azure_mgmt_network'
-gem 'azure_mgmt_resources'
+gem 'activemodel'
 gem 'colorize'
-gem 'commander'
-gem 'google-cloud-resource_manager'
+gem 'commander', git: 'https://github.com/alces-software/commander'
+gem 'hashie'
 gem 'ipaddr'
-gem 'rspec'
-gem 'rspec'
-gem 'rspec-wait'
-gem 'terminal-table'
-gem 'whirly'
+gem 'memoist'
+gem 'parallel'
+gem 'require_all'
+gem 'rubyzip'
+gem 'tty-markdown'
+gem 'tty-spinner'
+gem 'tty-table'
+
+group :config do
+  gem 'activesupport'
+  gem 'flight_config', git: 'https://github.com/alces-software/flight_config'
+end
+
+group :aws do
+  gem 'aws-sdk-cloudformation'
+  gem 'aws-sdk-ec2'
+end
+
+group :azure do
+  gem 'azure_mgmt_compute'
+  gem 'azure_mgmt_resources'
+end
+
+group :development do
+  gem 'factory_bot'
+  gem 'fakefs'
+  gem 'pilfer'
+  gem 'pry'
+  gem 'pry-byebug'
+  gem 'rake'
+  gem 'rspec'
+  gem 'rspec-wait'
+  gem 'rubocop', '~> 0.52.1', require: false
+  gem 'rubocop-rspec'
+end

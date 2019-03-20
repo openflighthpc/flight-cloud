@@ -24,28 +24,31 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
+require 'tty-spinner'
 
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
-      end
-
-      def path
-        Config.log_file
-      end
-
-      def warn(msg)
-        super
-      end
-
-      delegate_missing_to :instance
+  class Spinner
+    def initialize(message, **k)
+      @tty_spinner = TTY::Spinner.new(message, **k)
     end
+
+    def run(done_message = '')
+      tty_spinner.spin      # Always spin once
+      tty_spinner.auto_spin unless Config.debug
+      yield if block_given?
+    ensure
+      tty_spinner.stop(done_message)
+    end
+
+    private
+
+    attr_reader :tty_spinner
   end
 
-  Config.cache
-  FlightConfig.logger = Log
+  module WithSpinner
+    def with_spinner(msg = '', done: '', &block)
+      Spinner.new("[:spinner] #{msg}", format: :pipe)
+             .run(done, &block)
+    end
+  end
 end

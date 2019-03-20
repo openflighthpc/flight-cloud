@@ -24,28 +24,28 @@
 # ==============================================================================
 #
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
+require 'cloudware/models'
 
-module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
+FactoryBot.define do
+  models = Cloudware::Models
+
+  factory :deployment, class: models::Deployment do
+    initialize_with do
+      attr = attributes.dup
+      new(
+        attr.delete(:cluster),
+        attr.delete(:name),
+      ).tap do |deployment|
+        attr.each do |key, value|
+          deployment.send("#{key}=", value)
+        end
       end
-
-      def path
-        Config.log_file
-      end
-
-      def warn(msg)
-        super
-      end
-
-      delegate_missing_to :instance
     end
-  end
 
-  Config.cache
-  FlightConfig.logger = Log
+    name 'test-deployment'
+    template_path '/tmp/test-template'
+    results {}
+    replacements nil
+    cluster 'test-deployment-cluster'
+  end
 end
