@@ -1,28 +1,25 @@
-<div align="center">
-    <h2>Alces Cloudware</h2>
-    <p align="center">
-        <p>Cloud orchestration tool</p>
-    </p>
-</div>
+# Flight Cloud
 
-# Contents
-* [Installation](#installation)
-* [Configuring Cloudware](#configuring-cloudware)
-* [Configuring Cloud Authentication](#configuring-cloud-authentication)
-* [Usage](#usage)
-* [License](#license)
+A cloud-agnostic orchestration tool.
 
-# Installation
+## Overview
+
+Flight Cloud provides simple templating and deployment management for different
+cloud platforms.
+
+## Installation
 
 For installation instructions see INSTALL.md
 
-# Configuring Cloudware
+## Configuration
+
+### General Configuration
 
 Cloudware can be configured using the global configuration file - Cloudware
 expects this configuration file to be located at:
 `/opt/cloudware/etc/config.yml`
 
-## Provider configuration
+### Provider Configuration
 
 Provider credentials can be provided either:
 
@@ -47,54 +44,7 @@ aws:
   secret_access_key: '<insert your secret key here>'
 ```
 
-# Configuring Cloud Authentication
-
-The cloudware configuration file requires authentication tokens for the cloud platforms which are to be used. These can be obtained as follows
-
-## AWS
-
-## Access Key ID & Secret
-
-- In the AWS console, Navigate to _IAM_
-- If part of an organisation, select _Users_ and then click on yourself in that list
-- Toggle to the _Security Credentials_ tab
-- Click _Create Access Key_
-
-This will generate the ID and secret key required to access AWS.
-
-## Azure
-
-## Tenant ID
-
-**Tenant ID** can be found under _Properties_ of the _Active Directory_ tab in the Azure portal, it is referred to on this page as _Directory ID_.
-
-Direct Link - https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Properties
-
-## Subscription ID
-
-**Subscription ID** is found from either the _Subscriptions_ or _Cost Management and Billing_ tab of the Azure portal.
-
-Direct Link - https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade
-
-## Client Secret & ID
-
-* Create an _App Registration_ in _Active Directory_ and request the following permissions (_Setting → Required permissions_)
-    * _Windows Azure Service Management API_
-    * _Windows Azure Active Directory_
-    * Click _Grant Permissions_ to apply them to the registration
-* **Client ID** = _Application ID_
-* In the _App Registration_ page for the new app get the **Client Secret** via _Settings → Keys_ and creating one by adding a key description
-* Ensure the App has at least Contributor permissions in the IAM Role management of the Subscription
-    * As the Global Administrator navigate to the **subscription's** _Access Control (IAM)_
-    * Click _Add_ at the top of the page
-    * Set _Role_ to _Contributor_, _Assign access to to Azure AD user, group, or application_ and search for the app name set above
-    * Save to add the user to the subscription
-
-## Notes
-
-Only Global Administrator can create apps if App Registrations under User settings in  Active Directory is set to no
-
-# Usage
+## Operation
 
 Once the appropriate credentials have been configured, `cloudware` it's time
 start interacting with the providers. There are separate application for each
@@ -276,9 +226,76 @@ option. Machines can be assigned to a group using the groups tag:
 bin/cloud-aws power status -g my-group
 ```
 
+# Configuring Cloud Authentication
 
-# License
+The cloudware configuration file requires authentication tokens for the cloud platforms which are to be used. These can be obtained as follows
 
-AGPLv3+ License, see LICENSE.txt for details.
+## AWS
 
-Copyright (C) 2017 Alces Software Ltd.
+## Access Key ID & Secret
+
+- In the AWS console, Navigate to _IAM_
+- If part of an organisation, select _Users_ and then click on yourself in that list
+- Toggle to the _Security Credentials_ tab
+- Click _Create Access Key_
+
+This will generate the ID and secret key required to access AWS.
+
+## Azure
+
+## Tenant ID
+
+**Tenant ID** can be found under _Properties_ of the _Active Directory_ tab in the Azure portal, it is referred to on this page as _Directory ID_.
+
+Direct Link - https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Properties
+
+## Subscription ID
+
+**Subscription ID** is found from either the _Subscriptions_ or _Cost Management and Billing_ tab of the Azure portal.
+
+Direct Link - https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade
+
+## Client Secret & ID
+
+* Create an _App Registration_ in _Active Directory_ and request the following permissions (_Setting → Required permissions_)
+    * _Windows Azure Service Management API_
+    * _Windows Azure Active Directory_
+    * Click _Grant Permissions_ to apply them to the registration
+* **Client ID** = _Application ID_
+* In the _App Registration_ page for the new app get the **Client Secret** via _Settings → Keys_ and creating one by adding a key description
+* Ensure the App has at least Contributor permissions in the IAM Role management of the Subscription
+    * As the Global Administrator navigate to the **subscription's** _Access Control (IAM)_
+    * Click _Add_ at the top of the page
+    * Set _Role_ to _Contributor_, _Assign access to to Azure AD user, group, or application_ and search for the app name set above
+    * Save to add the user to the subscription
+
+## Notes
+
+Only Global Administrator can create apps if App Registrations under User settings in  Active Directory is set to no
+
+# Contributing
+
+Fork the project. Make your feature addition or bug fix. Send a pull
+request. Bonus points for topic branches.
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
+# Copyright and License
+
+Eclipse Public License 2.0, see [LICENSE.txt](LICENSE.txt) for details.
+
+Copyright (C) 2019-present Alces Flight Ltd.
+
+This program and the accompanying materials are made available under
+the terms of the Eclipse Public License 2.0 which is available at
+[https://www.eclipse.org/legal/epl-2.0](https://www.eclipse.org/legal/epl-2.0),
+or alternative license terms made available by Alces Flight Ltd -
+please direct inquiries about licensing to
+[licensing@alces-flight.com](mailto:licensing@alces-flight.com).
+
+Flight Cloud is distributed in the hope that it will be
+useful, but WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER
+EXPRESS OR IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR
+CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR
+A PARTICULAR PURPOSE. See the [Eclipse Public License 2.0](https://opensource.org/licenses/EPL-2.0) for more
+details.
