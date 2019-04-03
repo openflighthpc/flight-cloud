@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 gem 'activemodel'
 gem 'colorize'
-gem 'commander', git: 'https://github.com/alces-software/commander'
+gem 'commander-openflighthpc'
 gem 'hashie'
 gem 'ipaddr'
 gem 'memoist'
@@ -17,7 +17,7 @@ gem 'tty-table'
 
 group :config do
   gem 'activesupport'
-  gem 'flight_config', git: 'https://github.com/alces-software/flight_config'
+  gem 'flight_config'
 end
 
 group :aws do
