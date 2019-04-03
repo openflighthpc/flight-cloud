@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 gem 'activemodel'
 gem 'colorize'
-gem 'commander', git: 'https://github.com/alces-software/commander'
+gem 'commander', git: 'https://github.com/alces-software/commander', tag: '4.4.4.alces3'
 gem 'hashie'
 gem 'ipaddr'
 gem 'memoist'

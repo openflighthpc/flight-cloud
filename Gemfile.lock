@@ -1,6 +1,7 @@
 GIT
   remote: https://github.com/alces-software/commander
-  revision: 6e5b37ea4eb0ecb8a56a478f58ff4e97d591d805
+  revision: 89523312cc16c5454d79b598bec05112ee529d5d
+  tag: 4.4.4.alces3
   specs:
     commander (4.4.4.pre.alces2)
       highline (~> 1.7.2)
