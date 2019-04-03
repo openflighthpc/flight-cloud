@@ -1,4 +1,4 @@
-# Installing Flight CLoud
+# Installing Flight Cloud
 
 ## Generic
 
