@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # frozen_string_literal: true
 
 #==============================================================================
@@ -27,50 +28,37 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
-require 'tty-color'
+lib_dir = File.join(__dir__, '..', 'lib')
+$LOAD_PATH << File.join(lib_dir)
+ENV['BUNDLE_GEMFILE'] ||= File.join(__dir__, '..', 'Gemfile')
 
-module Cloudware
-  module Commands
-    module Concerns
-      module MarkdownTemplate
-        def self.included(base)
-          base.extend(ClassMethods)
-        end
+Thread.report_on_exception = false
 
-        module ClassMethods
-          def delayed_require
-            super
-            require 'cloudware/models/deployments'
-            require 'tty-markdown'
-          end
-        end
+require 'rubygems'
+require 'bundler'
 
-        RenderCluster = Struct.new(:cluster_identifier) do
-          delegate :machines, to: :deployments
-          delegate_missing_to :cluster
+# Catch any config errors during the require/setup
+begin
+  # Require the config and associated gems
+  Bundler.setup(:config)
+  require 'cloudware/config'
 
-          def cluster
-            @cluster ||= Cluster.read(cluster_identifier)
-          end
-
-          def deployments
-            @deployments ||= Models::Deployments.read(cluster_identifier)
-          end
-
-          def render(template, verbose: false)
-            ERB.new(template, nil, '-').result(binding)
-          end
-        end
-
-        def run
-          puts TTY::Markdown.parse(rendered_markdown)
-        end
-
-        def rendered_markdown
-          RenderCluster.new(__config__.current_cluster)
-                       .render(self.class::TEMPLATE, verbose: options.verbose)
-        end
-      end
-    end
+  # Require the development gems
+  if Cloudware::Config.debug
+    # `pry` needs to be required in a specific order so it doesn't clash with `pp`
+    Bundler.setup(:development)
+    require 'pp'
+    require 'pry'
+    require 'pry-byebug'
   end
+
+  # Setup the load path for remaining gems
+  Bundler.setup(:config, :default, Cloudware::Config.provider)
+
+  require 'cloudware'
+rescue => e
+  $stderr.puts e.message
+  exit 1
 end
+
+Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__
