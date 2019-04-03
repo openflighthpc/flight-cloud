@@ -1,11 +1,3 @@
-GIT
-  remote: https://github.com/alces-software/flight_config
-  revision: 0a0137d42fd5d6122e56b827c400bafa93b82520
-  specs:
-    flight_config (0.1.0)
-      fakefs
-      tty-config
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -46,12 +38,14 @@ GEM
     equatable (0.5.0)
     factory_bot (4.8.2)
       activesupport (>= 3.0.0)
-    fakefs (0.19.2)
+    fakefs (0.20.0)
     faraday (0.13.1)
       multipart-post (>= 1.2, < 3)
     faraday-cookie_jar (0.0.6)
       faraday (>= 0.7.4)
       http-cookie (~> 1.0.0)
+    flight_config (0.1.0)
+      tty-config
     hashie (3.6.0)
     highline (1.7.10)
     http-cookie (1.0.3)
@@ -168,7 +162,7 @@ DEPENDENCIES
   commander-openflighthpc
   factory_bot
   fakefs
-  flight_config!
+  flight_config
   hashie
   ipaddr
   memoist
