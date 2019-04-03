@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/alces-software/commander
-  revision: 89523312cc16c5454d79b598bec05112ee529d5d
-  tag: 4.4.4.alces3
-  specs:
-    commander (4.4.4.pre.alces2)
-      highline (~> 1.7.2)
-
-GIT
   remote: https://github.com/alces-software/flight_config
   revision: 0a0137d42fd5d6122e56b827c400bafa93b82520
   specs:
@@ -44,6 +36,8 @@ GEM
     byebug (10.0.2)
     coderay (1.1.2)
     colorize (0.8.1)
+    commander-openflighthpc (1.0.0)
+      highline (~> 1.7.2)
     concurrent-ruby (1.0.5)
     debugger-ruby_core_source (1.3.8)
     diff-lcs (1.3)
@@ -171,7 +165,7 @@ DEPENDENCIES
   azure_mgmt_compute
   azure_mgmt_resources
   colorize
-  commander!
+  commander-openflighthpc
   factory_bot
   fakefs
   flight_config!
