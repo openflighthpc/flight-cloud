@@ -2,8 +2,9 @@
 
 ## Generic
 
-Flight Cloud requires a recent version of `ruby` (2.5.1<=) and `bundler`.
+Flight Cloud requires a recent version of `ruby` (>=2.5.1) and `bundler`.
 The following will install from source using `git`:
+
 ```
 git clone https://github.com/openflighthpc/flight-cloud.git
 cd flight-cloud
@@ -32,7 +33,7 @@ Performing configuration ... OK.
 Integrating ... OK.
 ```
 
-Flight Cloud is now available via the `flight` tool::
+Flight Cloud is now available via the `flight` tool:
 
 ```
 [root@myhost ~]# flight cloud
