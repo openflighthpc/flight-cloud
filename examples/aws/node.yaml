@@ -4,6 +4,36 @@ Mappings:
   RegionMap:
     eu-west-2:
       "AMI": "ami-05c72636444d6f86c"
+    eu-north-1:
+      "AMI": "ami-0d47713982efd31ec"
+    ap-south-1:
+      "AMI": "ami-062358b492c2a9a4d"
+    eu-west-3:
+      "AMI": "ami-0fc9d8b5acbc07d8f"
+    eu-west-1:
+      "AMI": "ami-0ae715c5263451742"
+    ap-northeast-2:
+      "AMI": "ami-06ec50277fdc63ab3"
+    ap-northeast-1:
+      "AMI": "ami-0bfb023152ee2a42b"
+    sa-east-1:
+      "AMI": "ami-04054e245a2d342e7"
+    ca-central-1:
+      "AMI": "ami-077f407a4418df652"
+    ap-southeast-1:
+      "AMI": "ami-02b7dfce2332f7d80"
+    ap-southeast-2:
+      "AMI": "ami-064c2e901fd404028"
+    eu-central-1:
+      "AMI": "ami-0f9263422d91f6eaf"
+    us-east-1:
+      "AMI": "ami-0f70ff212b23be6d7"
+    us-east-2:
+      "AMI": "ami-017b202f3780ae884"
+    us-west-1:
+      "AMI": "ami-0a033ffddd7425b15"
+    us-west-2:
+      "AMI": "ami-02f12273e580aaebc"
 Resources:
 
   mynodenetwork1Interface:
