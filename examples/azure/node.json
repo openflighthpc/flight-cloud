@@ -1,6 +1,11 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
+  "variables": {
+      "images": {
+          "uksouth": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure"
+          }
+  },
   "resources": [
     {
       "type": "Microsoft.Network/publicIPAddresses",
@@ -62,20 +67,17 @@
         "hardwareProfile": {
 	  "vmSize": "Standard_DS3_v2"
 	},
-        "storageProfile": {
-	  "imageReference": {
-            "publisher": "OpenLogic",
-            "offer": "CentOS",
-            "sku": "7.3",
-            "version": "latest"
-	  },
-	  "osDisk": {
-	    "createOption": "fromImage",
-	    "managedDisk": {
-              "storageAccountType": "Premium_LRS"
-	    }
-	  }
-	},
+    "storageProfile": {
+        "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+                "storageAccountType": "Premium_LRS"
+            }
+        },
+        "imageReference": {
+            "id": "[variables('images')[resourceGroup().location]]"
+        }
+    },
 	"osProfile": {
           "computerName": "mynode.pri.mycluster.cluster.local",
           "adminUsername": "alces",
