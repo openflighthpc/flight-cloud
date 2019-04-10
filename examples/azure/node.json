@@ -13,7 +13,7 @@
       "apiVersion": "2017-03-01",
       "tags": {
         "Name": "%deployment_name%",
-        "alcescluster": "%deployment_name%"
+        "flightcluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
@@ -30,7 +30,7 @@
       "apiVersion": "2017-03-01",
       "tags": {
         "Name": "%deployment_name%",
-        "alcescluster": "%deployment_name%"
+        "flightcluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
@@ -60,7 +60,7 @@
       "apiVersion": "2016-04-30-preview",
       "tags": {
         "Name": "%deployment_name%",
-        "alcescluster": "%deployment_name%"
+        "flightcluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
@@ -80,12 +80,12 @@
     },
 	"osProfile": {
           "computerName": "mynode.pri.mycluster.cluster.local",
-          "adminUsername": "alces",
+          "adminUsername": "centos",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
             "publicKeys": [{
-              "path": "[concat ('/home/alces', '/.ssh/authorized_keys')]",
+              "path": "[concat ('/home/centos', '/.ssh/authorized_keys')]",
               "keyData": "%publicsshkey%"
               }]
             }
