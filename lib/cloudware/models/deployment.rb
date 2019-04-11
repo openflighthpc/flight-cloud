@@ -70,9 +70,9 @@ module Cloudware
           ERROR
         else
           raise e.exception, <<~ERROR.chomp
-            Can not recreate the deployment as an old configuration already exists.
-            Please run the following to view all the deployments:
-            `#{Config.app_name} list deployments --all`
+            Can not redeploy with a different template.
+            To redeploy the existing template, please use:
+            `#{Config.app_name} deploy #{a.last}`
             Alternatively, the configuration can be permanetly deleted with:
             `#{Config.app_name} delete #{a.last}`
           ERROR
