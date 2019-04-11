@@ -64,7 +64,19 @@ module Cloudware
           dep.validate_or_error('create')
         end
       rescue FlightConfig::CreateError => e
-        raise e.exception "Cowardly refusing to recreate the deployment"
+        if read_or_new(*a).deployed
+          raise e.exception, <<~ERROR.squish.chomp
+            The deployment already exists and is currently running
+          ERROR
+        else
+          raise e.exception, <<~ERROR.chomp
+            Can not recreate the deployment as an old configuration already exists.
+            Please run the following to view all the deployments:
+            `#{Config.app_name} list deployments --all`
+            Alternatively, the configuration can be permanetly deleted with:
+            `#{Config.app_name} delete #{a.last}`
+          ERROR
+        end
       end
 
       def self.deploy!(*a)
