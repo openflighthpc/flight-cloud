@@ -64,7 +64,19 @@ module Cloudware
           dep.validate_or_error('create')
         end
       rescue FlightConfig::CreateError => e
-        raise e.exception "Cowardly refusing to recreate the deployment"
+        if read_or_new(*a).deployed
+          raise e.exception, <<~ERROR.squish.chomp
+            The deployment already exists and is currently running
+          ERROR
+        else
+          raise e.exception, <<~ERROR.chomp
+            Can not redeploy with a different template.
+            To redeploy, do not provide the second template input:
+            `#{Config.app_name} deploy #{a.last}`
+            Alternatively, the configuration can be permanently deleted with:
+            `#{Config.app_name} delete #{a.last}`
+          ERROR
+        end
       end
 
       def self.deploy!(*a)
