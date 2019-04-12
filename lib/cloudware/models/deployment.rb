@@ -73,7 +73,7 @@ module Cloudware
             Can not redeploy with a different template.
             To redeploy, do not provide the second template input:
             `#{Config.app_name} deploy #{a.last}`
-            Alternatively, the configuration can be permanetly deleted with:
+            Alternatively, the configuration can be permanently deleted with:
             `#{Config.app_name} delete #{a.last}`
           ERROR
         end
