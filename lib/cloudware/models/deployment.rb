@@ -71,7 +71,7 @@ module Cloudware
         else
           raise e.exception, <<~ERROR.chomp
             Can not redeploy with a different template.
-            To redeploy the existing template, please use:
+            To redeploy, do not provide the second template input:
             `#{Config.app_name} deploy #{a.last}`
             Alternatively, the configuration can be permanetly deleted with:
             `#{Config.app_name} delete #{a.last}`
