@@ -1,6 +1,37 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
+  "variables": {
+      "images": {
+          "uksouth": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure",
+          "australiaeast": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-australiaeast",
+          "australiasoutheast": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-australiasoutheast",
+          "brazilsouth": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-brazilsouth",
+          "canadacentral": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-canadacentral",
+          "canadaeast": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-canadaeast",
+          "centralindia": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-centralindia",
+          "centralus": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-centralus",
+          "eastasia": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-eastasia",
+          "eastus": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-eastus",
+          "eastus2": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-eastus2",
+          "francecentral": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-francecentral",
+          "japaneast": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-japaneast",
+          "japanwest": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-japanwest",
+          "koreacentral": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-koreacentral",
+          "koreasouth": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-koreasouth",
+          "northcentralus": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-northcentralus",
+          "northeurope": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-northeurope",
+          "southcentralus": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-southcentralus",
+          "southeastasia": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-southeastasia",
+          "southindia": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-southindia",
+          "ukwest": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-ukwest",
+          "westcentralus": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-westcentralus",
+          "westeurope": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-westeurope",
+          "westindia": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-westindia",
+          "westus": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-westus",
+          "westus2": "/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/openflight-cloud/providers/Microsoft.Compute/images/openflight-cloud-base-1.0-azure-westus2"
+          }
+  },
   "resources": [
     {
       "type": "Microsoft.Network/publicIPAddresses",
@@ -8,7 +39,7 @@
       "apiVersion": "2017-03-01",
       "tags": {
         "Name": "%deployment_name%",
-        "alcescluster": "%deployment_name%"
+        "flightcluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
@@ -25,7 +56,7 @@
       "apiVersion": "2017-03-01",
       "tags": {
         "Name": "%deployment_name%",
-        "alcescluster": "%deployment_name%"
+        "flightcluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
@@ -55,35 +86,32 @@
       "apiVersion": "2016-04-30-preview",
       "tags": {
         "Name": "%deployment_name%",
-        "alcescluster": "%deployment_name%"
+        "flightcluster": "%deployment_name%"
       },
       "location": "[resourceGroup().location]",
       "properties": {
         "hardwareProfile": {
 	  "vmSize": "Standard_DS3_v2"
 	},
-        "storageProfile": {
-	  "imageReference": {
-            "publisher": "OpenLogic",
-            "offer": "CentOS",
-            "sku": "7.3",
-            "version": "latest"
-	  },
-	  "osDisk": {
-	    "createOption": "fromImage",
-	    "managedDisk": {
-              "storageAccountType": "Premium_LRS"
-	    }
-	  }
-	},
+    "storageProfile": {
+        "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+                "storageAccountType": "Premium_LRS"
+            }
+        },
+        "imageReference": {
+            "id": "[variables('images')[resourceGroup().location]]"
+        }
+    },
 	"osProfile": {
           "computerName": "mynode.pri.mycluster.cluster.local",
-          "adminUsername": "alces",
+          "adminUsername": "centos",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
             "publicKeys": [{
-              "path": "[concat ('/home/alces', '/.ssh/authorized_keys')]",
+              "path": "[concat ('/home/centos', '/.ssh/authorized_keys')]",
               "keyData": "%publicsshkey%"
               }]
             }

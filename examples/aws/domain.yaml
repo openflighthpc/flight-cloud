@@ -12,7 +12,7 @@ Resources:
           Key: 'Name'
           Value: '%deployment_name%'
         -
-          Key: 'alcescluster'
+          Key: 'flightcluster'
           Value: %deployment_name%
 
   myclusterInternetGateway:
@@ -24,7 +24,7 @@ Resources:
           Key: 'Name'
           Value: '%deployment_name%'
         -
-          Key: 'alcescluster'
+          Key: 'flightcluster'
           Value: %deployment_name%
   
   myclusterInternetGatewayAttachment:
@@ -43,7 +43,7 @@ Resources:
           Key: 'Name'
           Value: '%deployment_name%'
         -
-          Key: 'alcescluster'
+          Key: 'flightcluster'
           Value: %deployment_name%
 
   myclusternetwork1Subnet:
@@ -59,7 +59,7 @@ Resources:
           Key: 'Name'
           Value: '%deployment_name%'
         -
-          Key: 'alcescluster'
+          Key: 'flightcluster'
           Value: %deployment_name%
 
   network1SubnetRouteTableAssocation:
@@ -107,7 +107,7 @@ Resources:
           Key: 'Name'
           Value: '%deployment_name%'
         -
-          Key: 'alcescluster'
+          Key: 'flightcluster'
           Value: %deployment_name%
 
 Outputs:

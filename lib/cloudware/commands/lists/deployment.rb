@@ -39,10 +39,15 @@ module Cloudware
         def run!(verbose: false, all: false)
           deployments = Models::Deployments.read(__config__.current_cluster)
           deployments = deployments.select(&:deployed) unless all
-          return puts 'No Deployments found' if deployments.empty?
-          deployments.each do |d|
-            puts Templaters::DeploymentTemplater.new(d, verbose: verbose)
-                                                .render_info
+          if deployments.any?
+            deployments.each do |d|
+              puts Templaters::DeploymentTemplater.new(d, verbose: verbose)
+                                                  .render_info
+            end
+          elsif all
+            $stderr.puts 'No deployments found'
+          else
+            $stderr.puts 'No running deployments. Use --all for all the deployments'
           end
         end
       end

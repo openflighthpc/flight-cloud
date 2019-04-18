@@ -75,6 +75,9 @@ important to wait for the deployment to finish naturally. At the end of the
 deployment, the templates outputs will be saved. These outputs will be used
 to deploy machines within the domain.
 
+Offline deployments can be redeployed by omitting the template path. It is not
+possible to redeploy a `deployment` with a different template.
+
 **NOTE**: `%deployment_name%` within the template
 Cloudware supports substitutions within the templates, which forms the basis
 of the parameter passing (see below). In addition to this, the built in
@@ -165,6 +168,10 @@ as an atomic whole. It is not possible to destroy a single resource within a
 `deployment`. If a particular resources needs to be created and destroyed
 regularly, then consider making it a standalone `deployment`.
 
+Destroying a deployment only removes the remote resources, it does not delete
+the configuration file. Instead the deployment is flagged as `offline`. This
+allows it to be easily redeployed using the `deploy` command.
+
 The previously created domain could be destroy by running the following:
 
 ```
@@ -174,6 +181,13 @@ bin/cloud destroy my-domain
 **NOTE:** There are not checks for dependent resource in other deployments. In
 these cases, the other deployment records will not be deleted. However the
 provider may silently alter the resources.
+
+## Deleting a Deployment
+
+The `delete` command will permanently remove the deployment configuration file.
+It does not destroy the remote resources and will by default error if the
+deployment is currently running. The `--force` flag can be used to delete a
+deployment whilst leaving the remote resources running.
 
 ## Listing Machines
 

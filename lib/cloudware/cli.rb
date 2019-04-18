@@ -150,6 +150,14 @@ module Cloudware
     command 'destroy' do |c|
       cli_syntax(c, 'NAME')
       c.summary = 'Stop a running deployment'
+      c.description = <<~DESC
+        Destroys the deployment on the providers platform and flags it
+        as offline. This action does not remove the configuration file,
+        allowing it to be redeployed easily.
+
+        Once the deployment is offline, the configuration file can be
+        permanetly removed using the 'delete' command.
+      DESC
       action(c, Commands::Destroy)
     end
 
@@ -157,7 +165,7 @@ module Cloudware
       cli_syntax(c, 'NAME')
       c.summary = 'Remove the deployments configuration file'
       c.description = <<~DESC
-        Deletes the confiuration file for the deployment NAME. This action
+        Deletes the configuration file for the deployment NAME. This action
         will error if the resources are currently running. The resources can
         be stop using the 'destroy' command.
 
