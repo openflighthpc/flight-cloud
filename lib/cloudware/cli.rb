@@ -255,7 +255,7 @@ module Cloudware
       cli_attr = 'IDENTIFIER'
       cli_syntax(c, cli_attr)
       c.option '-g', '--group', <<~DESC
-        Preform the '#{action}' action on machine in group '#{cli_attr}'
+        Perform the '#{action}' action on machine in group '#{cli_attr}'
       DESC
     end
 
