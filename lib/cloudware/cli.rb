@@ -157,7 +157,7 @@ module Cloudware
         allowing it to be redeployed easily.
 
         Once the deployment is offline, the configuration file can be
-        permanetly removed using the 'delete' command.
+        permanently removed using the 'delete' command.
       DESC
       c.option '-g', '--group', 'Destroy all deployments within the specified group'
       action(c, Commands::Destroy)
