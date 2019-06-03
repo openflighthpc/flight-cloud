@@ -159,7 +159,7 @@ module Cloudware
         Once the deployment is offline, the configuration file can be
         permanetly removed using the 'delete' command.
       DESC
-      c.option '-g', '--group', 'Destroy all resources within the specified group'
+      c.option '-g', '--group', 'Destroy all deployments within the specified group'
       action(c, Commands::Destroy)
     end
 
