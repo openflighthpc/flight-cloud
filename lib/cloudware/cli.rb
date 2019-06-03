@@ -144,6 +144,7 @@ module Cloudware
       DESC
       c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
                String, 'A space separated list of keys to be replaced'
+      c.option '-g', '--group', 'Deploy all resources within the specified group'
       action(c, Commands::Deploy)
     end
 
