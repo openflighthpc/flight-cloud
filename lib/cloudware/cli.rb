@@ -129,7 +129,7 @@ module Cloudware
         deployment: NAME. This will result in an error if the deployment does
         not exist or is currently in a deployed state.
 
-        Calling it with a second argument will try and create a nem deployment
+        Calling it with a second argument will try and create a new deployment
         called NAME with the specified TEMPLATE. The TEMPLATE references the
         internal template which have been imported. Alternatively it can be
         an absolute path to a template file.
