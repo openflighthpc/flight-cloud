@@ -39,8 +39,10 @@ module Cloudware
 
       def run
         @name = argv[0]
-        with_spinner('Destroying resources...', done: 'Done') do
-          Models::Deployment.destroy!(__config__.current_cluster, name)
+        machines.each do |m|
+          with_spinner('Destroying resources...', done: 'Done') do
+            Models::Deployment.destroy!(__config__.current_cluster, m)
+          end
         end
       end
 
@@ -49,6 +51,16 @@ module Cloudware
           Models::Deployment.delete(__config__.current_cluster, name)
         else
           Models::Deployment.delete!(__config__.current_cluster, name)
+        end
+      end
+
+      private
+
+      def machines
+        if options.group
+          get_machines_in_group(name)
+        else
+          [name]
         end
       end
     end
