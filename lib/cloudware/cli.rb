@@ -175,6 +175,7 @@ module Cloudware
         using the '--force' flag. This will not destroy the remote resources
       DESC
       c.option '--force', 'Delete the deployment regardless if running'
+      c.option '-g', '--group', 'Delete all deployments within the specified group'
       action(c, Commands::Destroy, method: :delete)
     end
 
