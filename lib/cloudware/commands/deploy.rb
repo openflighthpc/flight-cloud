@@ -108,14 +108,6 @@ module Cloudware
         raise InvalidInput, "'#{dep.name}' is already running"
         ERROR
       end
-
-      def get_machines_in_group(group_name)
-        Models::Deployments.read(__config__.current_cluster)
-          .machines
-          .select { |m| m.groups.include?(group_name) }
-          .map { |m| m.name }
-          .sort
-      end
     end
   end
 end
