@@ -37,7 +37,7 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def run!(name, raw_path = nil, params: nil)
+      def run!(name, raw_path = nil, params: nil, group: nil)
         cur_dep = if raw_path
           create_deployment(name, raw_path, params: params)
         else
