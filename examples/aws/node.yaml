@@ -3,37 +3,37 @@ Description: 'Flight Domain Template'
 Mappings:
   RegionMap:
     eu-west-2:
-      "AMI": "ami-05c72636444d6f86c"
+      "AMI": "ami-0856d6bfdba0132c9"
     eu-north-1:
-      "AMI": "ami-0d47713982efd31ec"
+      "AMI": "ami-08270d7e5609c43fe"
     ap-south-1:
-      "AMI": "ami-062358b492c2a9a4d"
+      "AMI": "ami-0172b92b87b435f9f"
     eu-west-3:
-      "AMI": "ami-0fc9d8b5acbc07d8f"
+      "AMI": "ami-0ef0a38a3be9b6153"
     eu-west-1:
-      "AMI": "ami-0ae715c5263451742"
+      "AMI": "ami-0019f18ee3d4157d3"
     ap-northeast-2:
-      "AMI": "ami-06ec50277fdc63ab3"
+      "AMI": "ami-0a6297ef0fed4feab"
     ap-northeast-1:
-      "AMI": "ami-0bfb023152ee2a42b"
+      "AMI": "ami-0d594fc450b16d989"
     sa-east-1:
-      "AMI": "ami-04054e245a2d342e7"
+      "AMI": "ami-04c64e0377ef9611f"
     ca-central-1:
-      "AMI": "ami-077f407a4418df652"
+      "AMI": "ami-0f06da2b1f27ebfce"
     ap-southeast-1:
-      "AMI": "ami-02b7dfce2332f7d80"
+      "AMI": "ami-06f961d694adb87d2"
     ap-southeast-2:
-      "AMI": "ami-064c2e901fd404028"
+      "AMI": "ami-00240f6f25c5a080b"
     eu-central-1:
-      "AMI": "ami-0f9263422d91f6eaf"
+      "AMI": "ami-0516856a7af16297a"
     us-east-1:
-      "AMI": "ami-0f70ff212b23be6d7"
+      "AMI": "ami-02946ce583813a223"
     us-east-2:
-      "AMI": "ami-017b202f3780ae884"
+      "AMI": "ami-0d42c2a1cd2a7d60c"
     us-west-1:
-      "AMI": "ami-0a033ffddd7425b15"
+      "AMI": "ami-07bafb3a6a0aaeb86"
     us-west-2:
-      "AMI": "ami-02f12273e580aaebc"
+      "AMI": "ami-04cb5d5d2babce63b"
 Resources:
 
   mynodenetwork1Interface:
