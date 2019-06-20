@@ -174,6 +174,7 @@ module Cloudware
 
       def destroy(force: false)
         provider_client.destroy(tag)
+        __data__.delete("deployment_error") if self.deployment_error
         self.deployed = false
         true
       rescue => e
