@@ -46,7 +46,7 @@ module Cloudware
                    end
 
         machines.each do |m|
-          with_spinner('Destroying resources...', done: 'Done') do
+          with_spinner("Destroying resources for #{m}...", done: 'Done') do
             Models::Deployment.destroy!(__config__.current_cluster, m)
           end
         end
