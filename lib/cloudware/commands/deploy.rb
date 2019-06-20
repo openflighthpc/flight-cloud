@@ -37,21 +37,30 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def run!(name, raw_path = nil, params: nil)
-        cur_dep = if raw_path
-          create_deployment(name, raw_path, params: params)
-        else
-          Models::Deployment.read!(__config__.current_cluster, name)
-        end
-        raise_if_deployed(cur_dep)
-        puts "Deploying: #{cur_dep.path}"
-        with_spinner('Deploying resources...', done: 'Done') do
-          dep = Models::Deployment.deploy!(__config__.current_cluster, name)
-          return unless dep.deployment_error
-          raise DeploymentError, <<~ERROR.chomp
-             An error has occured. Please see for further details:
-            `#{Config.app_name} list deployments --verbose`
-          ERROR
+      def run!(name, raw_path = nil, params: nil, group: nil)
+        machines = if group
+                     get_machines_in_group(name)
+                   else
+                    [name]
+                   end
+
+        machines.each do |m|
+          cur_dep = if raw_path
+            create_deployment(m, raw_path, params: params)
+          else
+            Models::Deployment.read!(__config__.current_cluster, m)
+          end
+          raise_if_deployed(cur_dep)
+          puts "Deploying: #{cur_dep.path}"
+          with_spinner('Deploying resources...', done: 'Done') do
+            dep = Models::Deployment.deploy!(__config__.current_cluster, m)
+            if dep.deployment_error
+              raise DeploymentError, <<~ERROR.chomp
+                 An error has occured. Please see for further details:
+                `#{Config.app_name} list deployments --verbose`
+              ERROR
+            end
+          end
         end
       end
 

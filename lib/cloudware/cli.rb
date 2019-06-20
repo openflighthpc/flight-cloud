@@ -129,7 +129,7 @@ module Cloudware
         deployment: NAME. This will result in an error if the deployment does
         not exist or is currently in a deployed state.
 
-        Calling it with a second argument will try and create a nem deployment
+        Calling it with a second argument will try and create a new deployment
         called NAME with the specified TEMPLATE. The TEMPLATE references the
         internal template which have been imported. Alternatively it can be
         an absolute path to a template file.
@@ -144,6 +144,7 @@ module Cloudware
       DESC
       c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
                String, 'A space separated list of keys to be replaced'
+      c.option '-g', '--group', 'Deploy all resources within the specified group'
       action(c, Commands::Deploy)
     end
 
@@ -156,8 +157,9 @@ module Cloudware
         allowing it to be redeployed easily.
 
         Once the deployment is offline, the configuration file can be
-        permanetly removed using the 'delete' command.
+        permanently removed using the 'delete' command.
       DESC
+      c.option '-g', '--group', 'Destroy all deployments within the specified group'
       action(c, Commands::Destroy)
     end
 
@@ -173,6 +175,7 @@ module Cloudware
         using the '--force' flag. This will not destroy the remote resources
       DESC
       c.option '--force', 'Delete the deployment regardless if running'
+      c.option '-g', '--group', 'Delete all deployments within the specified group'
       action(c, Commands::Destroy, method: :delete)
     end
 
