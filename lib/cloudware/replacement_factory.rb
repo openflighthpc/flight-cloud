@@ -76,7 +76,7 @@ module Cloudware
       end
       keys, value = components
       keys.split(',').map do |key|
-        [key.to_sym, parse_key_pair(key.to_sym, value)]
+        [key.to_sym, value]
       end.to_h
     end
 
