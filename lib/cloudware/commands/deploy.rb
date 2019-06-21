@@ -52,6 +52,11 @@ module Cloudware
           end
           raise_if_deployed(cur_dep)
 
+          dependencies = cur_dep.replacements.map { |key, value|
+            next unless value.include? "*"
+            Models::Deployment.read(__config__.current_cluster, (value.delete "*"))
+          }.uniq.compact
+
           puts "Deploying: #{cur_dep.path}"
           deploy(m)
         end
