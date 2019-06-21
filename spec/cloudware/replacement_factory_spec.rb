@@ -153,10 +153,6 @@ RSpec.describe Cloudware::ReplacementFactory do
       include_context 'parse-param-deployment'
 
       it_behaves_like 'a default replacement'
-
-      it 'replaces the referenced result' do
-        expect(subject.build(input_string)).to include(key => result_string)
-      end
     end
 
     context 'with multi key-pair input string' do
