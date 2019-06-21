@@ -51,16 +51,9 @@ module Cloudware
             Models::Deployment.read!(__config__.current_cluster, m)
           end
           raise_if_deployed(cur_dep)
+
           puts "Deploying: #{cur_dep.path}"
-          with_spinner('Deploying resources...', done: 'Done') do
-            dep = Models::Deployment.deploy!(__config__.current_cluster, m)
-            if dep.deployment_error
-              raise DeploymentError, <<~ERROR.chomp
-                 An error has occured. Please see for further details:
-                `#{Config.app_name} list deployments --verbose`
-              ERROR
-            end
-          end
+          deploy(m)
         end
       end
 
@@ -107,6 +100,18 @@ module Cloudware
         return unless dep.deployed
         raise InvalidInput, "'#{dep.name}' is already running"
         ERROR
+      end
+
+      def deploy(machine)
+        with_spinner('Deploying resources...', done: 'Done') do
+          dep = Models::Deployment.deploy!(__config__.current_cluster, machine)
+          if dep.deployment_error
+            raise DeploymentError, <<~ERROR.chomp
+               An error has occured. Please see for further details:
+              `#{Config.app_name} list deployments --verbose`
+            ERROR
+          end
+        end
       end
     end
   end
