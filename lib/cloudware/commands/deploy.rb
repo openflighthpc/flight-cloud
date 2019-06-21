@@ -52,10 +52,12 @@ module Cloudware
           end
           raise_if_deployed(cur_dep)
 
-          dependencies = cur_dep.replacements.map { |key, value|
-            next unless value.include? "*"
+          dependencies = cur_dep.replacements.select { |key, value|
+            # Select only values to be resolved
+            value.include? "*"
+          }.each_value.uniq.map { |value|
             Models::Deployment.read(__config__.current_cluster, (value.delete "*"))
-          }.uniq.compact
+          }
 
           dependencies.each do |d|
             unless d.deployed
