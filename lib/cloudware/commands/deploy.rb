@@ -57,6 +57,13 @@ module Cloudware
             Models::Deployment.read(__config__.current_cluster, (value.delete "*"))
           }.uniq.compact
 
+          dependencies.each do |d|
+            unless d.deployed
+              puts "Deploying dependency: #{d.name}"
+              deploy(d.name)
+            end
+          end
+
           puts "Deploying: #{cur_dep.path}"
           deploy(m)
         end
