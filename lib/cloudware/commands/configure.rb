@@ -36,6 +36,10 @@ module Cloudware
         file_data = IO.readlines(Config.path)
         access_details = Config.provider_details
 
+        if access_details.nil?
+          raise ConfigError, 'No provider details found'
+        end
+
         # Grab the line number in the config corresponding to the current
         # provider
         line_number = nil
