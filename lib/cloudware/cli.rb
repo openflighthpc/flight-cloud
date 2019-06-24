@@ -299,5 +299,11 @@ module Cloudware
       DESC
       action(c, Commands::Deploy, method: :render)
     end
+
+    command 'configure' do |c|
+      cli_syntax(c)
+      c.description = 'Configure access details for the current provider'
+      action(c, Commands::Configure)
+    end
   end
 end

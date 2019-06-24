@@ -74,6 +74,10 @@ module Cloudware
       end
     end
 
+    def provider_details
+      __data__.fetch(provider)
+    end
+
     def prefix_tag
       __data__.fetch(:prefix_tag, default: 'cloudware-shared')
     end
