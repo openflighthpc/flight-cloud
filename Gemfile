@@ -14,6 +14,7 @@ gem 'rubyzip'
 gem 'tty-markdown'
 gem 'tty-spinner'
 gem 'tty-table'
+gem 'tty-prompt'
 
 group :config do
   gem 'activesupport'
