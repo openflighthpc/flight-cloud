@@ -62,6 +62,8 @@ module Cloudware
           end
           dep.replacements = replacements
           dep.validate
+          dep.replacements.merge!((yield dep.errors.messages.keys if dep.errors))
+          dep.validate # Second validation to potentially clear any previous errors
           dep.error('create') unless dep.errors.blank?
         end
       rescue FlightConfig::CreateError => e
