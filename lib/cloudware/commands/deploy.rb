@@ -28,6 +28,7 @@
 #===============================================================================
 
 require 'cloudware/list_templates'
+require 'tty-prompt'
 
 module Cloudware
   module Commands
@@ -71,6 +72,19 @@ module Cloudware
         end
       end
 
+      def prompt_for_params(errors)
+        puts "Please provide values for the following missing parameters:"
+        puts "(Note: Use the format of *<resource_name> to reference a resource)"
+        prompt = TTY::Prompt.new
+
+        replacements = {}
+        errors.each do |e|
+          replacements[e.to_s.delete('%').to_sym] = prompt.ask("#{e}:")
+        end
+
+        return replacements
+      end
+
       def render(name, template = nil, params: nil)
         cluster = __config__.current_cluster
         deployment = Models::Deployment.read_or_new(cluster, name)
@@ -107,7 +121,7 @@ module Cloudware
           __config__.current_cluster, name,
           template: raw_path,
           replacements: replacements
-        )
+        ) { |errors| prompt_for_params(errors) }
       end
 
       def raise_if_deployed(dep)
