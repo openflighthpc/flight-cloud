@@ -61,7 +61,8 @@ module Cloudware
             dep.cluster_config.templates.resolve_human_path(template)
           end
           dep.replacements = replacements
-          dep.validate_or_error('create')
+          dep.validate
+          dep.error('create') unless dep.errors.blank?
         end
       rescue FlightConfig::CreateError => e
         if read_or_new(*a).deployed
@@ -216,6 +217,12 @@ module Cloudware
 
       def validate_or_error(action)
         validate
+        unless errors.blank?
+          raise ModelValidationError, render_errors_message(action)
+        end
+      end
+
+      def error(action)
         unless errors.blank?
           raise ModelValidationError, render_errors_message(action)
         end
