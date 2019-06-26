@@ -54,7 +54,7 @@ module Cloudware
         access_details.each_with_index do |(k, v), i|
           # Given the line number found before we know where in the config
           # file the access details are expected
-          new_v = prompt.ask(k, default: v)
+          new_v = prompt.ask("#{k}:", default: v)
           file_data[line_number + i] = file_data[line_number + i].sub(v, new_v)
         end
 
