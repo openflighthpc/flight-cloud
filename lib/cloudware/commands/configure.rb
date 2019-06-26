@@ -33,6 +33,8 @@ module Cloudware
   module Commands
     class Configure < Command
       def run
+        create_config_file unless File.exist? Config.path
+
         file_data = IO.readlines(Config.path)
         access_details = Config.provider_details
 
@@ -60,6 +62,13 @@ module Cloudware
 
         # Write the changes to the config file
         IO.write(Config.path, file_data.join)
+      end
+
+      private
+
+      def create_config_file
+        puts "Config file missing. Creating file at #{Config.path}..."
+        FileUtils.cp(Config.path + '.example', Config.path)
       end
     end
   end
