@@ -219,9 +219,7 @@ module Cloudware
 
       def validate_or_error(action)
         validate
-        unless errors.blank?
-          raise ModelValidationError, render_errors_message(action)
-        end
+        error(action) unless errors.blank?
       end
 
       def error(action)
