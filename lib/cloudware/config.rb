@@ -75,7 +75,7 @@ module Cloudware
     end
 
     def provider_details
-      __data__.fetch(provider)
+      Data.load(path)[provider.to_sym]
     end
 
     def prefix_tag
