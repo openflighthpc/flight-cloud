@@ -62,7 +62,7 @@ module Cloudware
           end
           dep.replacements = replacements
           dep.validate
-          dep.replacements.merge!((yield dep.errors.messages.keys if dep.errors))
+          dep.replacements.merge!(yield dep.errors.messages.keys) unless dep.errors.blank?
           dep.validate # Second validation to potentially clear any previous errors
           dep.error('create') unless dep.errors.blank?
         end
