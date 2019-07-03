@@ -79,8 +79,13 @@ module Cloudware
         prompt = TTY::Prompt.new
 
         replacements = {}
+        previous_error = nil
         errors.each do |e|
-          replacements[e.to_s.delete('%').to_sym] = prompt.ask("#{e}:")
+          key = e.to_s.delete('%').to_sym
+          replacements[key] = prompt.ask("#{e}:") do |q|
+            q.default previous_error unless previous_error.nil?
+          end
+          previous_error = replacements[key] if replacements[key]&.include? '*'
         end
 
         return replacements
