@@ -81,13 +81,17 @@ module Cloudware
         replacements = {}
         previous_param = nil
 
+        # Prompt the user for each missing parameter
         missing_params.map { |p| p.to_s.delete('%') }.each do |p|
           key = p.to_sym
 
           replacements[key] = prompt.ask("#{p}:") do |q|
+            # If the previous parameter is a resource reference then offer it
+            # as the default value for this parameter
             q.default previous_param unless previous_param.nil?
           end
 
+          # Set as the value of the parameter if it is a resource reference
           previous_param = replacements[key] if replacements[key]&.include? '*'
         end
 
