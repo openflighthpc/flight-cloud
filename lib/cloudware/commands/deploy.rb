@@ -80,11 +80,14 @@ module Cloudware
 
         replacements = {}
         previous_param = nil
+
         missing_params.map { |p| p.to_s.delete('%') }.each do |p|
           key = p.to_sym
+
           replacements[key] = prompt.ask("#{p}:") do |q|
             q.default previous_param unless previous_param.nil?
           end
+
           previous_param = replacements[key] if replacements[key]&.include? '*'
         end
 
