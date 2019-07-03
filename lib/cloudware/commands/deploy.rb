@@ -80,8 +80,8 @@ module Cloudware
 
         replacements = {}
         previous_error = nil
-        errors.each do |e|
-          key = e.to_s.delete('%').to_sym
+        errors.map { |e| e.to_s.delete('%') }.each do |e|
+          key = e.to_sym
           replacements[key] = prompt.ask("#{e}:") do |q|
             q.default previous_error unless previous_error.nil?
           end
