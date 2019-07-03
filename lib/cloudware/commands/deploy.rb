@@ -73,19 +73,19 @@ module Cloudware
         end
       end
 
-      def prompt_for_params(errors)
+      def prompt_for_params(missing_params)
         puts "Please provide values for the following missing parameters:"
         puts "(Note: Use the format of *<resource_name> to reference a resource)"
         prompt = TTY::Prompt.new
 
         replacements = {}
-        previous_error = nil
-        errors.map { |e| e.to_s.delete('%') }.each do |e|
-          key = e.to_sym
-          replacements[key] = prompt.ask("#{e}:") do |q|
-            q.default previous_error unless previous_error.nil?
+        previous_param = nil
+        missing_params.map { |p| p.to_s.delete('%') }.each do |p|
+          key = p.to_sym
+          replacements[key] = prompt.ask("#{p}:") do |q|
+            q.default previous_param unless previous_param.nil?
           end
-          previous_error = replacements[key] if replacements[key]&.include? '*'
+          previous_param = replacements[key] if replacements[key]&.include? '*'
         end
 
         return replacements
