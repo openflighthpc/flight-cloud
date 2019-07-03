@@ -47,6 +47,7 @@ module Cloudware
 
         machines.each do |m|
           cur_dep = if raw_path
+            raw_path = prompt_for_template(raw_path) unless File.exist? raw_path
             create_deployment(m, raw_path, params: params)
           else
             Models::Deployment.read!(__config__.current_cluster, m)
@@ -113,6 +114,22 @@ module Cloudware
       end
 
       private
+
+      def prompt_for_template(path)
+        puts "No valid template found at #{path}. Please provide a valid template."
+        prompt = TTY::Prompt.new
+
+        path = prompt.ask('Template:')
+
+        # The application will keep prompting if the template is invalid and
+        # will only stop prompting if the user provides a real file or exits
+        # manually
+        if File.exist? path
+          path
+        else
+          prompt_for_template(path)
+        end
+      end
 
       def create_deployment(name, raw_path, params: nil)
         replacements = ReplacementFactory.new(__config__.current_cluster, name)
