@@ -21,6 +21,12 @@ group :config do
   gem 'flight_config'
 end
 
+group :server do
+  gem 'sinatra'
+  gem 'sinatra-namespace'
+  gem 'sinatra-param'
+end
+
 group :aws do
   gem 'aws-sdk-cloudformation'
   gem 'aws-sdk-ec2'
