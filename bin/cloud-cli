@@ -28,37 +28,9 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
-lib_dir = File.join(__dir__, '..', 'lib')
-$LOAD_PATH << File.join(lib_dir)
-ENV['BUNDLE_GEMFILE'] ||= File.join(__dir__, '..', 'Gemfile')
+require 'rake'
+load File.expand_path(File.join(__dir__, '..', 'Rakefile'))
 
-Thread.report_on_exception = false
-
-require 'rubygems'
-require 'bundler'
-
-# Catch any config errors during the require/setup
-begin
-  # Require the config and associated gems
-  Bundler.setup(:config)
-  require 'cloudware/config'
-
-  # Require the development gems
-  if Cloudware::Config.debug
-    # `pry` needs to be required in a specific order so it doesn't clash with `pp`
-    Bundler.setup(:development)
-    require 'pp'
-    require 'pry'
-    require 'pry-byebug'
-  end
-
-  # Setup the load path for remaining gems
-  Bundler.setup(:config, :default, Cloudware::Config.provider)
-
-  require 'cloudware'
-rescue => e
-  $stderr.puts e.message
-  exit 1
-end
+Rake::Task[:setup].invoke
 
 Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__
