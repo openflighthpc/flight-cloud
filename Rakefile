@@ -40,7 +40,7 @@ task :setup do
   # Catch any config errors during the require/setup
   begin
     # Require the config and associated gems
-    Bundler.setup(:config)
+    Bundler.require(:config)
     require 'cloudware/config'
 
     # Require the development gems
@@ -52,8 +52,7 @@ task :setup do
       require 'pry-byebug'
     end
 
-    # Setup the load path for remaining gems
-    Bundler.setup(:config, :default, Cloudware::Config.provider)
+    Bundler.setup(:default)
 
     require 'cloudware'
   rescue => e
