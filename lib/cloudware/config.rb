@@ -126,6 +126,10 @@ module Cloudware
       File.join(base, provider)
     end
 
+    def server_cluster
+      __data__.fetch(:server_cluster) { 'server' }
+    end
+
     def debug
       !!__data__.fetch(:debug)
     end

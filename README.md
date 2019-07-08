@@ -44,6 +44,17 @@ aws:
   secret_access_key: '<insert your secret key here>'
 ```
 
+### Server Mode Configuration
+
+No additional configuration is required to run the cloud server. It will
+start on port 80 when `bin/server` is called. To ensure consistent behaviour,
+the server will ignore the current cluster used by the `CLI`. Instead it will
+switch to `server_cluster` specified in the main config file (default: `server`).
+
+Caution, the `CLI` can still manage the server cluster if it is manually
+switched to it first. This is to allow admin action to be preformed on it
+directly. Naturally this may alter the behaviour of the server.
+
 ## Operation
 
 Once the appropriate credentials have been configured, `cloudware` it's time

@@ -43,9 +43,9 @@ module Cloudware
 
     def current_cluster
       if server_mode
-        path = Models::Cluster.path('server')
-        return 'server' if File.exists?(path)
-        Models::Cluster.create('server').identifier
+        path = Models::Cluster.path(Config.server_cluster)
+        return Config.server_cluster if File.exists?(path)
+        Models::Cluster.create(Config.server_cluster).identifier
       else
         __data__.fetch(:current_cluster) do
           path = Models::Cluster.path('default')
