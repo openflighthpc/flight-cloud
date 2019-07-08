@@ -37,8 +37,8 @@ module Cloudware
 
     delegate_missing_to Config
 
-    def path
-      File.join(content_path, 'etc/config.yaml')
+    def self.path(*_)
+      File.join(Config.content_path, 'etc/config.yaml')
     end
 
     def current_cluster

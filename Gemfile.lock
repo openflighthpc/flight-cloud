@@ -45,7 +45,7 @@ GEM
     faraday-cookie_jar (0.0.6)
       faraday (>= 0.7.4)
       http-cookie (~> 1.0.0)
-    flight_config (0.1.0)
+    flight_config (0.2.0)
       tty-config
     hashie (3.6.0)
     highline (1.7.10)
@@ -146,7 +146,7 @@ GEM
     timeliness (0.3.8)
     timers (4.3.0)
     tty-color (0.4.3)
-    tty-config (0.3.1)
+    tty-config (0.3.2)
     tty-cursor (0.6.0)
     tty-markdown (0.4.0)
       kramdown (~> 1.16.2)

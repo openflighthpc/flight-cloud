@@ -47,8 +47,9 @@ module Cloudware
 
       attr_reader :identifier
 
-      def initialize(identifier)
+      def initialize(identifier, **h)
         @identifier = identifier
+        super
       end
 
       def __data__initialize(data)

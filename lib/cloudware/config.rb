@@ -43,22 +43,26 @@ module Cloudware
         @cache ||= self.load
       end
 
-      delegate_missing_to :cache
+      def root_dir
+        File.expand_path(File.join(__dir__, '..', '..'))
+      end
 
-      def new__data__
-        super.tap do |__data__|
-          __data__.env_prefix = 'cloudware'
-          ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
-        end
+      def path(_)
+        File.join(root_dir, 'etc/config.yaml')
+      end
+
+      delegate_missing_to :cache
+    end
+
+    def __data__
+      super.tap do |__data__|
+        __data__.env_prefix = 'cloudware'
+        ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
       end
     end
 
-    def path
-      File.join(root_dir, 'etc/config.yaml')
-    end
-
     def root_dir
-      File.expand_path(File.join(__dir__, '..', '..'))
+      self.class.root_dir
     end
 
     def log_file
