@@ -33,12 +33,6 @@ task :'setup:server' do
   ENV['CLOUDWARE_SERVER_MODE'] = 'true'
   Rake::Task[:setup].invoke
   $: << Cloudware::Config.root_dir
-
-  puts <<~MESSAGE
-   Starting cloudware in server mode. Please insure the server config has been setup:
-   #{Cloudware::Config.path}
-  MESSAGE
-  puts
 end
 
 task :setup do
