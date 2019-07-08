@@ -42,15 +42,27 @@ module Cloudware
     end
 
     def current_cluster
-      __data__.fetch(:current_cluster) do
-        path = Models::Cluster.new('default').path
-        return 'default' if File.exists?(path)
-        Models::Cluster.create('default').identifier
+      if server_mode
+        path = Models::Cluster.path('server')
+        return 'server' if File.exists?(path)
+        Models::Cluster.create('server').identifier
+      else
+        __data__.fetch(:current_cluster) do
+          path = Models::Cluster.path('default')
+          return 'default' if File.exists?(path)
+          Models::Cluster.create('default').identifier
+        end
       end
     end
 
     def current_cluster=(cluster)
-      __data__.set(:current_cluster, value: cluster)
+      if server_mode
+        raise ConfigError, <<~ERROR.chomp
+          Can not change the current cluster when in server mode
+        ERROR
+      else
+        __data__.set(:current_cluster, value: cluster)
+      end
     end
 
     def region

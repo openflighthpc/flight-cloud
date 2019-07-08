@@ -43,6 +43,10 @@ module Cloudware
         end
       end
 
+      def self.path(identifier)
+        RootDir.content_cluster(identifier, 'etc/config.yaml')
+      end
+
       delegate :provider, to: Config
 
       attr_reader :identifier
@@ -54,10 +58,6 @@ module Cloudware
 
       def __data__initialize(data)
         data.set(:tag, value: SecureRandom.hex(5))
-      end
-
-      def path
-        RootDir.content_cluster(identifier, 'etc/config.yaml')
       end
 
       def templates

@@ -57,7 +57,9 @@ module Cloudware
     def __data__
       super.tap do |__data__|
         __data__.env_prefix = 'cloudware'
-        ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
+        ['provider', 'debug', 'app_name', 'server_mode'].each do |x|
+          __data__.set_from_env(x)
+        end
       end
     end
 
@@ -130,6 +132,10 @@ module Cloudware
 
     def app_name
       __data__.fetch(:app_name) { File.basename($PROGRAM_NAME) }
+    end
+
+    def server_mode
+      __data__.fetch(:server_mode) { false }
     end
   end
 end

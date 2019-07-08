@@ -62,6 +62,18 @@ aws:                            # Requirement for cloud-aws
 # app_name:
 
 # =============================================================================
+# SERVER MODE
+# Server mode is an internal setting used by the app server. Setting this
+# parameter manually is not recommended. It will hard set the current cluster
+# to `server` and prevent it from changing. It can also be set via an var using
+# CLOUDWARE_SERVER_MODE
+#
+# Hard setting the mode to false will cause the server to run with whatever
+# the current cluster is in the CLI.
+# =============================================================================
+# server_mode: false
+
+# =============================================================================
 # DEBUG MODE
 # This will turn off the spinner and require the debugging libraries. This can
 # also be set with the `CLOUDWARE_DEBUG` env var
