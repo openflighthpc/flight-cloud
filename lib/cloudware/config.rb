@@ -47,8 +47,8 @@ module Cloudware
         File.expand_path(File.join(__dir__, '..', '..'))
       end
 
-      def path(_)
-        File.join(root_dir, 'etc/config.yaml')
+      def path(*_)
+        File.join(root_dir, 'etc', 'config.yaml')
       end
 
       delegate_missing_to :cache

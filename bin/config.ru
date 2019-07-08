@@ -26,13 +26,10 @@
 # https://github.com/openflighthpc/management-server
 #===============================================================================
 
-require 'rubygems'
-require 'bundler/setup'
+require 'rake'
+load File.expand_path(File.join(__dir__, '..', 'Rakefile'))
 
-Bundler.setup(:default, :server)
-$LOAD_PATH.unshift(File.expand_path('..', __dir__))
-
-require 'pry' if $DEBUG
+Rake::Task[:'setup:server'].invoke
 
 require 'app/routes'
 run App::Routes

@@ -27,6 +27,20 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
+task :'setup:server' do
+  #TODO: Make the server work with azure
+  ENV['CLOUDWARE_PROVIDER'] = 'aws'
+  ENV['CLOUDWARE_SERVER_MODE'] = 'true'
+  Rake::Task[:setup].invoke
+  $: << Cloudware::Config.root_dir
+
+  puts <<~MESSAGE
+   Starting cloudware in server mode. Please insure the server config has been setup:
+   #{Cloudware::Config.path}
+  MESSAGE
+  puts
+end
+
 task :setup do
   lib_dir = File.join(__dir__, 'lib')
   $LOAD_PATH << File.join(lib_dir)
@@ -52,7 +66,9 @@ task :setup do
       require 'pry-byebug'
     end
 
-    Bundler.setup(:default)
+    sections = [:default]
+    sections.push(:server) if ENV['CLOUDWARE_SERVER_MODE']
+    Bundler.setup(*sections)
 
     require 'cloudware'
   rescue => e
