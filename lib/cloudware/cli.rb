@@ -179,19 +179,20 @@ module Cloudware
       action(c, Commands::Destroy, method: :delete)
     end
 
-    command 'import' do |c|
-      cli_syntax(c, 'ZIP_PATH')
-      c.summary = 'Add templates to the cluster'
-      c.description = <<~DESC.split("\n\n").map(&:squish).join("\n")
-        Imports the '#{Config.provider}' templates into the internal cache. The
-        ZIP_PATH must be a zip file containing an '#{Config.provider}'
-        directory.\n\n
+    # TODO: Fix the import command
+    #command 'import' do |c|
+    #  cli_syntax(c, 'ZIP_PATH')
+    #  c.summary = 'Add templates to the cluster'
+    #  c.description = <<~DESC.split("\n\n").map(&:squish).join("\n")
+    #    Imports the '#{Config.provider}' templates into the internal cache. The
+    #    ZIP_PATH must be a zip file containing an '#{Config.provider}'
+    #    directory.\n\n
 
-        These templates can then be used to deploy resource using:\n
-        #{Config.app_name} deploy foo template
-      DESC
-      action(c, Commands::Import)
-    end
+    #    These templates can then be used to deploy resource using:\n
+    #    #{Config.app_name} deploy foo template
+    #  DESC
+    #  action(c, Commands::Import)
+    #end
 
     command 'list' do |c|
       cli_syntax(c)
@@ -300,10 +301,10 @@ module Cloudware
       action(c, Commands::Deploy, method: :render)
     end
 
-    command 'configure' do |c|
-      cli_syntax(c)
-      c.description = 'Configure access details for the current provider'
-      action(c, Commands::Configure)
-    end
+    # command 'configure' do |c|
+    #   cli_syntax(c)
+    #   c.description = 'Configure access details for the current provider'
+    #   action(c, Commands::Configure)
+    # end
   end
 end

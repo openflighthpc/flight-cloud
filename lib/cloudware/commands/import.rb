@@ -44,9 +44,10 @@ module Cloudware
 
       ZipImporter = Struct.new(:zip_file) do
         SECTION = /(domain|(group|node)\/[^\/]*)/
-        TEMPLATE_REMOVE = /#{Config.provider}\/#{SECTION}\/platform/
-        TEMPLATE_REPLACE = /(?<=#{Config.provider}\/)#{SECTION}/
-        TEMPLATE_GLOB = "#{Config.provider}/{domain,{group,node}/*}/platform/**/*#{Config.template_ext}"
+        # TODO: Support the import command again
+        # TEMPLATE_REMOVE = /#{Config.provider}\/#{SECTION}\/platform/
+        # TEMPLATE_REPLACE = /(?<=#{Config.provider}\/)#{SECTION}/
+        # TEMPLATE_GLOB = "#{Config.provider}/{domain,{group,node}/*}/platform/**/*#{Config.template_ext}"
 
         delegate_missing_to :zip_file
 

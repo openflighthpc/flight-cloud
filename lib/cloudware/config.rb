@@ -57,7 +57,7 @@ module Cloudware
     def __data__
       super.tap do |__data__|
         __data__.env_prefix = 'cloudware'
-        ['provider', 'debug', 'app_name', 'server_mode'].each do |x|
+        ['debug', 'app_name', 'server_mode'].each do |x|
           __data__.set_from_env(x)
         end
       end
@@ -71,17 +71,7 @@ module Cloudware
       dir = __data__.fetch(:log_directory) do
         File.join(self.class.root_dir, 'log').tap { |d| FileUtils.mkdir_p(d) }
       end
-      File.join(dir, provider + '.log')
-    end
-
-    def provider
-      __data__.fetch(:provider) do
-        raise ConfigError, 'No provider specified'
-      end
-    end
-
-    def provider_details
-      Data.load(path)[provider.to_sym]
+      File.join(dir, 'cloud.log')
     end
 
     def prefix_tag
@@ -105,14 +95,11 @@ module Cloudware
       end
     end
 
-    def default_region
-      __data__.fetch(provider, :default_region) do
-        raise ConfigError, <<~ERROR.chomp
-          The 'default_region' has not been set in the config
-          Please see the example config file for details:
-          #{path}.example
-        ERROR
-      end
+    def default_regions
+      OpenStruct.new(
+        aws: __data__.fetch(:aws, :default_region),
+        azure: __data__.fetch(:azure, :default_region)
+      )
     end
 
     def content(*paths)
@@ -120,10 +107,9 @@ module Cloudware
     end
 
     def content_path
-      base = __data__.fetch(:content_directory) do
+      __data__.fetch(:content_directory) do
         File.join(self.class.root_dir, 'var')
       end
-      File.join(base, provider)
     end
 
     def server_cluster

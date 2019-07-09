@@ -32,6 +32,7 @@ require 'tty-prompt'
 module Cloudware
   module Commands
     class Configure < Command
+      # TODO: Fix how the access_details are found
       def run
         create_config_file unless File.exist? Config.path
 

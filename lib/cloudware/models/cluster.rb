@@ -47,8 +47,6 @@ module Cloudware
         RootDir.content_cluster(identifier, 'etc/config.yaml')
       end
 
-      delegate :provider, to: Config
-
       attr_reader :identifier
 
       def initialize(identifier, **h)
@@ -70,6 +68,12 @@ module Cloudware
 
       def tag
         __data__.fetch(:tag)
+      end
+
+      def provider
+        __data__.fetch(:provider) do
+          raise ConfigError, "The cluster's provider has not been set"
+        end
       end
 
       def deployments

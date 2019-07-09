@@ -29,7 +29,6 @@
 
 task :'setup:server' do
   #TODO: Make the server work with azure
-  ENV['CLOUDWARE_PROVIDER'] = 'aws'
   ENV['CLOUDWARE_SERVER_MODE'] = 'true'
   Rake::Task[:setup].invoke
   $: << Cloudware::Config.root_dir
