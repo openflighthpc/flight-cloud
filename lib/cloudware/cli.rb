@@ -97,7 +97,7 @@ module Cloudware
     end
 
     command 'cluster init' do |c|
-      cli_syntax(c, 'PROVIDER CLUSTER')
+      cli_syntax(c, 'CLUSTER PROVIDER')
       c.summary = 'Create a new cluster'
       c.description = <<~DESC
         Create a new cluster that can be identified by CLUSTER. The cluster

@@ -50,7 +50,7 @@ module Cloudware
         super
       end
 
-      def init(provider, identifier, import: nil)
+      def init(identifier, provider, import: nil)
         new_cluster = Models::Cluster.create!(identifier, provider: provider)
         update_cluster(new_cluster.identifier)
         Import.new(__config__).run!(import) if import
