@@ -32,44 +32,28 @@ require 'tty-prompt'
 module Cloudware
   module Commands
     class Configure < Command
-      # TODO: Fix how the access_details are found
       def run
-        create_config_file unless File.exist? Config.path
-
-        file_data = IO.readlines(Config.path)
-        access_details = Config.provider_details
-
-        if access_details.nil?
-          raise ConfigError, 'No provider details found'
-        end
-
-        # Grab the line number in the config corresponding to the current
-        # provider
-        line_number = nil
-        file_data.each_with_index do |line, index|
-          if line.include?("#{Config.provider}:")
-            line_number = index + 1
+        prompt = TTY::Prompt.new
+        puts "Continuing will remove the comments from the config file: #{Config.path}"
+        return unless prompt.ask(<<~DESC.chomp, convert: :bool)
+          Do you wish to continue (y/n)?
+        DESC
+        require 'cloudware/providers/aws_interface'
+        require 'cloudware/providers/azure_interface'
+        {
+          'aws': Providers::AWSInterface::Credentials.required_keys,
+          'azure': Providers::AzureInterface::Credentials.required_keys
+        }.each do |provider, keys|
+          if prompt.ask("Configure #{provider} (y/n)?", convert: :bool)
+            Config.create_or_update do |conf|
+              data = conf.public_send(provider, allow_missing: true)
+              keys.each do |key|
+                data[key] = prompt.ask("What is the #{key}?", default: data[key])
+              end
+              conf.public_send("#{provider}=", data)
+            end
           end
         end
-
-        prompt = TTY::Prompt.new
-        puts "Provide access details for #{Config.provider}:"
-        access_details.each_with_index do |(k, v), i|
-          # Given the line number found before we know where in the config
-          # file the access details are expected
-          file_data[line_number + i] = file_data[line_number + i]
-          .gsub(/:(.*)#/im, ": #{prompt.ask("#{k}:", default: v)} #")
-        end
-
-        # Write the changes to the config file
-        IO.write(Config.path, file_data.join)
-      end
-
-      private
-
-      def create_config_file
-        puts "Config file missing. Creating file at #{Config.path}..."
-        FileUtils.cp(Config.path + '.example', Config.path)
       end
     end
   end

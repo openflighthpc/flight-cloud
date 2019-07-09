@@ -35,7 +35,7 @@ require 'cloudware/exceptions'
 
 module Cloudware
   class Config
-    include FlightConfig::Loader
+    include FlightConfig::Updater
     allow_missing_read
 
     class << self
@@ -79,8 +79,9 @@ module Cloudware
     end
 
     [:azure, :aws].each do |init_provider|
-      define_method(init_provider) do
+      define_method(init_provider) do |allow_missing: false|
         provider_data = __data__.fetch(init_provider) do
+          next {} if allow_missing
           raise ConfigError, <<~ERROR.chomp
             The config is missing the credentials for: #{init_provider}
             Please see the example config file for details:
@@ -88,6 +89,10 @@ module Cloudware
           ERROR
         end
         OpenStruct.new(provider_data)
+      end
+
+      define_method("#{init_provider}=") do |value|
+        __data__.set(init_provider, value: value.to_h)
       end
     end
 

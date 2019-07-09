@@ -39,6 +39,10 @@ module Cloudware
           Aws::Credentials.new(config.access_key_id, config.secret_access_key)
         end
 
+        def self.required_keys
+          [:access_key_id, :secret_access_key]
+        end
+
         private_class_method
 
         def self.config
