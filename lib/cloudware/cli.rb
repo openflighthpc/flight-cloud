@@ -265,19 +265,19 @@ module Cloudware
     command 'power status' do |c|
       shared_power_attr(c)
       c.description = 'Check the power state of a machine'
-      action(c, Commands::Powers::Status)
+      action(c, Commands::Power, method: :status_cli)
     end
 
     command 'power off' do |c|
       shared_power_attr(c)
       c.description = 'Turn the machine off'
-      action(c, Commands::Powers::Off)
+      action(c, Commands::Power, method: :off_cli)
     end
 
     command 'power on' do |c|
       shared_power_attr(c)
       c.description = 'Turn the machine on'
-      action(c, Commands::Powers::On)
+      action(c, Commands::Power, method: :on_cli)
     end
 
     command 'render' do |c|

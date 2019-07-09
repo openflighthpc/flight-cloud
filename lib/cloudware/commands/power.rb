@@ -29,29 +29,46 @@
 
 module Cloudware
   module Commands
-    module Powers
-      class Power < Command
-        attr_reader :identifier
+    class Power < Command
+      attr_reader :identifier
 
-        def run
-          @identifier = argv[0]
-          machines.each { |m| run_power_command(m) }
+      def status_cli(*a)
+        set_arguments(*a)
+        machines.each  { |m| puts "#{m.name}: #{m.status}"}
+      end
+
+      def on_cli(*a)
+        set_arguments(*a)
+        machines.each do |machine|
+          puts "Turning on: #{machine.name}"
+          machine.on
         end
+      end
 
-        def run_power_command(_machine)
-          raise NotImplementedError
+      def off_cli(*a)
+        set_arguments(*a)
+        machines.each do |machine|
+          puts "Turning off: #{machine.name}"
+          machine.off
         end
+      end
 
-        private
+      private
 
-        def machines
-          if options.group
-            Models::Deployments.read(__config__.current_cluster)
-                       .machines
-                       .select { |m| m.groups.include?(identifier) }
-          else
-            [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
-          end
+      attr_reader :identifier, :group
+
+      def set_arguments(identifier, group: false)
+        @identifier = identifier
+        @group = group
+      end
+
+      def machines
+        if group
+          Models::Deployments.read(__config__.current_cluster)
+                             .machines
+                             .select { |m| m.groups.include?(identifier) }
+        else
+          [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
         end
       end
     end
