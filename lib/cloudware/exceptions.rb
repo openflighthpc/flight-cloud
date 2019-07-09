@@ -32,6 +32,7 @@ module Cloudware
   class CloudwareError < RuntimeError; end
   class UserError < CloudwareError; end
   class InternalError < CloudwareError; end
+  class ProviderError < CloudwareError; end
 
   # Other errors
   class ConfigError < CloudwareError; end

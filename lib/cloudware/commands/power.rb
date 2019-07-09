@@ -55,17 +55,17 @@ module Cloudware
 
       def status_hash(*a)
         set_arguments(*a)
-        machines.map { |m| [m.name, m.status] }.to_h
+        hashify_machines { |m| m.status }
       end
 
       def on_hash(*a)
         set_arguments(*a)
-        machines.map { |m| [m.name, m.on] }.to_h
+        hashify_machines { |m| m.on }
       end
 
       def off_hash(*a)
         set_arguments(*a)
-        machines.map { |m| [m.name, m.off] }.to_h
+        hashify_machines { |m| m.off }
       end
 
       private
@@ -75,6 +75,16 @@ module Cloudware
       def set_arguments(identifier, group: false)
         @identifier = identifier
         @group = group
+      end
+
+      def hashify_machines
+        machines.each_with_object({ nodes: {}, errors: {} }) do |machine, memo|
+          begin
+            memo[:nodes][machine.name] = yield machine
+          rescue CloudwareError => e
+            memo[:errors][machine.name] = e.message
+          end
+        end
       end
 
       def machines
