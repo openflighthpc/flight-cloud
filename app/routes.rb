@@ -30,7 +30,8 @@ require 'sinatra/base'
 require 'sinatra/namespace'
 require 'sinatra/json'
 require 'sinatra/param'
-require 'app/cloud_command'
+
+require 'cloudware/commands/power'
 
 module App
   class Routes < Sinatra::Base
@@ -44,18 +45,15 @@ module App
 
     namespace '/power/:node' do
       get '' do
-        json CloudCommand.power_status(node_param, group: group_param)
-                         .response
+        json Cloudware::Commands::Power.new.status_hash(node_param, group: group_param)
       end
 
       get '/on' do
-        json CloudCommand.power_on(node_param, group: group_param)
-                         .response
+        json Cloudware::Commands::Power.new.on_hash(node_param, group: group_param)
       end
 
       get '/off' do
-        json CloudCommand.power_off(node_param, group: group_param)
-                         .response
+        json Cloudware::Commands::Power.new.off_hash(node_param, group: group_param)
       end
     end
 

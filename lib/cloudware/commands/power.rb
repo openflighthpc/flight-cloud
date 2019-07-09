@@ -53,6 +53,21 @@ module Cloudware
         end
       end
 
+      def status_hash(*a)
+        set_arguments(*a)
+        machines.map { |m| [m.name, m.status] }.to_h
+      end
+
+      def on_hash(*a)
+        set_arguments(*a)
+        machines.map { |m| [m.name, m.on] }.to_h
+      end
+
+      def off_hash(*a)
+        set_arguments(*a)
+        machines.map { |m| [m.name, m.off] }.to_h
+      end
+
       private
 
       attr_reader :identifier, :group
