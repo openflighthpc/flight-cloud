@@ -42,16 +42,21 @@ module Cloudware
     end
 
     def current_cluster
-      if server_mode
-        path = Models::Cluster.path(Config.server_cluster)
-        return Config.server_cluster if File.exists?(path)
-        Models::Cluster.create(Config.server_cluster).identifier
+      name = (server_mode ? server_cluster : __data__.fetch(:current_cluster))
+      if name && File.exists?(Models::Cluster.path(name))
+        name
+      elsif name
+        raise ConfigError, <<~ERROR.squish
+          The current cluster '#{name}' does not exist. Please create it with
+          '#{app_name} cluster init <provider> #{name}'
+        ERROR
       else
-        __data__.fetch(:current_cluster) do
-          path = Models::Cluster.path('default')
-          return 'default' if File.exists?(path)
-          Models::Cluster.create('default').identifier
-        end
+        raise ConfigError, <<~ERROR.chomp
+          Can not currently preform this operation as a cluster has not been selected.
+          Please select a cluster using either:
+          * '#{app_name} cluster init <provider> <new-cluster>
+          * '#{app_name} cluster switch <existing-cluster>
+        ERROR
       end
     end
 

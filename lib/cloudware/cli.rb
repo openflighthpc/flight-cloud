@@ -97,11 +97,12 @@ module Cloudware
     end
 
     command 'cluster init' do |c|
-      cli_syntax(c, 'CLUSTER')
+      cli_syntax(c, 'PROVIDER CLUSTER')
       c.summary = 'Create a new cluster'
       c.description = <<~DESC
         Create a new cluster that can be identified by CLUSTER. The cluster
-        must not already exist. Use the `--import` option to import templates
+        must not already exist. The resources will be deployed to the
+        specified PROVIDER. Use the `--import` option to import templates
         into your new cluster. See `#{Config.app_name} import` for further
         details.
       DESC

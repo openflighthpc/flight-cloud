@@ -96,10 +96,10 @@ module Cloudware
     end
 
     def default_regions
-      OpenStruct.new(
+      {
         aws: __data__.fetch(:aws, :default_region),
         azure: __data__.fetch(:azure, :default_region)
-      )
+      }
     end
 
     def content(*paths)
