@@ -89,6 +89,10 @@ module Cloudware
         end
       end
 
+      def template_ext
+        provider == 'azure' ? '.json' : '.yaml'
+      end
+
       def deployments
         Models::Deployments.read(identifier)
       end
