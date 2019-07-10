@@ -43,12 +43,27 @@ module Cloudware
       def node(identifier)
         node = Models::Node.read(__config__.current_cluster, identifier)
         raise_if_deployed(node)
-        deployed_node = with_spinner('Deploying resources...', done: 'Done') do
+        deployed_node = with_spinner('Deploying node...', done: 'Done') do
           Models::Node.deploy!(__config__.current_cluster, identifier)
         end
         if deployed_node.deployment_error
           raise DeploymentError, <<~ERROR.chomp
              An error has occured. Please see for further details:
+            `#{Config.app_name} list deployments --verbose`
+          ERROR
+        end
+      end
+
+      # TODO: DRY This up with above
+      def domain
+        domain = Models::Domain.read(__config__.current_cluster)
+        raise_if_deployed(domain)
+        deployed_domain = with_spinner('Deploying domain...', done: 'Done') do
+          Models::Domain.deploy!(__config__.current_cluster)
+        end
+        if deployed_domain.deployment_error
+          raise DeploymentError, <<~ERROR.chomp
+            An error has occurred deploying the domain.
             `#{Config.app_name} list deployments --verbose`
           ERROR
         end
