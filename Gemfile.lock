@@ -47,6 +47,8 @@ GEM
       http-cookie (~> 1.0.0)
     flight_config (0.2.0)
       tty-config
+    flight_manifest (0.1.3)
+      hashie
     hashie (3.6.0)
     highline (1.7.10)
     http-cookie (1.0.3)
@@ -198,6 +200,7 @@ DEPENDENCIES
   factory_bot
   fakefs
   flight_config
+  flight_manifest (~> 0.1.3)
   hashie
   ipaddr
   memoist
