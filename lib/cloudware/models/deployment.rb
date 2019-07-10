@@ -48,6 +48,24 @@ module Cloudware
       include FlightConfig::Updater
       include FlightConfig::Deleter
       include FlightConfig::Globber
+      include FlightConfig::Links
+
+      # Hack the links mechanism to work with inheritance, consider refactoring
+      def self.links_class
+        @links_class ||= if self == Deployment
+          super
+        else
+          superclass.links_class.dup
+        end
+      end
+
+      define_link(:cluster, Models::Cluster) { [cluster] }
+
+      # TODO: Make this an archatype class and replace the path with:
+      # raise NotImplementedError
+      def self.path(cluster, name)
+        RootDir.content_cluster(cluster.to_s, 'var/deployments', name + '.yaml')
+      end
 
       def self.read!(*a)
         reraise_missing_file { read(*a) }
@@ -122,6 +140,9 @@ module Cloudware
         super
       end
 
+      # TODO: Remove template_path as a saved parameter and make it static
+      # Soon all deployments will have a 1:1 relationship with its template
+      # Replace the archetype method with: raise NotImplementedError
       SAVE_ATTR = [
         :template_path, :results, :replacements, :deployed,
         :deployment_error, :epoch_time
@@ -140,7 +161,7 @@ module Cloudware
 
       def cluster_config
         # Protect the read from a `nil` cluster. There is a separate validation
-        # for nil clusters
+       # for nil clusters
         @cluster_config ||= Models::Cluster.read(cluster.to_s)
       end
 
@@ -151,10 +172,6 @@ module Cloudware
       # Ensure the template is a string not `Pathname`
       def template_path=(path)
         __data__.set(:template_path, value: path.to_s)
-      end
-
-      def path
-        RootDir.content_cluster(cluster.to_s, 'var/deployments', name + '.yaml')
       end
 
       def template
