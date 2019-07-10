@@ -44,16 +44,6 @@ aws:                            # Requirement for cloud-aws
 # log_directory:
 
 # =============================================================================
-# STATIC PROVIDER
-# The provider can be statically set within the config. This will override
-# the provider set within the binaries (not recommended)
-#
-# NOTE: There is a limited ability to set this with the `CLOUDWARE_PROVIDER`
-# env var if the source code is required directly (but not through bin/*)
-# =============================================================================
-# provider:
-
-# =============================================================================
 # APPNAME
 # The appname is inferred from the filepath that initiated the ruby process.
 # However it can be independently set in the config or with
