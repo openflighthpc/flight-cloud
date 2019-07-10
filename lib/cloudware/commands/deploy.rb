@@ -35,9 +35,26 @@ module Cloudware
     class Deploy < Command
       def self.delayed_require
         super
+        require 'cloudware/models/node'
         require 'cloudware/replacement_factory'
       end
 
+      # TODO: Handle dependent deployments at some point
+      def node(identifier)
+        node = Models::Node.read(__config__.current_cluster, identifier)
+        raise_if_deployed(node)
+        deployed_node = with_spinner('Deploying resources...', done: 'Done') do
+          Models::Node.deploy!(__config__.current_cluster, identifier)
+        end
+        if deployed_node.deployment_error
+          raise DeploymentError, <<~ERROR.chomp
+             An error has occured. Please see for further details:
+            `#{Config.app_name} list deployments --verbose`
+          ERROR
+        end
+      end
+
+      # TODO: Retire this method completely
       def run!(name, raw_path = nil, params: nil, group: nil)
         machines = if group
                      get_machines_in_group(name)
@@ -156,7 +173,6 @@ module Cloudware
       def raise_if_deployed(dep)
         return unless dep.deployed
         raise InvalidInput, "'#{dep.name}' is already running"
-        ERROR
       end
 
       def deploy(machine)

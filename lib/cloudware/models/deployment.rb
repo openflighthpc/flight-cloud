@@ -159,6 +159,10 @@ module Cloudware
         end
       end
 
+      def provider
+        links.cluster.provider
+      end
+
       def cluster_config
         # Protect the read from a `nil` cluster. There is a separate validation
        # for nil clusters

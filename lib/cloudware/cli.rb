@@ -149,6 +149,12 @@ module Cloudware
       action(c, Commands::Deploy)
     end
 
+    command 'deploy-node' do |c|
+      cli_syntax(c, 'IDENTIFIER')
+      c.summary = 'Deploy the node to the provider'
+      action(c, Commands::Deploy, method: :node)
+    end
+
     command 'destroy' do |c|
       cli_syntax(c, 'NAME')
       c.summary = 'Stop a running deployment'
