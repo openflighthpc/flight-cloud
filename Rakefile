@@ -90,9 +90,11 @@ end
 #   require 'cloudware'
 # end
 
-# task console: :setup do
-#   Pry::REPL.start({})
-# end
+task :console do
+  ENV['CLOUDWARE_DEBUG'] = 'true'
+  Rake::Task[:setup].invoke
+  binding.pry
+end
 
 # task :spin do
 #   include Cloudware::WithSpinner
