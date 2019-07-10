@@ -31,6 +31,13 @@ load File.join(__dir__, 'Rakefile')
 
 Rake::Task[:'setup:server'].invoke
 
+# Insure the current cluster exists before starting the server
+# NOTE: $PROGRAM_NAME is changed so the error message is correct
+old_name = $PROGRAM_NAME
+$PROGRAM_NAME = 'cloud'
+Cloudware::CommandConfig.read.current_cluster
+$PROGRAM_NAME = old_name
+
 require 'app/routes'
 run App::Routes
 
