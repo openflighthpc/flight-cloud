@@ -27,7 +27,7 @@
 #===============================================================================
 
 require 'rake'
-load File.expand_path(File.join(__dir__, '..', 'Rakefile'))
+load File.join(__dir__, 'Rakefile')
 
 Rake::Task[:'setup:server'].invoke
 

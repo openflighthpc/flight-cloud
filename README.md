@@ -55,6 +55,14 @@ Caution, the `CLI` can still manage the server cluster if it is manually
 switched to it first. This is to allow admin action to be preformed on it
 directly. Naturally this may alter the behaviour of the server.
 
+### Deploying the server
+
+The server can be started with:
+
+```
+rackup -p <port> -o 0.0.0.0
+```
+
 ## Operation
 
 Once the appropriate credentials have been configured, `cloudware` it's time
