@@ -122,32 +122,41 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :delete)
     end
 
-    command 'deploy' do |c|
-      cli_syntax(c, 'NAME [TEMPLATE]')
-      c.summary = 'Deploy new resource(s) define by a template'
-      c.description = <<-DESC.strip_heredoc
-        When called with a single argument, it will deploy a currently existing
-        deployment: NAME. This will result in an error if the deployment does
-        not exist or is currently in a deployed state.
-
-        Calling it with a second argument will try and create a new deployment
-        called NAME with the specified TEMPLATE. The TEMPLATE references the
-        internal template which have been imported. Alternatively it can be
-        an absolute path to a template file.
-
-        In either case, the template is read and sent to the provider. The
-        template is read each time it is re-deployed. Be careful not to delete
-        or modify it.
-
-        The templates also support basic rendering of parameters from the
-        command line. This is intended to provide minor tweaks to the templates
-        (e.g. IPs or names).
-      DESC
-      c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
-               String, 'A space separated list of keys to be replaced'
-      c.option '-g', '--group', 'Deploy all resources within the specified group'
-      action(c, Commands::Deploy)
+    command 'configure' do |c|
+      cli_syntax(c)
+      c.description = 'Configure access details for the current provider'
+      action(c, Commands::Configure)
     end
+
+    # TODO: The old deploy command is being maintained for reference, once the
+    # functionality has been replicated, remove this code block
+    #
+    # command 'deploy' do |c|
+    #   cli_syntax(c, 'NAME [TEMPLATE]')
+    #   c.summary = 'Deploy new resource(s) define by a template'
+    #   c.description = <<-DESC.strip_heredoc
+    #     When called with a single argument, it will deploy a currently existing
+    #     deployment: NAME. This will result in an error if the deployment does
+    #     not exist or is currently in a deployed state.
+
+    #     Calling it with a second argument will try and create a new deployment
+    #     called NAME with the specified TEMPLATE. The TEMPLATE references the
+    #     internal template which have been imported. Alternatively it can be
+    #     an absolute path to a template file.
+
+    #     In either case, the template is read and sent to the provider. The
+    #     template is read each time it is re-deployed. Be careful not to delete
+    #     or modify it.
+
+    #     The templates also support basic rendering of parameters from the
+    #     command line. This is intended to provide minor tweaks to the templates
+    #     (e.g. IPs or names).
+    #   DESC
+    #   c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
+    #            String, 'A space separated list of keys to be replaced'
+    #   c.option '-g', '--group', 'Deploy all resources within the specified group'
+    #   action(c, Commands::Deploy)
+    # end
 
     command 'deploy-domain' do |c|
       cli_syntax(c)
@@ -293,30 +302,25 @@ module Cloudware
       action(c, Commands::Power, method: :on_cli)
     end
 
-    command 'render' do |c|
-      cli_syntax(c, 'NAME [TEMPLATE]')
-      c.summary = 'Return the template for an existing or new deployment'
-      c.description = <<~DESC
-        Renders the template for the `NAME` deployment. Existing deployments
-        will always render the saved template and replacements.
+    # TODO: Replace with render-node and render-domain
+    # command 'render' do |c|
+    #   cli_syntax(c, 'NAME [TEMPLATE]')
+    #   c.summary = 'Return the template for an existing or new deployment'
+    #   c.description = <<~DESC
+    #     Renders the template for the `NAME` deployment. Existing deployments
+    #     will always render the saved template and replacements.
 
-        If the deployment does not exist, the `TEMPLATE` and `--params`
-        options are used instead. See the 'deploy' command for valid inputs
-        for these inputs.
-      DESC
-      c.option '-t', '--template PATH', String, <<~DESC
-        Template path for a new deployment
-      DESC
-      c.option '--params STRING', String, <<~DESC
-        Values to be replaced for a new deployment
-      DESC
-      action(c, Commands::Deploy, method: :render)
-    end
-
-    command 'configure' do |c|
-      cli_syntax(c)
-      c.description = 'Configure access details for the current provider'
-      action(c, Commands::Configure)
-    end
+    #     If the deployment does not exist, the `TEMPLATE` and `--params`
+    #     options are used instead. See the 'deploy' command for valid inputs
+    #     for these inputs.
+    #   DESC
+    #   c.option '-t', '--template PATH', String, <<~DESC
+    #     Template path for a new deployment
+    #   DESC
+    #   c.option '--params STRING', String, <<~DESC
+    #     Values to be replaced for a new deployment
+    #   DESC
+    #   action(c, Commands::Deploy, method: :render)
+    # end
   end
 end

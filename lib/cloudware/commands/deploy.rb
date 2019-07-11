@@ -69,121 +69,45 @@ module Cloudware
         end
       end
 
-      # TODO: Retire this method completely
-      def run!(name, raw_path = nil, params: nil, group: nil)
-        machines = if group
-                     get_machines_in_group(name)
-                   else
-                    [name]
-                   end
+      # TODO: If this code is still commented out in a few months, feel free to delete it
+      # def prompt_for_params(errors)
+      #   puts "Please provide values for the following missing parameters:"
+      #   puts "(Note: Use the format of *<resource_name> to reference a resource)"
+      #   prompt = TTY::Prompt.new
 
-        machines.each do |m|
-          cur_dep = if raw_path
-            raw_path = prompt_for_template(raw_path) unless File.exist? raw_path
-            create_deployment(m, raw_path, params: params)
-          else
-            Models::Deployment.read!(__config__.current_cluster, m)
-          end
-          raise_if_deployed(cur_dep)
+      #   replacements = {}
+      #   errors.each do |e|
+      #     replacements[e.to_s.delete('%').to_sym] = prompt.ask("#{e}:")
+      #   end
 
-          dependencies = cur_dep.replacements.select { |key, value|
-            # Select only values to be resolved
-            value.include? "*"
-          }.each_value.uniq.map { |value|
-            Models::Deployment.read(__config__.current_cluster, (value.delete "*"))
-          }
+      #   return replacements
+      # end
 
-          dependencies.each do |d|
-            unless d.deployed
-              puts "Deploying dependency: #{d.name}"
-              deploy(d.name)
-            end
-          end
-
-          puts "Deploying: #{cur_dep.path}"
-          deploy(m)
-        end
-      end
-
-      def prompt_for_params(missing_params)
-        puts "Please provide values for the following missing parameters:"
-        puts "(Note: Use the format of *<resource_name> to reference a resource)"
-        prompt = TTY::Prompt.new
-
-        replacements = {}
-        previous_param = nil
-
-        # Prompt the user for each missing parameter
-        missing_params.map { |p| p.to_s.delete('%') }.each do |p|
-          key = p.to_sym
-
-          replacements[key] = prompt.ask("#{p}:") do |q|
-            # If the previous parameter is a resource reference then offer it
-            # as the default value for this parameter
-            q.default previous_param unless previous_param.nil?
-          end
-
-          # Set as the value of the parameter if it is a resource reference
-          previous_param = replacements[key] if replacements[key]&.include? '*'
-        end
-
-        return replacements
-      end
-
-      def render(name, template = nil, params: nil)
-        cluster = __config__.current_cluster
-        deployment = Models::Deployment.read_or_new(cluster, name)
-        unless deployment.template_path
-          path = resolve_template(template, error_missing: true)
-          deployment.template_path = path
-          deployment.replacements = ReplacementFactory.new(cluster, name)
-                                                      .build(params)
-        end
-        puts deployment.template
-      end
-
-      def list_templates(verbose: false)
-        list = Models::Cluster.load(__config__.current_cluster).templates
-        if verbose && list.any?
-          list.human_paths.each do |human_path, abs_path|
-            puts "#{human_path} => #{abs_path}"
-          end
-        elsif list.any?
-          list.shorthand_paths.each do |human_path, _|
-            puts human_path
-          end
-        else
-          raise UserError, 'No templates found'
-        end
-      end
+      # TODO: If this code is still commented out in a few months, feel free to delete it
+      # def render(name, template = nil, params: nil)
+      #   cluster = __config__.current_cluster
+      #   deployment = Models::Deployment.read_or_new(cluster, name)
+      #   unless deployment.template_path
+      #     path = resolve_template(template, error_missing: true)
+      #     deployment.template_path = path
+      #     deployment.replacements = ReplacementFactory.new(cluster, name)
+      #                                                 .build(params)
+      #   end
+      #   puts deployment.template
+      # end
 
       private
 
-      def prompt_for_template(path)
-        puts "No valid template found at #{path}. Please provide a valid template."
-        prompt = TTY::Prompt.new
-
-        path = prompt.ask('Template:')
-
-        # The application will keep prompting if the template is invalid and
-        # will only stop prompting if the user provides a real file or exits
-        # manually
-        if File.exist? path
-          path
-        else
-          prompt_for_template(path)
-        end
-      end
-
-      def create_deployment(name, raw_path, params: nil)
-        replacements = ReplacementFactory.new(__config__.current_cluster, name)
-                                         .build(params)
-        Models::Deployment.create!(
-          __config__.current_cluster, name,
-          template: raw_path,
-          replacements: replacements
-        ) { |errors| prompt_for_params(errors) }
-      end
+      # TODO: If this code is still commented out in a few months, feel free to delete it
+      # def create_deployment(name, raw_path, params: nil)
+      #   replacements = ReplacementFactory.new(__config__.current_cluster, name)
+      #                                    .build(params)
+      #   Models::Deployment.create!(
+      #     __config__.current_cluster, name,
+      #     template: raw_path,
+      #     replacements: replacements
+      #   ) { |errors| prompt_for_params(errors) }
+      # end
 
       def raise_if_deployed(dep)
         return unless dep.deployed
