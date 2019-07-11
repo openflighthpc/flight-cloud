@@ -71,33 +71,23 @@ module Cloudware
         reraise_missing_file { read(*a) }
       end
 
-      def self.create!(*a, template:, replacements:)
+      def self.create!(*a, template:)
         create(*a) do |dep|
-          dep.template_path = if Pathname.new(template).absolute?
-            template
-          else
-            dep.cluster_config.templates.resolve_human_path(template)
-          end
-          dep.replacements = replacements
-          dep.validate
-          dep.replacements.merge!(yield dep.errors.messages.keys) unless dep.errors.blank?
-          dep.validate # Second validation to potentially clear any previous errors
-          dep.error('create') unless dep.errors.blank?
+          src = Pathname.new(template)
+          raise ConfigError, <<~ERROR.chomp unless src.absolute?
+            The source template must be an absolute path
+          ERROR
+          raise ConfigError, <<~ERROR.chomp unless src.file?
+            The source template must exist and be a regular file:
+            #{src.to_s}
+          ERROR
+          FileUtils.mkdir_p File.dirname(dep.template_path)
+          FileUtils.cp src, dep.template_path
         end
       rescue FlightConfig::CreateError => e
-        if read_or_new(*a).deployed
-          raise e.exception, <<~ERROR.squish.chomp
-            The deployment already exists and is currently running
-          ERROR
-        else
-          raise e.exception, <<~ERROR.chomp
-            Can not redeploy with a different template.
-            To redeploy, do not provide the second template input:
-            `#{Config.app_name} deploy #{a.last}`
-            Alternatively, the configuration can be permanently deleted with:
-            `#{Config.app_name} delete #{a.last}`
-          ERROR
-        end
+        raise e.exception, <<~ERROR.chomp
+          Can not re-create an existing deployment
+        ERROR
       end
 
       def self.deploy!(*a)
