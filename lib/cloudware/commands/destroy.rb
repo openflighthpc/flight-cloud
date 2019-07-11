@@ -53,19 +53,15 @@ module Cloudware
         end
       end
 
-      def delete(name, force: false, group: nil)
-        machines = if group
-                     get_machines_in_group(name)
-                   else
-                     [name]
-                   end
-
-        machines.each do |m|
-          if force
-            Models::Deployment.delete(__config__.current_cluster, m)
-          else
-            Models::Deployment.delete!(__config__.current_cluster, m)
-          end
+      def delete(name, force: false)
+        if name == 'domain' && force
+          Models::Domain.delete(__config__.current_cluster)
+        elsif force
+          Models::Node.delete(__config__.current_cluster, name)
+        elsif name == 'domain'
+          Models::Domain.delete!(__config__.current_cluster)
+        else
+          Models::Node.delete!(__config__.current_cluster, name)
         end
       end
     end
