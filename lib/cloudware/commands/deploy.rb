@@ -39,6 +39,10 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
+      def run!(identifier)
+        identifier == 'domain' ? domain : node(identifier)
+      end
+
       # TODO: Handle dependent deployments at some point
       def node(identifier)
         node = Models::Node.prompt!(__config__.current_cluster, identifier)

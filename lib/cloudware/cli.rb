@@ -158,16 +158,10 @@ module Cloudware
     #   action(c, Commands::Deploy)
     # end
 
-    command 'deploy-domain' do |c|
-      cli_syntax(c)
-      c.summary = 'Deploy the domain'
-      action(c, Commands::Deploy, method: :domain)
-    end
-
-    command 'deploy-node' do |c|
+    command 'deploy' do |c|
       cli_syntax(c, 'IDENTIFIER')
-      c.summary = 'Deploy the node to the provider'
-      action(c, Commands::Deploy, method: :node)
+      c.summary = 'Deploy a domain or node'
+      action(c, Commands::Deploy)
     end
 
     command 'destroy' do |c|
