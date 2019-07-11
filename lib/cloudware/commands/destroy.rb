@@ -37,18 +37,9 @@ module Cloudware
         super
       end
 
-      def run
-        @name = argv[0]
-        machines = if options.group
-                     get_machines_in_group(name)
-                   else
-                     [name]
-                   end
-
-        machines.each do |m|
-          with_spinner("Destroying resources for #{m}...", done: 'Done') do
-            Models::Deployment.destroy!(__config__.current_cluster, m)
-          end
+      def node(name)
+        with_spinner("Destroying resources for #{name}...", done: 'Done') do
+          Models::Node.destroy!(__config__.current_cluster, name)
         end
       end
 
