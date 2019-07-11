@@ -89,9 +89,7 @@ module Cloudware
 
       def machines
         if group
-          Models::Deployments.read(__config__.current_cluster)
-                             .machines
-                             .select { |m| m.groups.include?(identifier) }
+          raise NotImplementedError
         else
           [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
         end
