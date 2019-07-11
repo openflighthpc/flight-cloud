@@ -183,7 +183,7 @@ module Cloudware
       DESC
       # TODO: Support groups again
       # c.option '-g', '--group', 'Destroy all deployments within the specified group'
-      action(c, Commands::Destroy, method: :node)
+      action(c, Commands::Destroy)
     end
 
     command 'delete' do |c|

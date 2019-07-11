@@ -37,6 +37,16 @@ module Cloudware
         super
       end
 
+      def run!(name)
+        name == 'domain' ? domain : node(name)
+      end
+
+      def domain
+        with_spinner("Destroying domain ...", done: 'Done') do
+          Models::Domain.destroy!(__config__.current_cluster)
+        end
+      end
+
       def node(name)
         with_spinner("Destroying resources for #{name}...", done: 'Done') do
           Models::Node.destroy!(__config__.current_cluster, name)
