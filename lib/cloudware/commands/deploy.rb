@@ -73,18 +73,14 @@ module Cloudware
         end
       end
 
-      # TODO: If this code is still commented out in a few months, feel free to delete it
-      # def render(name, template = nil, params: nil)
-      #   cluster = __config__.current_cluster
-      #   deployment = Models::Deployment.read_or_new(cluster, name)
-      #   unless deployment.template_path
-      #     path = resolve_template(template, error_missing: true)
-      #     deployment.template_path = path
-      #     deployment.replacements = ReplacementFactory.new(cluster, name)
-      #                                                 .build(params)
-      #   end
-      #   puts deployment.template
-      # end
+      def render(name)
+        dep = if name == 'domain'
+                Models::Domain.prompt!(__config__.current_cluster)
+              else
+                Models::Node.prompt!(__config__.current_cluster, name)
+              end
+        puts dep.template
+      end
 
       private
 

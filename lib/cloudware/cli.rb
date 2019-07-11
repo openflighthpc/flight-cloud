@@ -250,21 +250,6 @@ module Cloudware
       action(c, Commands::Lists::Machine)
     end
 
-    command 'list templates' do |c|
-      cli_syntax(c)
-      c.summary = 'Lists the available templates for the cluster'
-      c.description = <<~DESC
-        Lists the templates for a particular cluster. These templates
-        can be used directly with the `deploy` command.
-
-        By default the template name is not required if it can be
-        unambiguously determined from the directory name. Use the
-        verbose option to see the full template paths
-      DESC
-      c.option '--verbose', 'Show the shorthand mappings'
-      action(c, Commands::Deploy, method: :list_templates)
-    end
-
     command 'power' do |c|
       cli_syntax(c)
       c.sub_command_group = true
@@ -298,25 +283,10 @@ module Cloudware
       action(c, Commands::Power, method: :on_cli)
     end
 
-    # TODO: Replace with render-node and render-domain
-    # command 'render' do |c|
-    #   cli_syntax(c, 'NAME [TEMPLATE]')
-    #   c.summary = 'Return the template for an existing or new deployment'
-    #   c.description = <<~DESC
-    #     Renders the template for the `NAME` deployment. Existing deployments
-    #     will always render the saved template and replacements.
-
-    #     If the deployment does not exist, the `TEMPLATE` and `--params`
-    #     options are used instead. See the 'deploy' command for valid inputs
-    #     for these inputs.
-    #   DESC
-    #   c.option '-t', '--template PATH', String, <<~DESC
-    #     Template path for a new deployment
-    #   DESC
-    #   c.option '--params STRING', String, <<~DESC
-    #     Values to be replaced for a new deployment
-    #   DESC
-    #   action(c, Commands::Deploy, method: :render)
-    # end
+    command 'render' do |c|
+      cli_syntax(c, 'NAME [TEMPLATE]')
+      c.summary = 'Return the template for an existing or new deployment'
+      action(c, Commands::Deploy, method: :render)
+    end
   end
 end
