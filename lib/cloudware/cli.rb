@@ -229,7 +229,7 @@ module Cloudware
     command('list clusters', &list_clusters_proc)
     command('cluster list', &list_clusters_proc)
 
-    command 'list deployments' do |c|
+    command 'list' do |c|
       cli_syntax(c)
       c.description = 'List all the previous deployed templates'
       c.option '-a', '--all', 'Include offline deployments'
