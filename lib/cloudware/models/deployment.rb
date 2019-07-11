@@ -37,6 +37,7 @@ require 'pathname'
 require 'time'
 
 require 'erb'
+require 'tty/prompt'
 
 module Cloudware
   module Models
@@ -49,6 +50,7 @@ module Cloudware
       include FlightConfig::Deleter
       include FlightConfig::Globber
       include FlightConfig::Links
+      include FlightConfig::Accessor
 
       # Hack the links mechanism to work with inheritance, consider refactoring
       def self.links_class
@@ -90,6 +92,10 @@ module Cloudware
         ERROR
       end
 
+      def self.prompt!(*a)
+        reraise_missing_file { update(*a, &:prompt_for_missing_replacements) }
+      end
+
       def self.deploy!(*a)
         reraise_missing_file do
           update(*a) do |dep|
@@ -122,6 +128,13 @@ module Cloudware
         raise e.exception "The deployment does not exist"
       end
 
+      data_reader(:replacements) do |r|
+        r || begin
+          self.replacements = {}
+        end
+      end
+      data_writer(:replacements) { |r| r.to_h }
+
       attr_reader :cluster, :name
 
       def initialize(cluster, name, **_h)
@@ -134,8 +147,7 @@ module Cloudware
       # Soon all deployments will have a 1:1 relationship with its template
       # Replace the archetype method with: raise NotImplementedError
       SAVE_ATTR = [
-        :template_path, :results, :replacements, :deployed,
-        :deployment_error, :epoch_time
+        :template_path, :results, :deployed, :deployment_error, :epoch_time
       ].freeze
 
       SAVE_ATTR.each do |method|
@@ -166,6 +178,10 @@ module Cloudware
       # Ensure the template is a string not `Pathname`
       def template_path=(path)
         __data__.set(:template_path, value: path.to_s)
+      end
+
+      def raw_template
+        File.read(template_path)
       end
 
       def template
@@ -229,6 +245,21 @@ module Cloudware
         "#{Config.prefix_tag}-#{name}-#{cluster_config.tag}"
       end
 
+      def required_replacements
+        raw_template.scan(/(?<=%)[\w-]*(?=%)/).uniq
+      end
+
+      def missing_replacements
+        required_replacements - replacements.keys
+      end
+
+      def prompt_for_missing_replacements
+        prompt = TTY::Prompt.new
+        missing_replacements.each do |key|
+          self.replacements[key.to_sym] = prompt.ask("%#{key}%:")
+        end
+      end
+
       def validate_or_error(action)
         validate
         error(action) unless errors.blank?
@@ -251,10 +282,6 @@ module Cloudware
           <% end -%>
           <% end -%>
         TEMPLATE
-      end
-
-      def raw_template
-        File.read(template_path)
       end
     end
   end

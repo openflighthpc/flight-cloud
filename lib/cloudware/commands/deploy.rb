@@ -41,7 +41,7 @@ module Cloudware
 
       # TODO: Handle dependent deployments at some point
       def node(identifier)
-        node = Models::Node.read(__config__.current_cluster, identifier)
+        node = Models::Node.prompt!(__config__.current_cluster, identifier)
         raise_if_deployed(node)
         deployed_node = with_spinner('Deploying node...', done: 'Done') do
           Models::Node.deploy!(__config__.current_cluster, identifier)
@@ -56,7 +56,7 @@ module Cloudware
 
       # TODO: DRY This up with above
       def domain
-        domain = Models::Domain.read(__config__.current_cluster)
+        domain = Models::Domain.prompt!(__config__.current_cluster)
         raise_if_deployed(domain)
         deployed_domain = with_spinner('Deploying domain...', done: 'Done') do
           Models::Domain.deploy!(__config__.current_cluster)
@@ -68,20 +68,6 @@ module Cloudware
           ERROR
         end
       end
-
-      # TODO: If this code is still commented out in a few months, feel free to delete it
-      # def prompt_for_params(errors)
-      #   puts "Please provide values for the following missing parameters:"
-      #   puts "(Note: Use the format of *<resource_name> to reference a resource)"
-      #   prompt = TTY::Prompt.new
-
-      #   replacements = {}
-      #   errors.each do |e|
-      #     replacements[e.to_s.delete('%').to_sym] = prompt.ask("#{e}:")
-      #   end
-
-      #   return replacements
-      # end
 
       # TODO: If this code is still commented out in a few months, feel free to delete it
       # def render(name, template = nil, params: nil)
