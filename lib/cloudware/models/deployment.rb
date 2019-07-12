@@ -97,7 +97,7 @@ module Cloudware
         reraise_missing_file do
           update(*a) do |dep|
             TTY::Editor.open(dep.template_path)
-            dep.prompt_for_missing_replacements
+            dep.prompt_for_all_replacements
           end
         end
       end
@@ -263,11 +263,12 @@ module Cloudware
         required_replacements - replacements.keys
       end
 
+      def prompt_for_all_replacements
+        required_replacements.each { |k| ask_for_replacement(k) }
+      end
+
       def prompt_for_missing_replacements
-        prompt = TTY::Prompt.new
-        missing_replacements.each do |key|
-          self.replacements[key.to_sym] = prompt.ask("%#{key}%:")
-        end
+        missing_replacements.each { |k| ask_for_replacement(k) }
       end
 
       def validate_or_error(action)
@@ -282,6 +283,15 @@ module Cloudware
       end
 
       private
+
+      def ask_for_replacement(key)
+        value = self.replacements[key]
+        self.replacements[key]= prompt.ask("%#{key}%:", default: value)
+      end
+
+      def prompt
+        @prompt ||= TTY::Prompt.new
+      end
 
       def render_errors_message(action)
         ERB.new(<<~TEMPLATE, nil, '-').result(binding).chomp
