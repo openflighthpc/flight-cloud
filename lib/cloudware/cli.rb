@@ -197,6 +197,12 @@ module Cloudware
       action(c, Commands::Destroy, method: :delete)
     end
 
+    command 'edit' do |c|
+      cli_syntax(c, 'NAME')
+      c.summary = 'Update the cloud template and deployment parameters'
+      action(c, Commands::Edit)
+    end
+
     command 'import' do |c|
       cli_syntax(c, 'ZIP_PATH')
       c.summary = 'Add templates to the cluster'

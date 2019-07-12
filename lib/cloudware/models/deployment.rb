@@ -92,6 +92,16 @@ module Cloudware
         ERROR
       end
 
+
+      def self.edit_then_prompt!(*a)
+        reraise_missing_file do
+          update(*a) do |dep|
+            TTY::Editor.open(dep.template_path)
+            dep.prompt_for_missing_replacements
+          end
+        end
+      end
+
       def self.prompt!(*a)
         reraise_missing_file { update(*a, &:prompt_for_missing_replacements) }
       end
