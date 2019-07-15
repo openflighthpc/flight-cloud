@@ -37,6 +37,12 @@ module Cloudware
       end
 
       def domain(template: nil)
+      # NOTE: The domain can be implicitly created as their can only be one domain
+        unless File.exists?(Models::Domain.path(__config__.current_cluster))
+          model = Models::Domain.create(__config__.current_cluster)
+          FileUtils.mkdir_p File.dirname(model.template_path)
+          FileUtils.touch model.template_path
+        end
         if template
           replace_model_template(
             template, Models::Domain.read(__config__.current_cluster)
