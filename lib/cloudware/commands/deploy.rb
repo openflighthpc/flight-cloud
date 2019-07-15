@@ -40,7 +40,11 @@ module Cloudware
       end
 
       def run!(identifier)
-        identifier == 'domain' ? domain : node(identifier)
+        if identifier == 'domain'
+          domain
+        else
+          node(identifier)
+        end
       end
 
       # TODO: Handle dependent deployments at some point

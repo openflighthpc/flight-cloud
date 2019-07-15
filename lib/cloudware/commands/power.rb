@@ -27,6 +27,8 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
+require 'cloudware/models/group'
+
 module Cloudware
   module Commands
     class Power < Command
@@ -89,7 +91,9 @@ module Cloudware
 
       def machines
         if group
-          raise NotImplementedError
+          Models::Group.read(__config__.current_cluster, identifier).nodes.map do |node|
+            Models::Machine.new(name: node.name, cluster: __config__.current_cluster)
+          end
         else
           [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
         end
