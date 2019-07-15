@@ -131,6 +131,10 @@ module Cloudware
     command 'create' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
       c.description = 'Add a new node to the cluster'
+      c.option '--groups [GROUPS]', <<~DESC.squish
+        Set which GROUPS the node belongs to. This option is ignored when
+        configuring a domain. The GROUPS must be given as a comma separated list.
+      DESC
       action(c, Commands::Create)
     end
 
