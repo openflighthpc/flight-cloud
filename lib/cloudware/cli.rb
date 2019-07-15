@@ -200,6 +200,7 @@ module Cloudware
     command 'edit' do |c|
       cli_syntax(c, 'NAME')
       c.summary = 'Update the cloud template and deployment parameters'
+      c.option '--template PATH', 'Replace the old template with the new file PATH'
       action(c, Commands::Edit)
     end
 

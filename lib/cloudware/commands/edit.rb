@@ -32,16 +32,37 @@ require 'tty-editor'
 module Cloudware
   module Commands
     class Edit < Command
-      def run!(name)
-        name == 'domain' ? domain : node(name)
+      def run!(name, **kwargs)
+        name == 'domain' ? domain(**kwargs) : node(name, **kwargs)
       end
 
-      def domain
-        Models::Domain.edit_then_prompt!(__config__.current_cluster)
+      def domain(template: nil)
+        if template
+          replace_model_template(
+            template, Models::Domain.read(__config__.current_cluster)
+          )
+          Models::Domain.prompt!(__config__.current_cluster, all: true)
+        else
+          Models::Domain.edit_then_prompt!(__config__.current_cluster)
+        end
       end
 
-      def node(name)
-        Models::Node.edit_then_prompt!(__config__.current_cluster, name)
+      def node(name, template: nil)
+        if template
+          replace_model_template(
+            template, Models::Node.read(__config__.current_cluster, name)
+          )
+          Models::Node.prompt!(__config__.current_cluster, name, all: true)
+        else
+          Models::Node.edit_then_prompt!(__config__.current_cluster, name)
+        end
+      end
+
+      private
+
+      def replace_model_template(template, model)
+        FileUtils.mkdir_p File.dirname(model.template_path)
+        FileUtils.cp template, model.template_path
       end
     end
   end
