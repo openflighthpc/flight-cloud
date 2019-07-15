@@ -87,7 +87,7 @@ module Cloudware
       def self.edit_then_prompt!(*a)
         reraise_missing_file do
           update(*a) do |dep|
-            TTY::Editor.open(dep.template_path)
+            dep.edit_template
             dep.prompt_for_all_replacements
           end
         end
@@ -266,6 +266,10 @@ module Cloudware
         missing_replacements.each { |k| ask_for_replacement(k) }
       end
 
+      def edit_template
+        TTY::Editor.open(template_path)
+      end
+
       def save_template(src_path)
         src = Pathname.new(src_path)
         raise ConfigError, <<~ERROR.chomp unless src.absolute?
@@ -277,6 +281,14 @@ module Cloudware
         ERROR
         FileUtils.mkdir_p File.dirname(template_path)
         FileUtils.cp src, template_path
+      end
+
+      def cli_groups=(input)
+        if input.is_a?(String)
+          self.groups = input.split(',')
+        elsif input
+          self.groups = []
+        end
       end
 
       def validate_or_error(action)

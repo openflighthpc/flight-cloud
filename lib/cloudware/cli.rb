@@ -131,9 +131,9 @@ module Cloudware
     command 'create' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
       c.description = 'Add a new node to the cluster'
-      c.option '--groups [GROUPS]', <<~DESC.squish
+      c.option '--groups GROUPS', <<~DESC.squish
         Set which GROUPS the node belongs to. This option is ignored when
-        configuring a domain. The GROUPS must be given as a comma separated list.
+        creating a domain. The GROUPS must be given as a comma separated list.
       DESC
       action(c, Commands::Create)
     end
@@ -211,6 +211,11 @@ module Cloudware
       cli_syntax(c, 'NAME')
       c.summary = 'Update the cloud template and deployment parameters'
       c.option '--template PATH', 'Replace the old template with the new file PATH'
+      c.option '--groups [GROUPS]', <<~DESC.squish
+        Set which GROUPS the node belongs to. This option is ignored when
+        editting a domain. The GROUPS must be given as a comma separated list.
+        Omitting the GROUPS argument will unassign the node from all groups
+      DESC
       action(c, Commands::Edit)
     end
 

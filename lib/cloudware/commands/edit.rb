@@ -53,14 +53,15 @@ module Cloudware
         end
       end
 
-      def node(name, template: nil)
-        if template
-          replace_model_template(
-            template, Models::Node.read(__config__.current_cluster, name)
-          )
-          Models::Node.prompt!(__config__.current_cluster, name, all: true)
-        else
-          Models::Node.edit_then_prompt!(__config__.current_cluster, name)
+      def node(name, template: nil, groups: nil)
+        Models::Node.update(__config__.current_cluster, name) do |node|
+          if template
+            node.save_template(template)
+          else
+            node.edit_template
+          end
+          node.prompt_for_missing_replacements
+          node.cli_groups = groups
         end
       end
 
