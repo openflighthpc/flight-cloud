@@ -128,6 +128,12 @@ module Cloudware
       action(c, Commands::Configure)
     end
 
+    command 'create' do |c|
+      cli_syntax(c, 'NAME TEMPLATE')
+      c.description = 'Add a new node to the cluster'
+      action(c, Commands::Create)
+    end
+
     # TODO: The old deploy command is being maintained for reference, once the
     # functionality has been replicated, remove this code block
     #
