@@ -49,6 +49,15 @@ module Cloudware
       def template_path=(*a)
         # noop
       end
+
+      data_reader(:groups) { |v| v || [] }
+      data_writer(:groups) do |v|
+        if v.nil? || v.is_a?(Array)
+          v
+        else
+          [v]
+        end
+      end
     end
   end
 end

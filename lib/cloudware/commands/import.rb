@@ -33,6 +33,18 @@ require 'flight_manifest'
 require 'cloudware/models/domain'
 require 'cloudware/models/node'
 
+# TODO: Move me into the `flight_manifest` repo
+# ALERT: See the following bug if the primary group causes and issue
+# https://github.com/openflighthpc/flight_manifest/issues/1
+module FlightManifest
+  class Node
+    def groups
+      start = (primary_group ? [primary_group] : [])
+      [*start, *secondary_groups]
+    end
+  end
+end
+
 module Cloudware
   module Commands
     class Import < Command
@@ -46,6 +58,7 @@ module Cloudware
         manifest.nodes.each do |man|
           Models::Node.create!(__config__.current_cluster, man.name) do |node|
             node.save_template(man[provider_file].expand_path(manifest.base))
+            node.groups = man.groups
           end
         end
       end
