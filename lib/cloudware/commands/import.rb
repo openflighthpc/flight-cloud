@@ -35,42 +35,27 @@ module Cloudware
     class Import < Command
       def run!(raw_path)
         zip_path = Pathname.new(raw_path).expand_path.sub_ext('.zip').to_s
-        ZipImporter.extract(zip_path) do |zip|
-          zip.copy_templates(__config__.current_cluster)
-        end
+        ZipImporter.extract(zip_path, __config__.current_cluster)
       end
 
       private
 
-      ZipImporter = Struct.new(:zip_file) do
+      ZipImporter = Struct.new(:zip_file, :cluster) do
         SECTION = /(domain|(group|node)\/[^\/]*)/
-        TEMPLATE_REMOVE = /#{Config.provider}\/#{SECTION}\/platform/
-        TEMPLATE_REPLACE = /(?<=#{Config.provider}\/)#{SECTION}/
-        TEMPLATE_GLOB = "#{Config.provider}/{domain,{group,node}/*}/platform/**/*#{Config.template_ext}"
 
+        delegate :provider, :template_ext, to: :cluster_model
         delegate_missing_to :zip_file
 
-        def self.extract(path)
+        def self.extract(path, cluster)
           Zip::File.open(path) do |f|
-            yield new(f) if block_given?
+            new(f, cluster).copy_templates
           end
         end
 
-        ##
-        # Strip the root provider directory and the `platform`
-        # sub directory from the destination path
-        #
-        def self.dst_template_path(src, base)
-          replace = src.match(TEMPLATE_REPLACE)[0]
-          Pathname.new(src)
-                  .sub(/#{TEMPLATE_REMOVE}/, replace)
-                  .expand_path(base)
-        end
-
-        def copy_templates(cluster)
+        def copy_templates
           base = RootDir.content_cluster_template(cluster)
           templates.each do |zip_src|
-            dst = self.class.dst_template_path(zip_src.name, base)
+            dst = dst_template_path(zip_src.name, base)
             dst.dirname.mkpath
             if dst.exist?
               $stderr.puts "Skipping, file already exists: #{dst}"
@@ -82,7 +67,36 @@ module Cloudware
         end
 
         def templates
-          glob(TEMPLATE_GLOB).reject(&:directory?)
+          glob(template_glob).reject(&:directory?)
+        end
+
+        private
+
+        def cluster_model
+          @cluter_model ||= Models::Cluster.read(cluster)
+        end
+
+        def template_remove
+          /#{provider}\/#{SECTION}\/platform/
+        end
+
+        def template_replace
+          /(?<=#{provider}\/)#{SECTION}/
+        end
+
+        def template_glob
+          "#{provider}/{domain,{group,node}/*}/platform/**/*#{template_ext}"
+        end
+
+        ##
+        # Strip the root provider directory and the `platform`
+        # sub directory from the destination path
+        #
+        def dst_template_path(src, base)
+          replace = src.match(template_replace)[0]
+          Pathname.new(src)
+                  .sub(/#{template_remove}/, replace)
+                  .expand_path(base)
         end
       end
     end

@@ -44,22 +44,32 @@ aws:                            # Requirement for cloud-aws
 # log_directory:
 
 # =============================================================================
-# STATIC PROVIDER
-# The provider can be statically set within the config. This will override
-# the provider set within the binaries (not recommended)
-#
-# NOTE: There is a limited ability to set this with the `CLOUDWARE_PROVIDER`
-# env var if the source code is required directly (but not through bin/*)
-# =============================================================================
-# provider:
-
-# =============================================================================
 # APPNAME
 # The appname is inferred from the filepath that initiated the ruby process.
 # However it can be independently set in the config or with
 # `CLOUDWARE_APP_NAME` env var
 # =============================================================================
 # app_name:
+
+# =============================================================================
+# SERVER MODE
+# Server mode is an internal setting used by the app server. Setting this
+# parameter manually is not recommended. It will hard set the current cluster
+# to `server` and prevent it from changing. It can also be set via an var using
+# CLOUDWARE_SERVER_MODE
+#
+# Hard setting the mode to false will cause the server to run with whatever
+# the current cluster is in the CLI.
+# =============================================================================
+# server_mode: false
+
+# =============================================================================
+# SERVER CLUSTER
+# Set the current cluster used by the server. The server will automatically
+# switch the current cluster to match when it starts. This is to ensure a
+# consistent cluster is used regardless of the CLI
+# =============================================================================
+# server_cluster: server
 
 # =============================================================================
 # DEBUG MODE

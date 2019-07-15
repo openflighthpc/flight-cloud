@@ -119,6 +119,7 @@ module Cloudware
       def initialize(cluster, name, **_h)
         @cluster = cluster
         @name = name
+        super
       end
 
       SAVE_ATTR = [

@@ -1,9 +1,8 @@
 # frozen_string_literal: true
-
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2019-present OpenFlightHPC
 #
-# This file is part of Flight Cloud.
+# This file is part of management-server
 #
 # This program and the accompanying materials are made available under
 # the terms of the Eclipse Public License 2.0 which is available at
@@ -11,7 +10,7 @@
 # terms made available by Alces Flight Ltd - please direct inquiries
 # about licensing to licensing@alces-flight.com.
 #
-# Flight Cloud is distributed in the hope that it will be useful, but
+# This project is distributed in the hope that it will be useful, but
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS
 # OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A
@@ -19,23 +18,19 @@
 # details.
 #
 # You should have received a copy of the Eclipse Public License 2.0
-# along with Flight Cloud. If not, see:
+# along with this project. If not, see:
 #
 #  https://opensource.org/licenses/EPL-2.0
 #
-# For more information on Flight Cloud, please visit:
-# https://github.com/openflighthpc/flight-cloud
+# For more information on flight-account, please visit:
+# https://github.com/openflighthpc/management-server
 #===============================================================================
 
-module Cloudware
-  module Commands
-    module Powers
-      class Off < Power
-        def run_power_command(machine)
-          puts "Turning #{machine.name} off"
-          machine.off
-        end
-      end
-    end
-  end
-end
+require 'rake'
+load File.join(__dir__, 'Rakefile')
+
+Rake::Task[:'setup:server'].invoke
+
+require 'app/routes'
+run App::Routes
+

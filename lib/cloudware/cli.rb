@@ -97,11 +97,12 @@ module Cloudware
     end
 
     command 'cluster init' do |c|
-      cli_syntax(c, 'CLUSTER')
+      cli_syntax(c, 'CLUSTER PROVIDER')
       c.summary = 'Create a new cluster'
       c.description = <<~DESC
         Create a new cluster that can be identified by CLUSTER. The cluster
-        must not already exist. Use the `--import` option to import templates
+        must not already exist. The resources will be deployed to the
+        specified PROVIDER. Use the `--import` option to import templates
         into your new cluster. See `#{Config.app_name} import` for further
         details.
       DESC
@@ -183,9 +184,9 @@ module Cloudware
       cli_syntax(c, 'ZIP_PATH')
       c.summary = 'Add templates to the cluster'
       c.description = <<~DESC.split("\n\n").map(&:squish).join("\n")
-        Imports the '#{Config.provider}' templates into the internal cache. The
-        ZIP_PATH must be a zip file containing an '#{Config.provider}'
-        directory.\n\n
+        Imports the templates into the internal cache. The
+        ZIP_PATH must be a zip file containing a directory that matches
+        the cluster's provider directory.\n\n
 
         These templates can then be used to deploy resource using:\n
         #{Config.app_name} deploy foo template
@@ -265,19 +266,19 @@ module Cloudware
     command 'power status' do |c|
       shared_power_attr(c)
       c.description = 'Check the power state of a machine'
-      action(c, Commands::Powers::Status)
+      action(c, Commands::Power, method: :status_cli)
     end
 
     command 'power off' do |c|
       shared_power_attr(c)
       c.description = 'Turn the machine off'
-      action(c, Commands::Powers::Off)
+      action(c, Commands::Power, method: :off_cli)
     end
 
     command 'power on' do |c|
       shared_power_attr(c)
       c.description = 'Turn the machine on'
-      action(c, Commands::Powers::On)
+      action(c, Commands::Power, method: :on_cli)
     end
 
     command 'render' do |c|

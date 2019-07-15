@@ -40,6 +40,10 @@ module Cloudware
         def self.build
           raise NotImplementedError
         end
+
+        def self.required_keys
+          raise NotImplementedError
+        end
       end
 
       class Machine

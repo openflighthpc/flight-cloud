@@ -3,6 +3,10 @@
 source 'https://rubygems.org'
 
 gem 'activemodel'
+gem 'aws-sdk-cloudformation'
+gem 'aws-sdk-ec2'
+gem 'azure_mgmt_compute'
+gem 'azure_mgmt_resources'
 gem 'colorize'
 gem 'commander-openflighthpc'
 gem 'hashie'
@@ -21,14 +25,10 @@ group :config do
   gem 'flight_config'
 end
 
-group :aws do
-  gem 'aws-sdk-cloudformation'
-  gem 'aws-sdk-ec2'
-end
-
-group :azure do
-  gem 'azure_mgmt_compute'
-  gem 'azure_mgmt_resources'
+group :server do
+  gem 'sinatra'
+  gem 'sinatra-namespace'
+  gem 'sinatra-param'
 end
 
 group :development do

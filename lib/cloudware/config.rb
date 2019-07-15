@@ -35,7 +35,7 @@ require 'cloudware/exceptions'
 
 module Cloudware
   class Config
-    include FlightConfig::Loader
+    include FlightConfig::Updater
     allow_missing_read
 
     class << self
@@ -43,52 +43,45 @@ module Cloudware
         @cache ||= self.load
       end
 
-      delegate_missing_to :cache
+      def root_dir
+        File.expand_path(File.join(__dir__, '..', '..'))
+      end
 
-      def new__data__
-        super.tap do |__data__|
-          __data__.env_prefix = 'cloudware'
-          ['provider', 'debug', 'app_name'].each { |x| __data__.set_from_env(x) }
+      def path(*_)
+        File.join(root_dir, 'etc', 'config.yaml')
+      end
+
+      delegate_missing_to :cache
+    end
+
+    def __data__
+      super.tap do |__data__|
+        __data__.env_prefix = 'cloudware'
+        ['debug', 'app_name', 'server_mode'].each do |x|
+          __data__.set_from_env(x)
         end
       end
     end
 
-    def path
-      File.join(root_dir, 'etc/config.yaml')
-    end
-
     def root_dir
-      File.expand_path(File.join(__dir__, '..', '..'))
+      self.class.root_dir
     end
 
     def log_file
       dir = __data__.fetch(:log_directory) do
         File.join(self.class.root_dir, 'log').tap { |d| FileUtils.mkdir_p(d) }
       end
-      File.join(dir, provider + '.log')
-    end
-
-    def provider
-      __data__.fetch(:provider) do
-        raise ConfigError, 'No provider specified'
-      end
-    end
-
-    def provider_details
-      Data.load(path)[provider.to_sym]
+      File.join(dir, 'cloud.log')
     end
 
     def prefix_tag
       __data__.fetch(:prefix_tag, default: 'cloudware-shared')
     end
 
-    def template_ext
-      provider == 'azure' ? '.json' : '.yaml'
-    end
-
     [:azure, :aws].each do |init_provider|
-      define_method(init_provider) do
+      define_method(init_provider) do |allow_missing: false|
         provider_data = __data__.fetch(init_provider) do
+          next {} if allow_missing
           raise ConfigError, <<~ERROR.chomp
             The config is missing the credentials for: #{init_provider}
             Please see the example config file for details:
@@ -97,16 +90,17 @@ module Cloudware
         end
         OpenStruct.new(provider_data)
       end
+
+      define_method("#{init_provider}=") do |value|
+        __data__.set(init_provider, value: value.to_h)
+      end
     end
 
-    def default_region
-      __data__.fetch(provider, :default_region) do
-        raise ConfigError, <<~ERROR.chomp
-          The 'default_region' has not been set in the config
-          Please see the example config file for details:
-          #{path}.example
-        ERROR
-      end
+    def default_regions
+      {
+        aws: __data__.fetch(:aws, :default_region),
+        azure: __data__.fetch(:azure, :default_region)
+      }
     end
 
     def content(*paths)
@@ -114,10 +108,13 @@ module Cloudware
     end
 
     def content_path
-      base = __data__.fetch(:content_directory) do
+      __data__.fetch(:content_directory) do
         File.join(self.class.root_dir, 'var')
       end
-      File.join(base, provider)
+    end
+
+    def server_cluster
+      __data__.fetch(:server_cluster) { 'server' }
     end
 
     def debug
@@ -126,6 +123,10 @@ module Cloudware
 
     def app_name
       __data__.fetch(:app_name) { File.basename($PROGRAM_NAME) }
+    end
+
+    def server_mode
+      __data__.fetch(:server_mode) { false }
     end
   end
 end

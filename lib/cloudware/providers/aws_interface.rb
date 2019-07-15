@@ -39,6 +39,10 @@ module Cloudware
           Aws::Credentials.new(config.access_key_id, config.secret_access_key)
         end
 
+        def self.required_keys
+          [:access_key_id, :secret_access_key]
+        end
+
         private_class_method
 
         def self.config
@@ -52,11 +56,19 @@ module Cloudware
         end
 
         def off
-          instance.stop
+          instance.stop.stopping_instances.first.current_state.name
+        rescue Aws::EC2::Errors::IncorrectInstanceState
+          raise ProviderError, <<~ERROR.chomp
+            The instance is not in a state from which it can be turned off
+          ERROR
         end
 
         def on
-          instance.start
+          instance.start.starting_instances.first.current_state.name
+        rescue Aws::EC2::Errors::IncorrectInstanceState
+          raise ProviderError, <<~ERROR.chomp
+            The instance is not in a state from which it can be turned on
+          ERROR
         end
 
         private

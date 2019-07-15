@@ -36,7 +36,12 @@ module Cloudware
     def template_path(*parts, ext: true)
       path = RootDir.content_cluster_template(cluster, *parts)
       path = Pathname.new(path)
-      ext ? path.sub_ext(Config.template_ext) : path
+      if ext
+        new_ext = registry.read(Models::Cluster, cluster).template_ext
+        path.sub_ext(new_ext)
+      else
+        path
+      end
     end
 
     def base
@@ -85,6 +90,12 @@ module Cloudware
       @templates ||= Dir.glob(template_path('**/*'))
                         .sort
                         .map { |p| Pathname.new(p) }
+    end
+
+    private
+
+    def registry
+      @registry ||= FlightConfig::Registry.new
     end
   end
 end
