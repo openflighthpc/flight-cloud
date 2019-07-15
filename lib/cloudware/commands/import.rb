@@ -40,10 +40,13 @@ module Cloudware
         abs_path = File.expand_path(path, Dir.pwd)
         manifest = FlightManifest.load(abs_path)
         template = manifest.domain[provider_file].expand_path(manifest.base)
-        Models::Domain.create!(__config__.current_cluster, template: template)
-        manifest.nodes.each do |node|
-          template = node[provider_file].expand_path(manifest.base)
-          Models::Node.create!(__config__.current_cluster, node.name, template: template)
+        Models::Domain.create!(__config__.current_cluster) do |domain|
+          domain.save_template(template)
+        end
+        manifest.nodes.each do |man|
+          Models::Node.create!(__config__.current_cluster, man.name) do |node|
+            node.save_template(man[provider_file].expand_path(manifest.base))
+          end
         end
       end
 

@@ -73,18 +73,9 @@ module Cloudware
         reraise_missing_file { read(*a) }
       end
 
-      def self.create!(*a, template:)
+      def self.create!(*a)
         create(*a) do |dep|
-          src = Pathname.new(template)
-          raise ConfigError, <<~ERROR.chomp unless src.absolute?
-            The source template must be an absolute path
-          ERROR
-          raise ConfigError, <<~ERROR.chomp unless src.file?
-            The source template must exist and be a regular file:
-            #{src.to_s}
-          ERROR
-          FileUtils.mkdir_p File.dirname(dep.template_path)
-          FileUtils.cp src, dep.template_path
+          yield dep if block_given?
         end
       rescue FlightConfig::CreateError => e
         raise e.exception, <<~ERROR.chomp
@@ -273,6 +264,19 @@ module Cloudware
 
       def prompt_for_missing_replacements
         missing_replacements.each { |k| ask_for_replacement(k) }
+      end
+
+      def save_template(src_path)
+        src = Pathname.new(src_path)
+        raise ConfigError, <<~ERROR.chomp unless src.absolute?
+          The source template must be an absolute path
+        ERROR
+        raise ConfigError, <<~ERROR.chomp unless src.file?
+          The source template must exist and be a regular file:
+          #{src.to_s}
+        ERROR
+        FileUtils.mkdir_p File.dirname(template_path)
+        FileUtils.cp src, template_path
       end
 
       def validate_or_error(action)

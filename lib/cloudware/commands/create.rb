@@ -36,17 +36,15 @@ module Cloudware
       end
 
       def domain(abs_template)
-        Models::Domain.create(__config__.current_cluster) do |domain|
-          FileUtils.mkdir_p File.dirname(domain.template_path)
-          FileUtils.cp abs_template, domain.template_path
+        Models::Domain.create!(__config__.current_cluster) do |domain|
+          domain.save_template(abs_template)
           domain.prompt_for_missing_replacements
         end
       end
 
       def node(name, abs_template)
-        Models::Node.create(__config__.current_cluster, name) do |node|
-          FileUtils.mkdir_p File.dirname(node.template_path)
-          FileUtils.cp abs_template, node.template_path
+        Models::Node.create!(__config__.current_cluster, name) do |node|
+          node.save_template(abs_template)
           node.prompt_for_missing_replacements
         end
       end
