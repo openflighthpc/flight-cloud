@@ -53,7 +53,7 @@ module Cloudware
         if deployed_node.deployment_error
           raise DeploymentError, <<~ERROR.chomp
              An error has occured. Please see for further details:
-            `#{Config.app_name} list deployments --verbose`
+            `#{Config.app_name} list --verbose`
           ERROR
         end
       end
@@ -68,7 +68,7 @@ module Cloudware
         if deployed_domain.deployment_error
           raise DeploymentError, <<~ERROR.chomp
             An error has occurred deploying the domain.
-            `#{Config.app_name} list deployments --verbose`
+            `#{Config.app_name} list --verbose`
           ERROR
         end
       end
@@ -106,7 +106,7 @@ module Cloudware
           if dep.deployment_error
             raise DeploymentError, <<~ERROR.chomp
                An error has occured. Please see for further details:
-              `#{Config.app_name} list deployments --verbose`
+              `#{Config.app_name} list --verbose`
             ERROR
           end
         end
