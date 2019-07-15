@@ -36,7 +36,7 @@ module Cloudware
         name == 'domain' ? domain(**kwargs) : node(name, **kwargs)
       end
 
-      def domain(template: nil)
+      def domain(template: nil, **_kwargs)
       # NOTE: The domain can be implicitly created as their can only be one domain
         unless File.exists?(Models::Domain.path(__config__.current_cluster))
           model = Models::Domain.create(__config__.current_cluster)
