@@ -54,14 +54,10 @@ module Cloudware
       end
 
       def delete(name, force: false)
-        if name == 'domain' && force
-          Models::Domain.delete(__config__.current_cluster)
-        elsif force
-          Models::Node.delete(__config__.current_cluster, name)
-        elsif name == 'domain'
-          Models::Domain.delete!(__config__.current_cluster)
+        if name == 'domain'
+          Models::Domain.delete!(__config__.current_cluster, force: force)
         else
-          Models::Node.delete!(__config__.current_cluster, name)
+          Models::Node.delete!(__config__.current_cluster, name, force: force)
         end
       end
     end
