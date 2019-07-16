@@ -27,31 +27,77 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
+require 'cloudware/models/group'
+
 module Cloudware
   module Commands
-    module Powers
-      class Power < Command
-        attr_reader :identifier
+    class Power < Command
+      attr_reader :identifier
 
-        def run
-          @identifier = argv[0]
-          machines.each { |m| run_power_command(m) }
+      def status_cli(*a)
+        set_arguments(*a)
+        machines.each  { |m| puts "#{m.name}: #{m.status}"}
+      end
+
+      def on_cli(*a)
+        set_arguments(*a)
+        machines.each do |machine|
+          puts "Turning on: #{machine.name}"
+          machine.on
         end
+      end
 
-        def run_power_command(_machine)
-          raise NotImplementedError
+      def off_cli(*a)
+        set_arguments(*a)
+        machines.each do |machine|
+          puts "Turning off: #{machine.name}"
+          machine.off
         end
+      end
 
-        private
+      def status_hash(*a)
+        set_arguments(*a)
+        hashify_machines { |m| m.status }
+      end
 
-        def machines
-          if options.group
-            Models::Deployments.read(__config__.current_cluster)
-                       .machines
-                       .select { |m| m.groups.include?(identifier) }
-          else
-            [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
+      def on_hash(*a)
+        set_arguments(*a)
+        hashify_machines { |m| m.on }
+      end
+
+      def off_hash(*a)
+        set_arguments(*a)
+        hashify_machines { |m| m.off }
+      end
+
+      private
+
+      attr_reader :identifier, :group
+
+      def set_arguments(identifier, group: false)
+        @identifier = identifier
+        @group = group
+      end
+
+      def hashify_machines
+        machines.each_with_object({ nodes: {}, errors: {} }) do |machine, memo|
+          begin
+            memo[:nodes][machine.name] = yield machine
+          rescue CloudwareError => e
+            memo[:errors][machine.name] = e.message
+          rescue FlightConfig::MissingFile
+            memo[:errors][machine.name] = 'Node does not exist'
           end
+        end
+      end
+
+      def machines
+        if group
+          Models::Group.read(__config__.current_cluster, identifier).nodes.map do |node|
+            Models::Machine.new(name: node.name, cluster: __config__.current_cluster)
+          end
+        else
+          [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
         end
       end
     end

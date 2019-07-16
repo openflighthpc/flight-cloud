@@ -36,12 +36,11 @@ module Cloudware
     module AzureInterface
       class Credentials < Base::Credentials
         def self.build
-          {
-            subscription_id: config.subscription_id,
-            tenant_id: config.tenant_id,
-            client_id: config.client_id,
-            client_secret: config.client_secret,
-          }
+          required_keys.map { |k| [k, config.public_send(k)] }.to_h
+        end
+
+        def self.required_keys
+          [:subscription_id, :tenant_id, :client_id, :client_secret]
         end
 
         private_class_method

@@ -27,38 +27,49 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
+require 'tty-editor'
+
 module Cloudware
   module Commands
-    class Destroy < Command
-      attr_reader :name
-
-      def initialize(*a)
-        require 'cloudware/models/deployment'
-        super
+    class Edit < Command
+      def run!(name, **kwargs)
+        name == 'domain' ? domain(**kwargs) : node(name, **kwargs)
       end
 
-      def run!(name)
-        name == 'domain' ? domain : node(name)
-      end
-
-      def domain
-        with_spinner("Destroying domain ...", done: 'Done') do
-          Models::Domain.destroy!(__config__.current_cluster)
+      def domain(template: nil, **_kwargs)
+      # NOTE: The domain can be implicitly created as their can only be one domain
+        unless File.exists?(Models::Domain.path(__config__.current_cluster))
+          model = Models::Domain.create(__config__.current_cluster)
+          FileUtils.mkdir_p File.dirname(model.template_path)
+          FileUtils.touch model.template_path
         end
-      end
-
-      def node(name)
-        with_spinner("Destroying resources for #{name}...", done: 'Done') do
-          Models::Node.destroy!(__config__.current_cluster, name)
-        end
-      end
-
-      def delete(name, force: false)
-        if name == 'domain'
-          Models::Domain.delete!(__config__.current_cluster, force: force)
+        if template
+          replace_model_template(
+            template, Models::Domain.read(__config__.current_cluster)
+          )
+          Models::Domain.prompt!(__config__.current_cluster, all: true)
         else
-          Models::Node.delete!(__config__.current_cluster, name, force: force)
+          Models::Domain.edit_then_prompt!(__config__.current_cluster)
         end
+      end
+
+      def node(name, template: nil, groups: nil)
+        Models::Node.update(__config__.current_cluster, name) do |node|
+          if template
+            node.save_template(template)
+          else
+            node.edit_template
+          end
+          node.prompt_for_missing_replacements
+          node.cli_groups = groups
+        end
+      end
+
+      private
+
+      def replace_model_template(template, model)
+        FileUtils.mkdir_p File.dirname(model.template_path)
+        FileUtils.cp template, model.template_path
       end
     end
   end

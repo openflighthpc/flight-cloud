@@ -37,6 +37,7 @@ require 'pathname'
 require 'time'
 
 require 'erb'
+require 'tty/prompt'
 
 module Cloudware
   module Models
@@ -48,37 +49,55 @@ module Cloudware
       include FlightConfig::Updater
       include FlightConfig::Deleter
       include FlightConfig::Globber
+      include FlightConfig::Links
+      include FlightConfig::Accessor
+
+      # Hack the links mechanism to work with inheritance, consider refactoring
+      def self.links_class
+        @links_class ||= if self == Deployment
+          super
+        else
+          superclass.links_class.dup
+        end
+      end
+
+      define_link(:cluster, Models::Cluster) { [cluster] }
+
+      # TODO: Make this an archatype class and replace the path with:
+      # raise NotImplementedError
+      def self.path(cluster, name)
+        RootDir.content_cluster(cluster.to_s, 'var/deployments', name + '.yaml')
+      end
 
       def self.read!(*a)
         reraise_missing_file { read(*a) }
       end
 
-      def self.create!(*a, template:, replacements:)
+      def self.create!(*a)
         create(*a) do |dep|
-          dep.template_path = if Pathname.new(template).absolute?
-            template
-          else
-            dep.cluster_config.templates.resolve_human_path(template)
-          end
-          dep.replacements = replacements
-          dep.validate
-          dep.replacements.merge!(yield dep.errors.messages.keys) unless dep.errors.blank?
-          dep.validate # Second validation to potentially clear any previous errors
-          dep.error('create') unless dep.errors.blank?
+          yield dep if block_given?
         end
       rescue FlightConfig::CreateError => e
-        if read_or_new(*a).deployed
-          raise e.exception, <<~ERROR.squish.chomp
-            The deployment already exists and is currently running
-          ERROR
-        else
-          raise e.exception, <<~ERROR.chomp
-            Can not redeploy with a different template.
-            To redeploy, do not provide the second template input:
-            `#{Config.app_name} deploy #{a.last}`
-            Alternatively, the configuration can be permanently deleted with:
-            `#{Config.app_name} delete #{a.last}`
-          ERROR
+        raise e.exception, <<~ERROR.chomp
+          Can not re-create an existing deployment
+        ERROR
+      end
+
+
+      def self.edit_then_prompt!(*a)
+        reraise_missing_file do
+          update(*a) do |dep|
+            dep.edit_template
+            dep.prompt_for_all_replacements
+          end
+        end
+      end
+
+      def self.prompt!(*a, all: false)
+        reraise_missing_file do
+          update(*a) do |dep|
+            all ? dep.prompt_for_all_replacements : dep.prompt_for_missing_replacements
+          end
         end
       end
 
@@ -95,13 +114,13 @@ module Cloudware
         reraise_missing_file { update(*a, &:destroy) }
       end
 
-      def self.delete!(*a)
+      def self.delete!(*a, force: false)
         reraise_missing_file do
           delete(*a) do |dep|
-            next true unless dep.deployed
-            raise DeploymentError, <<~ERROR.chomp
-              Can not delete a currently running deployment
-            ERROR
+            if !force && dep.deployed
+              raise DeploymentError, "Can not delete a currently running deployment"
+            end
+            FileUtils.rm_f dep.template_path
           end
         end
       end
@@ -114,16 +133,26 @@ module Cloudware
         raise e.exception "The deployment does not exist"
       end
 
+      data_reader(:replacements) do |r|
+        r || begin
+          self.replacements = {}
+        end
+      end
+      data_writer(:replacements) { |r| r.to_h }
+
       attr_reader :cluster, :name
 
       def initialize(cluster, name, **_h)
         @cluster = cluster
         @name = name
+        super
       end
 
+      # TODO: Remove template_path as a saved parameter and make it static
+      # Soon all deployments will have a 1:1 relationship with its template
+      # Replace the archetype method with: raise NotImplementedError
       SAVE_ATTR = [
-        :template_path, :results, :replacements, :deployed,
-        :deployment_error, :epoch_time
+        :template_path, :results, :deployed, :deployment_error, :epoch_time
       ].freeze
 
       SAVE_ATTR.each do |method|
@@ -137,9 +166,13 @@ module Cloudware
         end
       end
 
+      def provider
+        links.cluster.provider
+      end
+
       def cluster_config
         # Protect the read from a `nil` cluster. There is a separate validation
-        # for nil clusters
+       # for nil clusters
         @cluster_config ||= Models::Cluster.read(cluster.to_s)
       end
 
@@ -152,8 +185,8 @@ module Cloudware
         __data__.set(:template_path, value: path.to_s)
       end
 
-      def path
-        RootDir.content_cluster(cluster.to_s, 'var/deployments', name + '.yaml')
+      def raw_template
+        File.read(template_path)
       end
 
       def template
@@ -217,6 +250,47 @@ module Cloudware
         "#{Config.prefix_tag}-#{name}-#{cluster_config.tag}"
       end
 
+      def required_replacements
+        raw_template.scan(/(?<=%)[\w-]*(?=%)/).uniq
+      end
+
+      def missing_replacements
+        required_replacements - replacements.keys
+      end
+
+      def prompt_for_all_replacements
+        required_replacements.each { |k| ask_for_replacement(k) }
+      end
+
+      def prompt_for_missing_replacements
+        missing_replacements.each { |k| ask_for_replacement(k) }
+      end
+
+      def edit_template
+        TTY::Editor.open(template_path)
+      end
+
+      def save_template(src_path)
+        src = Pathname.new(src_path)
+        raise ConfigError, <<~ERROR.chomp unless src.absolute?
+          The source template must be an absolute path
+        ERROR
+        raise ConfigError, <<~ERROR.chomp unless src.file?
+          The source template must exist and be a regular file:
+          #{src.to_s}
+        ERROR
+        FileUtils.mkdir_p File.dirname(template_path)
+        FileUtils.cp src, template_path
+      end
+
+      def cli_groups=(input)
+        if input.is_a?(String)
+          self.groups = input.split(',')
+        elsif input
+          self.groups = []
+        end
+      end
+
       def validate_or_error(action)
         validate
         error(action) unless errors.blank?
@@ -230,6 +304,15 @@ module Cloudware
 
       private
 
+      def ask_for_replacement(key)
+        value = self.replacements[key]
+        self.replacements[key]= prompt.ask("%#{key}%:", default: value)
+      end
+
+      def prompt
+        @prompt ||= TTY::Prompt.new
+      end
+
       def render_errors_message(action)
         ERB.new(<<~TEMPLATE, nil, '-').result(binding).chomp
           Failed to <%= action %> resources. The following errors have occurred:
@@ -239,10 +322,6 @@ module Cloudware
           <% end -%>
           <% end -%>
         TEMPLATE
-      end
-
-      def raw_template
-        File.read(template_path)
       end
     end
   end

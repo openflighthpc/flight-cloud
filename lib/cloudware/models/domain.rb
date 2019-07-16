@@ -27,14 +27,42 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
+require 'cloudware/models/deployment'
+
 module Cloudware
-  module Commands
-    module Powers
-      class Status < Power
-        def run_power_command(machine)
-          puts "#{machine.name}: #{machine.status}"
-        end
+  module Models
+    class Domain < Deployment
+      allow_missing_read
+
+      def self.join_domain_path(cluster, *rest)
+        RootDir.content_cluster(cluster.to_s, 'var/domain', *rest)
+      end
+
+      # TODO: make this match the initialize
+      def self.path(cluster, *_a)
+        join_domain_path(cluster, 'etc', 'config.yaml')
+      end
+
+      # TODO: Replace the Deployment initialize with
+      # raise NotImplementedError
+      def initialize(cluster, **h)
+        super(cluster, nil, **h)
+      end
+
+      def name
+        'domain'
+      end
+
+      def template_path
+        ext = links.cluster.template_ext
+        self.class.join_domain_path(cluster, 'var', 'template' + ext)
+      end
+
+      # TODO: Remove this once the base class stops setting the template path
+      def template_path=(*a)
+        # noop
       end
     end
   end
 end
+

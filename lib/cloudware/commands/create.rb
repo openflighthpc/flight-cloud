@@ -29,11 +29,28 @@
 
 module Cloudware
   module Commands
-    module Powers
-      class On < Power
-        def run_power_command(machine)
-          puts "Turning #{machine.name} on"
-          machine.on
+    class Create < Command
+      def run!(name, template, groups: nil, delete_groups: nil)
+        abs_template = File.expand_path(template)
+        if name == 'domain'
+          domain(abs_template)
+        else
+          node(name, abs_template, groups: groups)
+        end
+      end
+
+      def domain(abs_template)
+        Models::Domain.create!(__config__.current_cluster) do |domain|
+          domain.save_template(abs_template)
+          domain.prompt_for_missing_replacements
+        end
+      end
+
+      def node(name, abs_template, groups: nil)
+        Models::Node.create!(__config__.current_cluster, name) do |node|
+          node.save_template(abs_template)
+          node.prompt_for_missing_replacements
+          node.groups = groups.split(',') if groups.is_a?(String)
         end
       end
     end

@@ -44,6 +44,25 @@ aws:
   secret_access_key: '<insert your secret key here>'
 ```
 
+### Server Mode Configuration
+
+No additional configuration is required to run the cloud server. It will
+start on port 80 when `bin/server` is called. To ensure consistent behaviour,
+the server will ignore the current cluster used by the `CLI`. Instead it will
+switch to `server_cluster` specified in the main config file (default: `server`).
+
+Caution, the `CLI` can still manage the server cluster if it is manually
+switched to it first. This is to allow admin action to be preformed on it
+directly. Naturally this may alter the behaviour of the server.
+
+### Deploying the server
+
+The server can be started with:
+
+```
+rackup -p <port> -o 0.0.0.0
+```
+
 ## Operation
 
 Once the appropriate credentials have been configured, `cloudware` it's time
@@ -197,8 +216,6 @@ the outputs from the templates it deploys.
 
 In order to manage machines, the deployment can return the following tags:
 - \<machine-name\>TAGID: The provider unique machine ID (*REQUIRED*)
-- \<machine-name\>TAGgroups: A comma separated list of groups the machine
-  belongs to (optional)
 - \<machine-name\>TAG<other-key>: Any other keys that are associated with
   the machine (optional)
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
 
 #==============================================================================
@@ -28,37 +27,38 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
-lib_dir = File.join(__dir__, '..', 'lib')
-$LOAD_PATH << File.join(lib_dir)
-ENV['BUNDLE_GEMFILE'] ||= File.join(__dir__, '..', 'Gemfile')
+require 'cloudware/models/deployment'
 
-Thread.report_on_exception = false
+module Cloudware
+  module Models
+    class Node < Deployment
+      def self.join_node_path(cluster, name, *rest)
+        RootDir.content_cluster(cluster.to_s, 'var/nodes', name, *rest)
+      end
 
-require 'rubygems'
-require 'bundler'
+      def self.path(*a)
+        join_node_path(*a, 'etc', 'config.yaml')
+      end
 
-# Catch any config errors during the require/setup
-begin
-  # Require the config and associated gems
-  Bundler.setup(:config)
-  require 'cloudware/config'
+      def template_path
+        ext = links.cluster.template_ext
+        self.class.join_node_path(cluster, name, 'var', 'template' + ext)
+      end
 
-  # Require the development gems
-  if Cloudware::Config.debug
-    # `pry` needs to be required in a specific order so it doesn't clash with `pp`
-    Bundler.setup(:development)
-    require 'pp'
-    require 'pry'
-    require 'pry-byebug'
+      # TODO: Remove this once the base class stops setting the template path
+      def template_path=(*a)
+        # noop
+      end
+
+      data_reader(:groups) { |v| v || [] }
+      data_writer(:groups) do |v|
+        if v.nil? || v.is_a?(Array)
+          v
+        else
+          [v]
+        end
+      end
+    end
   end
-
-  # Setup the load path for remaining gems
-  Bundler.setup(:config, :default, Cloudware::Config.provider)
-
-  require 'cloudware'
-rescue => e
-  $stderr.puts e.message
-  exit 1
 end
 
-Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__

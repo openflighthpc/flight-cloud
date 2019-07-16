@@ -27,25 +27,28 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
+require 'cloudware/models/cluster'
+require 'cloudware/models/node'
+
 module Cloudware
-  module Commands
-    module Lists
-      class Machine < Command
-        include Concerns::MarkdownTemplate
+  module Models
+    class Group
+      include FlightConfig::Reader
+      include FlightConfig::Accessor
+      include FlightConfig::Links
 
-        TEMPLATE = <<~ERB
-          <% if machines.empty? -%>
-          No machines found
-          <% end -%>
-          <% machines.each do |machine| -%>
-          # Machine: '<%= machine.name %>'
-          <% machine.tags.each do |key, value| -%>
-          - *<%= key %>*: <%= value %>
-          <% end -%>
+      allow_missing_read
 
-          <% end -%>
-        ERB
+      def self.path(cluster, name)
+        RootDir.content_cluster(cluster, 'var/groups', name, 'etc/config.yaml')
+      end
+      define_input_methods_from_path_parameters
+
+      def nodes
+        Models::Node.glob_read(cluster, '*', registry: __registry__)
+                    .select { |n| n.groups.include?(name) }
       end
     end
   end
 end
+

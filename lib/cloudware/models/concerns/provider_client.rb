@@ -33,8 +33,6 @@ module Cloudware
       module ProviderClient
         extend Memoist
 
-        delegate :provider, to: Config
-
         private
 
         def provider_client
