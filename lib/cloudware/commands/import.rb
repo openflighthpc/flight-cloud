@@ -28,76 +28,53 @@
 #===============================================================================
 
 require 'pathname'
-require 'zip'
+require 'flight_manifest'
+
+require 'cloudware/models/domain'
+require 'cloudware/models/node'
+
+# TODO: Move me into the `flight_manifest` repo
+# ALERT: See the following bug if the primary group causes and issue
+# https://github.com/openflighthpc/flight_manifest/issues/1
+module FlightManifest
+  class Node
+    def groups
+      start = (primary_group ? [primary_group] : [])
+      [*start, *secondary_groups]
+    end
+  end
+end
 
 module Cloudware
   module Commands
     class Import < Command
-      def run!(raw_path)
-        zip_path = Pathname.new(raw_path).expand_path.sub_ext('.zip').to_s
-        ZipImporter.extract(zip_path, __config__.current_cluster)
+      def run!(path)
+        abs_path = File.expand_path(path, Dir.pwd)
+        manifest = FlightManifest.load(abs_path)
+        template = manifest.domain[provider_file].expand_path(manifest.base)
+        Models::Domain.create!(__config__.current_cluster) do |domain|
+          domain.save_template(template)
+        end
+        manifest.nodes.each do |man|
+          Models::Node.create!(__config__.current_cluster, man.name) do |node|
+            node.save_template(man[provider_file].expand_path(manifest.base))
+            node.groups = man.groups
+          end
+        end
       end
 
       private
 
-      ZipImporter = Struct.new(:zip_file, :cluster) do
-        SECTION = /(domain|(group|node)\/[^\/]*)/
+      def registry
+        @registry ||= FlightConfig::Registry.new
+      end
 
-        delegate :provider, :template_ext, to: :cluster_model
-        delegate_missing_to :zip_file
+      def cluster
+        registry.read(Models::Cluster, __config__.current_cluster)
+      end
 
-        def self.extract(path, cluster)
-          Zip::File.open(path) do |f|
-            new(f, cluster).copy_templates
-          end
-        end
-
-        def copy_templates
-          base = RootDir.content_cluster_template(cluster)
-          templates.each do |zip_src|
-            dst = dst_template_path(zip_src.name, base)
-            dst.dirname.mkpath
-            if dst.exist?
-              $stderr.puts "Skipping, file already exists: #{dst}"
-            else
-              zip_src.extract(dst)
-              puts "Imported: #{dst}"
-            end
-          end
-        end
-
-        def templates
-          glob(template_glob).reject(&:directory?)
-        end
-
-        private
-
-        def cluster_model
-          @cluter_model ||= Models::Cluster.read(cluster)
-        end
-
-        def template_remove
-          /#{provider}\/#{SECTION}\/platform/
-        end
-
-        def template_replace
-          /(?<=#{provider}\/)#{SECTION}/
-        end
-
-        def template_glob
-          "#{provider}/{domain,{group,node}/*}/platform/**/*#{template_ext}"
-        end
-
-        ##
-        # Strip the root provider directory and the `platform`
-        # sub directory from the destination path
-        #
-        def dst_template_path(src, base)
-          replace = src.match(template_replace)[0]
-          Pathname.new(src)
-                  .sub(/#{template_remove}/, replace)
-                  .expand_path(base)
-        end
+      def provider_file
+        :"#{cluster.provider}_file"
       end
     end
   end

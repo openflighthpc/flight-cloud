@@ -51,8 +51,10 @@ module Cloudware
           <% end -%>
           *Creation Date*: <%= timestamp %>
           *Status*: <%= deployed ? 'Running' : 'Offline' %>
-          *Template*: <%= template_path %>
           *Provider Tag*: <%= tag %>
+          <% if respond_to?(:groups) -%>
+          *Groups*: <%= groups.empty? ? 'n/a' : groups.join(',')  %>
+          <% end -%>
 
           ## Results
           <% if results.nil? || results.empty? -%>

@@ -48,7 +48,7 @@ module Cloudware
       elsif name
         raise ConfigError, <<~ERROR.squish
           The current cluster '#{name}' does not exist. Please create it with
-          '#{app_name} cluster init <provider> #{name}'
+          '#{app_name} cluster init #{name} <provider>'
         ERROR
       else
         raise ConfigError, <<~ERROR.chomp

@@ -31,10 +31,10 @@ require 'shellwords'
 
 module Cloudware
   class ReplacementFactory
-    attr_reader :deployments, :deployment_name
+    attr_reader :cluster, :deployment_name
 
     def initialize(cluster, deployment_name)
-      @deployments = Models::Deployments.read(cluster)
+      @cluster = cluster
       @deployment_name = deployment_name
     end
 
@@ -50,7 +50,7 @@ module Cloudware
       if value[0] == '*'
         name = /(?<=\A\*)[^\.]*/.match(value).to_s
         other_key = /(?<=\.).*/.match(value).to_s.to_sym
-        results = deployments.find_by_name(name)&.results || {}
+        results = find_by_name(name)&.results || {}
         results[other_key.empty? ? key : other_key].to_s
       else
         value.to_s
@@ -66,6 +66,18 @@ module Cloudware
     end
 
     private
+
+    def registry
+      @registry ||= FlightConfig::Registry.new
+    end
+
+    def find_by_name(name)
+      if name == 'domain'
+        registry.read(Models::Domain, cluster)
+      else
+        registry.read(Models::Node, cluster, name)
+      end
+    end
 
     def parse(component_string)
       components = component_string.split('=', 2)

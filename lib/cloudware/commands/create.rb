@@ -29,35 +29,28 @@
 
 module Cloudware
   module Commands
-    class Destroy < Command
-      attr_reader :name
-
-      def initialize(*a)
-        require 'cloudware/models/deployment'
-        super
-      end
-
-      def run!(name)
-        name == 'domain' ? domain : node(name)
-      end
-
-      def domain
-        with_spinner("Destroying domain ...", done: 'Done') do
-          Models::Domain.destroy!(__config__.current_cluster)
-        end
-      end
-
-      def node(name)
-        with_spinner("Destroying resources for #{name}...", done: 'Done') do
-          Models::Node.destroy!(__config__.current_cluster, name)
-        end
-      end
-
-      def delete(name, force: false)
+    class Create < Command
+      def run!(name, template, groups: nil, delete_groups: nil)
+        abs_template = File.expand_path(template)
         if name == 'domain'
-          Models::Domain.delete!(__config__.current_cluster, force: force)
+          domain(abs_template)
         else
-          Models::Node.delete!(__config__.current_cluster, name, force: force)
+          node(name, abs_template, groups: groups)
+        end
+      end
+
+      def domain(abs_template)
+        Models::Domain.create!(__config__.current_cluster) do |domain|
+          domain.save_template(abs_template)
+          domain.prompt_for_missing_replacements
+        end
+      end
+
+      def node(name, abs_template, groups: nil)
+        Models::Node.create!(__config__.current_cluster, name) do |node|
+          node.save_template(abs_template)
+          node.prompt_for_missing_replacements
+          node.groups = groups.split(',') if groups.is_a?(String)
         end
       end
     end

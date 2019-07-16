@@ -27,6 +27,8 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
+require 'cloudware/models/group'
+
 module Cloudware
   module Commands
     class Power < Command
@@ -83,15 +85,17 @@ module Cloudware
             memo[:nodes][machine.name] = yield machine
           rescue CloudwareError => e
             memo[:errors][machine.name] = e.message
+          rescue FlightConfig::MissingFile
+            memo[:errors][machine.name] = 'Node does not exist'
           end
         end
       end
 
       def machines
         if group
-          Models::Deployments.read(__config__.current_cluster)
-                             .machines
-                             .select { |m| m.groups.include?(identifier) }
+          Models::Group.read(__config__.current_cluster, identifier).nodes.map do |node|
+            Models::Machine.new(name: node.name, cluster: __config__.current_cluster)
+          end
         else
           [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
         end

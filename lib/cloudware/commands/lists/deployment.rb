@@ -37,7 +37,11 @@ module Cloudware
         end
 
         def run!(verbose: false, all: false)
-          deployments = Models::Deployments.read(__config__.current_cluster)
+          registry = FlightConfig::Registry.new
+          deployments = [
+            Models::Domain.read(__config__.current_cluster, registry: registry),
+            *Models::Node.glob_read(__config__.current_cluster, '*', registry: registry)
+          ]
           deployments = deployments.select(&:deployed) unless all
           if deployments.any?
             deployments.each do |d|

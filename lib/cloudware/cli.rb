@@ -86,7 +86,7 @@ module Cloudware
     def self.cli_syntax(command, args_str = '')
       command.hidden = true if command.name.split.length > 1
       command.syntax = <<~SYNTAX.squish
-        #{program(:name)} #{command.name} #{args_str} [options]
+        #{program(:name)} #{command.name} #{args_str}
       SYNTAX
     end
 
@@ -122,30 +122,55 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :delete)
     end
 
-    command 'deploy' do |c|
-      cli_syntax(c, 'NAME [TEMPLATE]')
-      c.summary = 'Deploy new resource(s) define by a template'
-      c.description = <<-DESC.strip_heredoc
-        When called with a single argument, it will deploy a currently existing
-        deployment: NAME. This will result in an error if the deployment does
-        not exist or is currently in a deployed state.
+    command 'configure' do |c|
+      cli_syntax(c)
+      c.description = 'Configure access details for the current provider'
+      action(c, Commands::Configure)
+    end
 
-        Calling it with a second argument will try and create a new deployment
-        called NAME with the specified TEMPLATE. The TEMPLATE references the
-        internal template which have been imported. Alternatively it can be
-        an absolute path to a template file.
-
-        In either case, the template is read and sent to the provider. The
-        template is read each time it is re-deployed. Be careful not to delete
-        or modify it.
-
-        The templates also support basic rendering of parameters from the
-        command line. This is intended to provide minor tweaks to the templates
-        (e.g. IPs or names).
+    command 'create' do |c|
+      cli_syntax(c, 'NAME TEMPLATE')
+      c.description = 'Add a new node to the cluster'
+      c.option '--groups GROUPS', <<~DESC.squish
+        Set which GROUPS the node belongs to. This option is ignored when
+        creating a domain. The GROUPS must be given as a comma separated list.
       DESC
-      c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
-               String, 'A space separated list of keys to be replaced'
-      c.option '-g', '--group', 'Deploy all resources within the specified group'
+      action(c, Commands::Create)
+    end
+
+    # TODO: The old deploy command is being maintained for reference, once the
+    # functionality has been replicated, remove this code block
+    #
+    # command 'deploy' do |c|
+    #   cli_syntax(c, 'NAME [TEMPLATE]')
+    #   c.summary = 'Deploy new resource(s) define by a template'
+    #   c.description = <<-DESC.strip_heredoc
+    #     When called with a single argument, it will deploy a currently existing
+    #     deployment: NAME. This will result in an error if the deployment does
+    #     not exist or is currently in a deployed state.
+
+    #     Calling it with a second argument will try and create a new deployment
+    #     called NAME with the specified TEMPLATE. The TEMPLATE references the
+    #     internal template which have been imported. Alternatively it can be
+    #     an absolute path to a template file.
+
+    #     In either case, the template is read and sent to the provider. The
+    #     template is read each time it is re-deployed. Be careful not to delete
+    #     or modify it.
+
+    #     The templates also support basic rendering of parameters from the
+    #     command line. This is intended to provide minor tweaks to the templates
+    #     (e.g. IPs or names).
+    #   DESC
+    #   c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
+    #            String, 'A space separated list of keys to be replaced'
+    #   c.option '-g', '--group', 'Deploy all resources within the specified group'
+    #   action(c, Commands::Deploy)
+    # end
+
+    command 'deploy' do |c|
+      cli_syntax(c, 'IDENTIFIER')
+      c.summary = 'Deploy a domain or node'
       action(c, Commands::Deploy)
     end
 
@@ -160,7 +185,8 @@ module Cloudware
         Once the deployment is offline, the configuration file can be
         permanently removed using the 'delete' command.
       DESC
-      c.option '-g', '--group', 'Destroy all deployments within the specified group'
+      # TODO: Support groups again
+      # c.option '-g', '--group', 'Destroy all deployments within the specified group'
       action(c, Commands::Destroy)
     end
 
@@ -176,8 +202,21 @@ module Cloudware
         using the '--force' flag. This will not destroy the remote resources
       DESC
       c.option '--force', 'Delete the deployment regardless if running'
-      c.option '-g', '--group', 'Delete all deployments within the specified group'
+      # TODO: Add groups support back again
+      # c.option '-g', '--group', 'Delete all deployments within the specified group'
       action(c, Commands::Destroy, method: :delete)
+    end
+
+    command 'edit' do |c|
+      cli_syntax(c, 'NAME')
+      c.summary = 'Update the cloud template and deployment parameters'
+      c.option '--template PATH', 'Replace the old template with the new file PATH'
+      c.option '--groups [GROUPS]', <<~DESC.squish
+        Set which GROUPS the node belongs to. This option is ignored when
+        editting a domain. The GROUPS must be given as a comma separated list.
+        Omitting the GROUPS argument will unassign the node from all groups
+      DESC
+      action(c, Commands::Edit)
     end
 
     command 'import' do |c|
@@ -212,40 +251,12 @@ module Cloudware
     command('list clusters', &list_clusters_proc)
     command('cluster list', &list_clusters_proc)
 
-    command 'list deployments' do |c|
+    command 'list' do |c|
       cli_syntax(c)
       c.description = 'List all the previous deployed templates'
       c.option '-a', '--all', 'Include offline deployments'
       c.option '-v', '--verbose', 'Show full error messages'
       action(c, Commands::Lists::Deployment)
-    end
-
-    command 'list machines' do |c|
-      cli_syntax(c)
-      c.summary = 'List all the previous deployed machines'
-      c.description = <<~DESC
-        List the machines created within a previous deployment. This command
-        does not poll the provider for any information.
-
-        Instead it list the deployment outputs which follow the machine tag
-        format: `<machine-name>TAG<key>`
-      DESC
-      action(c, Commands::Lists::Machine)
-    end
-
-    command 'list templates' do |c|
-      cli_syntax(c)
-      c.summary = 'Lists the available templates for the cluster'
-      c.description = <<~DESC
-        Lists the templates for a particular cluster. These templates
-        can be used directly with the `deploy` command.
-
-        By default the template name is not required if it can be
-        unambiguously determined from the directory name. Use the
-        verbose option to see the full template paths
-      DESC
-      c.option '--verbose', 'Show the shorthand mappings'
-      action(c, Commands::Deploy, method: :list_templates)
     end
 
     command 'power' do |c|
@@ -284,27 +295,7 @@ module Cloudware
     command 'render' do |c|
       cli_syntax(c, 'NAME [TEMPLATE]')
       c.summary = 'Return the template for an existing or new deployment'
-      c.description = <<~DESC
-        Renders the template for the `NAME` deployment. Existing deployments
-        will always render the saved template and replacements.
-
-        If the deployment does not exist, the `TEMPLATE` and `--params`
-        options are used instead. See the 'deploy' command for valid inputs
-        for these inputs.
-      DESC
-      c.option '-t', '--template PATH', String, <<~DESC
-        Template path for a new deployment
-      DESC
-      c.option '--params STRING', String, <<~DESC
-        Values to be replaced for a new deployment
-      DESC
       action(c, Commands::Deploy, method: :render)
-    end
-
-    command 'configure' do |c|
-      cli_syntax(c)
-      c.description = 'Configure access details for the current provider'
-      action(c, Commands::Configure)
     end
   end
 end

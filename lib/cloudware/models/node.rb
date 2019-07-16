@@ -27,39 +27,38 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
+require 'cloudware/models/deployment'
+
 module Cloudware
-  module Commands
-    class Destroy < Command
-      attr_reader :name
-
-      def initialize(*a)
-        require 'cloudware/models/deployment'
-        super
+  module Models
+    class Node < Deployment
+      def self.join_node_path(cluster, name, *rest)
+        RootDir.content_cluster(cluster.to_s, 'var/nodes', name, *rest)
       end
 
-      def run!(name)
-        name == 'domain' ? domain : node(name)
+      def self.path(*a)
+        join_node_path(*a, 'etc', 'config.yaml')
       end
 
-      def domain
-        with_spinner("Destroying domain ...", done: 'Done') do
-          Models::Domain.destroy!(__config__.current_cluster)
-        end
+      def template_path
+        ext = links.cluster.template_ext
+        self.class.join_node_path(cluster, name, 'var', 'template' + ext)
       end
 
-      def node(name)
-        with_spinner("Destroying resources for #{name}...", done: 'Done') do
-          Models::Node.destroy!(__config__.current_cluster, name)
-        end
+      # TODO: Remove this once the base class stops setting the template path
+      def template_path=(*a)
+        # noop
       end
 
-      def delete(name, force: false)
-        if name == 'domain'
-          Models::Domain.delete!(__config__.current_cluster, force: force)
+      data_reader(:groups) { |v| v || [] }
+      data_writer(:groups) do |v|
+        if v.nil? || v.is_a?(Array)
+          v
         else
-          Models::Node.delete!(__config__.current_cluster, name, force: force)
+          [v]
         end
       end
     end
   end
 end
+

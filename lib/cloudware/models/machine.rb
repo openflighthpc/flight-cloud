@@ -92,8 +92,12 @@ module Cloudware
         fetch_result(GROUPS_TAG, default: '').split(',')
       end
 
+      def deployment
+        cluster.__registry__.read(Models::Node, cluster.identifier, name)
+      end
+
       def tags
-        (cluster.deployments.results || {}).each_with_object({}) do |(key, value), memo|
+        (deployment.results || {}).each_with_object({}) do |(key, value), memo|
           next unless (tag = extract_tag(key))
           memo[tag] = value
         end
@@ -125,7 +129,7 @@ module Cloudware
 
       def fetch_result(short_tag, default: nil)
         long_tag = tag_generator(short_tag)
-        result = (cluster.deployments.results || {})[long_tag]
+        result = (deployment.results || {})[long_tag]
         return result unless result.nil?
         return default unless default.nil?
         yield long_tag if block_given?

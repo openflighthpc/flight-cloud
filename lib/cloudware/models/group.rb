@@ -1,8 +1,9 @@
 # frozen_string_literal: true
+
 #==============================================================================
-# Copyright (C) 2019-present OpenFlightHPC
+# Copyright (C) 2019-present Alces Flight Ltd.
 #
-# This file is part of management-server
+# This file is part of Flight Cloud.
 #
 # This program and the accompanying materials are made available under
 # the terms of the Eclipse Public License 2.0 which is available at
@@ -10,7 +11,7 @@
 # terms made available by Alces Flight Ltd - please direct inquiries
 # about licensing to licensing@alces-flight.com.
 #
-# This project is distributed in the hope that it will be useful, but
+# Flight Cloud is distributed in the hope that it will be useful, but
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS
 # OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A
@@ -18,26 +19,36 @@
 # details.
 #
 # You should have received a copy of the Eclipse Public License 2.0
-# along with this project. If not, see:
+# along with Flight Cloud. If not, see:
 #
 #  https://opensource.org/licenses/EPL-2.0
 #
-# For more information on flight-account, please visit:
-# https://github.com/openflighthpc/management-server
+# For more information on Flight Cloud, please visit:
+# https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
-require 'rake'
-load File.join(__dir__, 'Rakefile')
+require 'cloudware/models/cluster'
+require 'cloudware/models/node'
 
-Rake::Task[:'setup:server'].invoke
+module Cloudware
+  module Models
+    class Group
+      include FlightConfig::Reader
+      include FlightConfig::Accessor
+      include FlightConfig::Links
 
-# Insure the current cluster exists before starting the server
-# NOTE: $PROGRAM_NAME is changed so the error message is correct
-old_name = $PROGRAM_NAME
-$PROGRAM_NAME = 'cloud'
-Cloudware::CommandConfig.read.current_cluster
-$PROGRAM_NAME = old_name
+      allow_missing_read
 
-require 'app/routes'
-run App::Routes
+      def self.path(cluster, name)
+        RootDir.content_cluster(cluster, 'var/groups', name, 'etc/config.yaml')
+      end
+      define_input_methods_from_path_parameters
+
+      def nodes
+        Models::Node.glob_read(cluster, '*', registry: __registry__)
+                    .select { |n| n.groups.include?(name) }
+      end
+    end
+  end
+end
 
