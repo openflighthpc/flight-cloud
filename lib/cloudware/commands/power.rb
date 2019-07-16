@@ -85,6 +85,8 @@ module Cloudware
             memo[:nodes][machine.name] = yield machine
           rescue CloudwareError => e
             memo[:errors][machine.name] = e.message
+          rescue FlightConfig::MissingFile
+            memo[:errors][machine.name] = 'Node does not exist'
           end
         end
       end
