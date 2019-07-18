@@ -39,16 +39,16 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def run!(identifier)
+      def run!(identifier, params=nil)
         if identifier == 'domain'
-          domain
+          domain(params)
         else
-          node(identifier)
+          node(identifier, params)
         end
       end
 
       # TODO: Handle dependent deployments at some point
-      def node(identifier)
+      def node(identifier, params)
         node = Models::Node.prompt!(__config__.current_cluster, identifier)
         raise_if_deployed(node)
         deployed_node = with_spinner('Deploying node...', done: 'Done') do
@@ -63,7 +63,7 @@ module Cloudware
       end
 
       # TODO: DRY This up with above
-      def domain
+      def domain(params)
         domain = Models::Domain.prompt!(__config__.current_cluster)
         raise_if_deployed(domain)
         deployed_domain = with_spinner('Deploying domain...', done: 'Done') do
