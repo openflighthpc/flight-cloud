@@ -93,7 +93,7 @@ module Cloudware
         end
       end
 
-      def self.prompt!(*a, all: false)
+      def self.prompt!(replacements=nil, *a, all: false)
         reraise_missing_file do
           update(*a) do |dep|
             all ? dep.prompt_for_all_replacements : dep.prompt_for_missing_replacements
