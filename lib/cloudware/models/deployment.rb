@@ -256,7 +256,7 @@ module Cloudware
       end
 
       def missing_replacements
-        required_replacements - replacements.keys
+        required_replacements - replacements.keys.map { |k| k.to_s }
       end
 
       def prompt_for_all_replacements
