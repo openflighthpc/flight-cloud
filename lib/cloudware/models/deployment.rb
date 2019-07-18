@@ -307,7 +307,7 @@ module Cloudware
 
       def ask_for_replacement(key)
         value = self.replacements[key]
-        self.replacements[key]= prompt.ask("%#{key}%:", default: value)
+        self.replacements[key]= prompt.ask("#{key}:", default: value)
       end
 
       def prompt
