@@ -49,7 +49,9 @@ module Cloudware
 
       # TODO: Handle dependent deployments at some point
       def node(identifier, params)
-        node = Models::Node.prompt!(__config__.current_cluster, identifier)
+        replacements = ReplacementFactory.new(__config__.current_cluster, identifier)
+          .build(params)
+        node = Models::Node.prompt!(replacements, __config__.current_cluster, identifier)
         raise_if_deployed(node)
         deployed_node = with_spinner('Deploying node...', done: 'Done') do
           Models::Node.deploy!(__config__.current_cluster, identifier)
