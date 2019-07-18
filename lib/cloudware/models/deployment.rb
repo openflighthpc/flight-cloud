@@ -95,6 +95,8 @@ module Cloudware
 
       def self.prompt!(replacements=nil, *a, all: false)
         reraise_missing_file do
+          puts "Please provide values for the following missing parameters:"
+          puts "(Note: Use the format of '*<resource_name>' to reference a resource)"
           update(*a) do |dep|
             dep.replacements = replacements
             all ? dep.prompt_for_all_replacements : dep.prompt_for_missing_replacements
