@@ -54,7 +54,7 @@ module Cloudware
         raise ConfigError, <<~ERROR.chomp
           Can not currently preform this operation as a cluster has not been selected.
           Please select a cluster using either:
-          * '#{app_name} cluster init <provider> <new-cluster>
+          * '#{app_name} cluster init <new-cluster> <provider>
           * '#{app_name} cluster switch <existing-cluster>
         ERROR
       end
