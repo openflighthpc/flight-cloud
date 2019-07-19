@@ -96,7 +96,11 @@ module Cloudware
       def self.prompt!(replacements=nil, *a, all: false)
         reraise_missing_file do
           update(*a) do |dep|
-            dep.replacements = replacements
+            dep.replacements = dep.replacements.merge(
+              replacements.inject({}) { |memo, (k, v)|
+                memo[k.to_s] = v; memo
+              }
+            )
             all ? dep.prompt_for_all_replacements : dep.prompt_for_missing_replacements
           end
         end
