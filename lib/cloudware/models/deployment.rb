@@ -97,8 +97,6 @@ module Cloudware
         reraise_missing_file do
           update(*a) do |dep|
             dep.replacements = replacements
-            puts "Please provide values for the following missing parameters:"
-            puts "(Note: Use the format of '*<resource_name>' to reference a resource)"
             all ? dep.prompt_for_all_replacements : dep.prompt_for_missing_replacements
           end
         end
@@ -266,7 +264,14 @@ module Cloudware
       end
 
       def prompt_for_missing_replacements
-        missing_replacements.each { |k| ask_for_replacement(k) }
+        missing_replacements.each_with_index do |k, i|
+          if i == 0
+            puts "Please provide values for the following missing parameters:"
+            puts "(Note: Use the format of '*<resource_name>' to reference a resource)"
+          end
+
+          ask_for_replacement(k)
+        end
       end
 
       def edit_template
