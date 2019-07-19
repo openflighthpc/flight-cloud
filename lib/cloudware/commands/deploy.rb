@@ -41,7 +41,7 @@ module Cloudware
 
       def run!(identifier, params: nil)
         if identifier == 'domain'
-          domain(params)
+          domain(params: params)
         else
           node(identifier, params: params)
         end
@@ -66,7 +66,9 @@ module Cloudware
 
       # TODO: DRY This up with above
       def domain(params: nil)
-        domain = Models::Domain.prompt!(__config__.current_cluster)
+        replacements = ReplacementFactory.new(__config__.current_cluster, 'domain')
+          .build(params)
+        domain = Models::Domain.prompt!(replacements, __config__.current_cluster)
         raise_if_deployed(domain)
         deployed_domain = with_spinner('Deploying domain...', done: 'Done') do
           Models::Domain.deploy!(__config__.current_cluster)
