@@ -40,7 +40,13 @@ module Cloudware
         end
 
         def self.required_keys
-          [:subscription_id, :tenant_id, :client_id, :client_secret]
+          [
+            :subscription_id,
+            :tenant_id,
+            :client_id,
+            :client_secret,
+            :default_region
+          ]
         end
 
         private_class_method
