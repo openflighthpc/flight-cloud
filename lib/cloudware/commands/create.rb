@@ -42,14 +42,12 @@ module Cloudware
       def domain(abs_template)
         Models::Domain.create!(__config__.current_cluster) do |domain|
           domain.save_template(abs_template)
-          domain.prompt_for_missing_replacements
         end
       end
 
       def node(name, abs_template, groups: nil)
         Models::Node.create!(__config__.current_cluster, name) do |node|
           node.save_template(abs_template)
-          node.prompt_for_missing_replacements
           node.groups = groups.split(',') if groups.is_a?(String)
         end
       end

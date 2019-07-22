@@ -93,9 +93,14 @@ module Cloudware
         end
       end
 
-      def self.prompt!(*a, all: false)
+      def self.prompt!(replacements=nil, *a, all: false)
         reraise_missing_file do
           update(*a) do |dep|
+            dep.replacements = dep.replacements.merge(
+              replacements.inject({}) { |memo, (k, v)|
+                memo[k.to_s] = v; memo
+              }
+            )
             all ? dep.prompt_for_all_replacements : dep.prompt_for_missing_replacements
           end
         end
@@ -255,7 +260,7 @@ module Cloudware
       end
 
       def missing_replacements
-        required_replacements - replacements.keys
+        required_replacements - replacements.keys.map { |k| k.to_s }
       end
 
       def prompt_for_all_replacements
@@ -263,7 +268,14 @@ module Cloudware
       end
 
       def prompt_for_missing_replacements
-        missing_replacements.each { |k| ask_for_replacement(k) }
+        missing_replacements.each_with_index do |k, i|
+          if i == 0
+            puts "Please provide values for the following missing parameters:"
+            puts "(Note: Use the format of '*<resource_name>' to reference a resource)"
+          end
+
+          ask_for_replacement(k)
+        end
       end
 
       def edit_template
@@ -306,7 +318,7 @@ module Cloudware
 
       def ask_for_replacement(key)
         value = self.replacements[key]
-        self.replacements[key]= prompt.ask("%#{key}%:", default: value)
+        self.replacements[key]= prompt.ask("#{key}:", default: value)
       end
 
       def prompt

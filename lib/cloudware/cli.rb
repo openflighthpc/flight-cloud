@@ -171,6 +171,8 @@ module Cloudware
     command 'deploy' do |c|
       cli_syntax(c, 'IDENTIFIER')
       c.summary = 'Deploy a domain or node'
+      c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
+        String, 'A space separated list of keys to be replaced'
       action(c, Commands::Deploy)
     end
 

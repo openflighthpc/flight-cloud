@@ -39,17 +39,19 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def run!(identifier)
+      def run!(identifier, params: nil)
         if identifier == 'domain'
-          domain
+          domain(params: params)
         else
-          node(identifier)
+          node(identifier, params: params)
         end
       end
 
       # TODO: Handle dependent deployments at some point
-      def node(identifier)
-        node = Models::Node.prompt!(__config__.current_cluster, identifier)
+      def node(identifier, params: nil)
+        replacements = ReplacementFactory.new(__config__.current_cluster, identifier)
+          .build(params)
+        node = Models::Node.prompt!(replacements, __config__.current_cluster, identifier)
         raise_if_deployed(node)
         deployed_node = with_spinner('Deploying node...', done: 'Done') do
           Models::Node.deploy!(__config__.current_cluster, identifier)
@@ -63,8 +65,10 @@ module Cloudware
       end
 
       # TODO: DRY This up with above
-      def domain
-        domain = Models::Domain.prompt!(__config__.current_cluster)
+      def domain(params: nil)
+        replacements = ReplacementFactory.new(__config__.current_cluster, 'domain')
+          .build(params)
+        domain = Models::Domain.prompt!(replacements, __config__.current_cluster)
         raise_if_deployed(domain)
         deployed_domain = with_spinner('Deploying domain...', done: 'Done') do
           Models::Domain.deploy!(__config__.current_cluster)
