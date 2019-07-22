@@ -40,7 +40,11 @@ module Cloudware
         end
 
         def self.required_keys
-          [:access_key_id, :secret_access_key]
+          [
+            :access_key_id,
+            :secret_access_key,
+            :default_region
+          ]
         end
 
         private_class_method
