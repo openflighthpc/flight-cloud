@@ -57,7 +57,7 @@ module Cloudware
 
       def status_hash(*a)
         set_arguments(*a)
-        hashify_machines { |m| m.status rescue 'undeployed'}
+        hashify_machines { |m| m.status }
       end
 
       def on_hash(*a)
@@ -86,7 +86,9 @@ module Cloudware
           rescue CloudwareError => e
             memo[:errors][machine.name] = e.message
           rescue FlightConfig::MissingFile
-            memo[:errors][machine.name] = 'Node does not exist'
+            memo[:errors][machine.name] = 'The node does not exist'
+          rescue Module::DelegationError
+            memo[:nodes][machine.name] = 'undeployed'
           end
         end
       end
