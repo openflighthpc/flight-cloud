@@ -58,7 +58,7 @@ module Cloudware
 
       def status_hash(*a)
         set_arguments(*a)
-        hashify_machines { |m| m.status }
+        hashify_machines { |m| m.status rescue 'undeployed'}
       end
 
       def on_hash(*a)
