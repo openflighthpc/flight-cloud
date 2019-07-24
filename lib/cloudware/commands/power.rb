@@ -36,7 +36,7 @@ module Cloudware
 
       def status_cli(*a)
         set_arguments(*a)
-        machines.each  { |m| puts "#{m.name}: #{m.status}"}
+        machines.each  { |m| puts "#{m.name}: #{m.status rescue 'undeployed'}"}
       end
 
       def on_cli(*a)
