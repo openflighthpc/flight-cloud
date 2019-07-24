@@ -36,7 +36,7 @@ module Cloudware
 
       def status_cli(*a)
         set_arguments(*a)
-        machines.each  { |m| puts "#{m.name}: #{m.status}"}
+        machines.each  { |m| puts "#{m.name}: #{m.status rescue 'undeployed'}"}
       end
 
       def on_cli(*a)
@@ -57,7 +57,7 @@ module Cloudware
 
       def status_hash(*a)
         set_arguments(*a)
-        hashify_machines { |m| m.status }
+        hashify_machines { |m| m.status rescue 'undeployed'}
       end
 
       def on_hash(*a)
@@ -93,7 +93,8 @@ module Cloudware
 
       def machines
         if group
-          Models::Group.read(__config__.current_cluster, identifier).nodes.map do |node|
+          Models::Group.read(__config__.current_cluster, identifier).nodes.sort_by { |n| n.name }
+            .map do |node|
             Models::Machine.new(name: node.name, cluster: __config__.current_cluster)
           end
         else

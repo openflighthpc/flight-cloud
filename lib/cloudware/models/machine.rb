@@ -80,12 +80,7 @@ module Cloudware
       end
 
       def provider_id
-        fetch_result(PROVIDER_ID_FLAG) do |long_tag|
-          raise ModelValidationError, <<-ERROR.squish
-            Machine '#{name}' is missing its provider ID. Make sure
-            '#{long_tag}' is set within the deployment output
-          ERROR
-        end
+        fetch_result(PROVIDER_ID_FLAG)
       end
 
       def groups
@@ -138,7 +133,8 @@ module Cloudware
       private
 
       def machine_client
-        provider_client.machine(provider_id)
+        id = provider_id
+        provider_client.machine(id) if id
       end
       memoize :machine_client
     end
