@@ -86,7 +86,7 @@ module Cloudware
           rescue CloudwareError => e
             memo[:errors][machine.name] = e.message
           rescue FlightConfig::MissingFile
-            memo[:errors][machine.name] = 'Node does not exist'
+            memo[:errors][machine.name] = 'The node does not exist'
           rescue Module::DelegationError
             memo[:nodes][machine.name] = 'undeployed'
           end
