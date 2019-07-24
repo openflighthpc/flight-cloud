@@ -135,7 +135,7 @@ module Cloudware
       def self.reraise_missing_file
         yield if block_given?
       rescue FlightConfig::MissingFile => e
-        raise e.exception "The deployment does not exist"
+        raise e.exception "The deployment is not configured"
       end
 
       data_reader(:replacements) do |r|
