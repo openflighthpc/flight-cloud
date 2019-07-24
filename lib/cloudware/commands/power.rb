@@ -36,8 +36,7 @@ module Cloudware
 
       def status_cli(*a)
         set_arguments(*a)
-        machines.sort_by { |m| m.name }
-          .each  { |m| puts "#{m.name}: #{m.status rescue 'undeployed'}"}
+        machines.each  { |m| puts "#{m.name}: #{m.status rescue 'undeployed'}"}
       end
 
       def on_cli(*a)
@@ -94,7 +93,8 @@ module Cloudware
 
       def machines
         if group
-          Models::Group.read(__config__.current_cluster, identifier).nodes.map do |node|
+          Models::Group.read(__config__.current_cluster, identifier).nodes.sort_by { |n| n.name }
+            .map do |node|
             Models::Machine.new(name: node.name, cluster: __config__.current_cluster)
           end
         else
