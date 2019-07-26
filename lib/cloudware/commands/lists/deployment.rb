@@ -37,14 +37,10 @@ module Cloudware
         end
 
         def run!(verbose: false, all: false)
-          registry = FlightConfig::Registry.new
-          deployments = [
-            Models::Domain.read(__config__.current_cluster, registry: registry),
-            *Models::Node.glob_read(__config__.current_cluster, '*', registry: registry)
-          ]
-          deployments = deployments.select(&:deployed) unless all
-          if deployments.any?
-            deployments.each do |d|
+          deps = deployments
+          deps = deps.select(&:deployed) unless all
+          if deps.any?
+            deps.each do |d|
               puts Templaters::DeploymentTemplater.new(d, verbose: verbose)
                                                   .render_info
             end
@@ -53,6 +49,30 @@ module Cloudware
           else
             $stderr.puts 'No running deployments. Use --all for all the deployments'
           end
+        end
+
+        def client_list
+          hashify_list
+        end
+
+        private
+
+        def hashify_list
+          deployments.each_with_object({ running: {}, offline: {} }) do |deployment, memo|
+            status = deployment.deployed ? 'Running' : 'Offline'
+            memo[status.downcase.to_sym][deployment.name] = {
+              status: status,
+              groups: (deployment.groups.join(',') if deployment.respond_to?(:groups))
+            }
+          end
+        end
+
+        def deployments
+          registry = FlightConfig::Registry.new
+          [
+            Models::Domain.read(__config__.current_cluster, registry: registry),
+            *Models::Node.glob_read(__config__.current_cluster, '*', registry: registry)
+          ]
         end
       end
     end
