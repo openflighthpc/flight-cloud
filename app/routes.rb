@@ -57,6 +57,12 @@ module App
       end
     end
 
+    namespace '/list' do
+      get '' do
+        json Cloudware::Commands::Lists::Deployment.new.client_list
+      end
+    end
+
     private
 
     def node_param
