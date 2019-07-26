@@ -54,6 +54,27 @@ module Cloudware
             $stderr.puts 'No running deployments. Use --all for all the deployments'
           end
         end
+
+        def client_list
+          registry = FlightConfig::Registry.new
+          deployments = [
+            Models::Domain.read(__config__.current_cluster, registry: registry),
+            *Models::Node.glob_read(__config__.current_cluster, '*', registry: registry)
+          ]
+          hashify_list(deployments)
+        end
+
+        private
+
+        def hashify_list(deployments)
+          deployments.each_with_object({ running: {}, offline: {} }) do |deployment, memo|
+            status = deployment.deployed ? 'Running' : 'Offline'
+            memo[status.downcase.to_sym][deployment.name] = {
+              status: status,
+              groups: (deployment.groups.join(',') if deployment.respond_to?(:groups))
+            }
+          end
+        end
       end
     end
   end
