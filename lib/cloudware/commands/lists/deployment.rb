@@ -70,16 +70,11 @@ module Cloudware
 
         def deployments(group)
           registry = FlightConfig::Registry.new
-          resources = [
+          [
             Models::Domain.read(__config__.current_cluster, registry: registry),
             *Models::Node.glob_read(__config__.current_cluster, '*', registry: registry)
           ].sort_by { |r| r.name }
-
-          if group
-            resources.select { |r| r.groups.include? group if r.respond_to?(:groups) }
-          end
-
-          resources
+            .select { |r| group ? (r.groups.include? group if r.respond_to?(:groups)) : r }
         end
       end
     end
