@@ -51,13 +51,13 @@ module Cloudware
           end
         end
 
-        def client_list
-          hashify_list
+        def client_list(group: nil)
+          hashify_list(group)
         end
 
         private
 
-        def hashify_list
+        def hashify_list(group)
           deployments(group)
             .each_with_object({ running: {}, offline: {} }) do |deployment, memo|
             status = deployment.deployed ? 'Running' : 'Offline'
