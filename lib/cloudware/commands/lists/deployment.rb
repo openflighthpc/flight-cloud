@@ -36,8 +36,8 @@ module Cloudware
           require 'cloudware/templaters/deployment_templater'
         end
 
-        def run!(verbose: false, all: false)
-          deps = deployments
+        def run!(verbose: false, all: false, group: nil)
+          deps = deployments(group)
           deps = deps.select(&:deployed) unless all
           if deps.any?
             deps.each do |d|
@@ -51,14 +51,15 @@ module Cloudware
           end
         end
 
-        def client_list
-          hashify_list
+        def client_list(group: nil)
+          hashify_list(group)
         end
 
         private
 
-        def hashify_list
-          deployments.each_with_object({ running: {}, offline: {} }) do |deployment, memo|
+        def hashify_list(group)
+          deployments(group)
+            .each_with_object({ running: {}, offline: {} }) do |deployment, memo|
             status = deployment.deployed ? 'Running' : 'Offline'
             memo[status.downcase.to_sym][deployment.name] = {
               status: status,
@@ -67,12 +68,13 @@ module Cloudware
           end
         end
 
-        def deployments
+        def deployments(group)
           registry = FlightConfig::Registry.new
           [
             Models::Domain.read(__config__.current_cluster, registry: registry),
             *Models::Node.glob_read(__config__.current_cluster, '*', registry: registry)
-          ]
+          ].sort_by { |r| r.name }
+            .select { |r| group ? (r.groups.include? group if r.respond_to?(:groups)) : r }
         end
       end
     end

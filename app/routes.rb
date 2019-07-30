@@ -59,7 +59,7 @@ module App
 
     namespace '/list' do
       get '' do
-        json Cloudware::Commands::Lists::Deployment.new.client_list
+        json Cloudware::Commands::Lists::Deployment.new.client_list(group: params[:group])
       end
     end
 
