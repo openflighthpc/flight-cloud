@@ -262,6 +262,12 @@ module Cloudware
       action(c, Commands::Lists::Deployment)
     end
 
+    command 'list-groups' do |c|
+      cli_syntax(c)
+      c.description = 'List all groups within the cluster'
+      action(c, Commands::Lists::Deployment, method: :list_groups)
+    end
+
     command 'power' do |c|
       cli_syntax(c)
       c.sub_command_group = true
