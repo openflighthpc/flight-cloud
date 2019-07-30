@@ -59,6 +59,10 @@ module Cloudware
           hashify_list(group)
         end
 
+        def client_list_groups
+          groups
+        end
+
         private
 
         def hashify_list(group)
