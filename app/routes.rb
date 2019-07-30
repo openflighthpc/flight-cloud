@@ -63,7 +63,7 @@ module App
       end
 
       get '/groups' do
-        json Cloudware::Commands::Lists::Deployment.new.list_groups
+        json Cloudware::Commands::Lists::Deployment.new.client_list_groups
       end
     end
 
