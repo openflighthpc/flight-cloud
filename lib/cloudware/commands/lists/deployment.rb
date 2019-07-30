@@ -51,6 +51,10 @@ module Cloudware
           end
         end
 
+        def list_groups
+          puts groups
+        end
+
         def client_list(group: nil)
           hashify_list(group)
         end
@@ -75,6 +79,12 @@ module Cloudware
             *Models::Node.glob_read(__config__.current_cluster, '*', registry: registry)
           ].sort_by { |r| r.name }
             .select { |r| group ? (r.groups.include? group if r.respond_to?(:groups)) : r }
+        end
+
+        def groups
+          deployments(nil)
+            .map { |d| d.groups.prepend if d.respond_to?(:groups) }
+            .flatten.compact.uniq.sort.map { |g| g.prepend('- ') }
         end
       end
     end
