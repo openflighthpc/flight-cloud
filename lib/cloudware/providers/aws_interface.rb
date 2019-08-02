@@ -75,7 +75,7 @@ module Cloudware
           ERROR
         end
 
-        def change_instance_type(type)
+        def modify_instance_type(type)
           # Instance must be off before changing instance type
           instance.stop
 

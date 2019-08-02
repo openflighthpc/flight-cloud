@@ -69,7 +69,7 @@ module Cloudware
           raise NotImplementedError
         end
 
-        def change_instance_type
+        def modify_instance_type
           raise NotImplementedError
         end
       end

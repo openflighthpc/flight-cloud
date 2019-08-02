@@ -36,7 +36,7 @@ module Cloudware
         end
       end
 
-      def client_change_instance_type(identifier, instance_type)
+      def client_modify_instance_type(identifier, instance_type)
         resize_instance(identifier, instance_type)
       end
 
@@ -44,7 +44,7 @@ module Cloudware
 
       def resize_instance(identifier, instance_type)
         Models::Machine.new(name: identifier, cluster: __config__.current_cluster)
-          .change_instance_type(instance_type)
+          .modify_instance_type(instance_type)
       end
     end
   end
