@@ -39,16 +39,16 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def run!(identifier, params: nil)
+      def run!(identifier, params: nil, instance_type: nil)
         if identifier == 'domain'
           domain(params: params)
         else
-          node(identifier, params: params)
+          node(identifier, params: params, instance_type: instance_type)
         end
       end
 
       # TODO: Handle dependent deployments at some point
-      def node(identifier, params: nil)
+      def node(identifier, params: nil, instance_type: nil)
         replacements = ReplacementFactory.new(__config__.current_cluster, identifier)
           .build(params)
         node = Models::Node.prompt!(replacements, __config__.current_cluster, identifier)

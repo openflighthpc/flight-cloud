@@ -173,6 +173,7 @@ module Cloudware
       c.summary = 'Deploy a domain or node'
       c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
         String, 'A space separated list of keys to be replaced'
+      c.option '-i', '--instance-type TYPE', String, 'Set the instance type of the resource'
       action(c, Commands::Deploy)
     end
 
