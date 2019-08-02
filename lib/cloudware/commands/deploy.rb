@@ -61,6 +61,11 @@ module Cloudware
              An error has occured. Please see for further details:
             `#{Config.app_name} list --verbose`
           ERROR
+        elsif !instance_type.nil?
+          with_spinner('Resizing instance...', done: 'Done') do
+            Models::Machine.new(name: identifier, cluster: __config__.current_cluster)
+              .change_instance_type(instance_type)
+          end
         end
       end
 
