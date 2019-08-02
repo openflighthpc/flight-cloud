@@ -36,6 +36,11 @@ module Cloudware
             .change_instance_type(instance_type)
         end
       end
+
+      def client_change_instance_type(identifier, instance_type)
+        Models::Machine.new(name: identifier, cluster: __config__.current_cluster)
+          .change_instance_type(instance_type)
+      end
     end
   end
 end
