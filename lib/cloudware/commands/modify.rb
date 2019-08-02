@@ -32,12 +32,17 @@ module Cloudware
     class Modify < Command
       def run!(identifier, instance_type)
         with_spinner('Resizing instance...', done: 'Done') do
-          Models::Machine.new(name: identifier, cluster: __config__.current_cluster)
-            .change_instance_type(instance_type)
+          resize_instance(identifier, instance_type)
         end
       end
 
       def client_change_instance_type(identifier, instance_type)
+        resize_instance(identifier, instance_type)
+      end
+
+      private
+
+      def resize_instance(identifier, instance_type)
         Models::Machine.new(name: identifier, cluster: __config__.current_cluster)
           .change_instance_type(instance_type)
       end
