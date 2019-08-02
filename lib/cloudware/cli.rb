@@ -306,5 +306,11 @@ module Cloudware
       c.summary = 'Return the template for an existing or new deployment'
       action(c, Commands::Deploy, method: :render)
     end
+
+    command 'modify-instance' do |c|
+      cli_syntax(c, 'NAME INSTANCE_TYPE')
+      c.description = 'Modify the instance type of a node'
+      action(c, Commands::Modify)
+    end
   end
 end
