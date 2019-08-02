@@ -30,7 +30,12 @@
 module Cloudware
   module Commands
     class Modify < Command
-      def run!(node, instance_type)
+      def run!(identifier, instance_type)
+        m = Models::Machine.new(name: identifier, cluster: __config__.current_cluster)
+
+        with_spinner('Modifying instance type...', done: 'Done') do
+          m.change_instance_type(instance_type)
+        end
       end
     end
   end
