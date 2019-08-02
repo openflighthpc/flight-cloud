@@ -75,6 +75,19 @@ module Cloudware
           ERROR
         end
 
+        def change_instance_type(type)
+          # Instance must be off before changing instance type
+          instance.stop
+
+          # Wait until the instance has stopped before continuing
+          sleep(1) until instance(true).state.name == 'stopped'
+
+          instance.modify_attribute({ instance_type: { value: type } })
+
+          # Start the instance back up once instance type modified
+          instance.start
+        end
+
         private
 
         def instance
