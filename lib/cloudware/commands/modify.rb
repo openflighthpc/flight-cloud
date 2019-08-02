@@ -33,7 +33,7 @@ module Cloudware
       def run!(identifier, instance_type)
         m = Models::Machine.new(name: identifier, cluster: __config__.current_cluster)
 
-        with_spinner('Modifying instance type...', done: 'Done') do
+        with_spinner('Resizing instance...', done: 'Done') do
           m.change_instance_type(instance_type)
         end
       end
