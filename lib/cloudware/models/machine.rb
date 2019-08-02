@@ -69,7 +69,7 @@ module Cloudware
       PROVIDER_ID_FLAG = 'ID'
       GROUPS_TAG = 'groups'
 
-      delegate :status, :off, :on, to: :machine_client
+      delegate :status, :off, :on, :change_instance_type, to: :machine_client
       delegate :region, :provider, to: :cluster
 
       attr_accessor :name, :cluster
