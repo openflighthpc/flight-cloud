@@ -307,7 +307,7 @@ module Cloudware
       action(c, Commands::Deploy, method: :render)
     end
 
-    command 'modify-instance' do |c|
+    command 'modify-type' do |c|
       cli_syntax(c, 'IDENTIFIER INSTANCE_TYPE')
       c.description = 'Modify the instance type of a node'
       action(c, Commands::Modify)
