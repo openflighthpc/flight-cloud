@@ -67,6 +67,13 @@ module App
       end
     end
 
+    namespace '/modify' do
+      get '/instance-type' do
+        json Cloudware::Commands::Modify.new
+          .client_change_instance_type(node_param, params[:instance_type])
+      end
+    end
+
     private
 
     def node_param
