@@ -288,12 +288,12 @@ Direct Link - https://portal.azure.com/#blade/Microsoft_Azure_Billing/Subscripti
 
 ## Client Secret & ID
 
-* Create an _App Registration_ in _Active Directory_ and request the following permissions (_Setting → Required permissions_)
-    * _Windows Azure Service Management API_
-    * _Windows Azure Active Directory_
-    * Click _Grant Permissions_ to apply them to the registration
+* Create an _App Registration_ in _Active Directory_ and add/request the following permissions (_API permissions → Add a permission_)
+    * Click _Azure Sevice Management_
+    * Tick *user_impersonation*
+    * Click _Add Permissions_ to apply them to the registration
 * **Client ID** = _Application ID_
-* In the _App Registration_ page for the new app get the **Client Secret** via _Settings → Keys_ and creating one by adding a key description
+* In the _App Registration_ page for the new app get the **Client Secret** via _Certificates & secrets_ and creating one by adding a _New client secret_
 * Ensure the App has at least Contributor permissions in the IAM Role management of the Subscription
     * As the Global Administrator navigate to the **subscription's** _Access Control (IAM)_
     * Click _Add_ at the top of the page
