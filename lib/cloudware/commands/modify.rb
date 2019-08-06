@@ -34,6 +34,8 @@ module Cloudware
         with_spinner('Resizing instance...', done: 'Done') do
           resize_instance(identifier, instance_type)
         end
+      rescue
+        puts "An error has occurred. Check that you're entering a valid instance type."
       end
 
       def client_modify_instance_type(identifier, instance_type)
