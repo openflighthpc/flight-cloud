@@ -43,6 +43,12 @@ module Cloudware
         set_arguments(*a)
         machines.each do |machine|
           unless instance_type.nil?
+            unless machine.status == 'stopped'
+              raise InvalidInput, <<~ERROR.chomp
+                The instance must be stopped to resize it
+              ERROR
+            end
+
             puts "Resizing instance type of #{machine.name} to #{instance_type}"
             machine.modify_instance_type(instance_type)
           end
