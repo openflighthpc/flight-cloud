@@ -42,6 +42,11 @@ module Cloudware
       def on_cli(*a)
         set_arguments(*a)
         machines.each do |machine|
+          unless instance_type.nil?
+            puts "Resizing instance type of #{machine.name} to #{instance_type}"
+            machine.modify_instance_type(instance_type)
+          end
+
           puts "Turning on: #{machine.name}"
           machine.on
         end
