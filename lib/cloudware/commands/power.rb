@@ -32,7 +32,7 @@ require 'cloudware/models/group'
 module Cloudware
   module Commands
     class Power < Command
-      attr_reader :identifier
+      attr_reader :identifier, :instance_type
 
       def status_cli(*a)
         set_arguments(*a)
