@@ -49,7 +49,7 @@ module Cloudware
               ERROR
             end
 
-            puts "Resizing instance type of #{machine.name} to #{instance_type}"
+            puts "Resizing #{machine.name} to #{instance_type}"
             machine.modify_instance_type(instance_type)
           end
 
