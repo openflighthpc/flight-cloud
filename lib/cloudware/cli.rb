@@ -299,6 +299,9 @@ module Cloudware
     command 'power on' do |c|
       shared_power_attr(c)
       c.description = 'Turn the machine on'
+      c.option '-i TYPE', '--instance TYPE', <<~DESC
+        Change the instance type before powering the instance on
+      DESC
       action(c, Commands::Power, method: :on_cli)
     end
 

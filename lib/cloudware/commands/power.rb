@@ -74,9 +74,10 @@ module Cloudware
 
       attr_reader :identifier, :group
 
-      def set_arguments(identifier, group: false)
+      def set_arguments(identifier, group: false, instance: nil)
         @identifier = identifier
         @group = group
+        @instance_type = instance
       end
 
       def hashify_machines
