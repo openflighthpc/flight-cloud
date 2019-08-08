@@ -71,10 +71,12 @@ module Cloudware
 
         def off
           compute_client.virtual_machines.power_off(*name_inputs)
+          status
         end
 
         def on
           compute_client.virtual_machines.start(*name_inputs)
+          status
         end
 
         def modify_instance_type(type)
