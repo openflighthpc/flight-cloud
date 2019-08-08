@@ -32,8 +32,6 @@ require 'cloudware/models/group'
 module Cloudware
   module Commands
     class Power < Command
-      attr_reader :identifier, :instance_type
-
       def status_cli(*a)
         set_arguments(*a)
         machines.each  { |m| puts "#{m.name}: #{m.status rescue 'undeployed'}"}
@@ -42,16 +40,7 @@ module Cloudware
       def on_cli(*a)
         set_arguments(*a)
         machines.each do |machine|
-          unless instance_type.nil?
-            unless machine.status == 'stopped'
-              raise InvalidInput, <<~ERROR.chomp
-                The instance must be stopped to resize it
-              ERROR
-            end
-
-            puts "Resizing #{machine.name} to #{instance_type}"
-            machine.modify_instance_type(instance_type)
-          end
+          resize_instance(machine) unless instance_type.nil?
 
           puts "Turning on: #{machine.name}"
           machine.on
@@ -73,7 +62,10 @@ module Cloudware
 
       def on_hash(*a)
         set_arguments(*a)
-        hashify_machines { |m| m.on }
+        hashify_machines do |m|
+          resize_instance(m) unless instance_type.nil?
+          m.on
+        end
       end
 
       def off_hash(*a)
@@ -83,7 +75,7 @@ module Cloudware
 
       private
 
-      attr_reader :identifier, :group
+      attr_reader :identifier, :group, :instance_type
 
       def set_arguments(identifier, group: false, instance: nil)
         @identifier = identifier
@@ -114,6 +106,17 @@ module Cloudware
         else
           [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
         end
+      end
+
+      def resize_instance(machine)
+        unless machine.status == 'stopped'
+          raise InvalidInput, <<~ERROR.chomp
+            The instance must be stopped to resize it
+          ERROR
+        end
+
+        puts "Resizing #{machine.name} to #{instance_type}"
+        machine.modify_instance_type(instance_type)
       end
     end
   end
