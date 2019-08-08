@@ -110,7 +110,7 @@ module Cloudware
 
       def resize_instance(machine)
         unless machine.status == 'stopped'
-          raise InvalidInput, <<~ERROR.chomp
+          raise RuntimeError, <<~ERROR.chomp
             The instance must be stopped to resize it
           ERROR
         end
