@@ -85,6 +85,8 @@ module Cloudware
           vm_params.hardware_profile = hardware_profile
 
           compute_client.virtual_machines.update(*name_inputs, vm_params)
+        rescue MsRestAzure::AzureOperationError
+          raise ProviderError, 'Please enter a valid instance type'
         end
 
         private
