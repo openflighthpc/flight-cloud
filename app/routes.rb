@@ -49,7 +49,11 @@ module App
       end
 
       get '/on' do
-        json Cloudware::Commands::Power.new.on_hash(node_param, group: group_param)
+        json Cloudware::Commands::Power.new.on_hash(
+          node_param,
+          group: group_param,
+          instance: params[:instance]
+        )
       end
 
       get '/off' do
