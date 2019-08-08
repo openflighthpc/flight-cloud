@@ -39,16 +39,16 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def run!(identifier, params: nil, instance_type: nil)
+      def run!(identifier, params: nil)
         if identifier == 'domain'
           domain(params: params)
         else
-          node(identifier, params: params, instance_type: instance_type)
+          node(identifier, params: params)
         end
       end
 
       # TODO: Handle dependent deployments at some point
-      def node(identifier, params: nil, instance_type: nil)
+      def node(identifier, params: nil)
         replacements = ReplacementFactory.new(__config__.current_cluster, identifier)
           .build(params)
         node = Models::Node.prompt!(replacements, __config__.current_cluster, identifier)
@@ -64,11 +64,6 @@ module Cloudware
              An error has occured. Please see for further details:
             `#{Config.app_name} list --verbose`
           ERROR
-        elsif !instance_type.nil?
-          with_spinner('Resizing instance...', done: 'Done') do
-            Models::Machine.new(name: identifier, cluster: __config__.current_cluster)
-              .modify_instance_type(instance_type)
-          end
         end
       end
 
