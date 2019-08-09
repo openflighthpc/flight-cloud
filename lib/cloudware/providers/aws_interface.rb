@@ -75,6 +75,10 @@ module Cloudware
           ERROR
         end
 
+        def modify_instance_type(type)
+          instance.modify_attribute({ instance_type: { value: type } })
+        end
+
         private
 
         def instance

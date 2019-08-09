@@ -71,10 +71,24 @@ module Cloudware
 
         def off
           compute_client.virtual_machines.power_off(*name_inputs)
+          status
         end
 
         def on
           compute_client.virtual_machines.start(*name_inputs)
+          status
+        end
+
+        def modify_instance_type(type)
+          hardware_profile = Azure::Compute::Profiles::Latest::Mgmt::Models::HardwareProfile.new
+          hardware_profile.vm_size = type
+
+          vm_params = Azure::Compute::Profiles::Latest::Mgmt::Models::VirtualMachine.new
+          vm_params.hardware_profile = hardware_profile
+
+          compute_client.virtual_machines.update(*name_inputs, vm_params)
+        rescue MsRestAzure::AzureOperationError
+          raise ProviderError, 'Please enter a valid instance type'
         end
 
         private

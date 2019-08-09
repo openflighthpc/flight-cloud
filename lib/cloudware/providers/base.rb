@@ -68,6 +68,10 @@ module Cloudware
         def on
           raise NotImplementedError
         end
+
+        def modify_instance_type
+          raise NotImplementedError
+        end
       end
 
       class Client

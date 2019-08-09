@@ -52,10 +52,13 @@ module Cloudware
         replacements = ReplacementFactory.new(__config__.current_cluster, identifier)
           .build(params)
         node = Models::Node.prompt!(replacements, __config__.current_cluster, identifier)
+
         raise_if_deployed(node)
+
         deployed_node = with_spinner('Deploying node...', done: 'Done') do
           Models::Node.deploy!(__config__.current_cluster, identifier)
         end
+
         if deployed_node.deployment_error
           raise DeploymentError, <<~ERROR.chomp
              An error has occured. Please see for further details:
@@ -69,10 +72,13 @@ module Cloudware
         replacements = ReplacementFactory.new(__config__.current_cluster, 'domain')
           .build(params)
         domain = Models::Domain.prompt!(replacements, __config__.current_cluster)
+
         raise_if_deployed(domain)
+
         deployed_domain = with_spinner('Deploying domain...', done: 'Done') do
           Models::Domain.deploy!(__config__.current_cluster)
         end
+
         if deployed_domain.deployment_error
           raise DeploymentError, <<~ERROR.chomp
             An error has occurred deploying the domain.
