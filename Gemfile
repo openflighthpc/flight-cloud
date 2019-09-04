@@ -32,6 +32,7 @@ group :server do
   gem 'sinatra'
   gem 'sinatra-namespace'
   gem 'sinatra-param'
+  gem 'webrick'
 end
 
 group :development do

@@ -38,6 +38,16 @@ $PROGRAM_NAME = 'cloud'
 Cloudware::CommandConfig.read.current_cluster
 $PROGRAM_NAME = old_name
 
+
+# Require the app
 require 'app/routes'
-run App::Routes
+
+require 'pry'
+binding.pry
+
+# Run the server using webrick
+require 'webrick'
+server = WEBrick::HTTPServer.new
+server.mount '/', Rack::Handler::WEBrick, App::Routes.new
+server.start
 
