@@ -27,6 +27,21 @@ aws:                            # Requirement for cloud-aws
   access_key_id:      # [VALUE] : Requirement for cloud-aws
   secret_access_key:  # [VALUE] : Requirement for cloud-aws
 
+# SERVER CONFIGURATION
+# =============================================================================
+# SSL CERTIFICATE
+# Specify the path to the SSL cert to be used by the server. It defaults to
+# etc/ssl.crt within the install directory
+# =============================================================================
+# ssl_certificate: <install-dir>/etc/ssl.crt
+
+# =============================================================================
+# SSL PRIVATE KEY
+# Specify the path to the SSL private key to be used by the server. It defaults
+# to etc/ssl.key within the install directory
+# =============================================================================
+# ssl_private_key: <install-dir>/etc/ssl.key
+
 # ADVANCED CONFIGURATION (Optional)
 # =============================================================================
 # Content Directory

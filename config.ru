@@ -42,12 +42,20 @@ $PROGRAM_NAME = old_name
 # Require the app
 require 'app/routes'
 
-require 'pry'
-binding.pry
+# Sets up the ssl options
+require 'webrick'
+require 'webrick/https'
+ssl_options = {
+  Port: 443,
+  SSLEnable: true,
+  SSLVerifyClient: OpenSSL::SSL::VERIFY_NONE,
+  SSLCertificate: OpenSSL::X509::Certificate.new(Cloudware::Config.read_ssl_certificate),
+  SSLPrivateKey: OpenSSL::PKey::RSA.new(Cloudware::Config.read_ssl_private_key),
+  SSLCertName: [ [ "CN", WEBrick::Utils::getservername ] ]
+}
 
 # Run the server using webrick
-require 'webrick'
-server = WEBrick::HTTPServer.new
+server = WEBrick::HTTPServer.new(ssl_options)
 server.mount '/', Rack::Handler::WEBrick, App::Routes.new
 server.start
 
