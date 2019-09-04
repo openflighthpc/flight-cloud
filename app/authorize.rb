@@ -42,26 +42,33 @@ module App
     end
 
     def call(env)
-      begin
+      validate_token(extract_token(env))
+    end
+
+    private
+
+    def extract_token(env)
+      env.fetch('HTTP_AUTHORIZATION', '').split(' ', 2).last
+    end
+
+    def validate_token(token)
+      if token
         options = { algorithm: 'HS256' } # .merge(iss: ENV['JWT_ISSUER'])
-        bearer = env.fetch('HTTP_AUTHORIZATION', '').slice(7..-1)
-        if bearer
-          JWT.decode(bearer, 'JWT_SECRET', true, options)
-        else
-          [401, { 'Content-Type' => 'text/plain' }, ['An authorization token must be provided with the request']]
-        end
-      rescue JWT::DecodeError
-        [401, { 'Content-Type' => 'text/plain' }, ['An error occurred when decoding the authorization token']]
-      rescue JWT::ExpiredSignature
-        [403, { 'Content-Type' => 'text/plain' }, ['The token has expired.']]
-      # Ignoring the issuer of the token for the time being
-      # rescue JWT::InvalidIssuerError
-      #   [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid issuer.']]
-      rescue JWT::InvalidIatError
-        [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid "issued at" time.']]
-      rescue
-        [500, { 'Content-Type' => 'text/plain' }, ['An unexpected error has occurred during authorization']]
+        JWT.decode(token, 'JWT_SECRET', true, options)
+      else
+        [401, { 'Content-Type' => 'text/plain' }, ['An authorization token must be provided with the request']]
       end
+    rescue JWT::DecodeError
+      [401, { 'Content-Type' => 'text/plain' }, ['An error occurred when decoding the authorization token']]
+    rescue JWT::ExpiredSignature
+      [403, { 'Content-Type' => 'text/plain' }, ['The token has expired.']]
+    # Ignoring the issuer of the token for the time being
+    # rescue JWT::InvalidIssuerError
+    #   [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid issuer.']]
+    rescue JWT::InvalidIatError
+      [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid "issued at" time.']]
+    rescue
+      [500, { 'Content-Type' => 'text/plain' }, ['An unexpected error has occurred during authorization']]
     end
   end
 end
