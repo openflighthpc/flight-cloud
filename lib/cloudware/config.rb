@@ -137,6 +137,12 @@ module Cloudware
       File.exists? ssl_private_key_path
     end
 
+    def jwt_shared_secret
+      __data__.fetch(:jwt_shared_secret) do
+        raise ConfigError, 'The jwt_shared_secret has not been set in the config'
+      end
+    end
+
     def read_ssl_certificate
       if ssl_certificate?
         File.read ssl_certificate_path

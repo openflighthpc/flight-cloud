@@ -32,6 +32,10 @@
 #
 
 require 'jwt'
+require 'cloudware/config'
+
+# Ensures the shared secret has been set
+Cloudware::Config.jwt_shared_secret
 
 module App
   class Authorize
@@ -42,25 +46,13 @@ module App
     end
 
     def call(env)
-      validate_token(extract_token(env))
-      app.call(env)
-    end
-
-    private
-
-    def extract_token(env)
-      env.fetch('HTTP_AUTHORIZATION', '').split(' ', 2).last
-    end
-
-    def validate_token(token)
-      if token
+      if token = extract_token(env)
         options = { algorithm: 'HS256' } # .merge(iss: ENV['JWT_ISSUER'])
-        JWT.decode(token, 'JWT_SECRET', true, options)
+        JWT.decode(token, Cloudware::Config.jwt_shared_secret, true, options)
+        app.call(env)
       else
         [401, { 'Content-Type' => 'text/plain' }, ['An authorization token must be provided with the request']]
       end
-    rescue JWT::DecodeError
-      [401, { 'Content-Type' => 'text/plain' }, ['An error occurred when decoding the authorization token']]
     rescue JWT::ExpiredSignature
       [403, { 'Content-Type' => 'text/plain' }, ['The token has expired.']]
     # Ignoring the issuer of the token for the time being
@@ -68,8 +60,18 @@ module App
     #   [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid issuer.']]
     rescue JWT::InvalidIatError
       [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid "issued at" time.']]
+    rescue JWT::VerificationError
+      [401, { 'Content-Type' => 'text/plain' }, ['Unrecognized authorization token signature']]
+    rescue JWT::DecodeError
+      [401, { 'Content-Type' => 'text/plain' }, ['An error occurred when decoding the authorization token']]
     rescue
       [500, { 'Content-Type' => 'text/plain' }, ['An unexpected error has occurred during authorization']]
+    end
+
+    private
+
+    def extract_token(env)
+      env.fetch('HTTP_AUTHORIZATION', '').split(' ', 2).last
     end
   end
 end
