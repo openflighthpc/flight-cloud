@@ -46,21 +46,45 @@ aws:
 
 ### Server Mode Configuration
 
-No additional configuration is required to run the cloud server. It will
-start on port 80 when `bin/server` is called. To ensure consistent behaviour,
-the server will ignore the current cluster used by the `CLI`. Instead it will
-switch to `server_cluster` specified in the main config file (default: `server`).
+The server requires the `jwt_shared_secret` to be set within the core config.
+It can be any arbitrary string but should be hard to guess. The app will
+automatically start on port 443 using `https`. A self signed certificate/key
+will automatically generated when the server starts.
 
-Caution, the `CLI` can still manage the server cluster if it is manually
+A custom SSL certificate can be stored as `etc/ssl.crt` and the private key
+as `etc/ssl.key`. Alternatively the path to the certificate files can be
+given within the config as `ssl_certificate` and `ssl_private_key`.
+
+To ensure consistent behaviour, the server will ignore the current cluster used
+by the `CLI`. Instead it will switch to `server_cluster` specified in the main
+config file (default: `server`).
+
+See `etc/config.yaml.example` for further configuration details.
+
+*Caution:* the `CLI` can still manage the server cluster if it is manually
 switched to it first. This is to allow admin action to be preformed on it
 directly. Naturally this may alter the behaviour of the server.
 
-### Deploying the server
+## Deploying the server
 
 The server can be started with:
 
 ```
-rackup -p <port> -o 0.0.0.0
+rackup
+```
+
+Tokens can be generated using the rack commands below. By default the token will
+expire in 30 days. A longer period can be specified as the first rack argument.
+
+```
+# Generate a token which expires in 30 day
+rake token:generate
+
+# Generate a token which expires in 365 days
+rake token:generate[365]
+
+# Generate a token with an arbitrary expiry in days
+rake token:generate[<length-in-days>]
 ```
 
 ## Operation

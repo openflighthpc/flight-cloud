@@ -27,6 +27,36 @@ aws:                            # Requirement for cloud-aws
   access_key_id:      # [VALUE] : Requirement for cloud-aws
   secret_access_key:  # [VALUE] : Requirement for cloud-aws
 
+jwt_shared_secret: # [REQUIRED BY THE SERVER] - See below
+
+# SERVER CONFIGURATION
+# =============================================================================
+# JWT SHARED SECRET
+# The shared secret is used to authorize requests to the server and is
+# required. It can be any arbitrary string but should be hard to guess
+# =============================================================================
+# jwt_shared_secret:
+
+# =============================================================================
+# SSL CERTIFICATE
+# Specify the path to the SSL cert to be used by the server. It defaults to
+# etc/ssl.crt within the install directory
+#
+# If this field is missing, then the server will default to an automatically
+# generated certificate and private key
+# =============================================================================
+# ssl_certificate: <install-dir>/etc/ssl.crt
+
+# =============================================================================
+# SSL PRIVATE KEY
+# Specify the path to the SSL private key to be used by the server. It defaults
+# to etc/ssl.key within the install directory
+#
+# If this field is missing, then the server will default to an automatically
+# generated certificate and private key
+# =============================================================================
+# ssl_private_key: <install-dir>/etc/ssl.key
+
 # ADVANCED CONFIGURATION (Optional)
 # =============================================================================
 # Content Directory

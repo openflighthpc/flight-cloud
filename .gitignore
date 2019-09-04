@@ -3,7 +3,7 @@
 tmp/
 var/
 log/
-etc/config.*
+etc/*
 !etc/config.yaml.example
 !etc/config.yaml.travis
 vendor/

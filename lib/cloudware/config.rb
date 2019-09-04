@@ -128,5 +128,47 @@ module Cloudware
     def server_mode
       __data__.fetch(:server_mode) { false }
     end
+
+    def ssl_certificate?
+      File.exists? ssl_certificate_path
+    end
+
+    def ssl_private_key?
+      File.exists? ssl_private_key_path
+    end
+
+    def jwt_shared_secret
+      __data__.fetch(:jwt_shared_secret) do
+        raise ConfigError, 'The jwt_shared_secret has not been set in the config'
+      end
+    end
+
+    def read_ssl_certificate
+      if ssl_certificate?
+        File.read ssl_certificate_path
+      else
+        raise ConfigError, "Can not locate ssl certificate: #{ssl_certificate_path}"
+      end
+    end
+
+    def read_ssl_private_key
+      if ssl_private_key?
+        File.read ssl_private_key_path
+      else
+        raise ConfigError, "Can not locate ssl private: #{ssl_private_key_path}"
+      end
+    end
+
+    def ssl_certificate_path
+      __data__.fetch(:ssl_certificate) do
+        File.join(self.class.root_dir, 'etc', 'ssl.crt')
+      end
+    end
+
+    def ssl_private_key_path
+      __data__.fetch(:ssl_private_key) do
+        File.join(self.class.root_dir, 'etc', 'ssl.key')
+      end
+    end
   end
 end
