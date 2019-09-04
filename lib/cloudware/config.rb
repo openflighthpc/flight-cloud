@@ -129,8 +129,16 @@ module Cloudware
       __data__.fetch(:server_mode) { false }
     end
 
+    def ssl_certificate?
+      File.exists? ssl_certificate_path
+    end
+
+    def ssl_private_key?
+      File.exists? ssl_private_key_path
+    end
+
     def read_ssl_certificate
-      if File.exists? ssl_certificate_path
+      if ssl_certificate?
         File.read ssl_certificate_path
       else
         raise ConfigError, "Can not locate ssl certificate: #{ssl_certificate_path}"
@@ -138,7 +146,7 @@ module Cloudware
     end
 
     def read_ssl_private_key
-      if File.exists? ssl_private_key_path
+      if ssl_private_key?
         File.read ssl_private_key_path
       else
         raise ConfigError, "Can not locate ssl private: #{ssl_private_key_path}"

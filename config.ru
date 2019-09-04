@@ -45,14 +45,24 @@ require 'app/routes'
 # Sets up the ssl options
 require 'webrick'
 require 'webrick/https'
-ssl_options = {
+
+base_options = {
   Port: 443,
-  SSLEnable: true,
-  SSLVerifyClient: OpenSSL::SSL::VERIFY_NONE,
-  SSLCertificate: OpenSSL::X509::Certificate.new(Cloudware::Config.read_ssl_certificate),
-  SSLPrivateKey: OpenSSL::PKey::RSA.new(Cloudware::Config.read_ssl_private_key),
-  SSLCertName: [ [ "CN", WEBrick::Utils::getservername ] ]
+  SSLEnable: true
 }
+
+ssl_options = if Cloudware::Config.ssl_private_key? && Cloudware::Config.ssl_certificate?
+  base_options.merge(
+    SSLCertificate: OpenSSL::X509::Certificate.new(Cloudware::Config.read_ssl_certificate),
+    SSLPrivateKey: OpenSSL::PKey::RSA.new(Cloudware::Config.read_ssl_private_key)
+  )
+else
+  puts <<~MSG.squish
+    Could not locate either the ssl certificate or private key. Defaulting to a
+    self signed certificate
+  MSG
+  base_options.merge(SSLCertName: [ %w[CN localhost] ])
+end
 
 # Run the server using webrick
 server = WEBrick::HTTPServer.new(ssl_options)
