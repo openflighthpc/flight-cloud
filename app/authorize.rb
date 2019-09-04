@@ -43,6 +43,7 @@ module App
 
     def call(env)
       validate_token(extract_token(env))
+      app.call(env)
     end
 
     private
