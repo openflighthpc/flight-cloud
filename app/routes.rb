@@ -32,12 +32,15 @@ require 'sinatra/json'
 require 'sinatra/param'
 
 require 'cloudware/commands/power'
+require 'app/authorize'
 
 module App
   class Routes < Sinatra::Base
     register Sinatra::JSON
     register Sinatra::Namespace
     helpers  Sinatra::Param
+
+    use App::Authorize
 
     get '/' do
       'openFlightHPC - Next generation HPC on any platform'

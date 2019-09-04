@@ -2,7 +2,7 @@
 #==============================================================================
 # Copyright (C) 2019-present OpenFlightHPC
 #
-# This file is part of management-server
+# This file is part of flight-cloud
 #
 # This program and the accompanying materials are made available under
 # the terms of the Eclipse Public License 2.0 which is available at
@@ -22,8 +22,8 @@
 #
 #  https://opensource.org/licenses/EPL-2.0
 #
-# For more information on flight-account, please visit:
-# https://github.com/openflighthpc/management-server
+# For more information on flight-cloud, please visit:
+# https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
 require 'rake'
