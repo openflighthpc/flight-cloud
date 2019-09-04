@@ -28,7 +28,6 @@
 #===============================================================================
 
 task :'setup:server' do
-  #TODO: Make the server work with azure
   ENV['CLOUDWARE_SERVER_MODE'] = 'true'
   Rake::Task[:setup].invoke
   $: << Cloudware::Config.root_dir
@@ -70,30 +69,18 @@ task :setup do
   end
 end
 
-# Old rake task. Reinstate as necessary
-# ENV['CLOUDWARE_DEBUG'] = 'true'
-
-# task :setup do
-#   ENV['BUNDLE_GEMFILE'] = File.join(__dir__, 'Gemfile')
-
-#   require 'rubygems'
-#   require 'bundler'
-
-#   Bundler.setup(:development)
-#   require 'pp'
-#   require 'pry'
-#   require 'pry-byebug'
-
-#   Bundler.setup(:default, :config, :aws, :azure)
-
-#   $LOAD_PATH.unshift(File.join(__dir__, 'lib'))
-#   require 'cloudware'
-# end
-
 task :console do
   ENV['CLOUDWARE_DEBUG'] = 'true'
   Rake::Task[:setup].invoke
   binding.pry
+end
+
+task :'token:generate', [:exp] => [:setup] do |_, args|
+  args.with_defaults(exp: '30')
+  require 'jwt'
+  require 'active_support/core_ext/numeric/time'
+  data = { exp: args.exp.to_i.days.from_now.to_i }
+  puts JWT.encode(data, Cloudware::Config.jwt_shared_secret, 'HS256')
 end
 
 # task :spin do

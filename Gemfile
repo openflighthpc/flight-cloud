@@ -29,9 +29,12 @@ group :config do
 end
 
 group :server do
+  gem 'json'
+  gem 'jwt'
   gem 'sinatra'
   gem 'sinatra-namespace'
   gem 'sinatra-param'
+  gem 'webrick'
 end
 
 group :development do

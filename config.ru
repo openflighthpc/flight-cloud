@@ -2,7 +2,7 @@
 #==============================================================================
 # Copyright (C) 2019-present OpenFlightHPC
 #
-# This file is part of management-server
+# This file is part of flight-cloud
 #
 # This program and the accompanying materials are made available under
 # the terms of the Eclipse Public License 2.0 which is available at
@@ -22,8 +22,8 @@
 #
 #  https://opensource.org/licenses/EPL-2.0
 #
-# For more information on flight-account, please visit:
-# https://github.com/openflighthpc/management-server
+# For more information on flight-cloud, please visit:
+# https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
 require 'rake'
@@ -38,6 +38,34 @@ $PROGRAM_NAME = 'cloud'
 Cloudware::CommandConfig.read.current_cluster
 $PROGRAM_NAME = old_name
 
+
+# Require the app
 require 'app/routes'
-run App::Routes
+
+# Sets up the ssl options
+require 'webrick'
+require 'webrick/https'
+
+base_options = {
+  Port: 443,
+  SSLEnable: true
+}
+
+ssl_options = if Cloudware::Config.ssl_private_key? && Cloudware::Config.ssl_certificate?
+  base_options.merge(
+    SSLCertificate: OpenSSL::X509::Certificate.new(Cloudware::Config.read_ssl_certificate),
+    SSLPrivateKey: OpenSSL::PKey::RSA.new(Cloudware::Config.read_ssl_private_key)
+  )
+else
+  puts <<~MSG.squish
+    Could not locate either the ssl certificate or private key. Defaulting to a
+    self signed certificate
+  MSG
+  base_options.merge(SSLCertName: [ %w[CN localhost] ])
+end
+
+# Run the server using webrick
+server = WEBrick::HTTPServer.new(ssl_options)
+server.mount '/', Rack::Handler::WEBrick, App::Routes.new
+server.start
 
