@@ -71,7 +71,14 @@ module App
     private
 
     def extract_token(env)
-      env.fetch('HTTP_AUTHORIZATION', '').split(' ', 2).last
+      req = Rack::Request.new(env)
+      if param = req.params['token']
+        param
+      elsif bearer = req.get_header('HTTP_AUTHORIZATION')
+        bearer.split(' ', 2).last
+      elsif cookie = req.cookies['token']
+        cookie
+      end
     end
   end
 end
