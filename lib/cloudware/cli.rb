@@ -283,11 +283,21 @@ module Cloudware
       DESC
     end
 
-    command 'power status' do |c|
-      cli_syntax(c, 'NODE')
-      c.description = 'Check the power state of a machine'
-      proxy_opts = { level: :node, method: :status_cli, named: true }
-      c.action(&Commands::ScopedPower.proxy(**proxy_opts))
+    [:cluster, :group, :node].each do |level|
+      command "#{level}-power-status" do |c|
+        if level == :cluster
+          cli_syntax(c)
+        else
+          cli_syntax(c, level.to_s.upcase)
+        end
+        if level == :node
+          c.description = 'Check the power state of the node'
+        else
+          c.description = 'Check the power state of the nodes'
+        end
+        proxy_opts = { level: level, method: :status_cli, named: (level != :cluster) }
+        c.action(&Commands::ScopedPower.proxy(**proxy_opts))
+      end
     end
 
     command 'power off' do |c|
