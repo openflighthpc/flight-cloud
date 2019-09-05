@@ -31,12 +31,13 @@ require 'cloudware/models/group'
 
 module Cloudware
   module Commands
-    class Power < Command
-      def status_cli(*a)
-        set_arguments(*a)
-        nodes.each  { |m| puts "#{m.name}: #{m.machine_client.status rescue 'undeployed'}"}
+    class ScopedPower < ScopedCommand
+      def status_cli
+        read_nodes.each { |n| puts "#{n.name}: #{n.machine_client.status rescue 'undeployed'}"}
       end
+    end
 
+    class Power < Command
       def on_cli(*a)
         set_arguments(*a)
         nodes.each do |node|

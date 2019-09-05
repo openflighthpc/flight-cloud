@@ -284,9 +284,9 @@ module Cloudware
     end
 
     command 'power status' do |c|
-      shared_power_attr(c)
+      cli_syntax(c, 'NODE')
       c.description = 'Check the power state of a machine'
-      action(c, Commands::Power, method: :status_cli)
+      c.action(&Commands::ScopedPower.proxy(level: :node, method: :status_cli).named)
     end
 
     command 'power off' do |c|
