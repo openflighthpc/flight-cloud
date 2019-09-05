@@ -83,6 +83,17 @@ module Cloudware
       end
     end
 
+    def self.multilevel_cli_syntax(command, level, args_str = '')
+      case level
+      when :group
+        cli_syntax(command, "GROUP #{args_str}".chomp)
+      when :node
+        cli_syntax(command, "NODE #{args_str}".chomp)
+      else
+        cli_syntax(command, args_str)
+      end
+    end
+
     def self.cli_syntax(command, args_str = '')
       command.hidden = true if command.name.split.length > 1
       command.syntax = <<~SYNTAX.squish
@@ -285,11 +296,7 @@ module Cloudware
 
     [:cluster, :group, :node].each do |level|
       command "#{level}-power-status" do |c|
-        if level == :cluster
-          cli_syntax(c)
-        else
-          cli_syntax(c, level.to_s.upcase)
-        end
+        multilevel_cli_syntax(c, level)
         if level == :node
           c.description = 'Check the power state of the node'
         else
