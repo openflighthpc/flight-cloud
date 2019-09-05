@@ -35,27 +35,38 @@ module Cloudware
       def status_cli
         read_nodes.each { |n| puts "#{n.name}: #{n.machine_client.status rescue 'undeployed'}"}
       end
-    end
 
-    class Power < Command
-      def on_cli(*a)
-        set_arguments(*a)
-        nodes.each do |node|
-          resize_instance(node) unless instance_type.nil?
-
-          puts "Turning on: #{node.name}"
-          node.machine_client.on
-        end
-      end
-
-      def off_cli(*a)
-        set_arguments(*a)
-        nodes.each do |node|
+      def off_cli
+        read_nodes.each do |node|
           puts "Turning off: #{node.name}"
           node.machine_client.off
         end
       end
 
+      # TODO: Add resize_instance back
+      def on_cli
+        read_nodes.each do |node|
+          # resize_instance(node) unless instance_type.nil?
+          puts "Turning on: #{node.name}"
+          node.machine_client.on
+        end
+      end
+
+      private
+
+      def resize_instance(node)
+        unless node.machine_client.status == 'stopped'
+          raise RuntimeError, <<~ERROR.chomp
+            The instance must be stopped to resize it
+          ERROR
+        end
+
+        puts "Resizing #{node.name} to #{instance_type}"
+        node.machine_client.modify_instance_type(instance_type)
+      end
+    end
+
+    class Power < Command
       def status_hash(*a)
         set_arguments(*a)
         hashify_nodes { |m| m.machine_client.status }

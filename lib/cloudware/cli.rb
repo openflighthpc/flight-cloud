@@ -305,21 +305,28 @@ module Cloudware
         proxy_opts = { level: level, method: :status_cli, named: (level != :cluster) }
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
-    end
 
-    command 'power off' do |c|
-      shared_power_attr(c)
-      c.description = 'Turn the machine off'
-      action(c, Commands::Power, method: :off_cli)
-    end
+      command "#{level}-power-off" do |c|
+        multilevel_cli_syntax(c, level)
+        if level == :node
+          c.description = 'Turn the node off'
+        else
+          c.description = 'Turn the nodes off'
+        end
+        proxy_opts = { level: level, method: :off_cli, named: (level != :cluster) }
+        c.action(&Commands::ScopedPower.proxy(**proxy_opts))
+      end
 
-    command 'power on' do |c|
-      shared_power_attr(c)
-      c.description = 'Turn the machine on'
-      c.option '-i TYPE', '--instance TYPE', <<~DESC
-        Change the instance type before powering the instance on
-      DESC
-      action(c, Commands::Power, method: :on_cli)
+      command "#{level}-power-on" do |c|
+        multilevel_cli_syntax(c, level)
+        if level == :node
+          c.description = 'Turn the node on'
+        else
+          c.description = 'Turn the nodes on'
+        end
+        proxy_opts = { level: level, method: :on_cli, named: (level != :cluster) }
+        c.action(&Commands::ScopedPower.proxy(**proxy_opts))
+      end
     end
 
     command 'render' do |c|
