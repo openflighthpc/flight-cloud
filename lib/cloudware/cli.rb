@@ -286,7 +286,8 @@ module Cloudware
     command 'power status' do |c|
       cli_syntax(c, 'NODE')
       c.description = 'Check the power state of a machine'
-      c.action(&Commands::ScopedPower.proxy(level: :node, method: :status_cli).named)
+      proxy_opts = { level: :node, method: :status_cli, named: true }
+      c.action(&Commands::ScopedPower.proxy(**proxy_opts))
     end
 
     command 'power off' do |c|

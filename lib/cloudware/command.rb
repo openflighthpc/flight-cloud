@@ -37,24 +37,22 @@ module Cloudware
   class CommanderProxy < Hashie::Dash
     property :klass, required: :true
     property :level, required: true
+    property :named, required: true
     property :method, required: false
     property :index, required: false
 
-    def named
-      lambda do |name_and_args, commander_opts|
-        name = name_and_args.first
-        args = name_and_args[1..-1]
-        run_proxy(name, args, commander_opts)
-      end
-    end
-
-    def unnamed
-      lambda { |a, o| run_proxy(nil, a, o) }
+    def to_lambda
+      lambda { |a, o| run_proxy(a, o) }
     end
 
     private
 
-    def run_proxy(name, args, commander_opts)
+    def run_proxy(commander_args, commander_opts)
+      name, args = if named
+                     [commander_args.first, commander_args[1..-1]]
+                   else
+                     [nil, commander_args]
+                   end
       opts = commander_opts.__hash__.dup.tap { |h| h.delete(:trace) }
       primary = opts.delete(:primary)
       instance = klass.new(level, name, index, primary)
@@ -78,7 +76,7 @@ module Cloudware
 
   ScopedCommand = Struct.new(:level, :name, :index, :primary) do
     def self.proxy(**kwargs)
-      CommanderProxy.new(**kwargs.merge(klass: self))
+      CommanderProxy.new(**kwargs.merge(klass: self)).to_lambda
     end
 
     def config
@@ -122,6 +120,8 @@ module Cloudware
     def read_nodes
       if level == :node
         [read_model]
+      elsif level == :group && primary
+        read_model.primary_nodes
       else
         read_model.nodes
       end
