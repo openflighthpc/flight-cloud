@@ -58,6 +58,11 @@ module Cloudware
           [v]
         end
       end
+
+      def machine_client
+        id = (results || {})[:"#{name}TAGID"]
+        provider_client.machine(id)
+      end
     end
   end
 end

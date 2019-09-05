@@ -34,35 +34,35 @@ module Cloudware
     class Power < Command
       def status_cli(*a)
         set_arguments(*a)
-        machines.each  { |m| puts "#{m.name}: #{m.machine_client.status rescue 'undeployed'}"}
+        nodes.each  { |m| puts "#{m.name}: #{m.machine_client.status rescue 'undeployed'}"}
       end
 
       def on_cli(*a)
         set_arguments(*a)
-        machines.each do |machine|
-          resize_instance(machine) unless instance_type.nil?
+        nodes.each do |node|
+          resize_instance(node) unless instance_type.nil?
 
-          puts "Turning on: #{machine.name}"
-          machine.machine_client.on
+          puts "Turning on: #{node.name}"
+          node.machine_client.on
         end
       end
 
       def off_cli(*a)
         set_arguments(*a)
-        machines.each do |machine|
-          puts "Turning off: #{machine.name}"
-          machine.machine_client.off
+        nodes.each do |node|
+          puts "Turning off: #{node.name}"
+          node.machine_client.off
         end
       end
 
       def status_hash(*a)
         set_arguments(*a)
-        hashify_machines { |m| m.machine_client.status }
+        hashify_nodes { |m| m.machine_client.status }
       end
 
       def on_hash(*a)
         set_arguments(*a)
-        hashify_machines do |m|
+        hashify_nodes do |m|
           resize_instance(m) unless instance_type.nil?
           m.machine_client.on
         end
@@ -70,7 +70,7 @@ module Cloudware
 
       def off_hash(*a)
         set_arguments(*a)
-        hashify_machines { |m| m.machine_client.off }
+        hashify_nodes { |m| m.machine_client.off }
       end
 
       private
@@ -83,40 +83,37 @@ module Cloudware
         @instance_type = instance
       end
 
-      def hashify_machines
-        machines.each_with_object({ nodes: {}, errors: {} }) do |machine, memo|
+      def hashify_nodes
+        nodes.each_with_object({ nodes: {}, errors: {} }) do |node, memo|
           begin
-            memo[:nodes][machine.name] = yield machine
+            memo[:nodes][node.name] = yield node
           rescue CloudwareError => e
-            memo[:errors][machine.name] = e.message
+            memo[:errors][node.name] = e.message
           rescue FlightConfig::MissingFile
-            memo[:errors][machine.name] = 'The node does not exist'
+            memo[:errors][node.name] = 'The node does not exist'
           rescue NoMethodError
-            memo[:nodes][machine.name] = 'undeployed'
+            memo[:nodes][node.name] = 'undeployed'
           end
         end
       end
 
-      def machines
+      def nodes
         if group
           Models::Group.read(__config__.current_cluster, identifier).nodes.sort_by { |n| n.name }
-            .map do |node|
-            Models::Machine.new(name: node.name, cluster: __config__.current_cluster)
-          end
         else
-          [Models::Machine.new(name: identifier, cluster: __config__.current_cluster)]
+          [Models::Node.read(__config__.current_cluster, identifier)]
         end
       end
 
-      def resize_instance(machine)
-        unless machine.machine_client.status == 'stopped'
+      def resize_instance(node)
+        unless node.machine_client.status == 'stopped'
           raise RuntimeError, <<~ERROR.chomp
             The instance must be stopped to resize it
           ERROR
         end
 
-        puts "Resizing #{machine.name} to #{instance_type}"
-        machine.machine_client.modify_instance_type(instance_type)
+        puts "Resizing #{node.name} to #{instance_type}"
+        node.machine_client.modify_instance_type(instance_type)
       end
     end
   end
