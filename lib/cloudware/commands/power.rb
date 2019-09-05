@@ -34,7 +34,7 @@ module Cloudware
     class Power < Command
       def status_cli(*a)
         set_arguments(*a)
-        machines.each  { |m| puts "#{m.name}: #{m.status rescue 'undeployed'}"}
+        machines.each  { |m| puts "#{m.name}: #{m.machine_client.status rescue 'undeployed'}"}
       end
 
       def on_cli(*a)
@@ -43,7 +43,7 @@ module Cloudware
           resize_instance(machine) unless instance_type.nil?
 
           puts "Turning on: #{machine.name}"
-          machine.on
+          machine.machine_client.on
         end
       end
 
@@ -51,26 +51,26 @@ module Cloudware
         set_arguments(*a)
         machines.each do |machine|
           puts "Turning off: #{machine.name}"
-          machine.off
+          machine.machine_client.off
         end
       end
 
       def status_hash(*a)
         set_arguments(*a)
-        hashify_machines { |m| m.status }
+        hashify_machines { |m| m.machine_client.status }
       end
 
       def on_hash(*a)
         set_arguments(*a)
         hashify_machines do |m|
           resize_instance(m) unless instance_type.nil?
-          m.on
+          m.machine_client.on
         end
       end
 
       def off_hash(*a)
         set_arguments(*a)
-        hashify_machines { |m| m.off }
+        hashify_machines { |m| m.machine_client.off }
       end
 
       private
@@ -109,14 +109,14 @@ module Cloudware
       end
 
       def resize_instance(machine)
-        unless machine.status == 'stopped'
+        unless machine.machine_client.status == 'stopped'
           raise RuntimeError, <<~ERROR.chomp
             The instance must be stopped to resize it
           ERROR
         end
 
         puts "Resizing #{machine.name} to #{instance_type}"
-        machine.modify_instance_type(instance_type)
+        machine.machine_client.modify_instance_type(instance_type)
       end
     end
   end

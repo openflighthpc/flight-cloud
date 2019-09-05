@@ -69,7 +69,6 @@ module Cloudware
       PROVIDER_ID_FLAG = 'ID'
       GROUPS_TAG = 'groups'
 
-      delegate :status, :off, :on, :modify_instance_type, to: :machine_client
       delegate :region, :provider, to: :cluster
 
       attr_accessor :name, :cluster
@@ -129,8 +128,6 @@ module Cloudware
         return default unless default.nil?
         yield long_tag if block_given?
       end
-
-      private
 
       def machine_client
         id = provider_id
