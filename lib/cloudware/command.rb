@@ -67,14 +67,6 @@ module Cloudware
       __config__.region
     end
 
-    def get_machines_in_group(group_name)
-      Models::Deployments.read(__config__.current_cluster)
-        .machines
-        .select { |m| m.groups.include?(group_name) }
-        .map { |m| m.name }
-        .sort
-    end
-
     private
 
     def _render(template)

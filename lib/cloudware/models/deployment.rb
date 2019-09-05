@@ -30,7 +30,6 @@
 require 'cloudware/models/deployment_callbacks'
 require 'cloudware/models/concerns/provider_client'
 require 'cloudware/models/application'
-require 'cloudware/models/machine'
 require 'cloudware/root_dir'
 
 require 'pathname'
