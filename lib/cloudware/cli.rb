@@ -107,7 +107,7 @@ module Cloudware
       c.summary = 'Manage the current cluster selection'
     end
 
-    command 'cluster init' do |c|
+    command 'cluster-init' do |c|
       cli_syntax(c, 'CLUSTER PROVIDER')
       c.summary = 'Create a new cluster'
       c.description = <<~DESC
@@ -121,13 +121,13 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :init)
     end
 
-    command 'cluster switch' do |c|
+    command 'cluster-switch' do |c|
       cli_syntax(c, 'CLUSTER')
       c.summary = 'Change the current cluster to CLUSTER'
       action(c, Commands::ClusterCommand, method: :switch)
     end
 
-    command 'cluster delete' do |c|
+    command 'cluster-delete' do |c|
       cli_syntax(c, 'CLUSTER')
       c.summary = 'Destroys the deployments and deletes the cluster'
       action(c, Commands::ClusterCommand, method: :delete)
@@ -139,7 +139,7 @@ module Cloudware
       action(c, Commands::Configure)
     end
 
-    command 'create' do |c|
+    command 'node-create' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
       c.description = 'Add a new node to the cluster'
       c.option '--groups GROUPS', <<~DESC.squish
