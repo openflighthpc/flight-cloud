@@ -179,12 +179,15 @@ module Cloudware
     #   action(c, Commands::Deploy)
     # end
 
-    command 'deploy' do |c|
-      cli_syntax(c, 'IDENTIFIER')
-      c.summary = 'Deploy a domain or node'
-      c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
-        String, 'A space separated list of keys to be replaced'
-      action(c, Commands::Deploy)
+    [:cluster, :group, :node].each do |level|
+      command "#{level}-deploy" do |c|
+        multilevel_cli_syntax(c, level)
+        c.summary = 'Create the templated resources on the provider'
+        c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
+                 String, 'A space separated list of keys to be replaced'
+        proxy_opts = { level: level, method: :run!, named: (level != :cluster) }
+        c.action(&Commands::Deploy.proxy(**proxy_opts))
+      end
     end
 
     command 'destroy' do |c|
@@ -198,8 +201,6 @@ module Cloudware
         Once the deployment is offline, the configuration file can be
         permanently removed using the 'delete' command.
       DESC
-      # TODO: Support groups again
-      # c.option '-g', '--group', 'Destroy all deployments within the specified group'
       action(c, Commands::Destroy)
     end
 

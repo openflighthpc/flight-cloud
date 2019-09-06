@@ -62,12 +62,6 @@ module Cloudware
 
       define_link(:cluster, Models::Cluster) { [cluster] }
 
-      # TODO: Make this an archatype class and replace the path with:
-      # raise NotImplementedError
-      def self.path(cluster, name)
-        RootDir.content_cluster(cluster.to_s, 'var/deployments', name + '.yaml')
-      end
-
       def self.read!(*a)
         reraise_missing_file { read(*a) }
       end
@@ -145,12 +139,6 @@ module Cloudware
       data_writer(:replacements) { |r| r.to_h }
 
       attr_reader :cluster, :name
-
-      def initialize(cluster, name, **_h)
-        @cluster = cluster
-        @name = name
-        super
-      end
 
       # TODO: Remove template_path as a saved parameter and make it static
       # Soon all deployments will have a 1:1 relationship with its template
