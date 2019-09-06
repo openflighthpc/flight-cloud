@@ -188,20 +188,21 @@ module Cloudware
         proxy_opts = { level: level, method: :run!, named: (level != :cluster) }
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
-    end
 
-    command 'destroy' do |c|
-      cli_syntax(c, 'NAME')
-      c.summary = 'Stop a running deployment'
-      c.description = <<~DESC
-        Destroys the deployment on the providers platform and flags it
-        as offline. This action does not remove the configuration file,
-        allowing it to be redeployed easily.
+      command "#{level}-destroy" do |c|
+        multilevel_cli_syntax(c, level)
+        c.summary = 'Teardown the resouces on the provider'
+        c.description = <<~DESC
+          Destroys the resources on the providers platform and flags it
+          as offline. This action does not remove the configuration file,
+          allowing it to be redeployed easily.
 
-        Once the deployment is offline, the configuration file can be
-        permanently removed using the 'delete' command.
-      DESC
-      action(c, Commands::Destroy)
+          Once the deployment is offline, the configuration file can be
+          permanently removed using the 'delete' command.
+        DESC
+        proxy_opts = { level: level, method: :run!, named: (level != :cluster) }
+        c.action(&Commands::Destroy.proxy(**proxy_opts))
+      end
     end
 
     command 'delete' do |c|
