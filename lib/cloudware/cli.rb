@@ -205,21 +205,20 @@ module Cloudware
       end
     end
 
-    command 'delete' do |c|
-      cli_syntax(c, 'NAME')
-      c.summary = 'Remove the deployments configuration file'
+    command 'node-delete' do |c|
+      cli_syntax(c, 'NODE')
+      c.summary = 'Remove the node from the cluster'
       c.description = <<~DESC
-        Deletes the configuration file for the deployment NAME. This action
-        will error if the resources are currently running. The resources can
-        be stop using the 'destroy' command.
+        Deletes the configuration file for the NODE. This action will error if
+        the node is currently running. The node cane be stopped using the
+        'destroy' command.
 
-        The configuration of a currently running deployment can be deleted
+        The configuration of a currently running node can be deleted
         using the '--force' flag. This will not destroy the remote resources
       DESC
       c.option '--force', 'Delete the deployment regardless if running'
-      # TODO: Add groups support back again
-      # c.option '-g', '--group', 'Delete all deployments within the specified group'
-      action(c, Commands::Destroy, method: :delete)
+      proxy_opts = { level: :node, method: :delete, named: true }
+      c.action(&Commands::Destroy.proxy(**proxy_opts))
     end
 
     command 'edit' do |c|

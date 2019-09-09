@@ -38,12 +38,10 @@ module Cloudware
         end
       end
 
-      def delete(name, force: false)
-        if name == 'domain'
-          Models::Domain.delete!(__config__.current_cluster, force: force)
-        else
-          Models::Node.delete!(__config__.current_cluster, name, force: force)
-        end
+      # NOTE: Currently this command only works for nodes. Deleting the domain
+      # should be equivalent to deleting the entire cluster
+      def delete(force: false)
+        Models::Node.delete!(*read_node.__inputs__, force: force)
       end
     end
   end

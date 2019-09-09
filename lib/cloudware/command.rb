@@ -117,6 +117,10 @@ module Cloudware
       end
     end
 
+    def read_node
+      Models::Node.read(config.current_cluster, name_or_error)
+    end
+
     def read_nodes
       if level == :node
         [read_model]
