@@ -34,7 +34,7 @@ module Cloudware
     class Edit < ScopedCommand
       def cluster(*a)
         # NOTE: Currently their is a distinction between Models::Domain and
-        # Models::Cluster. This will eventually be removed, but in the meantime
+        # Models::Profile. This will eventually be removed, but in the meantime
         # it should not be exposed to the user. As such the domain can be implicitly
         # created
         unless File.exists?(Models::Domain.path(name_or_error))
