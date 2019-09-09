@@ -41,8 +41,9 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def run!(params: nil)
+      def run!(*params)
         self.class.delayed_require
+        params = params.join(' ')
         dep_name = (model_klass == Models::Domain ? 'domain' : name_or_error)
         replacements = ReplacementFactory.new(config.current_cluster, dep_name)
                                          .build(params)

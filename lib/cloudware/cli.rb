@@ -183,10 +183,8 @@ module Cloudware
 
     [:cluster, :group, :node].each do |level|
       command "#{level} deploy" do |c|
-        multilevel_cli_syntax(c, level)
+        multilevel_cli_syntax(c, level, '[PARAMS...]')
         c.summary = 'Create the templated resources on the provider'
-        c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
-                 String, 'A space separated list of keys to be replaced'
         proxy_opts = { level: level, method: :run!, named: (level != :cluster) }
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
