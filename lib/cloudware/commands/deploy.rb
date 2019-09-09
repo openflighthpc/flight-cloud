@@ -43,7 +43,7 @@ module Cloudware
 
       def run!(params: nil)
         self.class.delayed_require
-        dep_name = (model_klass == Models::Cluster ? 'domain' : name_or_error)
+        dep_name = (model_klass == Models::Domain ? 'domain' : name_or_error)
         replacements = ReplacementFactory.new(config.current_cluster, dep_name)
                                          .build(params)
         model = model_klass.prompt!(replacements, *read_model.__inputs__)

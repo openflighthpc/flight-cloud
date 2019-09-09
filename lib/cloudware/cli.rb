@@ -240,21 +240,28 @@ module Cloudware
         }
         c.action(&Commands::Edit.proxy(**proxy_opts))
       end
+
+      command "#{level}-update" do |c|
+        multilevel_cli_syntax(c, level, 'PARAMS...')
+        c.summary = "Update the #{level}'s parameters"
+        proxy_opts = { level: level, method: :run, named: (level != :cluster) }
+        c.action(&Commands::Update.proxy(**proxy_opts))
+      end
     end
 
-    command 'import' do |c|
-      cli_syntax(c, 'ZIP_PATH')
-      c.summary = 'Add templates to the cluster'
-      c.description = <<~DESC.split("\n\n").map(&:squish).join("\n")
-        Imports the templates into the internal cache. The
-        ZIP_PATH must be a zip file containing a directory that matches
-        the cluster's provider directory.\n\n
+    #command 'import' do |c|
+    #  cli_syntax(c, 'ZIP_PATH')
+    #  c.summary = 'Add templates to the cluster'
+    #  c.description = <<~DESC.split("\n\n").map(&:squish).join("\n")
+    #    Imports the templates into the internal cache. The
+    #    ZIP_PATH must be a zip file containing a directory that matches
+    #    the cluster's provider directory.\n\n
 
-        These templates can then be used to deploy resource using:\n
-        #{Config.app_name} deploy foo template
-      DESC
-      action(c, Commands::Import)
-    end
+    #    These templates can then be used to deploy resource using:\n
+    #    #{Config.app_name} deploy foo template
+    #  DESC
+    #  action(c, Commands::Import)
+    #end
 
     command 'list' do |c|
       cli_syntax(c)
