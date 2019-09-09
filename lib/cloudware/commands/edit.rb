@@ -31,45 +31,28 @@ require 'tty-editor'
 
 module Cloudware
   module Commands
-    class Edit < Command
-      def run!(name, **kwargs)
-        name == 'domain' ? domain(**kwargs) : node(name, **kwargs)
-      end
-
-      def domain(template: nil, **_kwargs)
-      # NOTE: The domain can be implicitly created as their can only be one domain
-        unless File.exists?(Models::Domain.path(__config__.current_cluster))
-          model = Models::Domain.create(__config__.current_cluster)
+    class Edit < ScopedCommand
+      def cluster(*a)
+        # NOTE: Currently their is a distinction between Models::Domain and
+        # Models::Cluster. This will eventually be removed, but in the meantime
+        # it should not be exposed to the user. As such the domain can be implicitly
+        # created
+        unless File.exists?(Models::Domain.path(name_or_error))
+          model = Models::Domain.create(name_or_error)
           FileUtils.mkdir_p File.dirname(model.template_path)
           FileUtils.touch model.template_path
         end
-        if template
-          replace_model_template(
-            template, Models::Domain.read(__config__.current_cluster)
-          )
-          Models::Domain.prompt!(__config__.current_cluster, all: true)
-        else
-          Models::Domain.edit_then_prompt!(__config__.current_cluster)
-        end
+        run(*a)
       end
 
-      def node(name, template: nil, groups: nil)
-        Models::Node.update(__config__.current_cluster, name) do |node|
+      def run(template = nil)
+        model_klass.update(*read_model.__inputs__) do |node|
           if template
             node.save_template(template)
           else
             node.edit_template
           end
-          node.prompt_for_missing_replacements
-          node.cli_groups = groups
         end
-      end
-
-      private
-
-      def replace_model_template(template, model)
-        FileUtils.mkdir_p File.dirname(model.template_path)
-        FileUtils.cp template, model.template_path
       end
     end
   end

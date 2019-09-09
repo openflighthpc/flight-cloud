@@ -221,16 +221,25 @@ module Cloudware
       c.action(&Commands::Destroy.proxy(**proxy_opts))
     end
 
-    command 'edit' do |c|
-      cli_syntax(c, 'NAME')
-      c.summary = 'Update the cloud template and deployment parameters'
-      c.option '--template PATH', 'Replace the old template with the new file PATH'
-      c.option '--groups [GROUPS]', <<~DESC.squish
-        Set which GROUPS the node belongs to. This option is ignored when
-        editting a domain. The GROUPS must be given as a comma separated list.
-        Omitting the GROUPS argument will unassign the node from all groups
-      DESC
-      action(c, Commands::Edit)
+    [:cluster, :group, :node].each do |level|
+      command "#{level}-edit" do |c|
+        multilevel_cli_syntax(c, level, '[TEMPLATE]')
+        c.summary = 'Update the cloud template'
+        c.description = <<~DESC
+          Open the #{level} template in the editor so it can be updated.
+
+          Alternatively the template can be replaced by a system file by specifing
+          the optional TEMPLATE argument. TEMPLATE should give the file path to the
+          new file, which will be copied into place. This action will skip opening the
+          file in the editor.
+        DESC
+        proxy_opts = {
+          level: level,
+          method: (level == :cluster ? :cluster : :run),
+          named: (level != :cluster)
+        }
+        c.action(&Commands::Edit.proxy(**proxy_opts))
+      end
     end
 
     command 'import' do |c|
