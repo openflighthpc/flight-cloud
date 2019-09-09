@@ -34,19 +34,13 @@ module Cloudware
     class Domain < Deployment
       allow_missing_read
 
+      def self.path(cluster)
+        join_domain_path(cluster, 'etc/deployment-config.yaml')
+      end
+      define_input_methods_from_path_parameters
+
       def self.join_domain_path(cluster, *rest)
-        RootDir.content_cluster(cluster.to_s, 'var/domain', *rest)
-      end
-
-      # TODO: make this match the initialize
-      def self.path(cluster, *_a)
-        join_domain_path(cluster, 'etc', 'config.yaml')
-      end
-
-      # TODO: Replace the Deployment initialize with
-      # raise NotImplementedError
-      def initialize(cluster, **h)
-        super(cluster, nil, **h)
+        RootDir.content_cluster(cluster.to_s, *rest)
       end
 
       def name
@@ -61,6 +55,10 @@ module Cloudware
       # TODO: Remove this once the base class stops setting the template path
       def template_path=(*a)
         # noop
+      end
+
+      def nodes
+        Models::Node.glob_read(cluster, '*')
       end
     end
   end

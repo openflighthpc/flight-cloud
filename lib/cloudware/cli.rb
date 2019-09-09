@@ -83,6 +83,17 @@ module Cloudware
       end
     end
 
+    def self.multilevel_cli_syntax(command, level, args_str = '')
+      case level
+      when :group
+        cli_syntax(command, "GROUP #{args_str}".chomp)
+      when :node
+        cli_syntax(command, "NODE #{args_str}".chomp)
+      else
+        cli_syntax(command, args_str)
+      end
+    end
+
     def self.cli_syntax(command, args_str = '')
       command.hidden = true if command.name.split.length > 1
       command.syntax = <<~SYNTAX.squish
@@ -90,10 +101,12 @@ module Cloudware
       SYNTAX
     end
 
-    command 'cluster' do |c|
-      cli_syntax(c)
-      c.sub_command_group = true
-      c.summary = 'Manage the current cluster selection'
+    [:cluster, :group, :node].each do |level|
+      command level do |c|
+        cli_syntax(c)
+        c.sub_command_group = true
+        c.summary = "View, manage, and deploy #{ level == :cluster ? 'the' : 'a' } #{level}"
+      end
     end
 
     command 'cluster init' do |c|
@@ -128,7 +141,7 @@ module Cloudware
       action(c, Commands::Configure)
     end
 
-    command 'create' do |c|
+    command 'node create' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
       c.description = 'Add a new node to the cluster'
       c.option '--groups GROUPS', <<~DESC.squish
@@ -168,80 +181,81 @@ module Cloudware
     #   action(c, Commands::Deploy)
     # end
 
-    command 'deploy' do |c|
-      cli_syntax(c, 'IDENTIFIER')
-      c.summary = 'Deploy a domain or node'
-      c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
-        String, 'A space separated list of keys to be replaced'
-      action(c, Commands::Deploy)
+    [:cluster, :group, :node].each do |level|
+      command "#{level} deploy" do |c|
+        multilevel_cli_syntax(c, level, '[PARAMS...]')
+        c.summary = 'Create the templated resources on the provider'
+        proxy_opts = { level: level, method: :run!, named: (level != :cluster) }
+        c.action(&Commands::Deploy.proxy(**proxy_opts))
+      end
+
+      command "#{level} destroy" do |c|
+        multilevel_cli_syntax(c, level)
+        c.summary = 'Teardown the resouces on the provider'
+        c.description = <<~DESC
+          Destroys the resources on the providers platform and flags it
+          as offline. This action does not remove the configuration file,
+          allowing it to be redeployed easily.
+
+          Once the deployment is offline, the configuration file can be
+          permanently removed using the 'delete' command.
+        DESC
+        proxy_opts = { level: level, method: :run!, named: (level != :cluster) }
+        c.action(&Commands::Destroy.proxy(**proxy_opts))
+      end
     end
 
-    command 'destroy' do |c|
-      cli_syntax(c, 'NAME')
-      c.summary = 'Stop a running deployment'
+    command 'node delete' do |c|
+      cli_syntax(c, 'NODE')
+      c.summary = 'Remove the node from the cluster'
       c.description = <<~DESC
-        Destroys the deployment on the providers platform and flags it
-        as offline. This action does not remove the configuration file,
-        allowing it to be redeployed easily.
+        Deletes the configuration file for the NODE. This action will error if
+        the node is currently running. The node cane be stopped using the
+        'destroy' command.
 
-        Once the deployment is offline, the configuration file can be
-        permanently removed using the 'delete' command.
-      DESC
-      # TODO: Support groups again
-      # c.option '-g', '--group', 'Destroy all deployments within the specified group'
-      action(c, Commands::Destroy)
-    end
-
-    command 'delete' do |c|
-      cli_syntax(c, 'NAME')
-      c.summary = 'Remove the deployments configuration file'
-      c.description = <<~DESC
-        Deletes the configuration file for the deployment NAME. This action
-        will error if the resources are currently running. The resources can
-        be stop using the 'destroy' command.
-
-        The configuration of a currently running deployment can be deleted
+        The configuration of a currently running node can be deleted
         using the '--force' flag. This will not destroy the remote resources
       DESC
       c.option '--force', 'Delete the deployment regardless if running'
-      # TODO: Add groups support back again
-      # c.option '-g', '--group', 'Delete all deployments within the specified group'
-      action(c, Commands::Destroy, method: :delete)
+      proxy_opts = { level: :node, method: :delete, named: true }
+      c.action(&Commands::Destroy.proxy(**proxy_opts))
     end
 
-    command 'edit' do |c|
-      cli_syntax(c, 'NAME')
-      c.summary = 'Update the cloud template and deployment parameters'
-      c.option '--template PATH', 'Replace the old template with the new file PATH'
-      c.option '--groups [GROUPS]', <<~DESC.squish
-        Set which GROUPS the node belongs to. This option is ignored when
-        editting a domain. The GROUPS must be given as a comma separated list.
-        Omitting the GROUPS argument will unassign the node from all groups
-      DESC
-      action(c, Commands::Edit)
+    [:cluster, :group, :node].each do |level|
+      command "#{level} edit" do |c|
+        multilevel_cli_syntax(c, level, '[TEMPLATE]')
+        c.summary = 'Update the cloud template'
+        c.description = <<~DESC
+          Open the #{level} template in the editor so it can be updated.
+
+          Alternatively the template can be replaced by a system file by specifing
+          the optional TEMPLATE argument. TEMPLATE should give the file path to the
+          new file, which will be copied into place. This action will skip opening the
+          file in the editor.
+        DESC
+        proxy_opts = {
+          level: level,
+          method: (level == :cluster ? :cluster : :run),
+          named: (level != :cluster)
+        }
+        c.action(&Commands::Edit.proxy(**proxy_opts))
+      end
+
+      command "#{level} update" do |c|
+        multilevel_cli_syntax(c, level, 'PARAMS...')
+        c.summary = "Update the #{level}'s parameters"
+        proxy_opts = { level: level, method: :run, named: (level != :cluster) }
+        c.action(&Commands::Update.proxy(**proxy_opts))
+      end
     end
 
     command 'import' do |c|
-      cli_syntax(c, 'ZIP_PATH')
+      cli_syntax(c, 'PATH')
       c.summary = 'Add templates to the cluster'
-      c.description = <<~DESC.split("\n\n").map(&:squish).join("\n")
-        Imports the templates into the internal cache. The
-        ZIP_PATH must be a zip file containing a directory that matches
-        the cluster's provider directory.\n\n
-
-        These templates can then be used to deploy resource using:\n
-        #{Config.app_name} deploy foo template
-      DESC
       action(c, Commands::Import)
     end
 
-    command 'list' do |c|
-      cli_syntax(c)
-      c.sub_command_group = true
-      c.summary = 'List the deployed cloud resources'
-    end
-
-    list_clusters_proc = proc do |c|
+    command('cluster list') do |c|
       cli_syntax(c)
       c.summary = 'Show the current and available clusters'
       c.description = <<~DESC
@@ -249,9 +263,6 @@ module Cloudware
       DESC
       action(c, Commands::ClusterCommand, method: :list)
     end
-
-    command('list clusters', &list_clusters_proc)
-    command('cluster list', &list_clusters_proc)
 
     command 'list' do |c|
       cli_syntax(c)
@@ -262,52 +273,52 @@ module Cloudware
       action(c, Commands::Lists::Deployment)
     end
 
-    command 'list-groups' do |c|
+    command 'group list' do |c|
       cli_syntax(c)
       c.description = 'List all groups within the cluster'
       action(c, Commands::Lists::Deployment, method: :list_groups)
     end
 
-    command 'power' do |c|
-      cli_syntax(c)
-      c.sub_command_group = true
-      c.description = 'Start or stop machine and check their power status'
-    end
+    [:cluster, :group, :node].each do |level|
+      command "#{level} power-status" do |c|
+        multilevel_cli_syntax(c, level)
+        if level == :node
+          c.description = 'Check the power state of the node'
+        else
+          c.description = 'Check the power state of the nodes'
+        end
+        proxy_opts = { level: level, method: :status_cli, named: (level != :cluster) }
+        c.action(&Commands::ScopedPower.proxy(**proxy_opts))
+      end
 
-    def self.shared_power_attr(c)
-      action = c.name.split.last
-      cli_attr = 'IDENTIFIER'
-      cli_syntax(c, cli_attr)
-      c.option '-g', '--group', <<~DESC
-        Perform the '#{action}' action on machine in group '#{cli_attr}'
-      DESC
-    end
+      command "#{level} power-off" do |c|
+        multilevel_cli_syntax(c, level)
+        if level == :node
+          c.description = 'Turn the node off'
+        else
+          c.description = 'Turn the nodes off'
+        end
+        proxy_opts = { level: level, method: :off_cli, named: (level != :cluster) }
+        c.action(&Commands::ScopedPower.proxy(**proxy_opts))
+      end
 
-    command 'power status' do |c|
-      shared_power_attr(c)
-      c.description = 'Check the power state of a machine'
-      action(c, Commands::Power, method: :status_cli)
-    end
+      command "#{level} power-on" do |c|
+        multilevel_cli_syntax(c, level)
+        if level == :node
+          c.description = 'Turn the node on'
+        else
+          c.description = 'Turn the nodes on'
+        end
+        proxy_opts = { level: level, method: :on_cli, named: (level != :cluster) }
+        c.action(&Commands::ScopedPower.proxy(**proxy_opts))
+      end
 
-    command 'power off' do |c|
-      shared_power_attr(c)
-      c.description = 'Turn the machine off'
-      action(c, Commands::Power, method: :off_cli)
-    end
-
-    command 'power on' do |c|
-      shared_power_attr(c)
-      c.description = 'Turn the machine on'
-      c.option '-i TYPE', '--instance TYPE', <<~DESC
-        Change the instance type before powering the instance on
-      DESC
-      action(c, Commands::Power, method: :on_cli)
-    end
-
-    command 'render' do |c|
-      cli_syntax(c, 'NAME [TEMPLATE]')
-      c.summary = 'Return the template for an existing or new deployment'
-      action(c, Commands::Deploy, method: :render)
+      command "#{level} render" do |c|
+        cli_syntax(c, 'NAME')
+        c.summary = "Return the template the #{level}"
+        proxy_opts = { level: level, method: :render, named: (level != :cluster) }
+        c.action(&Commands::Deploy.proxy(**proxy_opts))
+      end
     end
   end
 end

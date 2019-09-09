@@ -33,7 +33,7 @@ require 'cloudware/providers/base'
 RSpec.describe Cloudware::Models::Deployment do
   subject do
     build(:deployment, replacements: replacements).tap do |deployment|
-      Cloudware::Models::Cluster.create_or_update(deployment.cluster)
+      Cloudware::Models::Profile.create_or_update(deployment.cluster)
     end
   end
 

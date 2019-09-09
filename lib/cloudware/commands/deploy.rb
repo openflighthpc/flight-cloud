@@ -32,34 +32,30 @@ require 'tty-prompt'
 
 module Cloudware
   module Commands
-    class Deploy < Command
+    class Deploy < ScopedCommand
+      include WithSpinner
+
       def self.delayed_require
-        super
+        require 'cloudware/models'
         require 'cloudware/models/node'
         require 'cloudware/replacement_factory'
       end
 
-      def run!(identifier, params: nil)
-        if identifier == 'domain'
-          domain(params: params)
-        else
-          node(identifier, params: params)
-        end
-      end
+      def run!(*params)
+        self.class.delayed_require
+        params = params.join(' ')
+        dep_name = (model_klass == Models::Domain ? 'domain' : name_or_error)
+        replacements = ReplacementFactory.new(config.current_cluster, dep_name)
+                                         .build(params)
+        model = model_klass.prompt!(replacements, *read_model.__inputs__)
 
-      # TODO: Handle dependent deployments at some point
-      def node(identifier, params: nil)
-        replacements = ReplacementFactory.new(__config__.current_cluster, identifier)
-          .build(params)
-        node = Models::Node.prompt!(replacements, __config__.current_cluster, identifier)
+        raise_if_deployed(model)
 
-        raise_if_deployed(node)
-
-        deployed_node = with_spinner('Deploying node...', done: 'Done') do
-          Models::Node.deploy!(__config__.current_cluster, identifier)
+        deployed = with_spinner("Deploying #{model.name}...", done: 'Done') do
+          model_klass.deploy!(*model.__inputs__)
         end
 
-        if deployed_node.deployment_error
+        if deployed.deployment_error
           raise DeploymentError, <<~ERROR.chomp
              An error has occured. Please see for further details:
             `#{Config.app_name} list --verbose`
@@ -67,33 +63,9 @@ module Cloudware
         end
       end
 
-      # TODO: DRY This up with above
-      def domain(params: nil)
-        replacements = ReplacementFactory.new(__config__.current_cluster, 'domain')
-          .build(params)
-        domain = Models::Domain.prompt!(replacements, __config__.current_cluster)
-
-        raise_if_deployed(domain)
-
-        deployed_domain = with_spinner('Deploying domain...', done: 'Done') do
-          Models::Domain.deploy!(__config__.current_cluster)
-        end
-
-        if deployed_domain.deployment_error
-          raise DeploymentError, <<~ERROR.chomp
-            An error has occurred deploying the domain.
-            `#{Config.app_name} list --verbose`
-          ERROR
-        end
-      end
-
-      def render(name)
-        dep = if name == 'domain'
-                Models::Domain.prompt!(__config__.current_cluster)
-              else
-                Models::Node.prompt!(__config__.current_cluster, name)
-              end
-        puts dep.template
+      def render
+        cur_model = model_klass.prompt!(nil, *read_model.__inputs__)
+        puts cur_model.template
       end
 
       private
