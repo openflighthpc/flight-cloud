@@ -296,21 +296,6 @@ module Cloudware
       action(c, Commands::Lists::Deployment, method: :list_groups)
     end
 
-    command 'power' do |c|
-      cli_syntax(c)
-      c.sub_command_group = true
-      c.description = 'Start or stop machine and check their power status'
-    end
-
-    def self.shared_power_attr(c)
-      action = c.name.split.last
-      cli_attr = 'IDENTIFIER'
-      cli_syntax(c, cli_attr)
-      c.option '-g', '--group', <<~DESC
-        Perform the '#{action}' action on machine in group '#{cli_attr}'
-      DESC
-    end
-
     [:cluster, :group, :node].each do |level|
       command "#{level}-power-status" do |c|
         multilevel_cli_syntax(c, level)
