@@ -249,27 +249,13 @@ module Cloudware
       end
     end
 
-    #command 'import' do |c|
-    #  cli_syntax(c, 'ZIP_PATH')
-    #  c.summary = 'Add templates to the cluster'
-    #  c.description = <<~DESC.split("\n\n").map(&:squish).join("\n")
-    #    Imports the templates into the internal cache. The
-    #    ZIP_PATH must be a zip file containing a directory that matches
-    #    the cluster's provider directory.\n\n
-
-    #    These templates can then be used to deploy resource using:\n
-    #    #{Config.app_name} deploy foo template
-    #  DESC
-    #  action(c, Commands::Import)
-    #end
-
-    command 'list' do |c|
-      cli_syntax(c)
-      c.sub_command_group = true
-      c.summary = 'List the deployed cloud resources'
+    command 'import' do |c|
+      cli_syntax(c, 'PATH')
+      c.summary = 'Add templates to the cluster'
+      action(c, Commands::Import)
     end
 
-    list_clusters_proc = proc do |c|
+    command('cluster-list') do |c|
       cli_syntax(c)
       c.summary = 'Show the current and available clusters'
       c.description = <<~DESC
@@ -277,9 +263,6 @@ module Cloudware
       DESC
       action(c, Commands::ClusterCommand, method: :list)
     end
-
-    command('list clusters', &list_clusters_proc)
-    command('cluster list', &list_clusters_proc)
 
     command 'list' do |c|
       cli_syntax(c)
@@ -290,7 +273,7 @@ module Cloudware
       action(c, Commands::Lists::Deployment)
     end
 
-    command 'list-groups' do |c|
+    command 'group-list' do |c|
       cli_syntax(c)
       c.description = 'List all groups within the cluster'
       action(c, Commands::Lists::Deployment, method: :list_groups)
