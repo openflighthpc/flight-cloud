@@ -86,7 +86,10 @@ module Cloudware
         end
       end
 
-      def self.prompt!(replacements=nil, *a, all: false)
+      # TODO: Remove replacements as the first argument as it breaks the idiom.
+      # The positional arguments should match the `read` method
+      def self.prompt!(replacements, *a, all: false)
+        replacements ||= {}
         reraise_missing_file do
           update(*a) do |dep|
             dep.replacements = dep.replacements.merge(

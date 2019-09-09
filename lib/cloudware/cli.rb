@@ -344,12 +344,13 @@ module Cloudware
         proxy_opts = { level: level, method: :on_cli, named: (level != :cluster) }
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
-    end
 
-    command 'render' do |c|
-      cli_syntax(c, 'NAME [TEMPLATE]')
-      c.summary = 'Return the template for an existing or new deployment'
-      action(c, Commands::Deploy, method: :render)
+      command "#{level}-render" do |c|
+        cli_syntax(c, 'NAME')
+        c.summary = "Return the template the #{level}"
+        proxy_opts = { level: level, method: :render, named: (level != :cluster) }
+        c.action(&Commands::Deploy.proxy(**proxy_opts))
+      end
     end
   end
 end

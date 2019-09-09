@@ -62,13 +62,9 @@ module Cloudware
         end
       end
 
-      def render(name)
-        dep = if name == 'domain'
-                Models::Domain.prompt!(__config__.current_cluster)
-              else
-                Models::Node.prompt!(__config__.current_cluster, name)
-              end
-        puts dep.template
+      def render
+        cur_model = model_klass.prompt!(nil, *read_model.__inputs__)
+        puts cur_model.template
       end
 
       private
