@@ -101,13 +101,15 @@ module Cloudware
       SYNTAX
     end
 
-    command 'cluster' do |c|
-      cli_syntax(c)
-      c.sub_command_group = true
-      c.summary = 'Manage the current cluster selection'
+    [:cluster, :group, :node].each do |level|
+      command level do |c|
+        cli_syntax(c)
+        c.sub_command_group = true
+        c.summary = "View, manage, and deploy #{ level == :cluster ? 'the' : 'a' } #{level}"
+      end
     end
 
-    command 'cluster-init' do |c|
+    command 'cluster init' do |c|
       cli_syntax(c, 'CLUSTER PROVIDER')
       c.summary = 'Create a new cluster'
       c.description = <<~DESC
@@ -121,13 +123,13 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :init)
     end
 
-    command 'cluster-switch' do |c|
+    command 'cluster switch' do |c|
       cli_syntax(c, 'CLUSTER')
       c.summary = 'Change the current cluster to CLUSTER'
       action(c, Commands::ClusterCommand, method: :switch)
     end
 
-    command 'cluster-delete' do |c|
+    command 'cluster delete' do |c|
       cli_syntax(c, 'CLUSTER')
       c.summary = 'Destroys the deployments and deletes the cluster'
       action(c, Commands::ClusterCommand, method: :delete)
@@ -139,7 +141,7 @@ module Cloudware
       action(c, Commands::Configure)
     end
 
-    command 'node-create' do |c|
+    command 'node create' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
       c.description = 'Add a new node to the cluster'
       c.option '--groups GROUPS', <<~DESC.squish
@@ -180,7 +182,7 @@ module Cloudware
     # end
 
     [:cluster, :group, :node].each do |level|
-      command "#{level}-deploy" do |c|
+      command "#{level} deploy" do |c|
         multilevel_cli_syntax(c, level)
         c.summary = 'Create the templated resources on the provider'
         c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
@@ -189,7 +191,7 @@ module Cloudware
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
 
-      command "#{level}-destroy" do |c|
+      command "#{level} destroy" do |c|
         multilevel_cli_syntax(c, level)
         c.summary = 'Teardown the resouces on the provider'
         c.description = <<~DESC
@@ -205,7 +207,7 @@ module Cloudware
       end
     end
 
-    command 'node-delete' do |c|
+    command 'node delete' do |c|
       cli_syntax(c, 'NODE')
       c.summary = 'Remove the node from the cluster'
       c.description = <<~DESC
@@ -222,7 +224,7 @@ module Cloudware
     end
 
     [:cluster, :group, :node].each do |level|
-      command "#{level}-edit" do |c|
+      command "#{level} edit" do |c|
         multilevel_cli_syntax(c, level, '[TEMPLATE]')
         c.summary = 'Update the cloud template'
         c.description = <<~DESC
@@ -241,7 +243,7 @@ module Cloudware
         c.action(&Commands::Edit.proxy(**proxy_opts))
       end
 
-      command "#{level}-update" do |c|
+      command "#{level} update" do |c|
         multilevel_cli_syntax(c, level, 'PARAMS...')
         c.summary = "Update the #{level}'s parameters"
         proxy_opts = { level: level, method: :run, named: (level != :cluster) }
@@ -255,7 +257,7 @@ module Cloudware
       action(c, Commands::Import)
     end
 
-    command('cluster-list') do |c|
+    command('cluster list') do |c|
       cli_syntax(c)
       c.summary = 'Show the current and available clusters'
       c.description = <<~DESC
@@ -273,14 +275,14 @@ module Cloudware
       action(c, Commands::Lists::Deployment)
     end
 
-    command 'group-list' do |c|
+    command 'group list' do |c|
       cli_syntax(c)
       c.description = 'List all groups within the cluster'
       action(c, Commands::Lists::Deployment, method: :list_groups)
     end
 
     [:cluster, :group, :node].each do |level|
-      command "#{level}-power-status" do |c|
+      command "#{level} power-status" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
           c.description = 'Check the power state of the node'
@@ -291,7 +293,7 @@ module Cloudware
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
 
-      command "#{level}-power-off" do |c|
+      command "#{level} power-off" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
           c.description = 'Turn the node off'
@@ -302,7 +304,7 @@ module Cloudware
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
 
-      command "#{level}-power-on" do |c|
+      command "#{level} power-on" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
           c.description = 'Turn the node on'
@@ -313,7 +315,7 @@ module Cloudware
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
 
-      command "#{level}-render" do |c|
+      command "#{level} render" do |c|
         cli_syntax(c, 'NAME')
         c.summary = "Return the template the #{level}"
         proxy_opts = { level: level, method: :render, named: (level != :cluster) }
