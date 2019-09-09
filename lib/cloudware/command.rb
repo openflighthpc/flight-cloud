@@ -31,8 +31,107 @@ require 'cloudware/spinner'
 require 'cloudware/log'
 require 'cloudware/command_config'
 require 'memoist'
+require 'hashie'
 
 module Cloudware
+  class CommanderProxy < Hashie::Dash
+    property :klass, required: :true
+    property :level, required: true
+    property :named, required: true
+    property :method, required: false
+    property :index, required: false
+
+    def to_lambda
+      lambda { |a, o| run_proxy(a, o) }
+    end
+
+    private
+
+    def run_proxy(commander_args, commander_opts)
+      name, args = if named
+                     [commander_args.first, commander_args[1..-1]]
+                   else
+                     [nil, commander_args]
+                   end
+      opts = commander_opts.__hash__.dup.tap { |h| h.delete(:trace) }
+      primary = opts.delete(:primary)
+      instance = klass.new(level, name, index, primary)
+      if opts.empty?
+        instance.public_send(method, *args)
+      else
+        instance.public_send(method, *args, **opts)
+      end
+    rescue Interrupt
+      $stderr.puts 'Received Interrupt!'
+      Log.warn 'Received Interrupt!'
+    rescue => e
+      Log.fatal(e)
+      raise e
+    end
+
+    def resolved_method
+      method || index || level
+    end
+  end
+
+  ScopedCommand = Struct.new(:level, :name, :index, :primary) do
+    def self.proxy(**kwargs)
+      CommanderProxy.new(**kwargs.merge(klass: self)).to_lambda
+    end
+
+    def config
+      @config ||= CommandConfig.read
+    end
+
+    def model_klass
+      case level
+      when :cluster
+        require 'cloudware/models/domain'
+        Models::Domain
+      when :group
+        require 'cloudware/models/group'
+        Models::Group
+      when :node
+        require 'cloudware/models/node'
+        Models::Node
+      else
+        raise InternalError, "Could not resolve the command level: #{level}"
+      end
+    end
+
+    def name_or_error
+      if name
+        name
+      elsif level == :cluster
+        config.current_cluster
+      else
+        raise InternalError, 'Failed to run the command as the model name is missing'
+      end
+    end
+
+    def read_model
+      if level == :cluster
+        Models::Domain.read(name_or_error)
+      else
+        model_klass.read(config.current_cluster, name_or_error)
+      end
+    end
+
+    def read_node
+      Models::Node.read(config.current_cluster, name_or_error)
+    end
+
+    def read_nodes
+      if level == :node
+        [read_model]
+      elsif level == :group && primary
+        read_model.primary_nodes
+      else
+        read_model.nodes
+      end
+    end
+  end
+
   class Command
     extend Memoist
     include WithSpinner
@@ -65,14 +164,6 @@ module Cloudware
 
     def region
       __config__.region
-    end
-
-    def get_machines_in_group(group_name)
-      Models::Deployments.read(__config__.current_cluster)
-        .machines
-        .select { |m| m.groups.include?(group_name) }
-        .map { |m| m.name }
-        .sort
     end
 
     private

@@ -37,7 +37,7 @@ module Cloudware
       path = RootDir.content_cluster_template(cluster, *parts)
       path = Pathname.new(path)
       if ext
-        new_ext = registry.read(Models::Cluster, cluster).template_ext
+        new_ext = registry.read(Models::Profile, cluster).template_ext
         path.sub_ext(new_ext)
       else
         path

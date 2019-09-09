@@ -30,7 +30,6 @@
 require 'cloudware/models/deployment_callbacks'
 require 'cloudware/models/concerns/provider_client'
 require 'cloudware/models/application'
-require 'cloudware/models/machine'
 require 'cloudware/root_dir'
 
 require 'pathname'
@@ -61,13 +60,7 @@ module Cloudware
         end
       end
 
-      define_link(:cluster, Models::Cluster) { [cluster] }
-
-      # TODO: Make this an archatype class and replace the path with:
-      # raise NotImplementedError
-      def self.path(cluster, name)
-        RootDir.content_cluster(cluster.to_s, 'var/deployments', name + '.yaml')
-      end
+      define_link(:cluster, Models::Profile) { [cluster] }
 
       def self.read!(*a)
         reraise_missing_file { read(*a) }
@@ -93,7 +86,10 @@ module Cloudware
         end
       end
 
-      def self.prompt!(replacements=nil, *a, all: false)
+      # TODO: Remove replacements as the first argument as it breaks the idiom.
+      # The positional arguments should match the `read` method
+      def self.prompt!(replacements, *a, all: false)
+        replacements ||= {}
         reraise_missing_file do
           update(*a) do |dep|
             dep.replacements = dep.replacements.merge(
@@ -147,12 +143,6 @@ module Cloudware
 
       attr_reader :cluster, :name
 
-      def initialize(cluster, name, **_h)
-        @cluster = cluster
-        @name = name
-        super
-      end
-
       # TODO: Remove template_path as a saved parameter and make it static
       # Soon all deployments will have a 1:1 relationship with its template
       # Replace the archetype method with: raise NotImplementedError
@@ -178,7 +168,7 @@ module Cloudware
       def cluster_config
         # Protect the read from a `nil` cluster. There is a separate validation
        # for nil clusters
-        @cluster_config ||= Models::Cluster.read(cluster.to_s)
+        @cluster_config ||= Models::Profile.read(cluster.to_s)
       end
 
       def results

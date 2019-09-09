@@ -43,7 +43,7 @@ module Cloudware
 
     def current_cluster
       name = (server_mode ? server_cluster : __data__.fetch(:current_cluster))
-      if name && File.exists?(Models::Cluster.path(name))
+      if name && File.exists?(Models::Profile.path(name))
         name
       elsif name
         raise ConfigError, <<~ERROR.squish

@@ -29,36 +29,19 @@
 
 module Cloudware
   module Commands
-    class Destroy < Command
-      attr_reader :name
+    class Destroy < ScopedCommand
+      include WithSpinner
 
-      def initialize(*a)
-        require 'cloudware/models/deployment'
-        super
-      end
-
-      def run!(name)
-        name == 'domain' ? domain : node(name)
-      end
-
-      def domain
-        with_spinner("Destroying domain ...", done: 'Done') do
-          Models::Domain.destroy!(__config__.current_cluster)
+      def run!
+        with_spinner("Destroying #{name_or_error}...") do
+          model_klass.destroy!(*read_model.__inputs__)
         end
       end
 
-      def node(name)
-        with_spinner("Destroying resources for #{name}...", done: 'Done') do
-          Models::Node.destroy!(__config__.current_cluster, name)
-        end
-      end
-
-      def delete(name, force: false)
-        if name == 'domain'
-          Models::Domain.delete!(__config__.current_cluster, force: force)
-        else
-          Models::Node.delete!(__config__.current_cluster, name, force: force)
-        end
+      # NOTE: Currently this command only works for nodes. Deleting the domain
+      # should be equivalent to deleting the entire cluster
+      def delete(force: false)
+        Models::Node.delete!(*read_node.__inputs__, force: force)
       end
     end
   end

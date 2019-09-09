@@ -45,14 +45,6 @@ module Cloudware
       def find_by_name(name)
         find { |deployment| deployment.name == name }
       end
-
-      def machines
-        results.keys
-               .map { |k| Models::Machine.name_from_tag(k) }
-               .uniq
-               .reject(&:nil?)
-               .map { |n| Models::Machine.new(name: n, cluster: first.cluster) }
-      end
     end
   end
 end

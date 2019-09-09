@@ -32,11 +32,7 @@ require 'cloudware/models/node'
 
 module Cloudware
   module Models
-    class Group
-      include FlightConfig::Reader
-      include FlightConfig::Accessor
-      include FlightConfig::Links
-
+    class Group < Deployment
       allow_missing_read
 
       def self.path(cluster, name)

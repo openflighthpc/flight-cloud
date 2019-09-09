@@ -32,12 +32,13 @@ require 'cloudware/models/deployment'
 module Cloudware
   module Models
     class Node < Deployment
+      def self.path(cluster, name)
+        join_node_path(cluster, name, 'etc', 'config.yaml')
+      end
+      define_input_methods_from_path_parameters
+
       def self.join_node_path(cluster, name, *rest)
         RootDir.content_cluster(cluster.to_s, 'var/nodes', name, *rest)
-      end
-
-      def self.path(*a)
-        join_node_path(*a, 'etc', 'config.yaml')
       end
 
       def template_path
@@ -57,6 +58,11 @@ module Cloudware
         else
           [v]
         end
+      end
+
+      def machine_client
+        id = (results || {})[:"#{name}TAGID"]
+        provider_client.machine(id)
       end
     end
   end

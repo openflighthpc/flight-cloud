@@ -27,32 +27,17 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
-require 'tty-editor'
+require 'cloudware/replacement_factory'
 
 module Cloudware
   module Commands
-    class Edit < ScopedCommand
-      def cluster(*a)
-        # NOTE: Currently their is a distinction between Models::Domain and
-        # Models::Profile. This will eventually be removed, but in the meantime
-        # it should not be exposed to the user. As such the domain can be implicitly
-        # created
-        unless File.exists?(Models::Domain.path(name_or_error))
-          model = Models::Domain.create(name_or_error)
-          FileUtils.mkdir_p File.dirname(model.template_path)
-          FileUtils.touch model.template_path
-        end
-        run(*a)
-      end
-
-      def run(template = nil)
-        model_klass.update(*read_model.__inputs__) do |node|
-          if template
-            node.save_template(template)
-          else
-            node.edit_template
-          end
-        end
+    class Update < ScopedCommand
+      def run(*params)
+        params_string = params.join(' ')
+        dep_name = (model_klass == Models::Domain ? 'domain' : name_or_error)
+        replacements = ReplacementFactory.new(config.current_cluster, dep_name)
+                                         .build(params_string)
+        model_klass.prompt!(replacements, *read_model.__inputs__)
       end
     end
   end
