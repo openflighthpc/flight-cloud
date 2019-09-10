@@ -38,6 +38,14 @@ module Cloudware
         end
       end
 
+      def nodes
+        read_nodes.each do |node|
+          with_spinner("Destroying #{node.name}...") do
+            node.class.destroy!(*node.__inputs__)
+          end
+        end
+      end
+
       # NOTE: Currently this command only works for nodes. Deleting the domain
       # should be equivalent to deleting the entire cluster
       def delete(force: false)

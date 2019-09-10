@@ -41,18 +41,35 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
+      def nodes(*params)
+        params = params.join(' ')
+        read_nodes.each do |node|
+          deploy(node, params)
+        end
+      end
+
       def run!(*params)
         self.class.delayed_require
-        params = params.join(' ')
-        dep_name = (model_klass == Models::Domain ? 'domain' : name_or_error)
+        deploy(read_model, params.join(' '))
+      end
+
+      def render
+        cur_model = model_klass.prompt!(nil, *read_model.__inputs__)
+        puts cur_model.template
+      end
+
+      private
+
+      def deploy(model, params)
+        dep_name = (model.class == Models::Domain ? 'domain' : model.name)
         replacements = ReplacementFactory.new(config.current_cluster, dep_name)
                                          .build(params)
-        model = model_klass.prompt!(replacements, *read_model.__inputs__)
+        new_model = model.class.prompt!(replacements, *model.__inputs__)
 
-        raise_if_deployed(model)
+        raise_if_deployed(new_model)
 
-        deployed = with_spinner("Deploying #{model.name}...", done: 'Done') do
-          model_klass.deploy!(*model.__inputs__)
+        deployed = with_spinner("Deploying #{new_model.name}...", done: 'Done') do
+          model.class.deploy!(*new_model.__inputs__)
         end
 
         if deployed.deployment_error
@@ -62,13 +79,6 @@ module Cloudware
           ERROR
         end
       end
-
-      def render
-        cur_model = model_klass.prompt!(nil, *read_model.__inputs__)
-        puts cur_model.template
-      end
-
-      private
 
       # TODO: If this code is still commented out in a few months, feel free to delete it
       # def create_deployment(name, raw_path, params: nil)
@@ -84,18 +94,6 @@ module Cloudware
       def raise_if_deployed(dep)
         return unless dep.deployed
         raise InvalidInput, "'#{dep.name}' is already running"
-      end
-
-      def deploy(machine)
-        with_spinner('Deploying resources...', done: 'Done') do
-          dep = Models::Deployment.deploy!(__config__.current_cluster, machine)
-          if dep.deployment_error
-            raise DeploymentError, <<~ERROR.chomp
-               An error has occured. Please see for further details:
-              `#{Config.app_name} list --verbose`
-            ERROR
-          end
-        end
       end
     end
   end

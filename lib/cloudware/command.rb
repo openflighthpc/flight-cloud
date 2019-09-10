@@ -57,9 +57,9 @@ module Cloudware
       primary = opts.delete(:primary)
       instance = klass.new(level, name, index, primary)
       if opts.empty?
-        instance.public_send(method, *args)
+        instance.public_send(resolved_method, *args)
       else
-        instance.public_send(method, *args, **opts)
+        instance.public_send(resolved_method, *args, **opts)
       end
     rescue Interrupt
       $stderr.puts 'Received Interrupt!'

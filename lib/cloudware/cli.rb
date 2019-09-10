@@ -181,15 +181,23 @@ module Cloudware
     #   action(c, Commands::Deploy)
     # end
 
-    [:cluster, :group, :node].each do |level|
-      command "#{level} deploy" do |c|
+    ['cluster', 'cluster_nodes', 'group', 'group_nodes', 'node'].each do |type|
+      level = type.chomp('_nodes').to_sym
+      index = type.match(/(?<=_)\w+\Z/)&.to_s&.to_sym
+      proxy_opts = {
+        level: level,
+        index: index,
+        method: (index ? nil : :run!),
+        named: (level != :cluster)
+      }
+
+      command "#{level} deploy#{ "-#{index}" if index }" do |c|
         multilevel_cli_syntax(c, level, '[PARAMS...]')
         c.summary = 'Create the templated resources on the provider'
-        proxy_opts = { level: level, method: :run!, named: (level != :cluster) }
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
 
-      command "#{level} destroy" do |c|
+      command "#{level} destroy#{ "-#{index}" if index }" do |c|
         multilevel_cli_syntax(c, level)
         c.summary = 'Teardown the resouces on the provider'
         c.description = <<~DESC
@@ -200,7 +208,6 @@ module Cloudware
           Once the deployment is offline, the configuration file can be
           permanently removed using the 'delete' command.
         DESC
-        proxy_opts = { level: level, method: :run!, named: (level != :cluster) }
         c.action(&Commands::Destroy.proxy(**proxy_opts))
       end
     end
