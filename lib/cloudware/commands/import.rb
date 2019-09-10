@@ -70,7 +70,7 @@ module Cloudware
       end
 
       def cluster
-        registry.read(Models::Profile, __config__.current_cluster)
+        registry.read(Models::Cluster, __config__.current_cluster)
       end
 
       def provider_file

@@ -60,7 +60,7 @@ module Cloudware
         end
       end
 
-      define_link(:cluster, Models::Profile) { [cluster] }
+      define_link(:cluster, Models::Cluster) { [cluster] }
 
       def self.read!(*a)
         reraise_missing_file { read(*a) }
@@ -168,7 +168,7 @@ module Cloudware
       def cluster_config
         # Protect the read from a `nil` cluster. There is a separate validation
        # for nil clusters
-        @cluster_config ||= Models::Profile.read(cluster.to_s)
+        @cluster_config ||= Models::Cluster.read(cluster.to_s)
       end
 
       def results

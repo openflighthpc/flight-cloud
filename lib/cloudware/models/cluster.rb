@@ -32,7 +32,7 @@ require 'securerandom'
 
 module Cloudware
   module Models
-    class Profile
+    class Cluster
       include FlightConfig::Updater
       include FlightConfig::Globber
 

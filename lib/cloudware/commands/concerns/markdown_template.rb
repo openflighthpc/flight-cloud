@@ -49,7 +49,7 @@ module Cloudware
           delegate_missing_to :cluster
 
           def cluster
-            @cluster ||= Profile.read(cluster_identifier)
+            @cluster ||= Cluster.read(cluster_identifier)
           end
 
           def deployments
