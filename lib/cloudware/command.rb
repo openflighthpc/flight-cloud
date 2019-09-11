@@ -105,7 +105,7 @@ module Cloudware
     def name_or_error
       if name
         name
-      elsif level == :domain
+      elsif [:domain, :cluster].include?(level)
         config.current_cluster
       else
         raise InternalError, 'Failed to run the command as the model name is missing'

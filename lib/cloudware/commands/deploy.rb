@@ -41,14 +41,19 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def nodes(*params)
+      def index(*params)
         params = params.join(' ')
-        read_nodes.each do |node|
-          deploy(node, params)
+        nodes = read_nodes
+        if nodes.empty?
+          puts 'Nothing to deploy'
+        else
+          read_nodes.each do |node|
+            deploy(node, params)
+          end
         end
       end
 
-      def run!(*params)
+      def deployable(*params)
         self.class.delayed_require
         deploy(read_model, params.join(' '))
       end

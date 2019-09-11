@@ -195,23 +195,21 @@ module Cloudware
     #   action(c, Commands::Deploy)
     # end
 
-    ['domain', 'cluster_nodes', 'stack', 'group_nodes', 'node'].each do |type|
-      level = type.chomp('_nodes').to_sym
-      index = type.match(/(?<=_)\w+\Z/)&.to_s&.to_sym
+    [:cluster, :domain, :group, :stack, :node].each do |level|
+      is_deployable = [:domain, :stack, :node].include?(level)
       proxy_opts = {
         level: level,
-        index: index,
-        method: (index ? nil : :run!),
-        named: (level != :domain)
+        method: (is_deployable ? :deployable : :index),
+        named: ![:cluster, :domain].include?(level)
       }
 
-      command "#{level} deploy#{ "-#{index}" if index }" do |c|
+      command "#{level} deploy" do |c|
         multilevel_cli_syntax(c, level, '[PARAMS...]')
         c.summary = 'Create the templated resources on the provider'
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
 
-      command "#{level} destroy#{ "-#{index}" if index }" do |c|
+      command "#{level} destroy" do |c|
         multilevel_cli_syntax(c, level)
         c.summary = 'Teardown the resouces on the provider'
         c.description = <<~DESC
