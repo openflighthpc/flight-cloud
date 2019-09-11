@@ -165,16 +165,6 @@ module Cloudware
       c.summary = 'Volatile'
     end
 
-    command 'node create' do |c|
-      cli_syntax(c, 'NAME TEMPLATE')
-      c.description = 'Add a new node to the cluster'
-      c.option '--groups GROUPS', <<~DESC.squish
-        Set which GROUPS the node belongs to. This option is ignored when
-        creating a domain. The GROUPS must be given as a comma separated list.
-      DESC
-      action(c, Commands::Create)
-    end
-
     # TODO: The old deploy command is being maintained for reference, once the
     # functionality has been replicated, remove this code block
     #
@@ -253,6 +243,27 @@ module Cloudware
     end
 
     [:domain, :stack, :node].each do |level|
+      command "#{level} create" do |c|
+        multilevel_cli_syntax(c, level, 'TEMPLATE')
+        if level == :domain
+          c.description = "Define the top level domain template"
+        else
+          c.description = "Add a new #{level} to the cluster"
+        end
+        if level == :node
+          c.option '--groups GROUPS', <<~DESC.squish
+            Set which GROUPS the node belongs to. This option is ignored when
+            creating a domain. The GROUPS must be given as a comma separated list.
+          DESC
+        end
+        proxy_opts = {
+          level: level,
+          method: (level == :node ? :node : :deployable),
+          named: (level != :domain)
+        }
+        c.action(&Commands::Create.proxy(**proxy_opts))
+      end
+
       command "#{level} edit" do |c|
         multilevel_cli_syntax(c, level, '[TEMPLATE]')
         c.summary = 'Update the cloud template'

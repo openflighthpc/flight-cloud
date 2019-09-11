@@ -29,19 +29,10 @@
 
 module Cloudware
   module Commands
-    class Create < Command
-      def run!(name, template, groups: nil, delete_groups: nil)
-        abs_template = File.expand_path(template)
-        if name == 'domain'
-          domain(abs_template)
-        else
-          node(name, abs_template, groups: groups)
-        end
-      end
-
-      def domain(abs_template)
-        Models::Domain.create!(__config__.current_cluster) do |domain|
-          domain.save_template(abs_template)
+    class Create < ScopedCommand
+      def deployable(abs_template)
+        model_klass.create!(*read_deployable.__inputs__) do |model|
+          model.save_template(abs_template)
         end
       end
 
