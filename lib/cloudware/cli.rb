@@ -87,6 +87,8 @@ module Cloudware
       case level
       when :group
         cli_syntax(command, "GROUP #{args_str}".chomp)
+      when :stack
+        cli_syntax(command, "STACK #{args_str}".chomp)
       when :node
         cli_syntax(command, "NODE #{args_str}".chomp)
       else
@@ -156,6 +158,13 @@ module Cloudware
       end
     end
 
+    command :stack do |c|
+      cli_syntax(c)
+      c.sub_command_group = true
+      c.hidden = true
+      c.summary = 'Volatile'
+    end
+
     command 'node create' do |c|
       cli_syntax(c, 'NAME TEMPLATE')
       c.description = 'Add a new node to the cluster'
@@ -196,7 +205,7 @@ module Cloudware
     #   action(c, Commands::Deploy)
     # end
 
-    ['domain', 'cluster_nodes', 'group', 'group_nodes', 'node'].each do |type|
+    ['domain', 'cluster_nodes', 'stack', 'group_nodes', 'node'].each do |type|
       level = type.chomp('_nodes').to_sym
       index = type.match(/(?<=_)\w+\Z/)&.to_s&.to_sym
       proxy_opts = {
@@ -243,7 +252,7 @@ module Cloudware
       c.action(&Commands::Destroy.proxy(**proxy_opts))
     end
 
-    [:domain, :group, :node].each do |level|
+    [:domain, :stack, :node].each do |level|
       command "#{level} edit" do |c|
         multilevel_cli_syntax(c, level, '[TEMPLATE]')
         c.summary = 'Update the cloud template'

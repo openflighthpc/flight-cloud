@@ -91,7 +91,7 @@ module Cloudware
       when :domain
         require 'cloudware/models/domain'
         Models::Domain
-      when :group
+      when :group, :stack
         require 'cloudware/models/group'
         Models::Group
       when :node
@@ -113,7 +113,7 @@ module Cloudware
     end
 
     def read_model
-      if [:cluster, :domain]
+      if [:cluster, :domain].include?(level)
         model_klass.read(name_or_error)
       else
         model_klass.read(config.current_cluster, name_or_error)
@@ -133,7 +133,7 @@ module Cloudware
     end
 
     def read_deployable
-      if [:domain, :group, :node].include?(level)
+      if [:domain, :stack, :node].include?(level)
         read_model
       else
         raise InternalError, "The #{level} is not a deployable model"
