@@ -86,6 +86,9 @@ module Cloudware
     def model_klass
       case level
       when :cluster
+        require 'cloudware/models/cluster'
+        Models::Cluster
+      when :domain
         require 'cloudware/models/domain'
         Models::Domain
       when :group
@@ -102,7 +105,7 @@ module Cloudware
     def name_or_error
       if name
         name
-      elsif level == :cluster
+      elsif level == :domain
         config.current_cluster
       else
         raise InternalError, 'Failed to run the command as the model name is missing'
@@ -110,7 +113,7 @@ module Cloudware
     end
 
     def read_model
-      if level == :cluster
+      if level == :domain
         Models::Domain.read(name_or_error)
       else
         model_klass.read(config.current_cluster, name_or_error)
@@ -126,6 +129,8 @@ module Cloudware
         [read_model]
       elsif level == :group && primary
         read_model.primary_nodes
+      elsif level == :cluster
+        raise InternalError, 'Can not load nodes within the cluster scope'
       else
         read_model.nodes
       end

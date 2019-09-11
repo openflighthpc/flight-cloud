@@ -101,11 +101,11 @@ module Cloudware
       SYNTAX
     end
 
-    [:cluster, :group, :node].each do |level|
+    [:domain, :group, :node].each do |level|
       command level do |c|
         cli_syntax(c)
         c.sub_command_group = true
-        c.summary = "View, manage, and deploy #{ level == :cluster ? 'the' : 'a' } #{level}"
+        c.summary = "View, manage, and deploy #{ level == :domain ? 'the' : 'a' } #{level}"
       end
     end
 
@@ -188,7 +188,7 @@ module Cloudware
         level: level,
         index: index,
         method: (index ? nil : :run!),
-        named: (level != :cluster)
+        named: (level != :domain)
       }
 
       command "#{level} deploy#{ "-#{index}" if index }" do |c|
@@ -228,7 +228,7 @@ module Cloudware
       c.action(&Commands::Destroy.proxy(**proxy_opts))
     end
 
-    [:cluster, :group, :node].each do |level|
+    [:domain, :group, :node].each do |level|
       command "#{level} edit" do |c|
         multilevel_cli_syntax(c, level, '[TEMPLATE]')
         c.summary = 'Update the cloud template'
@@ -242,8 +242,8 @@ module Cloudware
         DESC
         proxy_opts = {
           level: level,
-          method: (level == :cluster ? :cluster : :run),
-          named: (level != :cluster)
+          method: (level == :domain ? :domain : :run),
+          named: (level != :domain)
         }
         c.action(&Commands::Edit.proxy(**proxy_opts))
       end
@@ -251,7 +251,7 @@ module Cloudware
       command "#{level} update" do |c|
         multilevel_cli_syntax(c, level, 'PARAMS...')
         c.summary = "Update the #{level}'s parameters"
-        proxy_opts = { level: level, method: :run, named: (level != :cluster) }
+        proxy_opts = { level: level, method: :run, named: (level != :domain) }
         c.action(&Commands::Update.proxy(**proxy_opts))
       end
     end
@@ -286,7 +286,7 @@ module Cloudware
       action(c, Commands::Lists::Deployment, method: :list_groups)
     end
 
-    [:cluster, :group, :node].each do |level|
+    [:domain, :group, :node].each do |level|
       command "#{level} power-status" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
@@ -294,7 +294,7 @@ module Cloudware
         else
           c.description = 'Check the power state of the nodes'
         end
-        proxy_opts = { level: level, method: :status_cli, named: (level != :cluster) }
+        proxy_opts = { level: level, method: :status_cli, named: (level != :domain) }
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
 
@@ -305,7 +305,7 @@ module Cloudware
         else
           c.description = 'Turn the nodes off'
         end
-        proxy_opts = { level: level, method: :off_cli, named: (level != :cluster) }
+        proxy_opts = { level: level, method: :off_cli, named: (level != :domain) }
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
 
@@ -316,14 +316,14 @@ module Cloudware
         else
           c.description = 'Turn the nodes on'
         end
-        proxy_opts = { level: level, method: :on_cli, named: (level != :cluster) }
+        proxy_opts = { level: level, method: :on_cli, named: (level != :domain) }
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
 
       command "#{level} render" do |c|
         cli_syntax(c, 'NAME')
         c.summary = "Return the template the #{level}"
-        proxy_opts = { level: level, method: :render, named: (level != :cluster) }
+        proxy_opts = { level: level, method: :render, named: (level != :domain) }
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
     end
