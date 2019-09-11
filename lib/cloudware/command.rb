@@ -113,15 +113,31 @@ module Cloudware
     end
 
     def read_model
-      if level == :domain
-        Models::Domain.read(name_or_error)
+      if [:cluster, :domain]
+        model_klass.read(name_or_error)
       else
         model_klass.read(config.current_cluster, name_or_error)
       end
     end
 
+    def read_cluster
+      if level == :cluster
+        read_model
+      else
+        Models::Cluster.read(config.current_cluster)
+      end
+    end
+
     def read_node
       Models::Node.read(config.current_cluster, name_or_error)
+    end
+
+    def read_deployable
+      if [:domain, :group, :node].include?(level)
+        read_model
+      else
+        raise InternalError, "The #{level} is not a deployable model"
+      end
     end
 
     def read_nodes
