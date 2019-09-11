@@ -145,10 +145,10 @@ module Cloudware
         [read_model]
       elsif level == :group && primary
         read_model.primary_nodes
-      elsif level == :cluster
-        raise InternalError, 'Can not load nodes within the cluster scope'
+      elsif level == :domain
+        raise InternalError, 'Can not load nodes within the domain scope'
       else
-        read_model.nodes
+        read_model.read_nodes
       end
     end
   end

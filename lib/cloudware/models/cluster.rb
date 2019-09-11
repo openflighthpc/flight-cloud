@@ -93,6 +93,10 @@ module Cloudware
         provider == 'azure' ? '.json' : '.yaml'
       end
 
+      def read_nodes
+        Models::Node.glob_read(identifier, '*')
+      end
+
       def deployments
         Models::Deployments.read(identifier)
       end

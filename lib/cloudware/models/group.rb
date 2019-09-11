@@ -40,7 +40,7 @@ module Cloudware
       end
       define_input_methods_from_path_parameters
 
-      def nodes
+      def read_nodes
         Models::Node.glob_read(cluster, '*', registry: __registry__)
                     .select { |n| n.groups.include?(name) }
       end
