@@ -29,21 +29,9 @@
 
 module Cloudware
   module Commands
-    class Destroy < ScopedCommand
-      include WithSpinner
-
-      def run!
-        with_spinner("Destroying #{name_or_error}...") do
-          model_klass.destroy!(*read_model.__inputs__)
-        end
-      end
-
-      def nodes
-        read_nodes.each do |node|
-          with_spinner("Destroying #{node.name}...") do
-            node.class.destroy!(*node.__inputs__)
-          end
-        end
+    class Delete < ScopedCommand
+      def deployable(force: false)
+        model_klass.delete!(*read_model.__inputs__, force: force)
       end
     end
   end

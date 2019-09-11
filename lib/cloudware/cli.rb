@@ -224,22 +224,6 @@ module Cloudware
       end
     end
 
-    command 'node delete' do |c|
-      cli_syntax(c, 'NODE')
-      c.summary = 'Remove the node from the cluster'
-      c.description = <<~DESC
-        Deletes the configuration file for the NODE. This action will error if
-        the node is currently running. The node cane be stopped using the
-        'destroy' command.
-
-        The configuration of a currently running node can be deleted
-        using the '--force' flag. This will not destroy the remote resources
-      DESC
-      c.option '--force', 'Delete the deployment regardless if running'
-      proxy_opts = { level: :node, method: :delete, named: true }
-      c.action(&Commands::Destroy.proxy(**proxy_opts))
-    end
-
     [:domain, :stack, :node].each do |level|
       command "#{level} create" do |c|
         multilevel_cli_syntax(c, level, 'TEMPLATE')
@@ -293,6 +277,26 @@ module Cloudware
         c.summary = "Update the #{level}'s parameters"
         proxy_opts = { level: level, method: :run, named: (level != :domain) }
         c.action(&Commands::Update.proxy(**proxy_opts))
+      end
+
+      command "#{level} delete" do |c|
+        multilevel_cli_syntax(c, level)
+        c.summary = "Permanently remove the #{level} from the cluster"
+        c.description = <<~DESC
+          Permanently delete the configuration file and associated template.
+          This action will error if the deployment is currently running.
+
+          To circumvent the error, either:
+            1. Stop the deployment with '#{level} destroy' OR
+            2. Abandon the resources using the --force flag [DANGER]
+
+          Abandoning the resources will leave them running on the provider.
+          They will need to be stopped manually via some other means.
+          The provider may continue charging for these resources until they
+          are stopped.
+        DESC
+        proxy_opts = { level: :node, method: :delete, named: true }
+        c.action(&Commands::Destroy.proxy(**proxy_opts))
       end
     end
 
