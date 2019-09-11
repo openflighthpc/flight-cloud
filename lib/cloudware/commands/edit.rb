@@ -32,7 +32,7 @@ require 'tty-editor'
 module Cloudware
   module Commands
     class Edit < ScopedCommand
-      def cluster(*a)
+      def domain(*a)
         # NOTE: Currently their is a distinction between Models::Domain and
         # Models::Cluster. This will eventually be removed, but in the meantime
         # it should not be exposed to the user. As such the domain can be implicitly
