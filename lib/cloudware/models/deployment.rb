@@ -143,11 +143,8 @@ module Cloudware
 
       attr_reader :cluster, :name
 
-      # TODO: Remove template_path as a saved parameter and make it static
-      # Soon all deployments will have a 1:1 relationship with its template
-      # Replace the archetype method with: raise NotImplementedError
       SAVE_ATTR = [
-        :template_path, :results, :deployed, :deployment_error, :epoch_time
+        :results, :deployed, :deployment_error, :epoch_time
       ].freeze
 
       SAVE_ATTR.each do |method|
@@ -175,9 +172,8 @@ module Cloudware
         __data__.fetch(:results, default: {}).deep_symbolize_keys
       end
 
-      # Ensure the template is a string not `Pathname`
-      def template_path=(path)
-        __data__.set(:template_path, value: path.to_s)
+      def template_path
+        raise NotImplementedError
       end
 
       def raw_template

@@ -35,14 +35,30 @@ module Cloudware
     class Group < Deployment
       allow_missing_read
 
+      def self.join(cluster, name, *rest)
+        RootDir.content_cluster(cluster, 'var/groups', name, *rest)
+      end
+
       def self.path(cluster, name)
-        RootDir.content_cluster(cluster, 'var/groups', name, 'etc/config.yaml')
+        join(cluster, name, 'etc/config.yaml')
       end
       define_input_methods_from_path_parameters
+
+      def join(*rest)
+        self.class.join(*__inputs__, *rest)
+      end
+
+      def read_cluster
+        Models::Cluster.read(cluster, registry: __registry__)
+      end
 
       def read_nodes
         Models::Node.glob_read(cluster, '*', registry: __registry__)
                     .select { |n| n.groups.include?(name) }
+      end
+
+      def template_path
+        join('var', 'template' + read_cluster.template_ext)
       end
     end
   end

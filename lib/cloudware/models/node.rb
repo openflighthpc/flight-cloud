@@ -46,11 +46,6 @@ module Cloudware
         self.class.join_node_path(cluster, name, 'var', 'template' + ext)
       end
 
-      # TODO: Remove this once the base class stops setting the template path
-      def template_path=(*a)
-        # noop
-      end
-
       data_reader(:groups) { |v| v || [] }
       data_writer(:groups) do |v|
         if v.nil? || v.is_a?(Array)
