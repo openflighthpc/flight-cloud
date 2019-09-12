@@ -30,22 +30,25 @@
 module Cloudware
   module Commands
     class Group < ScopedCommand
-      def run_add_nodes(*names)
-        primary ? add_primary_nodes(*names) : add_other_nodes(*names)
-      end
-
-      def add_primary_nodes(*names)
-        load_existing_nodes(names).each do |node|
-          Models::Node.update(*node.__inputs__) do |n|
-            n.primary_group = name_or_error
+      def add(*names)
+        if primary
+          load_existing_nodes(names).each do |node|
+            Models::Node.update(*node.__inputs__) do |n|
+              n.primary_group = name_or_error
+            end
+          end
+        else
+          names = load_existing_nodes(raw_names).map(&:name)
+          Models::Group.update(*read_group.__inputs__) do |group|
+            group.other_nodes = [*group.other_nodes, *names].uniq
           end
         end
       end
 
-      def add_other_nodes(*raw_names)
+      def remove(*raw_names)
         names = load_existing_nodes(raw_names).map(&:name)
         Models::Group.update(*read_group.__inputs__) do |group|
-          group.other_nodes = [*group.other_nodes, *names].uniq
+          group.other_nodes = (group.other_nodes - names)
         end
       end
     end

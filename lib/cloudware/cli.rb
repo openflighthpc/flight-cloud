@@ -314,16 +314,23 @@ module Cloudware
     end
 
     command 'group add' do |c|
-      cli_syntax(c, 'NODE...')
+      cli_syntax(c, 'GROUP NODES...')
       c.description = 'Add nodes to the group'
       c.option '-p', '--primary', 'Change the nodes primary group'
-      proxy_opts = { level: :group, named: true, method: :run_add_nodes }
+      proxy_opts = { level: :group, named: true, method: :add }
+      c.action(&Commands::Group.proxy(**proxy_opts))
+    end
+
+    command 'group remove' do |c|
+      cli_syntax(c, 'GROUP NODES...')
+      c.description = 'Remove nodes from the group'
+      proxy_opts = { level: :group, named: true, method: :remove }
       c.action(&Commands::Group.proxy(**proxy_opts))
     end
 
     command 'group create' do |c|
       cli_syntax(c, 'GROUP')
-      c.description = 'Define a new collection of nodes'
+      c.description = 'Define a new empty group'
       c.action(&Commands::Create.proxy(level: :group, named: true))
     end
 
