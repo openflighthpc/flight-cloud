@@ -138,6 +138,8 @@ module Cloudware
         raise e.exception "The deployment is not configured"
       end
 
+      delegate :hash, :eql?, to: :__inputs__
+
       data_reader(:replacements) do |r|
         r || begin
           self.replacements = {}

@@ -75,6 +75,7 @@ module Cloudware
       def read_nodes
         Indices::GroupNode.glob_read(cluster, name, '*', '*')
                           .map(&:read_node)
+                          .uniq
       end
 
       def template_path
