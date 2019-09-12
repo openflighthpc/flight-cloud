@@ -313,6 +313,14 @@ module Cloudware
       action(c, Commands::Lists::Deployment, method: :list_groups)
     end
 
+    command 'group add' do |c|
+      cli_syntax(c, 'NODE...')
+      c.description = 'Add nodes to the group'
+      c.option '-p', '--primary', 'Change the nodes primary group'
+      proxy_opts = { level: :group, named: true, method: :run_add_nodes }
+      c.action(&Commands::Group.proxy(**proxy_opts))
+    end
+
     command 'group create' do |c|
       cli_syntax(c, 'GROUP')
       c.description = 'Define a new collection of nodes'

@@ -27,42 +27,28 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
-require 'active_support/core_ext/module/delegation'
-require 'logger'
-
 module Cloudware
-  class Log
-    class << self
-      def instance
-        @instance ||= Logger.new(path)
+  module Commands
+    class Group < ScopedCommand
+      def run_add_nodes(*names)
+        primary ? add_primary_nodes(*names) : add_other_nodes(*names)
       end
 
-      def path
-        Config.log_file
+      def add_primary_nodes(*names)
+        load_existing_nodes(names).each do |node|
+          Models::Node.update(*node.__inputs__) do |n|
+            n.primary_group = name_or_error
+          end
+        end
       end
 
-      def warn(msg)
-        super
+      def add_other_nodes(*raw_names)
+        names = load_existing_nodes(raw_names).map(&:name)
+        Models::Group.update(*read_group.__inputs__) do |group|
+          group.other_nodes = [*group.other_nodes, *names].uniq
+        end
       end
-
-      def info_puts(msg)
-        puts msg
-        info msg
-      end
-
-      def warn_puts(msg)
-        warn(msg)
-      end
-
-      def error_puts(msg)
-        $stderr.puts(msg)
-        error(msg)
-      end
-
-      delegate_missing_to :instance
     end
   end
-
-  Config.cache
-  FlightConfig.logger = Log
 end
+

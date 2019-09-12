@@ -139,6 +139,10 @@ module Cloudware
       Models::Node.read(config.current_cluster, name_or_error)
     end
 
+    def read_group
+      Models::Group.read(config.current_cluster, name_or_error)
+    end
+
     def read_deployable
       if [:domain, :stack, :node].include?(level)
         read_model
@@ -157,6 +161,15 @@ module Cloudware
       else
         read_model.read_nodes
       end
+    end
+
+    def load_existing_nodes(raw_names)
+      names = raw_names.reject do |cur_name|
+        next if Models::Node.exists?(config.current_cluster, cur_name)
+        Log.warn_puts "Skipping node '#{cur_name}' as it does not exist"
+        true
+      end
+      names.map { |n| Models::Node.read(config.current_cluster, n) }
     end
   end
 
