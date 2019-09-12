@@ -30,14 +30,11 @@
 require 'cloudware/index'
 require 'cloudware/root_dir'
 
-require 'cloudware/models/node'
-require 'cloudware/models/group'
-
 module Cloudware
   module Indices
     class GroupNode < Cloudware::Index
       def self.path(cluster, group, node, type)
-        CacheDir.join('cluster', cluster, 'groups', type.to_s, group, 'nodes', node + '.index')
+        CacheDir.join('cluster', cluster, "#{type}_groups", group, 'nodes', node + '.index')
       end
 
       [:cluster, :group, :node, :type].each_with_index do |method, idx|
@@ -49,15 +46,15 @@ module Cloudware
       end
 
       def read_group
-        Models::Group.read(cluster, node, registry: __registry__)
+        Models::Group.read(cluster, group, registry: __registry__)
       end
 
       def valid?
         case type.to_sym
         when :primary
-          read_node.primary_group.name == read_group.name
+          read_node.primary_group == group
         when :other
-          raise NotImplementedEror
+          read_group.other_nodes.include?(node)
         else
           false
         end
@@ -65,4 +62,7 @@ module Cloudware
     end
   end
 end
+
+require 'cloudware/models/node'
+require 'cloudware/models/group'
 

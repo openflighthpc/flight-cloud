@@ -47,7 +47,10 @@ task :setup do
   begin
     # Require the config and associated gems
     Bundler.require(:config)
+    require 'flight_config/has_indices'
     require 'flight_config/indexable'
+    # TODO: Remove this once it has been incorporated into FlightConfig
+    FlightConfig::Indexable::ClassMethods.include(FlightConfig::Globber::ClassMethods)
     require 'cloudware/config'
 
     # Require the development gems
