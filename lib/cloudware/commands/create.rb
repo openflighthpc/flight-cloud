@@ -36,8 +36,8 @@ module Cloudware
         end
       end
 
-      def node(name, abs_template, groups: nil)
-        Models::Node.create!(__config__.current_cluster, name) do |node|
+      def node(abs_template, groups: nil)
+        Models::Node.create!(config.current_cluster, name) do |node|
           node.save_template(abs_template)
           node.groups = groups.split(',') if groups.is_a?(String)
         end
