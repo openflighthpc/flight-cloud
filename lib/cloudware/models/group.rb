@@ -68,13 +68,13 @@ module Cloudware
       end
 
       def read_primary_nodes
-        Index::GroupNode.glob_read(cluster, name, '*', :primary)
-                        .map(&:read_node)
+        Indices::GroupNode.glob_read(cluster, name, '*', :primary)
+                          .map(&:read_node)
       end
 
       def read_nodes
-        Index::GroupNode.glob_read(cluster, name, '*', '*')
-                        .map(&:read_node)
+        Indices::GroupNode.glob_read(cluster, name, '*', '*')
+                          .map(&:read_node)
       end
 
       def template_path
