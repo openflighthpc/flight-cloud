@@ -296,7 +296,7 @@ module Cloudware
           are stopped.
         DESC
         proxy_opts = { level: :node, method: :delete, named: true }
-        c.action(&Commands::Destroy.proxy(**proxy_opts))
+        c.action(&Commands::Delete.proxy(**proxy_opts))
       end
     end
 

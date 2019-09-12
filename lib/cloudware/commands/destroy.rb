@@ -38,6 +38,14 @@ module Cloudware
         end
       end
 
+      def index
+        accumulate_errors(read_nodes.each) do |node|
+          with_spinner("Destroying: #{node.name}...") do
+            node.class.destroy!(*node.__inputs__)
+          end
+        end
+      end
+
       def nodes
         read_nodes.each do |node|
           with_spinner("Destroying #{node.name}...") do
