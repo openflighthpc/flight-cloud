@@ -298,7 +298,7 @@ module Cloudware
       action(c, Commands::Import)
     end
 
-    command 'list' do |c|
+    command 'cluster status' do |c|
       cli_syntax(c)
       c.description = 'List all the previous deployed templates'
       c.option '-a', '--all', 'Include offline deployments'
