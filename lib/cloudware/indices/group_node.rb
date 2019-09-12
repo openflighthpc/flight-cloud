@@ -35,12 +35,12 @@ require 'cloudware/models/group'
 
 module Cloudware
   module Indices
-    class PrimaryGroupNode < Cloudware::Index
-      def self.path(cluster, group, node)
-        CacheDir.join('cluster', cluster, 'primary_groups', group, 'nodes', node + '.index')
+    class GroupNode < Cloudware::Index
+      def self.path(cluster, group, node, type)
+        CacheDir.join('cluster', cluster, 'groups', type, group, 'nodes', node + '.index')
       end
 
-      [:cluster, :group, :node].each_with_index do |method, idx|
+      [:cluster, :group, :node, :type].each_with_index do |method, idx|
         define_method(method) { __inputs__[idx] }
       end
 
@@ -53,7 +53,14 @@ module Cloudware
       end
 
       def valid?
-        read_node.primary_group.name == read_group.name
+        case type.to_sym
+        when :primary
+          read_node.primary_group.name == read_group.name
+        when :other
+          raise NotImplementedEror
+        else
+          false
+        end
       end
     end
   end
