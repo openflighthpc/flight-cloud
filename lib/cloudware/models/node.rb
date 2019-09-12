@@ -83,6 +83,7 @@ module Cloudware
 
       has_indices(Indices::GroupNode) do |create|
         create.call(cluster, primary_group, name, :primary)
+        create.call(cluster, 'all', name, :all)
       end
     end
   end

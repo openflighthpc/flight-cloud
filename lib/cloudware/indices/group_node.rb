@@ -55,6 +55,8 @@ module Cloudware
           read_node.primary_group == group
         when :other
           read_group.other_nodes.include?(node)
+        when :all
+          group == 'all'
         else
           false
         end
