@@ -37,7 +37,7 @@ module Cloudware
   module Indices
     class GroupNode < Cloudware::Index
       def self.path(cluster, group, node, type)
-        CacheDir.join('cluster', cluster, 'groups', type, group, 'nodes', node + '.index')
+        CacheDir.join('cluster', cluster, 'groups', type.to_s, group, 'nodes', node + '.index')
       end
 
       [:cluster, :group, :node, :type].each_with_index do |method, idx|

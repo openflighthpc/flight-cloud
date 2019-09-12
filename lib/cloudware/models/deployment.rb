@@ -126,6 +126,10 @@ module Cloudware
         end
       end
 
+      def self.exists?(*a)
+        File.exists?(path(*a))
+      end
+
       private_class_method
 
       def self.reraise_missing_file

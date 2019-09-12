@@ -46,18 +46,43 @@ module Cloudware
         self.class.join_node_path(cluster, name, 'var', 'template' + ext)
       end
 
-      data_reader(:groups) { |v| v || [] }
-      data_writer(:groups) do |v|
-        if v.nil? || v.is_a?(Array)
-          v
-        else
-          [v]
+      data_reader(:primary_group) do |group|
+        group || begin
+          Models::Group.create_or_update(cluster, 'orphan').name
         end
+      end
+
+      data_writer(:primary_group) do |group|
+        unless Models::Group.exists?(cluster, group)
+          raise ModelValidationError, <<~ERROR
+            Can not add node to primary group '#{group}' as it does not exist
+          ERROR
+        end
+        group
+      end
+
+      def read_primary_group
+        Models::Group.read(cluster, primary_group)
+      end
+
+      def read_groups
+        Indices::GroupNode.glob_read(cluster, '*', name, '*')
+                          .map(&:read_group)
       end
 
       def machine_client
         id = (results || {})[:"#{name}TAGID"]
         provider_client.machine(id)
+      end
+    end
+
+    # Define the indices after the index model is loaded
+    require 'cloudware/indices/group_node'
+    class Node
+      include FlightConfig::HasIndices
+
+      has_indices(Indices::GroupNode) do |create|
+        create.call(cluster, primary_group, name, :primary)
       end
     end
   end
