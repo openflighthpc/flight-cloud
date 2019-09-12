@@ -232,16 +232,8 @@ module Cloudware
         else
           c.description = "Add a new #{level} to the cluster"
         end
-        if level == :node
-          c.option '--groups GROUPS', <<~DESC.squish
-            Set which GROUPS the node belongs to. This option is ignored when
-            creating a domain. The GROUPS must be given as a comma separated list.
-          DESC
-        end
         proxy_opts = {
-          level: level,
-          method: (level == :node ? :node : :deployable),
-          named: (level != :domain)
+          level: level, method: :deployable, named: (level != :domain)
         }
         c.action(&Commands::Create.proxy(**proxy_opts))
       end
