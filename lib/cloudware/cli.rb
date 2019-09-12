@@ -321,6 +321,12 @@ module Cloudware
       action(c, Commands::Lists::Deployment, method: :list_groups)
     end
 
+    command 'group create' do |c|
+      cli_syntax(c, 'GROUP')
+      c.description = 'Define a new collection of nodes'
+      c.action(&Commands::Create.proxy(level: :group, named: true))
+    end
+
     [:cluster, :group, :node].each do |level|
       command "#{level} power-status" do |c|
         multilevel_cli_syntax(c, level)

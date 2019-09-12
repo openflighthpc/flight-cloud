@@ -30,6 +30,11 @@
 module Cloudware
   module Commands
     class Create < ScopedCommand
+      def group
+        group = Models::Group.create(config.current_cluster, name_or_error)
+        Log.info_puts "Created group: #{group.name}"
+      end
+
       def deployable(abs_template)
         model_klass.create!(*read_deployable.__inputs__) do |model|
           model.save_template(abs_template)
