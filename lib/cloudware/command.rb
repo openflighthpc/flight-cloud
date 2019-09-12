@@ -169,7 +169,8 @@ module Cloudware
         Log.warn_puts "Skipping node '#{cur_name}' as it does not exist"
         true
       end
-      names.map { |n| Models::Node.read(config.current_cluster, n) }
+      r = FlightConfig::Registry.new
+      names.map { |n| Models::Node.read(config.current_cluster, n, registry: r) }
     end
   end
 

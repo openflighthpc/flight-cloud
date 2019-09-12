@@ -46,9 +46,20 @@ module Cloudware
       end
 
       def remove(*raw_names)
-        names = load_existing_nodes(raw_names).map(&:name)
+        nodes = load_existing_nodes(raw_names)
+        nodes.select { |n| n.primary_group == name_or_error }
+             .map(&:name)
+             .tap do |primaries|
+          unless primaries.empty?
+            Log.warn_puts <<~WARN.squish
+              Can not remove the following nodes from their primary group. They
+              will still be removed from the "other groups" list if applicable.
+            WARN
+            Log.warn_puts "Nodes: #{primaries.join(',')}"
+          end
+        end
         Models::Group.update(*read_group.__inputs__) do |group|
-          group.other_nodes = (group.other_nodes - names)
+          group.other_nodes = (group.other_nodes - nodes.map(&:name))
         end
       end
     end
