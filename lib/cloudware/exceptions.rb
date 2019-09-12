@@ -29,9 +29,15 @@
 
 module Cloudware
   class AccumulatedErrors < Array
-    def self.raise_if_any(&b)
-      new.tap { |errors| b.call(errors) }
-         .raise_if_any
+    def enumerate(enum)
+      enum.each do |*a|
+        begin
+          yield(*a) if block_given?
+        rescue => e
+          Log.error_puts('An error has occurred!')
+          self << e
+        end
+      end
     end
 
     def catch

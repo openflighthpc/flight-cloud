@@ -79,6 +79,13 @@ module Cloudware
       CommanderProxy.new(**kwargs.merge(klass: self)).to_lambda
     end
 
+
+    def accumulate_errors(*a, &b)
+      AccumulatedErrors.new
+                       .tap{ |e| e.enumerate(*a, &b) }
+                       .raise_if_any
+    end
+
     def config
       @config ||= CommandConfig.read
     end

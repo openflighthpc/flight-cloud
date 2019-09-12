@@ -33,11 +33,13 @@ module Cloudware
   module Commands
     class ScopedPower < ScopedCommand
       def status_cli
-        read_nodes.each { |n| puts "#{n.name}: #{n.machine_client.status rescue 'undeployed'}"}
+        accumulate_errors(read_nodes.each) do |node|
+          puts "#{node.name}: #{node.machine_client.status rescue 'undeployed'}"
+        end
       end
 
       def off_cli
-        read_nodes.each do |node|
+        accumulate_errors(read_nodes.each) do |node|
           puts "Turning off: #{node.name}"
           node.machine_client.off
         end
@@ -45,7 +47,7 @@ module Cloudware
 
       # TODO: Add resize_instance back
       def on_cli
-        read_nodes.each do |node|
+        accumulate_errors(read_nodes.each) do |node|
           # resize_instance(node) unless instance_type.nil?
           puts "Turning on: #{node.name}"
           node.machine_client.on
