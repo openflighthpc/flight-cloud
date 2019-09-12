@@ -47,6 +47,7 @@ task :setup do
   begin
     # Require the config and associated gems
     Bundler.require(:config)
+    require 'flight_config/indexable'
     require 'cloudware/config'
 
     # Require the development gems

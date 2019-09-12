@@ -27,41 +27,33 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
-require 'cloudware/models/cluster'
+require 'cloudware/index'
+require 'cloudware/root_dir'
+
 require 'cloudware/models/node'
+require 'cloudware/models/group'
 
 module Cloudware
-  module Models
-    class Group < Deployment
-      allow_missing_read
-
-      def self.join(cluster, name, *rest)
-        RootDir.content_cluster(cluster, 'var/groups', name, *rest)
+  module Indices
+    class PrimaryGroupNode < Cloudware::Index
+      def self.path(cluster, group, node)
+        CacheDir.join('cluster', cluster, 'primary_groups', group, 'nodes', node + '.index')
       end
 
-      def self.path(cluster, name)
-        join(cluster, name, 'etc/config.yaml')
-      end
-      define_input_methods_from_path_parameters
-
-      def join(*rest)
-        self.class.join(*__inputs__, *rest)
+      [:cluster, :group, :node].each_with_index do |method, idx|
+        define_method(method) { __inputs__[idx] }
       end
 
-      def read_cluster
-        Models::Cluster.read(cluster, registry: __registry__)
+      def read_node
+        Models::Node.read(cluster, node, registry: __registry__)
       end
 
-      def read_nodes
-        Models::Node.glob_read(cluster, '*', registry: __registry__)
-                    .select { |n| n.groups.include?(name) }
+      def read_group
+        Models::Group.read(cluster, node, registry: __registry__)
       end
 
-      def read_node_indices
-      end
-
-      def template_path
-        join('var', 'template' + read_cluster.template_ext)
+      def valid?
+        read_node.primary_group.name == read_group.name
       end
     end
   end
