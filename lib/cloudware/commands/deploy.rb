@@ -47,8 +47,10 @@ module Cloudware
         if nodes.empty?
           puts 'Nothing to deploy'
         else
-          read_nodes.each do |node|
-            deploy(node, params)
+          AccumulatedErrors.raise_if_any do |errors|
+            read_nodes.each do |node|
+              errors.catch { deploy(node, params) }
+            end
           end
         end
       end

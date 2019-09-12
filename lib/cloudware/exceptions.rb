@@ -28,11 +28,38 @@
 #===============================================================================
 
 module Cloudware
+  class AccumulatedErrors < Array
+    def self.raise_if_any(&b)
+      new.tap { |errors| b.call(errors) }
+         .raise_if_any
+    end
+
+    def catch
+      yield
+    rescue => e
+      self << e
+    end
+
+    def raise_if_any
+      if empty?
+        true
+      elsif length == 1
+        raise first
+      else
+        raise Cloudware::AccumulatedError, <<~ERROR
+          The following errors have occurred:
+          #{self.map(&:message).join("\n\n")}
+        ERROR
+      end
+    end
+  end
+
   # Base errors for all further errors to inherit from
   class CloudwareError < RuntimeError; end
   class UserError < CloudwareError; end
   class InternalError < CloudwareError; end
   class ProviderError < CloudwareError; end
+  class AccumulatedError < CloudwareError; end
 
   # Other errors
   class ConfigError < CloudwareError; end
