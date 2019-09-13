@@ -87,6 +87,8 @@ module Cloudware
       case level
       when :group
         cli_syntax(command, "GROUP #{args_str}".chomp)
+      when :stack
+        cli_syntax(command, "STACK #{args_str}".chomp)
       when :node
         cli_syntax(command, "NODE #{args_str}".chomp)
       else
@@ -101,12 +103,16 @@ module Cloudware
       SYNTAX
     end
 
-    [:cluster, :group, :node].each do |level|
-      command level do |c|
-        cli_syntax(c)
-        c.sub_command_group = true
-        c.summary = "View, manage, and deploy #{ level == :cluster ? 'the' : 'a' } #{level}"
-      end
+    command 'configure' do |c|
+      cli_syntax(c)
+      c.description = 'Configure access details for the current provider'
+      action(c, Commands::Configure)
+    end
+
+    command 'cluster' do |c|
+      cli_syntax(c)
+      c.sub_command_group = true
+      c.summary = 'Manage and overview the current cluster profile'
     end
 
     command 'cluster init' do |c|
@@ -123,6 +129,15 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :init)
     end
 
+    command('cluster list') do |c|
+      cli_syntax(c)
+      c.summary = 'Show the current and available clusters'
+      c.description = <<~DESC
+        Shows a list of clusters that have been previously deployed to
+      DESC
+      action(c, Commands::ClusterCommand, method: :list)
+    end
+
     command 'cluster switch' do |c|
       cli_syntax(c, 'CLUSTER')
       c.summary = 'Change the current cluster to CLUSTER'
@@ -135,20 +150,58 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :delete)
     end
 
-    command 'configure' do |c|
-      cli_syntax(c)
-      c.description = 'Configure access details for the current provider'
-      action(c, Commands::Configure)
+    [:cluster, :group].each do |level|
+      command "#{level} status" do |c|
+        multilevel_cli_syntax(c, level)
+        c.description = 'List all the previous deployed templates'
+        c.option '-a', '--all', 'Include offline deployments'
+        c.option '-v', '--verbose', 'Show full error messages'
+        proxy_opts = { level: level, index: :all, method: :deployables_status, named: (level != :cluster) }
+        c.action(&Commands::List.proxy(**proxy_opts))
+      end
     end
 
-    command 'node create' do |c|
-      cli_syntax(c, 'NAME TEMPLATE')
-      c.description = 'Add a new node to the cluster'
-      c.option '--groups GROUPS', <<~DESC.squish
-        Set which GROUPS the node belongs to. This option is ignored when
-        creating a domain. The GROUPS must be given as a comma separated list.
-      DESC
-      action(c, Commands::Create)
+    command 'domain show' do |c|
+      cli_syntax(c)
+      c.option '-v', '--verbose', 'Show full error messages'
+      proxy_opts = { level: :domain, method: :deployables, named: false }
+      c.action(&Commands::List.proxy(**proxy_opts))
+    end
+
+    [:list, :show].each do |cmd|
+      proxy_opts = {
+        level: (cmd == :list ? :cluster : :node),
+        index: :nodes,
+        method: :deployables,
+        named: (cmd == :show)
+      }
+
+      command "node #{cmd}" do |c|
+        if cmd == :list
+          cli_syntax(c)
+          c.summary = 'List all the nodes within the cluster'
+        else
+          cli_syntax(c, 'NODE')
+          c.summary = 'View the details about a particular node'
+        end
+        c.option '-v', '--verbose', 'Show full error messages'
+        c.action(&Commands::List.proxy(**proxy_opts))
+      end
+    end
+
+    [:domain, :group, :node].each do |level|
+      command level do |c|
+        cli_syntax(c)
+        c.sub_command_group = true
+        c.summary = "View, manage, and deploy #{ level == :domain ? 'the' : 'a' } #{level}"
+      end
+    end
+
+    command :stack do |c|
+      cli_syntax(c)
+      c.sub_command_group = true
+      c.hidden = true
+      c.summary = 'Volatile'
     end
 
     # TODO: The old deploy command is being maintained for reference, once the
@@ -181,11 +234,17 @@ module Cloudware
     #   action(c, Commands::Deploy)
     # end
 
-    [:cluster, :group, :node].each do |level|
+    [:cluster, :domain, :group, :stack, :node].each do |level|
+      is_deployable = [:domain, :stack, :node].include?(level)
+      proxy_opts = {
+        level: level,
+        method: (is_deployable ? :deployable : :index),
+        named: ![:cluster, :domain].include?(level)
+      }
+
       command "#{level} deploy" do |c|
         multilevel_cli_syntax(c, level, '[PARAMS...]')
         c.summary = 'Create the templated resources on the provider'
-        proxy_opts = { level: level, method: :run!, named: (level != :cluster) }
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
 
@@ -200,28 +259,24 @@ module Cloudware
           Once the deployment is offline, the configuration file can be
           permanently removed using the 'delete' command.
         DESC
-        proxy_opts = { level: level, method: :run!, named: (level != :cluster) }
         c.action(&Commands::Destroy.proxy(**proxy_opts))
       end
     end
 
-    command 'node delete' do |c|
-      cli_syntax(c, 'NODE')
-      c.summary = 'Remove the node from the cluster'
-      c.description = <<~DESC
-        Deletes the configuration file for the NODE. This action will error if
-        the node is currently running. The node cane be stopped using the
-        'destroy' command.
+    [:domain, :stack, :node].each do |level|
+      command "#{level} create" do |c|
+        multilevel_cli_syntax(c, level, 'TEMPLATE')
+        if level == :domain
+          c.description = "Define the top level domain template"
+        else
+          c.description = "Add a new #{level} to the cluster"
+        end
+        proxy_opts = {
+          level: level, method: :deployable, named: (level != :domain)
+        }
+        c.action(&Commands::Create.proxy(**proxy_opts))
+      end
 
-        The configuration of a currently running node can be deleted
-        using the '--force' flag. This will not destroy the remote resources
-      DESC
-      c.option '--force', 'Delete the deployment regardless if running'
-      proxy_opts = { level: :node, method: :delete, named: true }
-      c.action(&Commands::Destroy.proxy(**proxy_opts))
-    end
-
-    [:cluster, :group, :node].each do |level|
       command "#{level} edit" do |c|
         multilevel_cli_syntax(c, level, '[TEMPLATE]')
         c.summary = 'Update the cloud template'
@@ -235,17 +290,44 @@ module Cloudware
         DESC
         proxy_opts = {
           level: level,
-          method: (level == :cluster ? :cluster : :run),
-          named: (level != :cluster)
+          method: (level == :domain ? :domain : :run),
+          named: (level != :domain)
         }
         c.action(&Commands::Edit.proxy(**proxy_opts))
+      end
+
+      command "#{level} render" do |c|
+        cli_syntax(c, 'NAME')
+        c.summary = "Return the template the #{level}"
+        proxy_opts = { level: level, method: :render, named: (level != :cluster) }
+        c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
 
       command "#{level} update" do |c|
         multilevel_cli_syntax(c, level, 'PARAMS...')
         c.summary = "Update the #{level}'s parameters"
-        proxy_opts = { level: level, method: :run, named: (level != :cluster) }
+        proxy_opts = { level: level, method: :run, named: (level != :domain) }
         c.action(&Commands::Update.proxy(**proxy_opts))
+      end
+
+      command "#{level} delete" do |c|
+        multilevel_cli_syntax(c, level)
+        c.summary = "Permanently remove the #{level} from the cluster"
+        c.description = <<~DESC
+          Permanently delete the configuration file and associated template.
+          This action will error if the deployment is currently running.
+
+          To circumvent the error, either:
+            1. Stop the deployment with '#{level} destroy' OR
+            2. Abandon the resources using the --force flag [DANGER]
+
+          Abandoning the resources will leave them running on the provider.
+          They will need to be stopped manually via some other means.
+          The provider may continue charging for these resources until they
+          are stopped.
+        DESC
+        proxy_opts = { level: level, method: :deployable, named: true }
+        c.action(&Commands::Delete.proxy(**proxy_opts))
       end
     end
 
@@ -255,28 +337,39 @@ module Cloudware
       action(c, Commands::Import)
     end
 
-    command('cluster list') do |c|
-      cli_syntax(c)
-      c.summary = 'Show the current and available clusters'
-      c.description = <<~DESC
-        Shows a list of clusters that have been previously deployed to
-      DESC
-      action(c, Commands::ClusterCommand, method: :list)
-    end
-
-    command 'list' do |c|
-      cli_syntax(c)
-      c.description = 'List all the previous deployed templates'
-      c.option '-a', '--all', 'Include offline deployments'
-      c.option '-g GROUP', '--group GROUP', 'Filter the list by group'
-      c.option '-v', '--verbose', 'Show full error messages'
-      action(c, Commands::Lists::Deployment)
-    end
-
     command 'group list' do |c|
       cli_syntax(c)
       c.description = 'List all groups within the cluster'
-      action(c, Commands::Lists::Deployment, method: :list_groups)
+      proxy_opts = { level: :cluster, index: :groups, named: false }
+      c.action(&Commands::List.proxy(**proxy_opts))
+    end
+
+    command 'group show' do |c|
+      cli_syntax(c, 'GROUP')
+      c.description = 'View all the nodes within the group'
+      proxy_opts = { level: :group, named: true, method: :show}
+      c.action(&Commands::Group.proxy(**proxy_opts))
+    end
+
+    command 'group add' do |c|
+      cli_syntax(c, 'GROUP NODES...')
+      c.description = 'Add nodes to the group'
+      c.option '-p', '--primary', 'Change the nodes primary group'
+      proxy_opts = { level: :group, named: true, method: :add }
+      c.action(&Commands::Group.proxy(**proxy_opts))
+    end
+
+    command 'group remove' do |c|
+      cli_syntax(c, 'GROUP NODES...')
+      c.description = 'Remove nodes from the group'
+      proxy_opts = { level: :group, named: true, method: :remove }
+      c.action(&Commands::Group.proxy(**proxy_opts))
+    end
+
+    command 'group create' do |c|
+      cli_syntax(c, 'GROUP')
+      c.description = 'Define a new empty group'
+      c.action(&Commands::Create.proxy(level: :group, named: true))
     end
 
     [:cluster, :group, :node].each do |level|
@@ -311,13 +404,6 @@ module Cloudware
         end
         proxy_opts = { level: level, method: :on_cli, named: (level != :cluster) }
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
-      end
-
-      command "#{level} render" do |c|
-        cli_syntax(c, 'NAME')
-        c.summary = "Return the template the #{level}"
-        proxy_opts = { level: level, method: :render, named: (level != :cluster) }
-        c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
     end
   end

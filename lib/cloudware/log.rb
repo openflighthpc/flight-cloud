@@ -45,6 +45,20 @@ module Cloudware
         super
       end
 
+      def info_puts(msg)
+        puts msg
+        info msg
+      end
+
+      def warn_puts(msg)
+        warn(msg)
+      end
+
+      def error_puts(msg)
+        $stderr.puts(msg)
+        error(msg)
+      end
+
       delegate_missing_to :instance
     end
   end

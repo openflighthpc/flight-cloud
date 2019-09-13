@@ -57,9 +57,9 @@ module Cloudware
       primary = opts.delete(:primary)
       instance = klass.new(level, name, index, primary)
       if opts.empty?
-        instance.public_send(method, *args)
+        instance.public_send(resolved_method, *args)
       else
-        instance.public_send(method, *args, **opts)
+        instance.public_send(resolved_method, *args, **opts)
       end
     rescue Interrupt
       $stderr.puts 'Received Interrupt!'
@@ -79,6 +79,13 @@ module Cloudware
       CommanderProxy.new(**kwargs.merge(klass: self)).to_lambda
     end
 
+
+    def accumulate_errors(*a, &b)
+      AccumulatedErrors.new
+                       .tap{ |e| e.enumerate(*a, &b) }
+                       .raise_if_any
+    end
+
     def config
       @config ||= CommandConfig.read
     end
@@ -86,9 +93,12 @@ module Cloudware
     def model_klass
       case level
       when :cluster
+        require 'cloudware/models/cluster'
+        Models::Cluster
+      when :domain
         require 'cloudware/models/domain'
         Models::Domain
-      when :group
+      when :group, :stack
         require 'cloudware/models/group'
         Models::Group
       when :node
@@ -102,16 +112,32 @@ module Cloudware
     def name_or_error
       if name
         name
-      elsif level == :cluster
+      elsif [:domain, :cluster].include?(level)
         config.current_cluster
       else
         raise InternalError, 'Failed to run the command as the model name is missing'
       end
     end
 
+    def cluster_name
+      if [:domain, :cluster].include?(level)
+        name_or_error
+      else
+        config.current_cluster
+      end
+    end
+
+    def read_cluster
+      Models::Cluster.read(cluster_name)
+    end
+
+    def read_domain
+      Models::Domain.read(cluster_name)
+    end
+
     def read_model
-      if level == :cluster
-        Models::Domain.read(name_or_error)
+      if [:cluster, :domain].include?(level)
+        model_klass.read(cluster_name)
       else
         model_klass.read(config.current_cluster, name_or_error)
       end
@@ -121,14 +147,69 @@ module Cloudware
       Models::Node.read(config.current_cluster, name_or_error)
     end
 
+    def read_group
+      Models::Group.read(config.current_cluster, name_or_error)
+    end
+
+    def read_deployable
+      if [:domain, :stack, :node].include?(level)
+        read_model
+      else
+        raise InternalError, "The #{level} is not a deployable model"
+      end
+    end
+
+    # TODO: this will need to be updated with stack info
+    def read_deployables
+      if [:domain, :node].include?(level)
+        [read_model]
+      elsif level == :group
+        read_nodes
+      elsif level == :cluster && index == :all
+        [read_domain, *read_nodes]
+      elsif level == :cluster && index == :nodes
+        read_nodes
+      else
+        raise InternalError, <<~ERROR
+          Could not determine list of deployables. Ensure that :level and
+          :index are set correctly.
+        ERROR
+      end
+    end
+
     def read_nodes
       if level == :node
         [read_model]
       elsif level == :group && primary
         read_model.primary_nodes
+      elsif level == :domain
+        raise InternalError, 'Can not load nodes within the domain scope'
       else
-        read_model.nodes
+        read_model.read_nodes
       end
+    end
+
+    def read_groups
+      case level
+      when :group, :stack
+        [read_group]
+      when :node
+        read_node.read_groups
+      else
+        Indices::GroupNode.glob_read(cluster_name, '*', '*', '*')
+                          .uniq { |i| i.group }
+                          .map(&:read_group)
+      end
+    end
+
+    def load_existing_nodes(raw_names)
+      names = raw_names.reject do |cur_name|
+        next if Models::Node.exists?(config.current_cluster, cur_name)
+        Log.warn_puts "Skipping node '#{cur_name}' as it does not exist"
+        true
+      end
+      r = FlightConfig::Registry.new
+      names.map { |n| Models::Node.read(config.current_cluster, n, registry: r) }
     end
   end
 

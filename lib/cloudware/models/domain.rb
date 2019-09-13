@@ -56,10 +56,6 @@ module Cloudware
       def template_path=(*a)
         # noop
       end
-
-      def nodes
-        Models::Node.glob_read(cluster, '*')
-      end
     end
   end
 end

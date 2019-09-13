@@ -60,7 +60,7 @@ module Cloudware
         end
       end
 
-      define_link(:cluster, Models::Profile) { [cluster] }
+      define_link(:cluster, Models::Cluster) { [cluster] }
 
       def self.read!(*a)
         reraise_missing_file { read(*a) }
@@ -126,6 +126,10 @@ module Cloudware
         end
       end
 
+      def self.exists?(*a)
+        File.exists?(path(*a))
+      end
+
       private_class_method
 
       def self.reraise_missing_file
@@ -133,6 +137,8 @@ module Cloudware
       rescue FlightConfig::MissingFile => e
         raise e.exception "The deployment is not configured"
       end
+
+      delegate :hash, :eql?, to: :__inputs__
 
       data_reader(:replacements) do |r|
         r || begin
@@ -143,11 +149,8 @@ module Cloudware
 
       attr_reader :cluster, :name
 
-      # TODO: Remove template_path as a saved parameter and make it static
-      # Soon all deployments will have a 1:1 relationship with its template
-      # Replace the archetype method with: raise NotImplementedError
       SAVE_ATTR = [
-        :template_path, :results, :deployed, :deployment_error, :epoch_time
+        :results, :deployed, :deployment_error, :epoch_time
       ].freeze
 
       SAVE_ATTR.each do |method|
@@ -168,16 +171,15 @@ module Cloudware
       def cluster_config
         # Protect the read from a `nil` cluster. There is a separate validation
        # for nil clusters
-        @cluster_config ||= Models::Profile.read(cluster.to_s)
+        @cluster_config ||= Models::Cluster.read(cluster.to_s)
       end
 
       def results
         __data__.fetch(:results, default: {}).deep_symbolize_keys
       end
 
-      # Ensure the template is a string not `Pathname`
-      def template_path=(path)
-        __data__.set(:template_path, value: path.to_s)
+      def template_path
+        raise NotImplementedError
       end
 
       def raw_template

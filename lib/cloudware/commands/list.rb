@@ -27,31 +27,31 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
-require 'tty-editor'
-
 module Cloudware
   module Commands
-    class Edit < ScopedCommand
-      def domain(*a)
-        # NOTE: Currently their is a distinction between Models::Domain and
-        # Models::Cluster. This will eventually be removed, but in the meantime
-        # it should not be exposed to the user. As such the domain can be implicitly
-        # created
-        unless File.exists?(Models::Domain.path(name_or_error))
-          model = Models::Domain.create(name_or_error)
-          FileUtils.mkdir_p File.dirname(model.template_path)
-          FileUtils.touch model.template_path
-        end
-        run(*a)
+    class List < ScopedCommand
+      def groups
+        puts read_groups.map(&:name)
       end
 
-      def run(template = nil)
-        model_klass.update(*read_model.__inputs__) do |node|
-          if template
-            node.save_template(template)
-          else
-            node.edit_template
-          end
+      def deployables_status(verbose: false, all: false)
+        require 'cloudware/templaters/deployment_templater'
+        models = read_deployables
+        models = models.select(&:deployed) unless all
+        run(models, verbose)
+      end
+
+      def deployables(verbose: false)
+        require 'cloudware/templaters/deployment_templater'
+        run(read_deployables, verbose)
+      end
+
+      private
+
+      def run(models, verbose)
+        models.sort_by(&:name).map do |model|
+          puts Templaters::DeploymentTemplater.new(model, verbose: verbose)
+                                              .render_info
         end
       end
     end

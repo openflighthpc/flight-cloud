@@ -27,49 +27,48 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
-require 'tty-color'
-
 module Cloudware
   module Commands
-    module Concerns
-      module MarkdownTemplate
-        def self.included(base)
-          base.extend(ClassMethods)
-        end
-
-        module ClassMethods
-          def delayed_require
-            super
-            require 'cloudware/models/deployments'
-            require 'tty-markdown'
+    class Group < ScopedCommand
+      def add(*raw_names)
+        if primary
+          load_existing_nodes(raw_names).each do |node|
+            Models::Node.update(*node.__inputs__) do |n|
+              n.primary_group = name_or_error
+            end
+          end
+        else
+          names = load_existing_nodes(raw_names).map(&:name)
+          Models::Group.update(*read_group.__inputs__) do |group|
+            group.other_nodes = [*group.other_nodes, *names].uniq
           end
         end
+      end
 
-        RenderCluster = Struct.new(:cluster_identifier) do
-          delegate_missing_to :cluster
-
-          def cluster
-            @cluster ||= Cluster.read(cluster_identifier)
-          end
-
-          def deployments
-            @deployments ||= Models::Deployments.read(cluster_identifier)
-          end
-
-          def render(template, verbose: false)
-            ERB.new(template, nil, '-').result(binding)
+      def remove(*raw_names)
+        nodes = load_existing_nodes(raw_names)
+        nodes.select { |n| n.primary_group == name_or_error }
+             .map(&:name)
+             .tap do |primaries|
+          unless primaries.empty?
+            Log.warn_puts <<~WARN.squish
+              Can not remove the following nodes from their primary group. They
+              will still be removed from the "other groups" list if applicable.
+            WARN
+            Log.warn_puts "Nodes: #{primaries.join(',')}"
           end
         end
-
-        def run
-          puts TTY::Markdown.parse(rendered_markdown)
+        Models::Group.update(*read_group.__inputs__) do |group|
+          group.other_nodes = (group.other_nodes - nodes.map(&:name))
         end
+      end
 
-        def rendered_markdown
-          RenderCluster.new(__config__.current_cluster)
-                       .render(self.class::TEMPLATE, verbose: options.verbose)
-        end
+      def show
+        group = read_group
+        puts "Primary Nodes: #{group.read_primary_nodes.map(&:name).join(',')}"
+        puts "  Other Nodes: #{group.other_nodes.join(',')}"
       end
     end
   end
 end
+
