@@ -28,11 +28,47 @@
 #===============================================================================
 
 module Cloudware
+  class AccumulatedErrors < Array
+    def enumerate(enum)
+      enum.each do |*a|
+        begin
+          yield(*a) if block_given?
+        rescue => e
+          self << e
+          Log.error_puts("An error has occurred! (#{length})")
+        end
+      end
+    end
+
+    def catch
+      yield
+    rescue => e
+      self << e
+    end
+
+    def raise_if_any
+      if empty?
+        true
+      elsif length == 1
+        raise first
+      else
+        msgs = self.each_with_index
+                   .map { |err, idx| "Error #{idx + 1}:\n#{err.message}" }
+                   .join("\n\n")
+        raise Cloudware::AccumulatedError, <<~ERROR
+          The following errors have occurred:
+          #{msgs}
+        ERROR
+      end
+    end
+  end
+
   # Base errors for all further errors to inherit from
   class CloudwareError < RuntimeError; end
   class UserError < CloudwareError; end
   class InternalError < CloudwareError; end
   class ProviderError < CloudwareError; end
+  class AccumulatedError < CloudwareError; end
 
   # Other errors
   class ConfigError < CloudwareError; end

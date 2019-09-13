@@ -32,7 +32,7 @@ require 'securerandom'
 
 module Cloudware
   module Models
-    class Profile
+    class Cluster
       include FlightConfig::Updater
       include FlightConfig::Globber
 
@@ -91,6 +91,10 @@ module Cloudware
 
       def template_ext
         provider == 'azure' ? '.json' : '.yaml'
+      end
+
+      def read_nodes
+        Models::Node.glob_read(identifier, '*')
       end
 
       def deployments

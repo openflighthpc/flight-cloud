@@ -41,26 +41,21 @@ module Cloudware
         require 'cloudware/replacement_factory'
       end
 
-      def run!(*params)
-        self.class.delayed_require
+      def index(*params)
         params = params.join(' ')
-        dep_name = (model_klass == Models::Domain ? 'domain' : name_or_error)
-        replacements = ReplacementFactory.new(config.current_cluster, dep_name)
-                                         .build(params)
-        model = model_klass.prompt!(replacements, *read_model.__inputs__)
-
-        raise_if_deployed(model)
-
-        deployed = with_spinner("Deploying #{model.name}...", done: 'Done') do
-          model_klass.deploy!(*model.__inputs__)
+        nodes = read_nodes
+        if nodes.empty?
+          puts 'Nothing to deploy'
+        else
+          accumulate_errors(read_nodes.each) do |node|
+            deploy(node, params)
+          end
         end
+      end
 
-        if deployed.deployment_error
-          raise DeploymentError, <<~ERROR.chomp
-             An error has occured. Please see for further details:
-            `#{Config.app_name} list --verbose`
-          ERROR
-        end
+      def deployable(*params)
+        self.class.delayed_require
+        deploy(read_model, params.join(' '))
       end
 
       def render
@@ -69,6 +64,34 @@ module Cloudware
       end
 
       private
+
+      def deploy(model, params)
+        dep_name = (model.class == Models::Domain ? 'domain' : model.name)
+        replacements = ReplacementFactory.new(config.current_cluster, dep_name)
+                                         .build(params)
+        new_model = model.class.prompt!(replacements, *model.__inputs__)
+
+        raise_if_deployed(new_model)
+
+        deployed = with_spinner("Deploying #{new_model.name}...", done: 'Done') do
+          model.class.deploy!(*new_model.__inputs__)
+        end
+
+        if deployed.deployment_error
+          named_part = case deployed
+                       when Models::Domain
+                         'domain show'
+                       when Models::Node
+                         "node show #{deployed.name}"
+                       when Models::Group
+                         raise NotImplementedError
+                       end
+          raise DeploymentError, <<~ERROR.chomp
+            An error has occurred. Please see for further details:
+            '#{Config.app_name} #{named_part} --verbose'
+          ERROR
+        end
+      end
 
       # TODO: If this code is still commented out in a few months, feel free to delete it
       # def create_deployment(name, raw_path, params: nil)
@@ -84,18 +107,6 @@ module Cloudware
       def raise_if_deployed(dep)
         return unless dep.deployed
         raise InvalidInput, "'#{dep.name}' is already running"
-      end
-
-      def deploy(machine)
-        with_spinner('Deploying resources...', done: 'Done') do
-          dep = Models::Deployment.deploy!(__config__.current_cluster, machine)
-          if dep.deployment_error
-            raise DeploymentError, <<~ERROR.chomp
-               An error has occured. Please see for further details:
-              `#{Config.app_name} list --verbose`
-            ERROR
-          end
-        end
       end
     end
   end

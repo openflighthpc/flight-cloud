@@ -51,7 +51,7 @@ module Cloudware
       end
 
       def init(identifier, provider, import: nil)
-        new_cluster = Models::Profile.create!(identifier, provider: provider)
+        new_cluster = Models::Cluster.create!(identifier, provider: provider)
         update_cluster(new_cluster.identifier)
         Import.new(__config__).run!(import) if import
         puts "Created cluster: #{new_cluster.identifier}"
@@ -91,7 +91,7 @@ module Cloudware
       end
 
       def read_clusters
-        Models::Profile.glob_read('*').map { |c| c.identifier }
+        Models::Cluster.glob_read('*').map { |c| c.identifier }
       end
 
       def error_if_exists(cluster, action:)

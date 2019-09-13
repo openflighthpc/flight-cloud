@@ -35,14 +35,63 @@ module Cloudware
     class Group < Deployment
       allow_missing_read
 
+      def self.join(cluster, name, *rest)
+        RootDir.content_cluster(cluster, 'var/groups', name, *rest)
+      end
+
       def self.path(cluster, name)
-        RootDir.content_cluster(cluster, 'var/groups', name, 'etc/config.yaml')
+        join(cluster, name, 'etc/config.yaml')
       end
       define_input_methods_from_path_parameters
 
-      def nodes
-        Models::Node.glob_read(cluster, '*', registry: __registry__)
-                    .select { |n| n.groups.include?(name) }
+      def join(*rest)
+        self.class.join(*__inputs__, *rest)
+      end
+
+      def read_cluster
+        Models::Cluster.read(cluster, registry: __registry__)
+      end
+
+      data_reader(:other_nodes) { |n| n || [] }
+      data_writer(:other_nodes) do |nodes|
+        if nodes.nil? || nodes.is_a?(Array)
+          nodes
+        else
+          [nodes]
+        end
+      end
+
+      def read_other_nodes
+        other_nodes.map do |node|
+          Models::Node.read(cluster, node, registry: __registry__)
+        end
+      end
+
+      def read_primary_nodes
+        Indices::GroupNode.glob_read(cluster, name, '*', :primary)
+                          .map(&:read_node)
+      end
+
+      def read_nodes
+        Indices::GroupNode.glob_read(cluster, name, '*', '*')
+                          .map(&:read_node)
+                          .uniq
+      end
+
+      def template_path
+        join('var', 'template' + read_cluster.template_ext)
+      end
+    end
+
+    require 'cloudware/indices/group_node'
+    class Group
+      include FlightConfig::HasIndices
+
+
+      has_indices(Indices::GroupNode) do |create|
+        other_nodes.each do |node|
+          create.call(cluster, name, node, :other)
+        end
       end
     end
   end
