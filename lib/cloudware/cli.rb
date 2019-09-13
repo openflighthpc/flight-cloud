@@ -150,10 +150,20 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :delete)
     end
 
+    command 'cluster status' do |c|
+      cli_syntax(c)
+      c.description = 'List all the previous deployed templates'
+      c.option '-a', '--all', 'Include offline deployments'
+      c.option '-v', '--verbose', 'Show full error messages'
+      proxy_opts = { level: :cluster, index: :all, method: :deployables, named: false }
+      c.action(&Commands::List.proxy(**proxy_opts))
+    end
+
     [:list, :show].each do |cmd|
       proxy_opts = {
         level: (cmd == :list ? :cluster : :node),
         index: :nodes,
+        method: :deployables,
         named: (cmd == :show)
       }
 
@@ -316,15 +326,6 @@ module Cloudware
       cli_syntax(c, 'PATH')
       c.summary = 'Add templates to the cluster'
       action(c, Commands::Import)
-    end
-
-    command 'cluster status' do |c|
-      cli_syntax(c)
-      c.description = 'List all the previous deployed templates'
-      c.option '-a', '--all', 'Include offline deployments'
-      c.option '-g GROUP', '--group GROUP', 'Filter the list by group'
-      c.option '-v', '--verbose', 'Show full error messages'
-      action(c, Commands::Lists::Deployment)
     end
 
     command 'group list' do |c|

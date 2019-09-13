@@ -127,19 +127,19 @@ module Cloudware
       end
     end
 
-    def read_model
-      if [:cluster, :domain].include?(level)
-        model_klass.read(name_or_error)
-      else
-        model_klass.read(config.current_cluster, name_or_error)
-      end
+    def read_cluster
+      Models::Cluster.read(cluster_name)
     end
 
-    def read_cluster
-      if level == :cluster
-        read_model
+    def read_domain
+      Models::Domain.read(cluster_name)
+    end
+
+    def read_model
+      if [:cluster, :domain].include?(level)
+        model_klass.read(cluster_name)
       else
-        Models::Cluster.read(config.current_cluster)
+        model_klass.read(config.current_cluster, name_or_error)
       end
     end
 
@@ -156,6 +156,24 @@ module Cloudware
         read_model
       else
         raise InternalError, "The #{level} is not a deployable model"
+      end
+    end
+
+    # TODO: this will need to be updated with stack info
+    def read_deployables
+      if [:domain, :node].include?(level)
+        [read_model]
+      elsif level == :group
+        read_nodes
+      elsif level == :cluster && index == :all
+        [read_domain, *read_nodes]
+      elsif level == :cluster && index == :nodes
+        read_nodes
+      else
+        raise InternalError, <<~ERROR
+          Could not determine list of deployables. Ensure that :level and
+          :index are set correctly.
+        ERROR
       end
     end
 
