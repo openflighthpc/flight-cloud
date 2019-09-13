@@ -34,10 +34,11 @@ module Cloudware
         puts read_groups.map(&:name)
       end
 
-      def nodes
+      def nodes(verbose: false)
         require 'cloudware/templaters/deployment_templater'
         read_nodes.sort_by(&:name).map do |node|
-          puts Templaters::DeploymentTemplater.new(node).render_info
+          puts Templaters::DeploymentTemplater.new(node, verbose: verbose)
+                                              .render_info
         end
       end
     end

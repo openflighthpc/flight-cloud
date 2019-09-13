@@ -165,6 +165,7 @@ module Cloudware
           cli_syntax(c, 'NODE')
           c.summary = 'View the details about a particular node'
         end
+        c.option '-v', '--verbose', 'Show full error messages'
         c.action(&Commands::List.proxy(**proxy_opts))
       end
     end
