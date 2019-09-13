@@ -78,6 +78,22 @@ module Cloudware
         end
 
         if deployed.deployment_error
+          named_part = case deployed
+                       when Models::Domain
+                         'domain show'
+                       when Models::Node
+                         "node show #{deployed.name}"
+                       when Models::Group
+                         raise NotImplementedError
+                       end
+          raise DeploymentError, <<~ERROR.chomp
+            An error has occurred. Please see for further details:
+            '#{Config.app_name} #{named_part} --verbose'
+          ERROR
+        end
+
+        if model.is_a?(Models::Node) && deployed.deployment_error
+        elsif deployed
           raise DeploymentError, <<~ERROR.chomp
              An error has occured. Please see for further details:
             `#{Config.app_name} list --verbose`
