@@ -91,14 +91,6 @@ module Cloudware
             '#{Config.app_name} #{named_part} --verbose'
           ERROR
         end
-
-        if model.is_a?(Models::Node) && deployed.deployment_error
-        elsif deployed
-          raise DeploymentError, <<~ERROR.chomp
-             An error has occured. Please see for further details:
-            `#{Config.app_name} list --verbose`
-          ERROR
-        end
       end
 
       # TODO: If this code is still commented out in a few months, feel free to delete it
