@@ -326,7 +326,7 @@ module Cloudware
           The provider may continue charging for these resources until they
           are stopped.
         DESC
-        proxy_opts = { level: :node, method: :delete, named: true }
+        proxy_opts = { level: level, method: :deployable, named: true }
         c.action(&Commands::Delete.proxy(**proxy_opts))
       end
     end
