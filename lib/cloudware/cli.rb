@@ -150,13 +150,15 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :delete)
     end
 
-    command 'cluster status' do |c|
-      cli_syntax(c)
-      c.description = 'List all the previous deployed templates'
-      c.option '-a', '--all', 'Include offline deployments'
-      c.option '-v', '--verbose', 'Show full error messages'
-      proxy_opts = { level: :cluster, index: :all, method: :deployables, named: false }
-      c.action(&Commands::List.proxy(**proxy_opts))
+    [:cluster, :group].each do |level|
+      command "#{level} status" do |c|
+        multilevel_cli_syntax(c, level)
+        c.description = 'List all the previous deployed templates'
+        c.option '-a', '--all', 'Include offline deployments'
+        c.option '-v', '--verbose', 'Show full error messages'
+        proxy_opts = { level: level, index: :all, method: :deployables_status, named: (level != :cluster) }
+        c.action(&Commands::List.proxy(**proxy_opts))
+      end
     end
 
     [:list, :show].each do |cmd|

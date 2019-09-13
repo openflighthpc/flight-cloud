@@ -34,9 +34,22 @@ module Cloudware
         puts read_groups.map(&:name)
       end
 
+      def deployables_status(verbose: false, all: false)
+        require 'cloudware/templaters/deployment_templater'
+        models = read_deployables
+        models = models.select(&:deployed) unless all
+        run(models, verbose)
+      end
+
       def deployables(verbose: false)
         require 'cloudware/templaters/deployment_templater'
-        read_deployables.sort_by(&:name).map do |model|
+        run(read_deployables, verbose)
+      end
+
+      private
+
+      def run(models, verbose)
+        models.sort_by(&:name).map do |model|
           puts Templaters::DeploymentTemplater.new(model, verbose: verbose)
                                               .render_info
         end
