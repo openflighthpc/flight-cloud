@@ -34,8 +34,8 @@ module Cloudware
         begin
           yield(*a) if block_given?
         rescue => e
-          Log.error_puts('An error has occurred!')
           self << e
+          Log.error_puts("An error has occurred! (#{length})")
         end
       end
     end
@@ -52,9 +52,12 @@ module Cloudware
       elsif length == 1
         raise first
       else
+        msgs = self.each_with_index
+                   .map { |err, idx| "Error #{idx + 1}:\n#{err.message}" }
+                   .join("\n\n")
         raise Cloudware::AccumulatedError, <<~ERROR
           The following errors have occurred:
-          #{self.map(&:message).join("\n\n")}
+          #{msgs}
         ERROR
       end
     end
