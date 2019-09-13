@@ -32,7 +32,7 @@ module Cloudware
     class Destroy < ScopedCommand
       include WithSpinner
 
-      def run!
+      def deployable
         with_spinner("Destroying #{name_or_error}...") do
           model_klass.destroy!(*read_model.__inputs__)
         end
@@ -41,14 +41,6 @@ module Cloudware
       def index
         accumulate_errors(read_nodes.each) do |node|
           with_spinner("Destroying: #{node.name}...") do
-            node.class.destroy!(*node.__inputs__)
-          end
-        end
-      end
-
-      def nodes
-        read_nodes.each do |node|
-          with_spinner("Destroying #{node.name}...") do
             node.class.destroy!(*node.__inputs__)
           end
         end
