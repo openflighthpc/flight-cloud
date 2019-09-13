@@ -62,6 +62,12 @@ module Cloudware
           group.other_nodes = (group.other_nodes - nodes.map(&:name))
         end
       end
+
+      def show
+        group = read_group
+        puts "Primary Nodes: #{group.read_primary_nodes.map(&:name).join(',')}"
+        puts "  Other Nodes: #{group.other_nodes.join(',')}"
+      end
     end
   end
 end

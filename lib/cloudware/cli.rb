@@ -337,6 +337,13 @@ module Cloudware
       c.action(&Commands::List.proxy(**proxy_opts))
     end
 
+    command 'group show' do |c|
+      cli_syntax(c, 'GROUP')
+      c.description = 'View all the nodes within the group'
+      proxy_opts = { level: :group, named: true, method: :show}
+      c.action(&Commands::Group.proxy(**proxy_opts))
+    end
+
     command 'group add' do |c|
       cli_syntax(c, 'GROUP NODES...')
       c.description = 'Add nodes to the group'
