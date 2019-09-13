@@ -119,6 +119,14 @@ module Cloudware
       end
     end
 
+    def cluster_name
+      if [:domain, :cluster].include?(level)
+        name_or_error
+      else
+        config.current_cluster
+      end
+    end
+
     def read_model
       if [:cluster, :domain].include?(level)
         model_klass.read(name_or_error)
@@ -160,6 +168,19 @@ module Cloudware
         raise InternalError, 'Can not load nodes within the domain scope'
       else
         read_model.read_nodes
+      end
+    end
+
+    def read_groups
+      case level
+      when :group, :stack
+        [read_group]
+      when :node
+        read_node.read_groups
+      else
+        Indices::GroupNode.glob_read(cluster_name, '*', '*', '*')
+                          .uniq { |i| i.group }
+                          .map(&:read_group)
       end
     end
 

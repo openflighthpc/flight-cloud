@@ -310,7 +310,8 @@ module Cloudware
     command 'group list' do |c|
       cli_syntax(c)
       c.description = 'List all groups within the cluster'
-      action(c, Commands::Lists::Deployment, method: :list_groups)
+      proxy_opts = { level: :cluster, index: :groups, named: false }
+      c.action(&Commands::List.proxy(**proxy_opts))
     end
 
     command 'group add' do |c|
