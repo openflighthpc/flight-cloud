@@ -30,9 +30,9 @@
 module Cloudware
   module Commands
     class Group < ScopedCommand
-      def add(*names)
+      def add(*raw_names)
         if primary
-          load_existing_nodes(names).each do |node|
+          load_existing_nodes(raw_names).each do |node|
             Models::Node.update(*node.__inputs__) do |n|
               n.primary_group = name_or_error
             end
