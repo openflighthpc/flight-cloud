@@ -150,6 +150,13 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :delete)
     end
 
+    command 'node list' do |c|
+      cli_syntax(c)
+      c.summary = 'List all the nodes within the cluster'
+      proxy_opts = { level: :cluster, index: :nodes, named: false }
+      c.action(&Commands::List.proxy(**proxy_opts))
+    end
+
     [:domain, :group, :node].each do |level|
       command level do |c|
         cli_syntax(c)

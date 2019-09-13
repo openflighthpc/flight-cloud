@@ -33,6 +33,13 @@ module Cloudware
       def groups
         puts read_groups.map(&:name)
       end
+
+      def nodes
+        require 'cloudware/templaters/deployment_templater'
+        read_nodes.sort_by(&:name).map do |node|
+          puts Templaters::DeploymentTemplater.new(node).render_info
+        end
+      end
     end
   end
 end
