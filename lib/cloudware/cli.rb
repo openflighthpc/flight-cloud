@@ -388,6 +388,18 @@ module Cloudware
         end
         c.sub_command_group = true
       end
+    end
+
+    [:group, :node].each do |level|
+      command "#{level} action" do |c|
+        multilevel_cli_syntax(c, level)
+        if level == :nodes
+          c.description = 'Run a command on the node'
+        else
+          c.description = 'Run a command over the nodes'
+        end
+        c.sub_command_group = true
+      end
 
       command "#{level} action power-status" do |c|
         multilevel_cli_syntax(c, level)
