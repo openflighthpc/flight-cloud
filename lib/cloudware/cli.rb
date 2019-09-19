@@ -27,7 +27,7 @@
 # https://github.com/openflighthpc/flight-cloud
 #===============================================================================
 
-require 'commander'
+require 'cloudware/commander_proxy_delegates'
 
 require 'cloudware/command'
 require 'cloudware/log'
@@ -43,7 +43,7 @@ require 'require_all'
 
 module Cloudware
   class CLI
-    extend Commander::Delegates
+    include CommanderProxyDelegates
 
     program :name, Config.app_name
     program :version, Cloudware::VERSION
@@ -51,13 +51,6 @@ module Cloudware
     program :help_paging, false
 
     silent_trace!
-
-    def self.run!
-      # Display the help if there is no input arguments
-      ARGV.push '--help' if ARGV.empty?
-      Log.info "Run (CLI): #{ARGV.join(' ')}"
-      super
-    end
 
     def self.action(command, klass, method: :run!)
       command.action do |args, options|
