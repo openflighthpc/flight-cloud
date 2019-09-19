@@ -87,8 +87,6 @@ module Cloudware
       case level
       when :group
         cli_syntax(command, "GROUP #{args_str}".chomp)
-      when :stack
-        cli_syntax(command, "STACK #{args_str}".chomp)
       when :node
         cli_syntax(command, "NODE #{args_str}".chomp)
       else
@@ -203,45 +201,8 @@ module Cloudware
       end
     end
 
-    command :stack do |c|
-      cli_syntax(c)
-      c.sub_command_group = true
-      c.hidden = true
-      c.summary = 'Volatile'
-    end
-
-    # TODO: The old deploy command is being maintained for reference, once the
-    # functionality has been replicated, remove this code block
-    #
-    # command 'deploy' do |c|
-    #   cli_syntax(c, 'NAME [TEMPLATE]')
-    #   c.summary = 'Deploy new resource(s) define by a template'
-    #   c.description = <<-DESC.strip_heredoc
-    #     When called with a single argument, it will deploy a currently existing
-    #     deployment: NAME. This will result in an error if the deployment does
-    #     not exist or is currently in a deployed state.
-
-    #     Calling it with a second argument will try and create a new deployment
-    #     called NAME with the specified TEMPLATE. The TEMPLATE references the
-    #     internal template which have been imported. Alternatively it can be
-    #     an absolute path to a template file.
-
-    #     In either case, the template is read and sent to the provider. The
-    #     template is read each time it is re-deployed. Be careful not to delete
-    #     or modify it.
-
-    #     The templates also support basic rendering of parameters from the
-    #     command line. This is intended to provide minor tweaks to the templates
-    #     (e.g. IPs or names).
-    #   DESC
-    #   c.option '-p', '--params \'<REPLACE_KEY=*IDENTIFIER[.OUTPUT_KEY] >...\'',
-    #            String, 'A space separated list of keys to be replaced'
-    #   c.option '-g', '--group', 'Deploy all resources within the specified group'
-    #   action(c, Commands::Deploy)
-    # end
-
-    [:cluster, :domain, :group, :stack, :node].each do |level|
-      is_deployable = [:domain, :stack, :node].include?(level)
+    [:cluster, :domain, :group, :node].each do |level|
+      is_deployable = [:domain, :node].include?(level)
       proxy_opts = {
         level: level,
         method: (is_deployable ? :deployable : :index),
@@ -269,7 +230,7 @@ module Cloudware
       end
     end
 
-    [:domain, :stack, :node].each do |level|
+    [:domain, :node].each do |level|
       command "#{level} create" do |c|
         multilevel_cli_syntax(c, level, 'TEMPLATE')
         if level == :domain
