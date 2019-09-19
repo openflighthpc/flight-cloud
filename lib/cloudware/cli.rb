@@ -216,7 +216,7 @@ module Cloudware
 
     command "node create" do |c|
       multilevel_cli_syntax(c, :node, 'TEMPLATE')
-      c.description = "Add a new #{level} to the cluster"
+      c.description = "Add a new node to the cluster"
       proxy_opts = {
         level: :node, method: :deployable, named: true
       }
@@ -224,11 +224,19 @@ module Cloudware
     end
 
     [:domain, :node].each do |level|
-      command "#{level} edit" do |c|
+      cli_level = (level == :domain ? :cluster : level)
+
+      command  "#{cli_level} template" do |c|
+        multilevel_cli_syntax(c, level)
+        c.summary = "View and modify the #{cli_level} template"
+        c.sub_command_group = true
+      end
+
+      command "#{cli_level} template edit" do |c|
         multilevel_cli_syntax(c, level, '[TEMPLATE]')
         c.summary = 'Update the cloud template'
         c.description = <<~DESC
-          Open the #{level} template in the editor so it can be updated.
+          Open the #{cli_level} template in the editor so it can be updated.
 
           Alternatively the template can be replaced by a system file by specifing
           the optional TEMPLATE argument. TEMPLATE should give the file path to the
