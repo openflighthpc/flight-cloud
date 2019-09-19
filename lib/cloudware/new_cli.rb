@@ -95,6 +95,27 @@ module Cloudware
       group.flag 'members-in', desc: 'Run the action over the memebers in the group',
                                arg_name: 'GROUP'
       group.command(:action) {}
+
+      group.action do |global, options, args|
+        if args.empty?
+          raise GLI::RequestHelp.new('SHOW ME THE HELP')
+        else
+          name = args.first
+          other_args = args[1..-1]
+          new_options = options.merge(:"members-in" => name, "members-in" => name)
+          binding.pry
+          gli_option_parser = GLI::GLIOptionParser.new(group.commands,
+                                                       group.flags,
+                                                       group.switches,
+                                        accepts,
+                                        :default_command => group.instance_variable_get(:@default_command),
+                                        :autocomplete => autocomplete,
+                                        :subcommand_option_handling_strategy => subcommand_option_handling_strategy,
+                                        :argument_handling_strategy => argument_handling_strategy)
+
+          group.execute(global, new_options, other_args)
+        end
+      end
     end
   end
 end
