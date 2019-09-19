@@ -43,8 +43,6 @@ require 'require_all'
 
 module Cloudware
   class CLI
-    extend Commander::UI
-    extend Commander::UI::AskForClass
     extend Commander::Delegates
 
     program :name, Config.app_name
