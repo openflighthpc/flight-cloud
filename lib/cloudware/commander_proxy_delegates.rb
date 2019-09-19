@@ -35,8 +35,7 @@ module Cloudware
 
     class RunnerProxy
       PROXY_METHODS = [
-        :add_command, :command, :program, :error_handler, :global_option,
-        :alias_command, :default_command, :always_trace!, :never_trace!, :silent_trace!
+        :add_command, :command, :program, :global_option, :alias_command, :default_command
       ]
 
       PROXY_METHODS.each do |method|
@@ -58,7 +57,31 @@ module Cloudware
           suffix = runner.program(:name)
           runner.program(:name, "#{prefix} #{suffix}")
         end
-        runner.run!
+        runner.require_program(:version, :description)
+        runner.global_option('-h', '--help', 'Display the help text') do
+          runner_args = runner.instance_variable_get(:@args) - ['-h', '--help']
+          runner.command(:help).run(*runner_args)
+          return
+        end
+        runner.global_option('--version', 'Display version information') do
+          say version
+          return
+        end
+        trace = false
+        runner.global_option('--trace', 'Display backtrace when an error occurrs') do
+          trace = true
+        end
+        runner.parse_global_options
+        runner.remove_global_options runner.options, runner.instance_variable_get(:@args)
+        if trace
+          runner.run_active_command
+        else
+          begin
+            runner.run_active_command
+          rescue => e
+            ::Commander::Runner::DEFAULT_ERROR_HANDLER.call(runner, e)
+          end
+        end
       end
     end
 

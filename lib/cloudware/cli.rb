@@ -50,8 +50,6 @@ module Cloudware
     program :description, 'Cloud orchestration tool'
     program :help_paging, false
 
-    silent_trace!
-
     def self.action(command, klass, method: :run!)
       command.action do |args, options|
         hash = options.__hash__
