@@ -259,9 +259,9 @@ module Cloudware
       end
 
       command "#{cli_level} template render" do |c|
-        cli_syntax(c, 'NAME')
+        multilevel_cli_syntax(c, level)
         c.summary = "Return the template the #{cli_level}"
-        proxy_opts = { level: level, method: :render, named: (level != :cluster) }
+        proxy_opts = { level: level, method: :render, named: (level != :domain) }
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
 
