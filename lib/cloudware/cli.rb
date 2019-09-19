@@ -150,6 +150,7 @@ module Cloudware
 
     command 'cluster show' do |c|
       cli_syntax(c)
+      c.summary = "View details about the cluster's deployment"
       c.option '-v', '--verbose', 'Show full error messages'
       proxy_opts = { level: :domain, method: :deployables, named: false }
       c.action(&Commands::List.proxy(**proxy_opts))
