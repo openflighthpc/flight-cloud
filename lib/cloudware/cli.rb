@@ -177,7 +177,7 @@ module Cloudware
       end
     end
 
-    [:domain, :group, :node].each do |level|
+    [:group, :node].each do |level|
       command level do |c|
         cli_syntax(c)
         c.sub_command_group = true
@@ -291,12 +291,6 @@ module Cloudware
         proxy_opts = { level: level, method: :deployable, named: true }
         c.action(&Commands::Delete.proxy(**proxy_opts))
       end
-    end
-
-    command 'import' do |c|
-      cli_syntax(c, 'PATH')
-      c.summary = 'Add templates to the cluster'
-      action(c, Commands::Import)
     end
 
     command 'group list' do |c|
