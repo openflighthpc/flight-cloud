@@ -71,12 +71,6 @@ module Cloudware
         raise InvalidAction, 'Deleting a cluster is not currently supported :('
       end
 
-      def show
-        cluster = Models::Cluster.read(__config__.current_cluster)
-        puts "Cluster: #{cluster.identifier}"
-        puts "Nodes: #{cluster.read_nodes.map(&:name).join(',')}"
-      end
-
       private
 
       def update_cluster(new_cluster)

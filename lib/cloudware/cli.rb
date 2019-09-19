@@ -136,12 +136,6 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :list)
     end
 
-    command 'cluster show' do |c|
-      cli_syntax(c)
-      c.summary = 'Display information about the cluster'
-      action(c, Commands::ClusterCommand, method: :show)
-    end
-
     command 'cluster switch' do |c|
       cli_syntax(c, 'CLUSTER')
       c.summary = 'Change the current cluster to CLUSTER'
@@ -154,7 +148,7 @@ module Cloudware
       action(c, Commands::ClusterCommand, method: :delete)
     end
 
-    command 'domain show' do |c|
+    command 'cluster show' do |c|
       cli_syntax(c)
       c.option '-v', '--verbose', 'Show full error messages'
       proxy_opts = { level: :domain, method: :deployables, named: false }
