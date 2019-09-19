@@ -69,8 +69,7 @@ module Cloudware
         @runner_proxy_instance ||= RunnerProxy.new
       end
 
-      def run!
-        args = ARGV
+      def run(args)
         args.push('--help') if args.empty?
         Log.info "Run (CLI): #{args.join(' ')}"
         runner_proxy_instance.run(args)
