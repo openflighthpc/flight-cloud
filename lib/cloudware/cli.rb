@@ -233,6 +233,12 @@ module Cloudware
         c.sub_command_group = true
       end
 
+      command  "#{cli_level} parameters" do |c|
+        multilevel_cli_syntax(c, level)
+        c.summary = "View and modify the #{cli_level} parameters"
+        c.sub_command_group = true
+      end
+
       command "#{cli_level} template edit" do |c|
         multilevel_cli_syntax(c, level, '[TEMPLATE]')
         c.summary = 'Update the cloud template'
@@ -259,7 +265,7 @@ module Cloudware
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
 
-      command "#{level} update" do |c|
+      command "#{cli_level} parameters update" do |c|
         multilevel_cli_syntax(c, level, 'PARAMS...')
         c.summary = "Update the #{level}'s parameters"
         proxy_opts = { level: level, method: :run, named: (level != :domain) }
