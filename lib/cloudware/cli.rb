@@ -298,7 +298,13 @@ module Cloudware
       c.action(&Commands::List.proxy(**proxy_opts))
     end
 
-    command 'group show' do |c|
+    command 'group members' do |c|
+      cli_syntax(c, 'GROUP')
+      c.description = 'View and manage all the members within the group'
+      c.sub_command_group = true
+    end
+
+    command 'group members list' do |c|
       cli_syntax(c, 'GROUP')
       c.description = 'View all the nodes within the group'
       proxy_opts = { level: :group, named: true, method: :show}
@@ -324,7 +330,7 @@ module Cloudware
     end
 
     [:group, :node].each do |level|
-      command "#{level} action" do |c|
+      command "#{level} #{"members " if level == :group}action" do |c|
         multilevel_cli_syntax(c, level)
         if level == :nodes
           c.description = 'Run a command on the node'
