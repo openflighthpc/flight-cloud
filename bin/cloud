@@ -33,4 +33,5 @@ load File.expand_path(File.join(__dir__, '..', 'Rakefile'))
 
 Rake::Task[:setup].invoke
 
-Cloudware::CLI.run! if $PROGRAM_NAME == __FILE__
+require 'cloudware/new_cli'
+Cloudware::NewCLI.run(ARGV) if $PROGRAM_NAME == __FILE__
