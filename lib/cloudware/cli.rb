@@ -201,21 +201,22 @@ module Cloudware
       end
     end
 
-    [:cluster, :domain, :group, :node].each do |level|
-      is_deployable = [:domain, :node].include?(level)
+    [:domain, :group, :node].each do |level|
+      cli_level = (level == :domain ? :cluster : level)
+
       proxy_opts = {
         level: level,
-        method: (is_deployable ? :deployable : :index),
-        named: ![:cluster, :domain].include?(level)
+        method: (level == :group ? :index : :deployable),
+        named: (level != :domain)
       }
 
-      command "#{level} deploy" do |c|
+      command "#{cli_level} action deploy" do |c|
         multilevel_cli_syntax(c, level, '[PARAMS...]')
         c.summary = 'Create the templated resources on the provider'
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
 
-      command "#{level} destroy" do |c|
+      command "#{cli_level} action destroy" do |c|
         multilevel_cli_syntax(c, level)
         c.summary = 'Teardown the resouces on the provider'
         c.description = <<~DESC
