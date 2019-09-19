@@ -373,7 +373,17 @@ module Cloudware
     end
 
     [:cluster, :group, :node].each do |level|
-      command "#{level} power-status" do |c|
+      command "#{level} action" do |c|
+        multilevel_cli_syntax(c, level)
+        if level == :nodes
+          c.description = 'Run a command on the node'
+        else
+          c.description = 'Run a command over the nodes'
+        end
+        c.sub_command_group = true
+      end
+
+      command "#{level} action power-status" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
           c.description = 'Check the power state of the node'
@@ -384,7 +394,7 @@ module Cloudware
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
 
-      command "#{level} power-off" do |c|
+      command "#{level} action power-off" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
           c.description = 'Turn the node off'
@@ -395,7 +405,7 @@ module Cloudware
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
 
-      command "#{level} power-on" do |c|
+      command "#{level} action power-on" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
           c.description = 'Turn the node on'
