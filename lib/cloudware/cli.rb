@@ -115,7 +115,7 @@ module Cloudware
       c.summary = 'Manage and overview the current cluster profile'
     end
 
-    command 'cluster init' do |c|
+    command 'cluster create' do |c|
       cli_syntax(c, 'CLUSTER PROVIDER')
       c.summary = 'Create a new cluster'
       c.description = <<~DESC
