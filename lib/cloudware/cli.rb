@@ -214,20 +214,16 @@ module Cloudware
       end
     end
 
-    [:domain, :node].each do |level|
-      command "#{level} create" do |c|
-        multilevel_cli_syntax(c, level, 'TEMPLATE')
-        if level == :domain
-          c.description = "Define the top level domain template"
-        else
-          c.description = "Add a new #{level} to the cluster"
-        end
-        proxy_opts = {
-          level: level, method: :deployable, named: (level != :domain)
-        }
-        c.action(&Commands::Create.proxy(**proxy_opts))
-      end
+    command "node create" do |c|
+      multilevel_cli_syntax(c, :node, 'TEMPLATE')
+      c.description = "Add a new #{level} to the cluster"
+      proxy_opts = {
+        level: :node, method: :deployable, named: true
+      }
+      c.action(&Commands::Create.proxy(**proxy_opts))
+    end
 
+    [:domain, :node].each do |level|
       command "#{level} edit" do |c|
         multilevel_cli_syntax(c, level, '[TEMPLATE]')
         c.summary = 'Update the cloud template'
