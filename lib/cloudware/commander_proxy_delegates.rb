@@ -35,7 +35,7 @@ module Cloudware
 
     class RunnerProxy
       PROXY_METHODS = [
-        :add_command, :command, :program, :global_option, :alias_command, :default_command
+        :add_command, :command, :program, :global_option, :default_command
       ]
 
       PROXY_METHODS.each do |method|
@@ -64,7 +64,7 @@ module Cloudware
           return
         end
         runner.global_option('--version', 'Display version information') do
-          say version
+          runner.say runner.version
           return
         end
         trace = false
