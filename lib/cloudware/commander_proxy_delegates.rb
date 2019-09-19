@@ -49,10 +49,14 @@ module Cloudware
         @proxy_calls ||= []
       end
 
-      def run(args)
+      def run(args, prefix: nil)
         runner = ::Commander::Runner.new(args)
         proxy_calls.each_with_object(runner) do |(s, a, b), run|
           run.send(s, *a, &b)
+        end
+        if prefix
+          suffix = runner.program(:name)
+          runner.program(:name, "#{prefix} #{suffix}")
         end
         runner.run!
       end
