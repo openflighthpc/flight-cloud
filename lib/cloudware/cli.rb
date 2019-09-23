@@ -43,6 +43,10 @@ require 'require_all'
 
 module Cloudware
   class CLI
+    LOW_PRIORITY = 1
+    MID_PRIORITY = 10
+    LARGE_PRIORITY = 100
+
     extend Commander::Delegates
 
     program :name, Config.app_name
@@ -127,6 +131,7 @@ module Cloudware
 
     command('cluster list') do |c|
       cli_syntax(c)
+      c.priority = LOW_PRIORITY + 2
       c.summary = 'Show the current and available clusters'
       c.description = <<~DESC
         Shows a list of clusters that have been previously deployed to
@@ -136,18 +141,21 @@ module Cloudware
 
     command 'cluster switch' do |c|
       cli_syntax(c, 'CLUSTER')
+      c.priority = LOW_PRIORITY + 4
       c.summary = 'Change the current cluster to CLUSTER'
       action(c, Commands::ClusterCommand, method: :switch)
     end
 
     command 'cluster delete' do |c|
       cli_syntax(c, 'CLUSTER')
+      c.priority = LOW_PRIORITY + 1
       c.summary = 'Destroys the deployments and deletes the cluster'
       action(c, Commands::ClusterCommand, method: :delete)
     end
 
     command 'cluster show' do |c|
       cli_syntax(c)
+      c.priority = LOW_PRIORITY + 3
       c.summary = "View details about the cluster's deployment"
       c.option '-v', '--verbose', 'Show full error messages'
       proxy_opts = { level: :domain, method: :deployables, named: false }
@@ -165,9 +173,11 @@ module Cloudware
       command "node #{cmd}" do |c|
         if cmd == :list
           cli_syntax(c)
+          c.priority = LOW_PRIORITY + 2
           c.summary = 'List all the nodes within the cluster'
         else
           cli_syntax(c, 'NODE')
+          c.priority = LOW_PRIORITY + 3
           c.summary = 'View the details about a particular node'
         end
         c.option '-v', '--verbose', 'Show full error messages'
@@ -194,6 +204,7 @@ module Cloudware
 
       command "#{cli_level} action deploy" do |c|
         multilevel_cli_syntax(c, level, '[PARAMS...]')
+        c.priority = LARGE_PRIORITY
         c.summary = 'Create the templated resources on the provider'
         c.action(&Commands::Deploy.proxy(**proxy_opts))
       end
@@ -201,6 +212,7 @@ module Cloudware
       command "#{cli_level} action destroy" do |c|
         multilevel_cli_syntax(c, level)
         c.summary = 'Teardown the resouces on the provider'
+        c.priority = LARGE_PRIORITY
         c.description = <<~DESC
           Destroys the resources on the providers platform and flags it
           as offline. This action does not remove the configuration file,
@@ -216,6 +228,7 @@ module Cloudware
     command "node create" do |c|
       multilevel_cli_syntax(c, :node, 'TEMPLATE')
       c.description = "Add a new node to the cluster"
+      c.priority = LOW_PRIORITY
       proxy_opts = {
         level: :node, method: :deployable, named: true
       }
@@ -227,12 +240,14 @@ module Cloudware
 
       command  "#{cli_level} template" do |c|
         multilevel_cli_syntax(c, level)
+        c.priority = MID_PRIORITY + 1
         c.summary = "View and modify the #{cli_level} template"
         c.sub_command_group = true
       end
 
       command  "#{cli_level} parameters" do |c|
         multilevel_cli_syntax(c, level)
+        c.priority = MID_PRIORITY + 2
         c.summary = "View and modify the #{cli_level} parameters"
         c.sub_command_group = true
       end
@@ -272,6 +287,7 @@ module Cloudware
 
       command "#{level} delete" do |c|
         multilevel_cli_syntax(c, level)
+        c.priority = LOW_PRIORITY + 1
         c.summary = "Permanently remove the #{level} from the cluster"
         c.description = <<~DESC
           Permanently delete the configuration file and associated template.
@@ -293,6 +309,7 @@ module Cloudware
 
     command 'group list' do |c|
       cli_syntax(c)
+      c.priority = LOW_PRIORITY + 2
       c.description = 'List all groups within the cluster'
       proxy_opts = { level: :cluster, index: :groups, named: false }
       c.action(&Commands::List.proxy(**proxy_opts))
@@ -300,6 +317,7 @@ module Cloudware
 
     command 'group members' do |c|
       cli_syntax(c, 'GROUP')
+      c.priority = MID_PRIORITY
       c.description = 'View and manage all the members within the group'
       c.sub_command_group = true
     end
@@ -313,6 +331,7 @@ module Cloudware
 
     command 'group create' do |c|
       cli_syntax(c, 'GROUP')
+      c.priority = LOW_PRIORITY
       c.description = 'Define a new empty group'
       c.action(&Commands::Create.proxy(level: :group, named: true))
     end
@@ -320,6 +339,7 @@ module Cloudware
     [:cluster, :group, :node].each do |level|
       command "#{level} action" do |c|
         multilevel_cli_syntax(c, level)
+        c.priority = MID_PRIORITY
         if level == :nodes
           c.description = 'Run a command on the node'
         else
@@ -329,17 +349,20 @@ module Cloudware
       end
     end
 
-    [:group, :node].each do |level|
-      command "#{level} #{"members " if level == :group}action" do |c|
-        multilevel_cli_syntax(c, level)
-        if level == :nodes
-          c.description = 'Run a command on the node'
-        else
-          c.description = 'Run a command over the nodes'
-        end
-        c.sub_command_group = true
-      end
+    command "node action" do |c|
+      multilevel_cli_syntax(c, :node)
+      c.description = 'Run a command on the node'
+      c.sub_command_group = true
+      c.priority = MID_PRIORITY
+    end
 
+    command "group members action" do |c|
+      multilevel_cli_syntax(c, :group)
+      c.description = 'Run a command over the nodes'
+      c.sub_command_group = true
+    end
+
+    [:group, :node].each do |level|
       command "#{level} action power-status" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
