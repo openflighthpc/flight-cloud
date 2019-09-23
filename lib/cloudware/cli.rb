@@ -194,7 +194,14 @@ module Cloudware
     end
 
     [:domain, :group, :node].each do |level|
-      cli_level = (level == :domain ? :cluster : level)
+      cli_level = case level
+                  when :domain
+                    :cluster
+                  when :group
+                    'group members'
+                  else
+                    level
+                  end
 
       proxy_opts = {
         level: level,
@@ -336,6 +343,14 @@ module Cloudware
       c.sub_command_group = true
     end
 
+    command 'group show' do |c|
+      c.priority = LOW_PRIORITY + 3
+      cli_syntax(c, 'GROUP')
+      c.description = 'View all the nodes within the group'
+      proxy_opts = { level: :group, named: true, method: :show}
+      c.action(&Commands::Group.proxy(**proxy_opts))
+    end
+
     command 'group members list' do |c|
       cli_syntax(c, 'GROUP')
       c.description = 'View all the nodes within the group'
@@ -350,7 +365,7 @@ module Cloudware
       c.action(&Commands::Create.proxy(level: :group, named: true))
     end
 
-    [:cluster, :group, :node].each do |level|
+    [:cluster, :node].each do |level|
       command "#{level} action" do |c|
         multilevel_cli_syntax(c, level)
         c.priority = MID_PRIORITY
@@ -386,7 +401,8 @@ module Cloudware
     end
 
     [:group, :node].each do |level|
-      command "#{level} action power-status" do |c|
+      cli_level = (level == :group ? 'group members' : level)
+      command "#{cli_level} action power-status" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
           c.description = 'Check the power state of the node'
@@ -397,7 +413,7 @@ module Cloudware
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
 
-      command "#{level} action power-off" do |c|
+      command "#{cli_level} action power-off" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
           c.description = 'Turn the node off'
@@ -408,7 +424,7 @@ module Cloudware
         c.action(&Commands::ScopedPower.proxy(**proxy_opts))
       end
 
-      command "#{level} action power-on" do |c|
+      command "#{cli_level} action power-on" do |c|
         multilevel_cli_syntax(c, level)
         if level == :node
           c.description = 'Turn the node on'
