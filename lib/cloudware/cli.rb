@@ -363,6 +363,15 @@ module Cloudware
       end
     end
 
+    command 'node update' do |c|
+      multilevel_cli_syntax(c, :node)
+      c.priority = LOW_PRIORITY + 5
+      c.description = 'Modify the group membership of the node'
+      c.option '--primary-group GROUP', "Specify the node's primary group"
+      c.option '--other-groups GROUPS', "Specify the node's other groups as a comma seperated list"
+      c.action(&Commands::Update.proxy(level: :node, named: true))
+    end
+
     command "node action" do |c|
       cli_syntax(c)
       c.description = 'Run a command on the node'
