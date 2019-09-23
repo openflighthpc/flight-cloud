@@ -73,6 +73,7 @@ module Cloudware
   # Other errors
   class ConfigError < CloudwareError; end
   class InvalidInput < UserError; end
+  class InvalidAction < UserError; end
   class ModelValidationError < UserError; end
   class InvalidAzureRequest < UserError; end
   class DeploymentError < UserError; end

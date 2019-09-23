@@ -68,18 +68,7 @@ module Cloudware
       end
 
       def delete(cluster)
-        error_if_current_cluster(cluster)
-        deps = Models::Deployments.read(cluster)
-        with_spinner 'Deleting cluster (this may take some time)...'
-          Parallel.each(deps, in_threads: 5) do |dep|
-            Models::Deployment.destroy!(cluster, dep.name)
-            Models::Deployment.delete!(cluster, dep.name)
-          end
-        if Models::Deployments.read(cluster).empty?
-          FileUtils.rm_rf RootDir.content_cluster(cluster)
-        else
-          raise CloudwareError, 'Failed to delete the cluster'
-        end
+        raise InvalidAction, 'Deleting a cluster is not currently supported :('
       end
 
       private

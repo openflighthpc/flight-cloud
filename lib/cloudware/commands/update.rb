@@ -39,6 +39,23 @@ module Cloudware
                                          .build(params_string)
         model_klass.prompt!(replacements, *read_model.__inputs__)
       end
+
+      def node(primary_group: nil, other_groups: nil)
+        require 'cloudware/models/group'
+        require 'cloudware/models/node'
+        if primary_group
+          Models::Node.update(*read_node.__inputs__) do |node|
+            node.primary_group = primary_group
+          end
+        end
+        if other_groups
+          other_groups.split(',').each do |group_name|
+            Models::Group.create_or_update(cluster_name, group_name) do |group|
+              group.other_nodes = group.other_nodes.dup.tap { |n| n << name_or_error }
+            end
+          end
+        end
+      end
     end
   end
 end

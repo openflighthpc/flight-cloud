@@ -29,34 +29,19 @@
 
 module Cloudware
   module Commands
-    class Delete < ScopedCommand
-      def deployable(force: false)
-        model_klass.delete!(*read_model.__inputs__, force: force)
+    class Render < ScopedCommand
+      def render
+        puts model_klass.prompt!(nil, *read_model.__inputs__).template
       end
 
-      def group
-        group = read_group
-        if group.read_primary_nodes.empty? && group.read_other_nodes.empty?
-          Models::Group.delete(*group.__inputs__)
-        elsif group.read_other_nodes.empty?
-          msg = <<~ERROR.squish
-            Failed to delete group #{group.name} as the following primary nodes
-            are still within it:
-          ERROR
-          raise InvalidAction, <<~ERROR.chomp
-            #{msg}
-            #{group.read_primary_nodes.map(&:name).join(',')}
-          ERROR
-        else
-          msg = <<~ERROR.squish
-            Failed to delete group #{group.name} as the following other nodes
-            are still within it:
-          ERROR
-          raise InvalidAction, <<~ERROR.chomp
-            #{msg}
-          #{group.read_other_nodes.map(&:name).join(',')}
-          ERROR
-        end
+      def show
+        puts read_model.raw_template
+      end
+
+      def show_params
+        require 'cloudware/templaters/deployment_templater'
+        puts Templaters::DeploymentTemplater.new(read_model, verbose: false)
+                                            .render_replacements
       end
     end
   end
