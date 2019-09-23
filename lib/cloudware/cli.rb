@@ -357,7 +357,7 @@ module Cloudware
     end
 
     command "node action" do |c|
-      multilevel_cli_syntax(c, :node)
+      cli_syntax(c)
       c.description = 'Run a command on the node'
       c.sub_command_group = true
       c.priority = MID_PRIORITY
