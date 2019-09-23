@@ -191,7 +191,7 @@ module Cloudware
         dep = ReplacementFactory.new(cluster, self.name)
         replacements.reduce(raw_template) do |memo, (key, value)|
           # Resolve domain(s) of key value pairs if necessary
-          value = dep.parse_key_pair(key.to_sym, value) if value.include? "*"
+          value = dep.parse_key_pair(key.to_sym, value) if (value || '').include? "*"
 
           memo.gsub("%#{key}%", value.to_s)
         end

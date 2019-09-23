@@ -271,11 +271,18 @@ module Cloudware
         c.action(&Commands::Edit.proxy(**proxy_opts))
       end
 
+      command "#{cli_level} template show" do |c|
+        multilevel_cli_syntax(c, level)
+        c.summary = "Print the un rendered #{cli_level} template to stdout"
+        proxy_opts = { level: level, method: :show, named: (level != :domain) }
+        c.action(&Commands::Render.proxy(**proxy_opts))
+      end
+
       command "#{cli_level} template render" do |c|
         multilevel_cli_syntax(c, level)
         c.summary = "Return the template the #{cli_level}"
         proxy_opts = { level: level, method: :render, named: (level != :domain) }
-        c.action(&Commands::Deploy.proxy(**proxy_opts))
+        c.action(&Commands::Render.proxy(**proxy_opts))
       end
 
       command "#{cli_level} parameters update" do |c|

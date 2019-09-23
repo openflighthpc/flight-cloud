@@ -58,11 +58,6 @@ module Cloudware
         deploy(read_model, params.join(' '))
       end
 
-      def render
-        cur_model = model_klass.prompt!(nil, *read_model.__inputs__)
-        puts cur_model.template
-      end
-
       private
 
       def deploy(model, params)
