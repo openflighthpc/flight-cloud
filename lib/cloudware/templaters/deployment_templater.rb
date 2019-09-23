@@ -39,6 +39,17 @@ module Cloudware
         @verbose = verbose
       end
 
+      def render_replacements
+        render_markdown <<~ERB
+          <% if replacements.empty? -%>
+          No replacements available
+          <% end -%>
+          <% replacements.each do |key, value| -%>
+          - *<%= key %>*: <%= value %>
+          <% end -%>
+        ERB
+      end
+
       def render_info
         render_markdown <<~ERB
           # Deployment: '<%= name %>'
@@ -65,13 +76,14 @@ module Cloudware
           <% end -%>
           <% end -%>
 
-          <% if replacements -%>
           ## Replacements
+          <% if replacements.empty? -%>
+          No replacements available
+          <% end -%>
           <% replacements.each do |key, value| -%>
           - *<%= key %>*: <%= value %>
           <% end -%>
 
-          <% end -%>
           <% if verbose && deployment_error -%>
           ## Error
           *NOTE:* This is `<%= provider %>'s` raw error message

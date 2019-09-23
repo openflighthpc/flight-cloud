@@ -37,6 +37,12 @@ module Cloudware
       def show
         puts read_model.raw_template
       end
+
+      def show_params
+        require 'cloudware/templaters/deployment_templater'
+        puts Templaters::DeploymentTemplater.new(read_model, verbose: false)
+                                            .render_replacements
+      end
     end
   end
 end

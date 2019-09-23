@@ -285,6 +285,13 @@ module Cloudware
         c.action(&Commands::Render.proxy(**proxy_opts))
       end
 
+      command "#{cli_level} parameters show" do |c|
+        multilevel_cli_syntax(c, level)
+        c.summary = 'Display the replacements used during render'
+        proxy_opts = { level: level, method: :show_params, named: (level != :domain) }
+        c.action(&Commands::Render.proxy(**proxy_opts))
+      end
+
       command "#{cli_level} parameters update" do |c|
         multilevel_cli_syntax(c, level, 'PARAMS...')
         c.summary = "Update the #{level}'s parameters"
