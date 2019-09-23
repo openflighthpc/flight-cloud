@@ -196,9 +196,12 @@ module Cloudware
       when :node
         read_node.read_groups
       else
-        Indices::GroupNode.glob_read(cluster_name, '*', '*', '*')
-                          .uniq { |i| i.group }
-                          .map(&:read_group)
+        registry = FlightConfig::Registry.new
+        referenced = Indices::GroupNode.glob_read(cluster_name, '*', '*', '*', registry: registry)
+                                       .uniq { |i| i.group }
+                                       .map(&:read_group)
+        configs = Models::Group.glob_read(cluster_name, '*', registry: registry)
+        [*referenced, *configs].uniq
       end
     end
 

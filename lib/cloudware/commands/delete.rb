@@ -33,6 +33,31 @@ module Cloudware
       def deployable(force: false)
         model_klass.delete!(*read_model.__inputs__, force: force)
       end
+
+      def group
+        group = read_group
+        if group.read_primary_nodes.empty? && group.read_other_nodes.empty?
+          Models::Group.delete(*group.__inputs__)
+        elsif group.read_other_nodes.empty?
+          msg = <<~ERROR.squish
+            Failed to delete group #{group.name} as the following primary nodes
+            are still within it:
+          ERROR
+          raise InvalidAction, <<~ERROR.chomp
+            #{msg}
+            #{group.read_primary_nodes.map(&:name).join(',')}
+          ERROR
+        else
+          msg = <<~ERROR.squish
+            Failed to delete group #{group.name} as the following other nodes
+            are still within it:
+          ERROR
+          raise InvalidAction, <<~ERROR.chomp
+            #{msg}
+          #{group.read_other_nodes.map(&:name).join(',')}
+          ERROR
+        end
+      end
     end
   end
 end

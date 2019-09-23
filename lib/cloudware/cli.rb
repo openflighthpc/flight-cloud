@@ -351,6 +351,13 @@ module Cloudware
       c.action(&Commands::Group.proxy(**proxy_opts))
     end
 
+    command 'group delete' do |c|
+      c.priority = LOW_PRIORITY + 1
+      multilevel_cli_syntax(c, :group)
+      c.description = 'Remove the group from the cluster'
+      c.action(&Commands::Delete.proxy(level: :group, named: true))
+    end
+
     command 'group members list' do |c|
       cli_syntax(c, 'GROUP')
       c.description = 'View all the nodes within the group'
