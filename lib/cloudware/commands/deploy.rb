@@ -89,9 +89,9 @@ module Cloudware
 
       def render(name)
         dep = if name == 'domain'
-                Models::Domain.prompt!(__config__.current_cluster)
+                Models::Domain.prompt!({}, __config__.current_cluster)
               else
-                Models::Node.prompt!(__config__.current_cluster, name)
+                Models::Node.prompt!({}, __config__.current_cluster, name)
               end
         puts dep.template
       end
