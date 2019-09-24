@@ -73,6 +73,11 @@ module Cloudware
         hashify_machines { |m| m.off }
       end
 
+      def resize(id, size, hash = {})
+        set_arguments(id, instance: size, **hash)
+        hashify_machines { |m| resize_instance(m) }
+      end
+
       private
 
       attr_reader :identifier, :group, :instance_type

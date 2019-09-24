@@ -298,10 +298,14 @@ module Cloudware
     command 'power on' do |c|
       shared_power_attr(c)
       c.description = 'Turn the machine on'
-      c.option '-i TYPE', '--instance TYPE', <<~DESC
-        Change the instance type before powering the instance on
-      DESC
       action(c, Commands::Power, method: :on_cli)
+    end
+
+    command 'resize' do |c|
+      shared_power_attr(c)
+      cli_syntax(c, 'IDENTIFIER NEW_SIZE')
+      c.description = 'Resize the instance that corresponds with the deployment name'
+      action(c, Commands::Power, method: :resize)
     end
 
     command 'render' do |c|
