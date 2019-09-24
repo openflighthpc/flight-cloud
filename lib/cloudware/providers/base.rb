@@ -72,6 +72,10 @@ module Cloudware
         def modify_instance_type
           raise NotImplementedError
         end
+
+        def is_stopped?
+          status == 'stopped'
+        end
       end
 
       class Client
