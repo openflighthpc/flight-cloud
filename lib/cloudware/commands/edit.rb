@@ -47,7 +47,7 @@ module Cloudware
           replace_model_template(
             template, Models::Domain.read(__config__.current_cluster)
           )
-          Models::Domain.prompt!(__config__.current_cluster, all: true)
+          Models::Domain.prompt!({}, __config__.current_cluster, all: true)
         else
           Models::Domain.edit_then_prompt!(__config__.current_cluster)
         end

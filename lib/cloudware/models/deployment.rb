@@ -37,6 +37,7 @@ require 'pathname'
 require 'time'
 
 require 'erb'
+require 'open3'
 require 'tty/prompt'
 
 module Cloudware
@@ -197,11 +198,31 @@ module Cloudware
       def template
         return raw_template unless replacements
         dep = ReplacementFactory.new(cluster, self.name)
-        replacements.reduce(raw_template) do |memo, (key, value)|
+        next_template = replacements.reduce(raw_template) do |memo, (key, value)|
           # Resolve domain(s) of key value pairs if necessary
           value = dep.parse_key_pair(key.to_sym, value) if value.include? "*"
 
           memo.gsub("%#{key}%", value.to_s)
+        end
+        file_hash = next_template.scan(/%&file:\s?[^\s%]+%/)
+                                 .map do |key|
+          path = /%&file:\s?(?<path>.*)%/.match(key)[:path]
+          [key, File.read(path)]
+        end
+        script_hash = next_template.scan(/%&cmd:\s?[^\n%]+%/)
+                                   .map do |key|
+          cmd = /%&cmd:\s?(?<cmd>.*)%/.match(key)[:cmd]
+          stdout, status = Open3.capture2(cmd)
+          raise ScriptRenderError, <<~ERROR.chomp unless status == 0
+            The following command exited with status: #{status}
+            #{cmd}
+          ERROR
+          [key, stdout]
+        end
+        file_hash.to_h
+          .merge(script_hash.to_h)
+                 .reduce(next_template) do |memo, (key, content)|
+          memo.gsub(key, content)
         end
       end
 
