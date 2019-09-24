@@ -37,6 +37,7 @@ require 'pathname'
 require 'time'
 
 require 'erb'
+require 'open3'
 require 'tty/prompt'
 
 module Cloudware
@@ -208,7 +209,19 @@ module Cloudware
           path = /%&file:\s?(?<path>.*)%/.match(key)[:path]
           [key, File.read(path)]
         end
-        file_hash.reduce(next_template) do |memo, (key, content)|
+        script_hash = next_template.scan(/%&cmd:\s?[^\n%]+%/)
+                                   .map do |key|
+          cmd = /%&cmd:\s?(?<cmd>.*)%/.match(key)[:cmd]
+          stdout, status = Open3.capture2(cmd)
+          raise ScriptRenderError, <<~ERROR.chomp unless status == 0
+            The following command exited with status: #{status}
+            #{cmd}
+          ERROR
+          [key, stdout]
+        end
+        file_hash.to_h
+          .merge(script_hash.to_h)
+                 .reduce(next_template) do |memo, (key, content)|
           memo.gsub(key, content)
         end
       end
